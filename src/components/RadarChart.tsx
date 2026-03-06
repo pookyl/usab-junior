@@ -40,7 +40,7 @@ export default function RadarChart({ stats, color = '#10b981' }: Props) {
           strokeWidth={2}
         />
         <Tooltip
-          formatter={(v: number) => [`${v}/100`, 'Score']}
+          formatter={(v: number | undefined) => [`${v ?? 0}/100`, 'Score']}
           contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
         />
       </RechartsRadar>

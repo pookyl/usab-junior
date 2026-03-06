@@ -1,11 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Activity, Users, Calendar, BarChart2, Home } from 'lucide-react';
+import { Trophy, BarChart2, Home, Feather, Swords } from 'lucide-react';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: Home },
-  { path: '/players', label: 'Players', icon: Users },
-  { path: '/matches', label: 'Matches', icon: Calendar },
+  { path: '/players', label: 'Rankings', icon: Trophy },
   { path: '/analytics', label: 'Analytics', icon: BarChart2 },
+  { path: '/head-to-head', label: 'Head to Head', icon: Swords },
 ];
 
 export default function Navbar() {
@@ -15,24 +15,29 @@ export default function Navbar() {
     <nav className="bg-slate-900 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <div className="bg-emerald-500 p-2 rounded-lg">
-              <Activity className="w-5 h-5 text-white" />
+          <Link to="/" className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-violet-500 to-blue-600 p-2 rounded-lg">
+              <Feather className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              Shuttle<span className="text-emerald-400">Stats</span>
+              USA<span className="text-violet-400">Junior</span>
+              <span className="text-slate-400 font-normal text-sm ml-1.5 hidden sm:inline">Badminton</span>
             </span>
-          </div>
+          </Link>
+
           <div className="flex items-center gap-1">
             {navItems.map(({ path, label, icon: Icon }) => {
-              const active = location.pathname === path;
+              const active =
+                path === '/'
+                  ? location.pathname === '/'
+                  : location.pathname.startsWith(path);
               return (
                 <Link
                   key={path}
                   to={path}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     active
-                      ? 'bg-emerald-600 text-white'
+                      ? 'bg-violet-600 text-white'
                       : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                   }`}
                 >

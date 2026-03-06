@@ -64,7 +64,6 @@ export default function Matches() {
           {filtered.map((match) => {
             const p1 = players.find((p) => p.id === match.player1Id)!;
             const p2 = players.find((p) => p.id === match.player2Id)!;
-            const winner = players.find((p) => p.id === match.winnerId)!;
 
             return (
               <div

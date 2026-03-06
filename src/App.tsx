@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
-import Players from './pages/Players';
+import Rankings from './pages/Players';
 import PlayerDetail from './pages/PlayerDetail';
-import Matches from './pages/Matches';
 import Analytics from './pages/Analytics';
+import HeadToHead from './pages/HeadToHead';
 
 export default function App() {
   return (
@@ -14,10 +14,10 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/players" element={<Players />} />
+            <Route path="/players" element={<Rankings />} />
             <Route path="/players/:id" element={<PlayerDetail />} />
-            <Route path="/matches" element={<Matches />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/head-to-head" element={<HeadToHead />} />
           </Routes>
         </main>
       </div>
