@@ -84,7 +84,7 @@ export default function Matches() {
                 <div className="flex items-center gap-4">
                   {/* Player 1 */}
                   <Link
-                    to={`/players/${p1.id}`}
+                    to={`/directory/${p1.id}`}
                     className={`flex items-center gap-3 flex-1 ${
                       match.winnerId === p1.id ? 'opacity-100' : 'opacity-50'
                     }`}
@@ -114,7 +114,7 @@ export default function Matches() {
 
                   {/* Player 2 */}
                   <Link
-                    to={`/players/${p2.id}`}
+                    to={`/directory/${p2.id}`}
                     className={`flex items-center gap-3 flex-1 justify-end ${
                       match.winnerId === p2.id ? 'opacity-100' : 'opacity-50'
                     }`}

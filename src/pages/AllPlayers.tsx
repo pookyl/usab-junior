@@ -1,0 +1,349 @@
+import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, Users, RefreshCw, ChevronRight, Wifi, WifiOff } from 'lucide-react';
+import type { AgeGroup, EventType, UniquePlayer } from '../types/junior';
+import { AGE_GROUPS, EVENT_LABELS } from '../types/junior';
+import { usePlayers } from '../contexts/PlayersContext';
+
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+const AGE_BADGE_COLORS: Record<AgeGroup, string> = {
+  U11: 'bg-violet-100 text-violet-700',
+  U13: 'bg-blue-100 text-blue-700',
+  U15: 'bg-emerald-100 text-emerald-700',
+  U17: 'bg-amber-100 text-amber-700',
+  U19: 'bg-rose-100 text-rose-700',
+};
+
+const AGE_FILTER_ACTIVE: Record<AgeGroup, string> = {
+  U11: 'bg-violet-600 text-white',
+  U13: 'bg-blue-600 text-white',
+  U15: 'bg-emerald-600 text-white',
+  U17: 'bg-amber-500 text-white',
+  U19: 'bg-rose-600 text-white',
+};
+
+const EVENT_BADGE_COLORS: Record<EventType, string> = {
+  BS: 'bg-indigo-50 text-indigo-600',
+  GS: 'bg-pink-50 text-pink-600',
+  BD: 'bg-cyan-50 text-cyan-600',
+  GD: 'bg-orange-50 text-orange-600',
+  XD: 'bg-teal-50 text-teal-600',
+};
+
+function bestRankingForGroup(player: UniquePlayer, ageGroup: AgeGroup | null) {
+  const entries = ageGroup
+    ? player.entries.filter((e) => e.ageGroup === ageGroup)
+    : player.entries;
+  if (entries.length === 0) return null;
+  return entries.reduce((best, e) => (e.rank < best.rank ? e : best));
+}
+
+function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroupFilter: AgeGroup | null }) {
+  const best = bestRankingForGroup(player, ageGroupFilter);
+  const ageGroups = [...new Set(player.entries.map((e) => e.ageGroup))].sort(
+    (a, b) => AGE_GROUPS.indexOf(a) - AGE_GROUPS.indexOf(b),
+  );
+  const events = [...new Set(player.entries.map((e) => e.eventType))];
+
+  return (
+    <Link
+      to={`/directory/${player.usabId}`}
+      className="group block bg-white rounded-xl border border-slate-100 hover:border-violet-200 hover:shadow-md transition-all p-4"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+            {player.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-slate-800 group-hover:text-violet-700 transition-colors truncate">
+              {player.name}
+            </p>
+            <p className="text-xs text-slate-400 font-mono">{player.usabId}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {best && (
+            <div className="text-right">
+              <p className="text-sm font-bold text-emerald-600">#{best.rank}</p>
+              <p className="text-[10px] text-slate-400">{best.ageGroup} {best.eventType}</p>
+            </div>
+          )}
+          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-violet-400 transition-colors" />
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {ageGroups.map((ag) => (
+          <span key={ag} className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${AGE_BADGE_COLORS[ag]}`}>
+            {ag}
+          </span>
+        ))}
+        {events.map((et) => (
+          <span key={et} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${EVENT_BADGE_COLORS[et]}`}>
+            {EVENT_LABELS[et]}
+          </span>
+        ))}
+      </div>
+    </Link>
+  );
+}
+
+export default function AllPlayers() {
+  const { players, loading, error, source, refresh } = usePlayers();
+  const [search, setSearch] = useState('');
+  const [activeLetter, setActiveLetter] = useState<string | null>(null);
+  const [ageGroupFilter, setAgeGroupFilter] = useState<AgeGroup | null>(null);
+
+  const filtered = useMemo(() => {
+    let result = players;
+
+    if (ageGroupFilter) {
+      result = result.filter((p) =>
+        p.entries.some((e) => e.ageGroup === ageGroupFilter),
+      );
+    }
+
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (p) => p.name.toLowerCase().includes(q) || p.usabId.includes(search),
+      );
+    }
+
+    if (activeLetter) {
+      result = result.filter((p) =>
+        p.name.toUpperCase().startsWith(activeLetter),
+      );
+    }
+
+    return result;
+  }, [players, search, activeLetter, ageGroupFilter]);
+
+  const ageGroupCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const ag of AGE_GROUPS) {
+      counts[ag] = players.filter((p) =>
+        p.entries.some((e) => e.ageGroup === ag),
+      ).length;
+    }
+    return counts;
+  }, [players]);
+
+  const letterCounts = useMemo(() => {
+    const base = ageGroupFilter
+      ? players.filter((p) => p.entries.some((e) => e.ageGroup === ageGroupFilter))
+      : players;
+    const counts: Record<string, number> = {};
+    for (const p of base) {
+      const first = p.name[0]?.toUpperCase();
+      if (first) counts[first] = (counts[first] ?? 0) + 1;
+    }
+    return counts;
+  }, [players, ageGroupFilter]);
+
+  const grouped = useMemo(() => {
+    const groups: Record<string, UniquePlayer[]> = {};
+    for (const p of filtered) {
+      const letter = p.name[0]?.toUpperCase() ?? '#';
+      if (!groups[letter]) groups[letter] = [];
+      groups[letter].push(p);
+    }
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+  }, [filtered]);
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Users className="w-6 h-6 text-violet-500" />
+            <h1 className="text-3xl font-bold text-slate-800">Players</h1>
+          </div>
+          <p className="text-slate-500">
+            Complete directory of USAB Junior ranked players ·{' '}
+            <span className="font-medium text-slate-700">{players.length.toLocaleString()}</span> players
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {source === 'live' ? (
+            <span className="flex items-center gap-1.5 text-sm text-emerald-600">
+              <Wifi className="w-4 h-4" /> All groups loaded
+            </span>
+          ) : source === 'static' ? (
+            <span className="flex items-center gap-1.5 text-sm text-slate-500">
+              <WifiOff className="w-4 h-4" /> Static data · U11 only
+            </span>
+          ) : null}
+          <button
+            onClick={refresh}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50 text-sm"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Loading…' : 'Refresh'}
+          </button>
+        </div>
+      </div>
+
+      {/* Age group filter */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Filter by Age Group</p>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setAgeGroupFilter(null)}
+            className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
+              ageGroupFilter === null
+                ? 'bg-slate-800 text-white scale-105'
+                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+            }`}
+          >
+            All Groups
+            <span className="ml-1.5 text-xs opacity-60">{players.length}</span>
+          </button>
+          {AGE_GROUPS.map((ag) => {
+            const count = ageGroupCounts[ag] ?? 0;
+            return (
+              <button
+                key={ag}
+                onClick={() => setAgeGroupFilter(ag === ageGroupFilter ? null : ag)}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
+                  ageGroupFilter === ag
+                    ? `${AGE_FILTER_ACTIVE[ag]} scale-105`
+                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+                }`}
+              >
+                {ag}
+                <span className="ml-1.5 text-xs opacity-60">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by name or USAB ID…"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            if (e.target.value) setActiveLetter(null);
+          }}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white"
+        />
+      </div>
+
+      {/* Alphabet strip */}
+      <div className="flex flex-wrap gap-1">
+        <button
+          onClick={() => setActiveLetter(null)}
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            activeLetter === null
+              ? 'bg-violet-600 text-white'
+              : 'bg-white border border-slate-200 text-slate-500 hover:border-violet-300'
+          }`}
+        >
+          A-Z
+        </button>
+        {ALPHABET.map((letter) => {
+          const count = letterCounts[letter] ?? 0;
+          return (
+            <button
+              key={letter}
+              onClick={() => {
+                setActiveLetter(letter === activeLetter ? null : letter);
+                setSearch('');
+              }}
+              disabled={count === 0}
+              className={`w-9 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                letter === activeLetter
+                  ? 'bg-violet-600 text-white'
+                  : count > 0
+                    ? 'bg-white border border-slate-200 text-slate-600 hover:border-violet-300 hover:text-violet-600'
+                    : 'bg-slate-50 border border-slate-100 text-slate-300 cursor-not-allowed'
+              }`}
+            >
+              {letter}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Loading state */}
+      {loading && players.length === 0 && (
+        <div className="py-16 text-center">
+          <RefreshCw className="w-8 h-8 text-slate-300 animate-spin mx-auto mb-3" />
+          <p className="text-slate-400 text-sm">
+            Loading players across all age groups (U11–U19)…
+          </p>
+          <p className="text-slate-300 text-xs mt-1">Fetching 25 ranking categories · This may take a moment</p>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && players.length === 0 && (
+        <div className="py-16 text-center space-y-3">
+          <p className="text-slate-400 text-sm">{error}</p>
+          <button
+            onClick={refresh}
+            className="text-violet-600 hover:underline text-sm"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {/* Results count */}
+      {filtered.length > 0 && (
+        <p className="text-sm text-slate-400">
+          Showing <span className="font-medium text-slate-600">{filtered.length}</span>{' '}
+          {ageGroupFilter ? `${ageGroupFilter} ` : ''}
+          players
+          {activeLetter && ` starting with "${activeLetter}"`}
+          {search && ` matching "${search}"`}
+        </p>
+      )}
+
+      {/* No results */}
+      {!loading && filtered.length === 0 && players.length > 0 && (
+        <div className="py-10 text-center text-slate-400 text-sm">
+          No players match your filters.
+        </div>
+      )}
+
+      {/* Grouped player cards */}
+      <div className="space-y-6">
+        {grouped.map(([letter, group]) => (
+          <div key={letter}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-600">
+                {letter}
+              </span>
+              <span className="text-xs text-slate-400">{group.length} players</span>
+              <div className="flex-1 h-px bg-slate-100" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {group.map((player) => (
+                <PlayerCard key={player.usabId} player={player} ageGroupFilter={ageGroupFilter} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Loading overlay for refresh */}
+      {loading && players.length > 0 && (
+        <div className="fixed bottom-6 right-6 bg-slate-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          Loading all age groups…
+        </div>
+      )}
+    </div>
+  );
+}

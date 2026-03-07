@@ -6,6 +6,8 @@ import type {
   EventType,
   RankingsKey,
   H2HResult,
+  UniquePlayer,
+  TswPlayerStats,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -44,7 +46,9 @@ export async function fetchPlayerDetail(
     const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
     if (!res.ok) return null;
 
-    const history: TournamentEntry[] = await res.json();
+    const data = await res.json();
+    const entries: TournamentEntry[] = Array.isArray(data) ? data : data.entries ?? [];
+    const gender: string | null = Array.isArray(data) ? null : data.gender ?? null;
     return {
       usabId,
       name: '',
@@ -52,7 +56,8 @@ export async function fetchPlayerDetail(
       rankingPoints: 0,
       ageGroup,
       eventType,
-      tournamentHistory: history,
+      gender,
+      tournamentHistory: entries,
     };
   } catch {
     return null;
@@ -82,8 +87,43 @@ export function tswH2HUrl(usabId1: string, usabId2: string) {
   return `https://www.tournamentsoftware.com/head-2-head?OrganizationCode=C36A90FE-DFA8-414B-A8B6-F2BCF6B9B8BD&T1P1MemberID=${usabId1}&T2P1MemberID=${usabId2}`;
 }
 
+let allPlayersCache: UniquePlayer[] | null = null;
+
+export async function fetchAllPlayers(
+  date: string = RANKINGS_DATE,
+): Promise<UniquePlayer[]> {
+  if (allPlayersCache) return allPlayersCache;
+
+  const url = `/api/all-players?date=${date}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
+  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+
+  const players: UniquePlayer[] = await res.json();
+  if (!Array.isArray(players)) throw new Error('Invalid response');
+
+  allPlayersCache = players;
+  return players;
+}
+
+let tswStatsCache = new Map<string, TswPlayerStats>();
+
+export async function fetchPlayerTswStats(
+  usabId: string,
+  playerName: string,
+): Promise<TswPlayerStats> {
+  if (tswStatsCache.has(usabId)) return tswStatsCache.get(usabId)!;
+
+  const url = `/api/player/${usabId}/tsw-stats?name=${encodeURIComponent(playerName)}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+  if (!res.ok) throw new Error(`TSW stats API ${res.status}`);
+
+  const stats: TswPlayerStats = await res.json();
+  tswStatsCache.set(usabId, stats);
+  return stats;
+}
+
 export function tswSearchUrl(playerName: string) {
-  return `https://www.tournamentsoftware.com/find?type=player&q=${encodeURIComponent(playerName)}`;
+  return `https://www.tournamentsoftware.com/find/player?q=${encodeURIComponent(playerName)}`;
 }
 
 export function tswTournamentUrl(tournamentId: string) {

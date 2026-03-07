@@ -31,11 +31,79 @@ export interface TournamentEntry {
 }
 
 export interface JuniorPlayerDetail extends JuniorPlayer {
+  gender: string | null;
   tournamentHistory: TournamentEntry[];
 }
 
 export type RankingsKey = `${AgeGroup}-${EventType}`;
 export type RankingsMap = Partial<Record<RankingsKey, JuniorPlayer[]>>;
+
+export interface PlayerEntry {
+  ageGroup: AgeGroup;
+  eventType: EventType;
+  rank: number;
+  rankingPoints: number;
+}
+
+export interface UniquePlayer {
+  usabId: string;
+  name: string;
+  entries: PlayerEntry[];
+}
+
+export interface TswMatchResult {
+  tournament: string;
+  event: string;
+  round: string;
+  opponent: string;
+  partner: string;
+  category: 'singles' | 'doubles' | 'mixed';
+  score: string;
+  won: boolean;
+  date: string;
+}
+
+export interface WinLossRecord {
+  wins: number;
+  losses: number;
+  total: number;
+  winPct: number;
+}
+
+export interface CategoryStats {
+  career: WinLossRecord;
+  thisYear: WinLossRecord;
+}
+
+export type StatsCategory = 'total' | 'singles' | 'doubles' | 'mixed';
+
+export interface TswTournamentEvent {
+  name: string;
+  category: 'singles' | 'doubles' | 'mixed';
+  wins: number;
+  losses: number;
+}
+
+export interface TswTournament {
+  name: string;
+  url: string;
+  dates: string;
+  location: string;
+  events: TswTournamentEvent[];
+  matches: TswMatchResult[];
+}
+
+export interface TswPlayerStats {
+  tswProfileUrl: string | null;
+  tswSearchUrl: string;
+  total: CategoryStats;
+  singles: CategoryStats;
+  doubles: CategoryStats;
+  mixed: CategoryStats;
+  recentHistory: Array<{ won: boolean; date: string }>;
+  recentResults: TswMatchResult[];
+  tournamentsByYear: Record<string, TswTournament[]>;
+}
 
 export interface H2HMatch {
   tournament: string;

@@ -4,7 +4,6 @@ import { Search, ExternalLink, RefreshCw, Trophy, Wifi, WifiOff } from 'lucide-r
 import type { AgeGroup, EventType } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
 import { useRankings } from '../hooks/useRankings';
-import { usabPlayerUrl, tswSearchUrl } from '../services/rankingsService';
 
 const AGE_COLORS: Record<AgeGroup, string> = {
   U11: 'bg-violet-600',
@@ -124,7 +123,6 @@ function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
                   <th className="px-5 py-3 font-medium">Player</th>
                   <th className="px-5 py-3 font-medium hidden sm:table-cell">USAB ID</th>
                   <th className="px-5 py-3 font-medium text-right">Points</th>
-                  <th className="px-5 py-3 font-medium text-right">Links</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -135,8 +133,8 @@ function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
                     </td>
                     <td className="px-5 py-3">
                       <Link
-                        to={`/players/${player.usabId}?age_group=${player.ageGroup}&category=${player.eventType}`}
-                        className="font-medium text-slate-800 hover:text-emerald-700 transition-colors"
+                        to={`/directory/${player.usabId}`}
+                        className="font-medium text-slate-800 hover:text-violet-600 transition-colors"
                       >
                         {player.name}
                       </Link>
@@ -148,28 +146,6 @@ function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
                       <span className="font-bold text-emerald-600 tabular-nums">
                         {player.rankingPoints.toLocaleString()}
                       </span>
-                    </td>
-                    <td className="px-5 py-3 text-right">
-                      <div className="flex items-center gap-1.5 justify-end">
-                        <a
-                          href={usabPlayerUrl(player.usabId, player.ageGroup, player.eventType)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="View USAB profile"
-                          className="px-2 py-0.5 text-xs bg-violet-50 text-violet-700 border border-violet-200 rounded-full hover:bg-violet-100 transition-colors flex items-center gap-0.5"
-                        >
-                          USAB <ExternalLink className="w-2.5 h-2.5" />
-                        </a>
-                        <a
-                          href={tswSearchUrl(player.name)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Search match history on TournamentSoftware"
-                          className="px-2 py-0.5 text-xs bg-orange-50 text-orange-700 border border-orange-200 rounded-full hover:bg-orange-100 transition-colors flex items-center gap-0.5"
-                        >
-                          Matches <ExternalLink className="w-2.5 h-2.5" />
-                        </a>
-                      </div>
                     </td>
                   </tr>
                 ))}

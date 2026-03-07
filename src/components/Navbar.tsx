@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Trophy, BarChart2, Home, Feather, Swords } from 'lucide-react';
+import { Trophy, BarChart2, Home, Feather, Swords, Users } from 'lucide-react';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: Home },
   { path: '/players', label: 'Rankings', icon: Trophy },
+  { path: '/directory', label: 'Players', icon: Users },
   { path: '/analytics', label: 'Analytics', icon: BarChart2 },
   { path: '/head-to-head', label: 'Head to Head', icon: Swords },
 ];

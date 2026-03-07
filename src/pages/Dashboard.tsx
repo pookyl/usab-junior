@@ -40,7 +40,7 @@ function TopPlayerCard({ ageGroup }: { ageGroup: AgeGroup }) {
               {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
             </span>
             <Link
-              to={`/players/${player.usabId}?age_group=${player.ageGroup}&category=${player.eventType}`}
+              to={`/directory/${player.usabId}`}
               className="flex-1 min-w-0"
             >
               <p className="font-semibold text-slate-800 text-sm truncate hover:text-emerald-700 transition-colors">

@@ -68,6 +68,11 @@ function parseRankings(html, ageGroup, eventType) {
 //       data-tournament-name="2025 YONEX U.S. JUNIOR..." ...></td>
 //   <td>1</td>          ← position/place
 //   <td>1701</td>       ← points
+function parsePlayerGender(html) {
+  const m = html.match(/<h4>\s*Gender\s*:\s*(\w+)\s*<\/h4>/i);
+  return m ? m[1].trim() : null;
+}
+
 function parsePlayerDetail(html) {
   const entries = [];
   const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
@@ -251,6 +256,358 @@ function parseH2HContent(html, headers) {
   };
 }
 
+// ── TSW USAB player profile URL builder ──────────────────────────────────────
+function tswUsabProfilePath(usabId) {
+  const encoded = Buffer.from('base64:' + usabId).toString('base64');
+  return `/player/${TSW_ORG_CODE}/${encoded}`;
+}
+
+function tswUsabTournamentsPath(usabId) {
+  const encoded = Buffer.from('base64:' + usabId).toString('base64');
+  return `/player/${TSW_ORG_CODE}/${encoded}/tournaments/TournamentsPartial`;
+}
+
+function tswUsabOverviewPath(usabId) {
+  const encoded = Buffer.from('base64:' + usabId).toString('base64');
+  return `/player/${TSW_ORG_CODE}/${encoded}/OverviewPartial`;
+}
+
+// ── TSW Overview Statistics parser ──────────────────────────────────────────
+function emptyWL() { return { wins: 0, losses: 0, total: 0, winPct: 0 }; }
+function emptyCat() { return { career: emptyWL(), thisYear: emptyWL() }; }
+
+function parseWLString(str) {
+  const m = str.match(/(\d+)\s*\/\s*(\d+)\s*\((\d+)\)/);
+  if (!m) return emptyWL();
+  const wins = parseInt(m[1], 10);
+  const losses = parseInt(m[2], 10);
+  const total = parseInt(m[3], 10);
+  return { wins, losses, total, winPct: total > 0 ? Math.round((wins / total) * 100) : 0 };
+}
+
+function parseTswOverviewStats(html) {
+  const stats = {
+    total: emptyCat(),
+    singles: emptyCat(),
+    doubles: emptyCat(),
+    mixed: emptyCat(),
+    recentHistory: [],
+  };
+
+  const tabMap = {
+    tabStatsTotal: 'total',
+    tabStatsSingles: 'singles',
+    tabStatsDoubles: 'doubles',
+    tabStatsMixed: 'mixed',
+  };
+
+  const tabIds = Object.keys(tabMap);
+  for (let i = 0; i < tabIds.length; i++) {
+    const tabId = tabIds[i];
+    const catKey = tabMap[tabId];
+    const tabStart = html.indexOf(`id="${tabId}"`);
+    if (tabStart === -1) continue;
+
+    // Find the end of this tab (start of next tab, or a far boundary)
+    let tabEnd = html.length;
+    for (let j = i + 1; j < tabIds.length; j++) {
+      const nextIdx = html.indexOf(`id="${tabIds[j]}"`, tabStart + 1);
+      if (nextIdx > -1) { tabEnd = nextIdx; break; }
+    }
+    const tabHtml = html.substring(tabStart, tabEnd);
+
+    // Extract Career and This year W-L
+    const wlRegex = /list__label">\s*([^<]+)[\s\S]*?list__value-start">\s*([\d]+\s*\/\s*[\d]+\s*\(\d+\))/g;
+    let wlMatch;
+    while ((wlMatch = wlRegex.exec(tabHtml)) !== null) {
+      const label = wlMatch[1].trim().toLowerCase();
+      const record = parseWLString(wlMatch[2]);
+      if (label === 'career') stats[catKey].career = record;
+      else if (label.includes('year')) stats[catKey].thisYear = record;
+    }
+  }
+
+  // Parse recent history W/L indicators from Total tab
+  const totalStart = html.indexOf('id="tabStatsTotal"');
+  if (totalStart > -1) {
+    const historyIdx = html.indexOf('History', totalStart);
+    if (historyIdx > -1) {
+      const histEnd = html.indexOf('</ul>', historyIdx);
+      const histHtml = html.substring(historyIdx, histEnd > -1 ? histEnd : historyIdx + 2000);
+      const tagRegex = /tag--(success|danger)[^"]*"[^>]*title="([^"]*)"/g;
+      let hm;
+      while ((hm = tagRegex.exec(histHtml)) !== null) {
+        stats.recentHistory.push({ won: hm[1] === 'success', date: hm[2] });
+      }
+    }
+  }
+
+  return stats;
+}
+
+// ── TSW tournament history parser ────────────────────────────────────────────
+function deriveCategoryFromEvent(eventName) {
+  const ev = eventName.toLowerCase();
+  if (ev.includes('xd') || ev.includes('mixed')) return 'mixed';
+  if (ev.includes('bd') || ev.includes('gd') || ev.includes('doubles')) return 'doubles';
+  return 'singles';
+}
+
+function parseTswTournaments(html, playerName) {
+  const tournaments = [];
+  const recentResults = [];
+
+  // Split HTML by tournament media blocks (each <div class="media"> starts a tournament)
+  const tournBlocks = html.split(/<div class="media">/g).slice(1);
+
+  for (const tournBlock of tournBlocks) {
+    // Tournament name
+    const nameMatch = tournBlock.match(/media__link[^>]*>\s*<span class="nav-link__value">([^<]+)/);
+    if (!nameMatch) continue;
+    const name = nameMatch[1].trim().replace(/&amp;/g, '&');
+
+    // Tournament URL
+    const urlMatch = tournBlock.match(/href="(\/sport\/tournament\?id=[^"]+)"/);
+    const url = urlMatch ? `https://www.tournamentsoftware.com${urlMatch[1].replace(/&amp;/g, '&')}` : '';
+
+    // Dates
+    const dateMatch = tournBlock.match(/<time[^>]*>([^<]+)<\/time>\s*(?:to\s*<time[^>]*>([^<]+)<\/time>)?/);
+    const dates = dateMatch ? (dateMatch[2] ? `${dateMatch[1].trim()} - ${dateMatch[2].trim()}` : dateMatch[1].trim()) : '';
+
+    // Location
+    const locMatch = tournBlock.match(/icon-lang[^>]*\/>\s*([^<]+)/);
+    const location = locMatch ? locMatch[1].trim().replace(/^\|\s*/, '') : '';
+
+    // Parse events and their matches within this tournament
+    const eventMap = new Map(); // eventName → { wins, losses }
+    let currentEvent = '';
+
+    const innerRegex = /module-divider__body[^>]*>\s*(?:Event:\s*)?([^<]+)|<div class="match">([\s\S]*?)(?=<div class="match">|<h[45] class="module-divider|<\/li>\s*<li class="module|$)/g;
+    let im;
+    while ((im = innerRegex.exec(tournBlock)) !== null) {
+      if (im[1]) {
+        const ev = im[1].trim();
+        if (ev) currentEvent = ev;
+        continue;
+      }
+      if (im[2] !== undefined) {
+        const block = im[2];
+        if (block.includes('>Bye<')) continue;
+
+        const rowBlocks = block.split(/<div class="match__row[\s"]/g).slice(1);
+        if (rowBlocks.length < 2) continue;
+
+        const status1 = rowBlocks[0].match(/match__status">([WL])</);
+        const status2 = rowBlocks[1].match(/match__status">([WL])</);
+        if (!status1 && !status2) continue;
+        const row1IsPlayer = !!status1;
+        const playerWon = status1 ? status1[1] === 'W' : status2[1] === 'W';
+
+        if (currentEvent) {
+          if (!eventMap.has(currentEvent)) eventMap.set(currentEvent, { wins: 0, losses: 0 });
+          const rec = eventMap.get(currentEvent);
+          if (playerWon) rec.wins++;
+          else rec.losses++;
+        }
+
+        // Extract names for match result
+        function extractNames(rowHtml) {
+          const names = [];
+          const re = /nav-link__value">([^<]+)<\/span><\/a>\s*<\/span>/g;
+          let nm;
+          while ((nm = re.exec(rowHtml)) !== null) names.push(nm[1].trim());
+          return names;
+        }
+        const row1Names = extractNames(rowBlocks[0]);
+        const row2Names = extractNames(rowBlocks[1]);
+        const opponentNames = row1IsPlayer ? row2Names : row1Names;
+        const teamNames = row1IsPlayer ? row1Names : row2Names;
+        const nameParts = playerName.toLowerCase().split(/\s+/);
+        const partnerNames = teamNames.filter((n) =>
+          !nameParts.every((p) => new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(n)),
+        );
+
+        const category = deriveCategoryFromEvent(currentEvent);
+        const roundMatch = block.match(/match__header-title-item[\s\S]*?nav-link__value">([^<]+)/);
+        const round = roundMatch ? roundMatch[1].trim() : '';
+
+        const scores = [];
+        const setRegex = /<ul class="points">([\s\S]*?)<\/ul>/g;
+        let sm;
+        while ((sm = setRegex.exec(block)) !== null) {
+          const pts = [];
+          const ptRegex = /<li class="points__cell[^"]*">\s*(\d+)/g;
+          let ptm;
+          while ((ptm = ptRegex.exec(sm[1])) !== null) pts.push(parseInt(ptm[1], 10));
+          if (pts.length === 2) scores.push(row1IsPlayer ? pts : [pts[1], pts[0]]);
+        }
+
+        const dateM = block.match(/icon-clock[\s\S]*?nav-link__value">([^<]+)/);
+
+        recentResults.push({
+          tournament: name,
+          event: currentEvent,
+          round,
+          opponent: opponentNames.join(' / ') || 'Unknown',
+          partner: partnerNames.join(' / '),
+          category,
+          score: scores.map((s) => s.join('-')).join(', '),
+          won: playerWon,
+          date: dateM ? dateM[1].trim() : '',
+        });
+      }
+    }
+
+    const events = [...eventMap.entries()]
+      .filter(([n]) => n.length > 0)
+      .map(([n, wl]) => ({ name: n, category: deriveCategoryFromEvent(n), ...wl }));
+
+    const tournamentMatches = recentResults.filter((r) => r.tournament === name);
+    if (events.length > 0) {
+      tournaments.push({ name, url, dates, location, events, matches: tournamentMatches });
+    }
+  }
+
+  return { tournaments, recentResults };
+}
+
+// ── TSW player profile parser (legacy, kept for compatibility) ───────────────
+function parseTswProfile(html, tswProfileUrl, playerName) {
+  const stats = {
+    tswProfileUrl,
+    tswSearchUrl: '',
+    totalMatches: 0,
+    wins: 0,
+    losses: 0,
+    recentResults: [],
+  };
+
+  try {
+    // The profile page groups matches under tournament media blocks.
+    // Split by <div class="media"> to find tournament sections, then find
+    // event headers (module-divider) and match blocks within each section.
+
+    // First, build a mapping: for each match block position in the HTML,
+    // track the most recent tournament name and event name seen before it.
+    let currentTournament = '';
+    let currentEvent = '';
+
+    // Use a single pass: scan for tournament titles, event titles, and match blocks
+    const tokenRegex =
+      /media__link[^>]*>\s*<span class="nav-link__value">([^<]+)|module-divider__body[\s\S]*?nav-link__value">([^<]+)|<div class="match">([\s\S]*?)(?=<div class="match">|<div class="media">|<\/ol>|$)/g;
+
+    let token;
+    while ((token = tokenRegex.exec(html)) !== null) {
+      if (token[1]) {
+        // Tournament name (skip if it matches the player's own name)
+        const name = token[1].trim();
+        if (!name.toLowerCase().includes(playerName.split(' ')[0].toLowerCase()) ||
+            name.includes('CHAMPIONSHIP') || name.includes('OPEN') || name.includes('TOURNAMENT')) {
+          currentTournament = name;
+        }
+        continue;
+      }
+      if (token[2]) {
+        currentEvent = token[2].trim();
+        continue;
+      }
+      if (token[3] !== undefined) {
+        const block = token[3];
+
+        // Skip byes
+        if (block.includes('>Bye<')) continue;
+
+        // Round from header
+        const roundMatch = block.match(
+          /match__header-title-item[\s\S]*?nav-link__value">([^<]+)/,
+        );
+        const round = roundMatch ? roundMatch[1].trim() : '';
+
+        // Extract player rows
+        const rowBlocks = block.split(/<div class="match__row[\s"]/g).slice(1);
+        if (rowBlocks.length < 2) continue;
+
+        function extractNames(rowHtml) {
+          const names = [];
+          const re = /nav-link__value">([^<]+)<\/span><\/a>\s*<\/span>/g;
+          let m;
+          while ((m = re.exec(rowHtml)) !== null) names.push(m[1].trim());
+          return names;
+        }
+
+        const row1Names = extractNames(rowBlocks[0]);
+        const row2Names = extractNames(rowBlocks[1]);
+
+        // TSW marks the viewed player's row with a match__status tag (W or L)
+        const status1 = rowBlocks[0].match(/match__status">([WL])</);
+        const status2 = rowBlocks[1].match(/match__status">([WL])</);
+        const row1IsPlayer = !!status1;
+        const playerWon = status1 ? status1[1] === 'W' : status2 ? status2[1] === 'W' : false;
+
+        if (!status1 && !status2) continue;
+
+        const opponentNames = row1IsPlayer ? row2Names : row1Names;
+        const teamNames = row1IsPlayer ? row1Names : row2Names;
+
+        // Extract partner (teammates other than the viewed player)
+        const nameParts = playerName.toLowerCase().split(/\s+/);
+        const partnerNames = teamNames.filter((n) =>
+          !nameParts.every((p) => new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(n)),
+        );
+
+        // Derive category from event name (e.g. "BS U13", "BD U11", "XD U11")
+        const evLower = currentEvent.toLowerCase();
+        let category = 'singles';
+        if (evLower.includes('xd') || evLower.includes('mixed')) category = 'mixed';
+        else if (evLower.includes('bd') || evLower.includes('gd') || evLower.includes('doubles')) category = 'doubles';
+
+        // Scores (HTML lists row1 score first; reorder so player's score is first)
+        const scores = [];
+        const setRegex = /<ul class="points">([\s\S]*?)<\/ul>/g;
+        let sm;
+        while ((sm = setRegex.exec(block)) !== null) {
+          const pts = [];
+          const ptRegex = /<li class="points__cell[^"]*">\s*(\d+)/g;
+          let ptm;
+          while ((ptm = ptRegex.exec(sm[1])) !== null) pts.push(parseInt(ptm[1], 10));
+          if (pts.length === 2) {
+            scores.push(row1IsPlayer ? pts : [pts[1], pts[0]]);
+          }
+        }
+        const scoreStr = scores.map((s) => s.join('-')).join(', ');
+
+        // Date
+        const dateMatch = block.match(
+          /icon-clock[\s\S]*?nav-link__value">([^<]+)/,
+        );
+
+        stats.totalMatches++;
+        if (playerWon) stats.wins++;
+        else stats.losses++;
+
+        stats.recentResults.push({
+          tournament: currentTournament,
+          event: currentEvent,
+          round,
+          opponent: opponentNames.join(' / ') || 'Unknown',
+          partner: partnerNames.join(' / '),
+          category,
+          score: scoreStr,
+          won: playerWon,
+          date: dateMatch ? dateMatch[1].trim() : '',
+        });
+      }
+    }
+  } catch (parseErr) {
+    console.error('[tsw-stats] profile parse error:', parseErr.message);
+  }
+
+  console.log(
+    `[tsw-stats] parsed ${stats.totalMatches} matches (${stats.wins}W ${stats.losses}L)`,
+  );
+  return stats;
+}
+
 // ── HTTP server ───────────────────────────────────────────────────────────────
 const server = createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -321,10 +678,12 @@ const server = createServer(async (req, res) => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const html = await response.text();
       const history = parsePlayerDetail(html);
-      console.log(`[player] parsed ${history.length} tournament entries for USAB ${usabId}`);
-      setCache(cacheKey, history);
+      const gender = parsePlayerGender(html);
+      console.log(`[player] parsed ${history.length} tournament entries for USAB ${usabId}, gender=${gender}`);
+      const result = { gender, entries: history };
+      setCache(cacheKey, result);
       res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(history));
+      res.end(JSON.stringify(result));
     } catch (err) {
       console.error(`[player] error:`, err.message);
       res.writeHead(500);
@@ -365,6 +724,196 @@ const server = createServer(async (req, res) => {
       console.error('[h2h] error:', err.message);
       res.writeHead(500);
       res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // GET /api/all-players?date=2026-03-01
+  if (reqUrl.pathname === '/api/all-players') {
+    const date = reqUrl.searchParams.get('date') ?? '2026-03-01';
+    const cacheKey = `all-players:${date}`;
+
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    const ageGroups = ['U11', 'U13', 'U15', 'U17', 'U19'];
+    const eventTypes = ['BS', 'GS', 'BD', 'GD', 'XD'];
+    const allPlayers = new Map();
+
+    const tasks = [];
+    for (const ag of ageGroups) {
+      for (const et of eventTypes) {
+        tasks.push({ ag, et });
+      }
+    }
+
+    console.log(`[all-players] fetching ${tasks.length} ranking combinations…`);
+
+    for (let i = 0; i < tasks.length; i += 5) {
+      const batch = tasks.slice(i, i + 5);
+      const results = await Promise.allSettled(
+        batch.map(async ({ ag, et }) => {
+          const rankCacheKey = `rankings:${ag}:${et}:${date}`;
+          const rankCached = getCached(rankCacheKey);
+          if (rankCached) return rankCached;
+
+          const url = `${USAB_BASE}/?age_group=${ag}&category=${et}&date=${date}`;
+          const response = await fetch(url, { headers: BROWSER_HEADERS });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const html = await response.text();
+          const players = parseRankings(html, ag, et);
+          setCache(rankCacheKey, players);
+          return players;
+        }),
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
+          for (const player of result.value) {
+            if (!allPlayers.has(player.usabId)) {
+              allPlayers.set(player.usabId, {
+                usabId: player.usabId,
+                name: player.name,
+                entries: [],
+              });
+            }
+            allPlayers.get(player.usabId).entries.push({
+              ageGroup: player.ageGroup,
+              eventType: player.eventType,
+              rank: player.rank,
+              rankingPoints: player.rankingPoints,
+            });
+          }
+        }
+      }
+    }
+
+    const uniquePlayers = [...allPlayers.values()].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+
+    console.log(`[all-players] aggregated ${uniquePlayers.length} unique players`);
+    setCache(cacheKey, uniquePlayers);
+    res.writeHead(200, { 'X-Cache': 'MISS' });
+    res.end(JSON.stringify(uniquePlayers));
+    return;
+  }
+
+  // GET /api/player/:id/tsw-stats?name=PLAYER_NAME
+  const tswStatsMatch = reqUrl.pathname.match(/^\/api\/player\/(\d+)\/tsw-stats$/);
+  if (tswStatsMatch) {
+    const usabId = tswStatsMatch[1];
+    const playerName = reqUrl.searchParams.get('name') ?? '';
+    const cacheKey = `tsw-stats:${usabId}`;
+
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    const profilePath = tswUsabProfilePath(usabId);
+    const tswProfileUrl = `${TSW_BASE}${profilePath}`;
+    const tswSearchLink = `${TSW_BASE}/find/player?q=${encodeURIComponent(playerName)}`;
+    const fallback = {
+      tswProfileUrl,
+      tswSearchUrl: tswSearchLink,
+      total: emptyCat(),
+      singles: emptyCat(),
+      doubles: emptyCat(),
+      mixed: emptyCat(),
+      recentHistory: [],
+      recentResults: [],
+      tournamentsByYear: {},
+    };
+
+    try {
+      console.log(`[tsw-stats] fetching overview + tournaments for "${playerName}" (${usabId})`);
+
+      const encoded = Buffer.from('base64:' + usabId).toString('base64');
+      const encodedNoPad = encoded.replace(/=+$/, '');
+
+      // Fetch OverviewPartial and TournamentsPartial in parallel
+      const [overviewResp, tournamentsResp] = await Promise.all([
+        tswFetch(tswUsabOverviewPath(usabId)),
+        tswFetch(tswUsabTournamentsPath(usabId)),
+      ]);
+
+      let overviewStats = { total: emptyCat(), singles: emptyCat(), doubles: emptyCat(), mixed: emptyCat(), recentHistory: [] };
+      if (overviewResp.ok) {
+        const overviewHtml = await overviewResp.text();
+        overviewStats = parseTswOverviewStats(overviewHtml);
+        console.log(`[tsw-stats] overview: career ${overviewStats.total.career.wins}W/${overviewStats.total.career.losses}L`);
+      } else {
+        console.warn(`[tsw-stats] overview fetch failed: HTTP ${overviewResp.status}`);
+      }
+
+      // Parse the TournamentsPartial to get match results + tournaments for the most recent year,
+      // and extract available year tabs for fetching older years.
+      const tournamentsByYear = {};
+      let recentResults = [];
+
+      if (tournamentsResp.ok) {
+        const tournamentsHtml = await tournamentsResp.text();
+
+        // Extract available year tabs
+        const yearRegex = /data-tabid="(\d{4})"/g;
+        const years = [];
+        let ym;
+        while ((ym = yearRegex.exec(tournamentsHtml)) !== null) years.push(parseInt(ym[1]));
+
+        // Parse current year from TournamentsPartial
+        const currentYearData = parseTswTournaments(tournamentsHtml, playerName);
+        recentResults = currentYearData.recentResults;
+        if (years[0] && currentYearData.tournaments.length > 0) {
+          tournamentsByYear[years[0]] = currentYearData.tournaments;
+        }
+        console.log(`[tsw-stats] year ${years[0]}: ${currentYearData.tournaments.length} tournaments, ${recentResults.length} matches`);
+
+        // Fetch older years in parallel (max 3 extra years to keep it fast)
+        const olderYears = years.slice(1, 4);
+        if (olderYears.length > 0) {
+          const olderResults = await Promise.allSettled(
+            olderYears.map(async (year) => {
+              const path = `/player/${TSW_ORG_CODE}/${encodeURIComponent(encoded)}/tournaments/GetPlayerTournamentsByYear?AOrganizationCode=${TSW_ORG_CODE}&AMemberID=${encodedNoPad}&Year=${year}&IncludeOlderTournaments=False`;
+              const resp = await tswFetch(path);
+              if (!resp.ok) return { year, tournaments: [], results: [] };
+              const html = await resp.text();
+              const data = parseTswTournaments(html, playerName);
+              return { year, tournaments: data.tournaments, results: data.recentResults };
+            }),
+          );
+
+          for (const r of olderResults) {
+            if (r.status === 'fulfilled' && r.value.tournaments.length > 0) {
+              tournamentsByYear[r.value.year] = r.value.tournaments;
+              console.log(`[tsw-stats] year ${r.value.year}: ${r.value.tournaments.length} tournaments`);
+            }
+          }
+        }
+      }
+
+      const stats = {
+        tswProfileUrl,
+        tswSearchUrl: tswSearchLink,
+        ...overviewStats,
+        recentResults,
+        tournamentsByYear,
+      };
+
+      setCache(cacheKey, stats);
+      res.writeHead(200, { 'X-Cache': 'MISS' });
+      res.end(JSON.stringify(stats));
+    } catch (err) {
+      console.error('[tsw-stats] error:', err.message);
+      setCache(cacheKey, fallback);
+      res.writeHead(200);
+      res.end(JSON.stringify(fallback));
     }
     return;
   }
