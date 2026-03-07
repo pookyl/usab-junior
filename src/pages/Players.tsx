@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ExternalLink, RefreshCw, Trophy, Wifi, WifiOff } from 'lucide-react';
+import { Search, ExternalLink, RefreshCw, Trophy, Wifi, WifiOff, Calendar } from 'lucide-react';
 import type { AgeGroup, EventType } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
 import { useRankings } from '../hooks/useRankings';
+import { usePlayers } from '../contexts/PlayersContext';
 
 const AGE_COLORS: Record<AgeGroup, string> = {
   U11: 'bg-violet-600',
@@ -20,6 +21,11 @@ const AGE_LIGHT: Record<AgeGroup, string> = {
   U19: 'bg-rose-50 text-rose-700 border-rose-200',
 };
 
+function formatRankingsDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return <span className="text-xl font-black text-amber-500">🥇</span>;
   if (rank === 2) return <span className="text-xl font-black text-slate-400">🥈</span>;
@@ -27,9 +33,9 @@ function RankBadge({ rank }: { rank: number }) {
   return <span className="font-semibold text-slate-500 tabular-nums">#{rank}</span>;
 }
 
-function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType: EventType }) {
+function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; eventType: EventType; date: string }) {
   const [search, setSearch] = useState('');
-  const { players, loading, error, source, refresh } = useRankings(ageGroup, eventType);
+  const { players, loading, error, source, refresh } = useRankings(ageGroup, eventType, date);
 
   const filtered = useMemo(
     () =>
@@ -63,7 +69,7 @@ function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
             </span>
           ) : source === 'static' ? (
             <span className="flex items-center gap-1.5 text-slate-500">
-              <WifiOff className="w-4 h-4" /> Cached · Mar 2026
+              <WifiOff className="w-4 h-4" /> Cached · {formatRankingsDate(date)}
             </span>
           ) : null}
           <button
@@ -85,7 +91,7 @@ function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
             {!loading && <span className="text-slate-400 font-normal ml-2">· {filtered.length} players</span>}
           </p>
           <a
-            href={`https://usabjrrankings.org/?age_group=${ageGroup}&category=${eventType}&date=2026-03-01`}
+            href={`https://usabjrrankings.org/?age_group=${ageGroup}&category=${eventType}&date=${date}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
@@ -104,7 +110,7 @@ function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
             <WifiOff className="w-8 h-8 text-slate-300 mx-auto" />
             <p className="text-slate-400 text-sm">Could not load rankings for {ageGroup} {eventType}</p>
             <a
-              href={`https://usabjrrankings.org/?age_group=${ageGroup}&category=${eventType}&date=2026-03-01`}
+              href={`https://usabjrrankings.org/?age_group=${ageGroup}&category=${eventType}&date=${date}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline"
@@ -161,6 +167,7 @@ function RankingsTable({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
 export default function Rankings() {
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('U11');
   const [eventType, setEventType] = useState<EventType>('BS');
+  const { rankingsDate } = usePlayers();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -192,6 +199,14 @@ export default function Rankings() {
             </a>
           </p>
         </div>
+      </div>
+
+      {/* Rankings date note */}
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl text-sm text-blue-700">
+        <Calendar className="w-4 h-4 shrink-0" />
+        <span>
+          Rankings data as of <span className="font-semibold">{formatRankingsDate(rankingsDate)}</span>
+        </span>
       </div>
 
       {/* Age Group Tabs */}
@@ -230,7 +245,7 @@ export default function Rankings() {
       </div>
 
       {/* Rankings Table */}
-      <RankingsTable key={`${ageGroup}-${eventType}`} ageGroup={ageGroup} eventType={eventType} />
+      <RankingsTable key={`${ageGroup}-${eventType}-${rankingsDate}`} ageGroup={ageGroup} eventType={eventType} date={rankingsDate} />
     </div>
   );
 }

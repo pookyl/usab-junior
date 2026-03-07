@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef, useMemo, type ReactNode } from 'react';
 import type { UniquePlayer } from '../types/junior';
-import { fetchAllPlayers } from '../services/rankingsService';
-import { staticRankings } from '../data/usaJuniorData';
+import { fetchAllPlayers, fetchLatestDate, invalidateRankingsCache } from '../services/rankingsService';
+import { staticRankings, RANKINGS_DATE } from '../data/usaJuniorData';
 
 export type DataSource = 'live' | 'static' | 'none';
 
@@ -10,6 +10,7 @@ interface PlayersContextValue {
   loading: boolean;
   error: string | null;
   source: DataSource;
+  rankingsDate: string;
   refresh: () => void;
   playerNameMap: Map<string, string>;
 }
@@ -42,35 +43,54 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<DataSource>(staticPlayers.length > 0 ? 'static' : 'none');
+  const [rankingsDate, setRankingsDate] = useState<string>(RANKINGS_DATE);
   const fetchCount = useRef(0);
 
-  const load = () => {
+  const load = (dateOverride?: string) => {
     const id = ++fetchCount.current;
     setLoading(true);
     setError(null);
 
-    fetchAllPlayers()
-      .then((data) => {
-        if (fetchCount.current !== id) return;
-        setPlayers(data);
-        setSource('live');
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        if (fetchCount.current !== id) return;
-        if (staticPlayers.length > 0) {
-          setPlayers(staticPlayers);
-          setSource('static');
-        } else {
-          setSource('none');
-        }
-        setError(err.message);
-        setLoading(false);
-      });
+    const doFetch = async () => {
+      const date = dateOverride ?? rankingsDate;
+      const data = await fetchAllPlayers(date);
+      if (fetchCount.current !== id) return;
+      setPlayers(data);
+      setSource('live');
+      setLoading(false);
+    };
+
+    doFetch().catch((err: Error) => {
+      if (fetchCount.current !== id) return;
+      if (staticPlayers.length > 0) {
+        setPlayers(staticPlayers);
+        setSource('static');
+      } else {
+        setSource('none');
+      }
+      setError(err.message);
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
-    load();
+    let cancelled = false;
+
+    (async () => {
+      const { latestDate } = await fetchLatestDate();
+
+      if (cancelled) return;
+
+      if (latestDate && latestDate !== rankingsDate) {
+        invalidateRankingsCache();
+        setRankingsDate(latestDate);
+        load(latestDate);
+      } else {
+        load();
+      }
+    })();
+
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -83,7 +103,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   }, [players]);
 
   return (
-    <PlayersContext.Provider value={{ players, loading, error, source, refresh: load, playerNameMap }}>
+    <PlayersContext.Provider value={{ players, loading, error, source, rankingsDate, refresh: () => load(), playerNameMap }}>
       {children}
     </PlayersContext.Provider>
   );

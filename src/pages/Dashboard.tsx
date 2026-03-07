@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Award, ExternalLink, Trophy, Feather } from 'lucide-react';
+import { Users, Award, ExternalLink, Trophy, Feather, Calendar } from 'lucide-react';
 import { usePlayers } from '../contexts/PlayersContext';
 import type { AgeGroup, PlayerEntry } from '../types/junior';
 import { AGE_GROUPS } from '../types/junior';
@@ -78,8 +78,13 @@ function AgeGroupCard({ ageGroup, stats }: { ageGroup: AgeGroup; stats: GroupSta
   );
 }
 
+function formatRankingsDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
 export default function Dashboard() {
-  const { players, loading, source } = usePlayers();
+  const { players, loading, source, rankingsDate } = usePlayers();
 
   const { totalBoys, totalGirls, totalPlayers, groupStats } = useMemo(() => {
     let boys = 0;
@@ -136,6 +141,10 @@ export default function Dashboard() {
                 Live data
               </span>
             )}
+          </p>
+          <p className="text-slate-400 text-sm ml-13 flex items-center gap-1.5 mt-0.5">
+            <Calendar className="w-3.5 h-3.5" />
+            Rankings as of {formatRankingsDate(rankingsDate)}
           </p>
         </div>
       </div>

@@ -11,14 +11,46 @@ import type {
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
-// In-memory cache to avoid redundant requests within the same browser session
+// ── Latest date detection ───────────────────────────────────────────────────
+let latestDateCache: { latestDate: string; availableDates: string[] } | null = null;
+
+export async function fetchLatestDate(): Promise<{ latestDate: string; availableDates: string[] }> {
+  if (latestDateCache) return latestDateCache;
+
+  try {
+    const res = await fetch('/api/latest-date', { signal: AbortSignal.timeout(10_000) });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    if (data.latestDate) {
+      latestDateCache = data;
+      return data;
+    }
+  } catch {
+    // Fall back to the static date
+  }
+  return { latestDate: RANKINGS_DATE, availableDates: [RANKINGS_DATE] };
+}
+
+// ── Rankings cache (keyed by date + category) ───────────────────────────────
+let rankingsCacheDate = '';
 const cache = new Map<RankingsKey, JuniorPlayer[]>();
+
+export function invalidateRankingsCache() {
+  cache.clear();
+  allPlayersCache = null;
+  allPlayersCacheDate = '';
+}
 
 export async function fetchRankings(
   ageGroup: AgeGroup,
   eventType: EventType,
   date: string = RANKINGS_DATE,
 ): Promise<JuniorPlayer[]> {
+  if (date !== rankingsCacheDate) {
+    cache.clear();
+    rankingsCacheDate = date;
+  }
+
   const key: RankingsKey = `${ageGroup}-${eventType}`;
   if (cache.has(key)) return cache.get(key)!;
 
@@ -88,11 +120,12 @@ export function tswH2HUrl(usabId1: string, usabId2: string) {
 }
 
 let allPlayersCache: UniquePlayer[] | null = null;
+let allPlayersCacheDate = '';
 
 export async function fetchAllPlayers(
   date: string = RANKINGS_DATE,
 ): Promise<UniquePlayer[]> {
-  if (allPlayersCache) return allPlayersCache;
+  if (allPlayersCache && allPlayersCacheDate === date) return allPlayersCache;
 
   const url = `/api/all-players?date=${date}`;
   const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
@@ -102,6 +135,7 @@ export async function fetchAllPlayers(
   if (!Array.isArray(players)) throw new Error('Invalid response');
 
   allPlayersCache = players;
+  allPlayersCacheDate = date;
   return players;
 }
 

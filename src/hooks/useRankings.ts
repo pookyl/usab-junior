@@ -13,7 +13,7 @@ export interface UseRankingsResult {
   refresh: () => void;
 }
 
-export function useRankings(ageGroup: AgeGroup, eventType: EventType): UseRankingsResult {
+export function useRankings(ageGroup: AgeGroup, eventType: EventType, date?: string): UseRankingsResult {
   const key: RankingsKey = `${ageGroup}-${eventType}`;
   const staticData = staticRankings[key] ?? [];
 
@@ -28,7 +28,7 @@ export function useRankings(ageGroup: AgeGroup, eventType: EventType): UseRankin
     setLoading(true);
     setError(null);
 
-    fetchRankings(ageGroup, eventType)
+    fetchRankings(ageGroup, eventType, date)
       .then((data) => {
         if (fetchCount.current !== id) return;
         setPlayers(data);
@@ -49,7 +49,6 @@ export function useRankings(ageGroup: AgeGroup, eventType: EventType): UseRankin
   };
 
   useEffect(() => {
-    // Always seed with static data immediately if available
     const cached = staticRankings[key];
     if (cached) {
       setPlayers(cached);
@@ -57,7 +56,7 @@ export function useRankings(ageGroup: AgeGroup, eventType: EventType): UseRankin
     }
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ageGroup, eventType]);
+  }, [ageGroup, eventType, date]);
 
   return { players, loading, error, source, refresh: load };
 }

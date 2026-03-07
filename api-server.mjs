@@ -6,7 +6,7 @@
  */
 import { createServer } from 'http';
 import { URL } from 'url';
-import { readFileSync, existsSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync } from 'fs';
 import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -15,12 +15,61 @@ const USAB_BASE = 'https://usabjrrankings.org';
 const TSW_BASE = 'https://www.tournamentsoftware.com';
 const TSW_ORG_CODE = 'C36A90FE-DFA8-414B-A8B6-F2BCF6B9B8BD'; // Badminton USA
 
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const DISK_CACHE_DIR = join(__dirname, 'data');
+const DISK_CACHE_FILE = join(DISK_CACHE_DIR, 'rankings-cache.json');
+
 const BROWSER_HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
   'Accept-Language': 'en-US,en;q=0.9',
 };
+
+// ── Persistent disk cache ─────────────────────────────────────────────────────
+// Structure: { date, rankings: { "U11-BS": [...], ... }, allPlayers: [...], savedAt }
+
+function loadDiskCache() {
+  try {
+    if (existsSync(DISK_CACHE_FILE)) {
+      const raw = readFileSync(DISK_CACHE_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      console.log(`[disk-cache] loaded cache for date ${data.date} (saved ${data.savedAt})`);
+      return data;
+    }
+  } catch (err) {
+    console.warn('[disk-cache] failed to load:', err.message);
+  }
+  return null;
+}
+
+function saveDiskCache(date, rankings, allPlayers) {
+  try {
+    if (!existsSync(DISK_CACHE_DIR)) mkdirSync(DISK_CACHE_DIR, { recursive: true });
+    const data = { date, rankings, allPlayers, savedAt: new Date().toISOString() };
+    writeFileSync(DISK_CACHE_FILE, JSON.stringify(data, null, 2));
+    console.log(`[disk-cache] saved cache for date ${date} (${Object.keys(rankings).length} categories, ${allPlayers.length} players)`);
+  } catch (err) {
+    console.warn('[disk-cache] failed to save:', err.message);
+  }
+}
+
+function getDiskCachedRankings(key) {
+  const disk = loadDiskCache();
+  if (disk && disk.rankings && disk.rankings[key]) return disk.rankings[key];
+  return null;
+}
+
+function getDiskCachedAllPlayers() {
+  const disk = loadDiskCache();
+  if (disk && disk.allPlayers) return { players: disk.allPlayers, date: disk.date };
+  return null;
+}
+
+function getDiskCachedDate() {
+  const disk = loadDiskCache();
+  return disk?.date ?? null;
+}
 
 // In-memory cache: key → { data, timestamp }
 const cache = new Map();
@@ -652,8 +701,16 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(players));
     } catch (err) {
       console.error(`[rankings] error:`, err.message);
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: err.message }));
+      const diskKey = `${ageGroup}-${eventType}`;
+      const diskData = getDiskCachedRankings(diskKey);
+      if (diskData) {
+        console.log(`[rankings] serving from disk cache for ${diskKey}`);
+        res.writeHead(200, { 'X-Cache': 'DISK' });
+        res.end(JSON.stringify(diskData));
+      } else {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: err.message }));
+      }
     }
     return;
   }
@@ -731,6 +788,53 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // GET /api/latest-date  – scrapes the USAB homepage for the most recent "As Of" date
+  if (reqUrl.pathname === '/api/latest-date') {
+    const cacheKey = 'latest-date';
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    try {
+      console.log('[latest-date] fetching USAB homepage…');
+      const response = await fetch(USAB_BASE, { headers: BROWSER_HEADERS });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const html = await response.text();
+
+      // Parse the <option> values from the "As Of Date" dropdown
+      const dates = [];
+      const optionRegex = /<option[^>]*value="([^"]+)"[^>]*>/gi;
+      let om;
+      while ((om = optionRegex.exec(html)) !== null) {
+        const val = om[1].trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) dates.push(val);
+      }
+
+      const latestDate = dates.length > 0 ? dates[0] : null;
+      console.log(`[latest-date] found ${dates.length} dates, latest: ${latestDate}`);
+      const result = { latestDate, availableDates: dates };
+      setCache(cacheKey, result);
+      res.writeHead(200, { 'X-Cache': 'MISS' });
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      console.error('[latest-date] error:', err.message);
+      const diskDate = getDiskCachedDate();
+      if (diskDate) {
+        console.log(`[latest-date] website unreachable, using disk-cached date: ${diskDate}`);
+        const result = { latestDate: diskDate, availableDates: [diskDate] };
+        res.writeHead(200, { 'X-Cache': 'DISK' });
+        res.end(JSON.stringify(result));
+      } else {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    }
+    return;
+  }
+
   // GET /api/all-players?date=2026-03-01
   if (reqUrl.pathname === '/api/all-players') {
     const date = reqUrl.searchParams.get('date') ?? '2026-03-01';
@@ -746,6 +850,8 @@ const server = createServer(async (req, res) => {
     const ageGroups = ['U11', 'U13', 'U15', 'U17', 'U19'];
     const eventTypes = ['BS', 'GS', 'BD', 'GD', 'XD'];
     const allPlayers = new Map();
+    const rankingsByCategory = {};
+    let fetchedFromWeb = false;
 
     const tasks = [];
     for (const ag of ageGroups) {
@@ -762,7 +868,7 @@ const server = createServer(async (req, res) => {
         batch.map(async ({ ag, et }) => {
           const rankCacheKey = `rankings:${ag}:${et}:${date}`;
           const rankCached = getCached(rankCacheKey);
-          if (rankCached) return rankCached;
+          if (rankCached) return { players: rankCached, ag, et, fromWeb: false };
 
           const url = `${USAB_BASE}/?age_group=${ag}&category=${et}&date=${date}`;
           const response = await fetch(url, { headers: BROWSER_HEADERS });
@@ -770,13 +876,17 @@ const server = createServer(async (req, res) => {
           const html = await response.text();
           const players = parseRankings(html, ag, et);
           setCache(rankCacheKey, players);
-          return players;
+          return { players, ag, et, fromWeb: true };
         }),
       );
 
       for (const result of results) {
         if (result.status === 'fulfilled' && result.value) {
-          for (const player of result.value) {
+          const { players, ag, et, fromWeb } = result.value;
+          if (fromWeb) fetchedFromWeb = true;
+          const catKey = `${ag}-${et}`;
+          rankingsByCategory[catKey] = players;
+          for (const player of players) {
             if (!allPlayers.has(player.usabId)) {
               allPlayers.set(player.usabId, {
                 usabId: player.usabId,
@@ -799,10 +909,27 @@ const server = createServer(async (req, res) => {
       a.name.localeCompare(b.name),
     );
 
-    console.log(`[all-players] aggregated ${uniquePlayers.length} unique players`);
-    setCache(cacheKey, uniquePlayers);
-    res.writeHead(200, { 'X-Cache': 'MISS' });
-    res.end(JSON.stringify(uniquePlayers));
+    if (uniquePlayers.length > 0) {
+      console.log(`[all-players] aggregated ${uniquePlayers.length} unique players`);
+      setCache(cacheKey, uniquePlayers);
+
+      if (fetchedFromWeb) {
+        saveDiskCache(date, rankingsByCategory, uniquePlayers);
+      }
+
+      res.writeHead(200, { 'X-Cache': 'MISS' });
+      res.end(JSON.stringify(uniquePlayers));
+    } else {
+      const diskData = getDiskCachedAllPlayers();
+      if (diskData) {
+        console.log(`[all-players] website returned no data, serving from disk cache (date ${diskData.date})`);
+        res.writeHead(200, { 'X-Cache': 'DISK' });
+        res.end(JSON.stringify(diskData.players));
+      } else {
+        res.writeHead(200);
+        res.end(JSON.stringify([]));
+      }
+    }
     return;
   }
 
@@ -922,7 +1049,6 @@ const server = createServer(async (req, res) => {
   }
 
   // ── Serve static files from dist/ (production build) ─────────────────────
-  const __dirname = fileURLToPath(new URL('.', import.meta.url));
   const distDir = join(__dirname, 'dist');
 
   if (existsSync(distDir)) {
