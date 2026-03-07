@@ -387,7 +387,7 @@ export default function Analytics() {
                   dataKey="count"
                   radius={[4, 4, 0, 0]}
                   cursor="pointer"
-                  minPointSize={8}
+                  background={{ fill: 'transparent', cursor: 'pointer' }}
                   onClick={(entry) => handleDistributionClick(entry as unknown as { lo: number; hi: number })}
                 >
                   {distribution.map((_, i) => (
@@ -422,7 +422,7 @@ export default function Analytics() {
                   radius={[4, 4, 0, 0]}
                   fill="#10b981"
                   cursor="pointer"
-                  minPointSize={8}
+                  background={{ fill: 'transparent', cursor: 'pointer' }}
                   onClick={(entry) => handleCategoryClick(entry as unknown as { n: number; label: string })}
                 />
               </BarChart>
