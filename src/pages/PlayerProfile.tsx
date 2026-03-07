@@ -143,7 +143,7 @@ function PlayerNameLink({
             {foundId && foundId !== currentUsabId ? (
               <Link
                 to={`/directory/${foundId}`}
-                className={`underline decoration-dotted underline-offset-2 hover:decoration-solid ${className ?? ''}`}
+                className={`no-underline hover:text-violet-600 transition-colors ${className ?? ''}`}
                 onClick={(e) => e.stopPropagation()}
               >
                 {trimmed}
@@ -278,7 +278,7 @@ export default function PlayerProfile() {
               <span>·</span>
               {gender && (
                 <>
-                  <span>{gender === 'M' ? 'Male' : gender === 'F' ? 'Female' : gender}</span>
+                  <span>{gender === 'M' ? 'Boy' : gender === 'F' ? 'Girl' : gender}</span>
                   <span>·</span>
                 </>
               )}
