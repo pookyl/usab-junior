@@ -153,7 +153,7 @@ export default function Analytics() {
       .slice(0, 50);
   }, [players, ageGroup, eventType]);
 
-  const { distribution, bucketSize } = useMemo(() => {
+  const { distribution } = useMemo(() => {
     const allPts = players
       .map((p) => p.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0))
       .filter((pts) => pts > 0);
@@ -302,8 +302,8 @@ export default function Analytics() {
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} />
                 <YAxis dataKey="shortName" type="category" tick={{ fontSize: 11, fill: '#64748b' }} width={70} />
                 <Tooltip
-                  formatter={(v: number) => [v.toLocaleString(), 'Points']}
-                  labelFormatter={(_: string, payload: Array<{ payload?: { name?: string } }>) =>
+                  formatter={(v: unknown) => [(v as number).toLocaleString(), 'Points']}
+                  labelFormatter={(_: unknown, payload: ReadonlyArray<{ payload?: { name?: string } }>) =>
                     payload[0]?.payload?.name ?? ''
                   }
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: 12 }}
@@ -343,8 +343,8 @@ export default function Analytics() {
                 />
                 <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
                 <Tooltip
-                  formatter={(v: number) => [v.toLocaleString(), 'Points']}
-                  labelFormatter={(label: number) => `Rank #${label}`}
+                  formatter={(v: unknown) => [(v as number).toLocaleString(), 'Points']}
+                  labelFormatter={(label: unknown) => `Rank #${label}`}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: 12 }}
                 />
                 <Area
@@ -380,7 +380,7 @@ export default function Analytics() {
                 />
                 <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
                 <Tooltip
-                  formatter={(v: number) => [v, 'Players']}
+                  formatter={(v: unknown) => [String(v), 'Players']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: 12 }}
                 />
                 <Bar
@@ -388,7 +388,7 @@ export default function Analytics() {
                   radius={[4, 4, 0, 0]}
                   cursor="pointer"
                   minPointSize={8}
-                  onClick={(entry) => handleDistributionClick(entry)}
+                  onClick={(entry) => handleDistributionClick(entry as unknown as { lo: number; hi: number })}
                 >
                   {distribution.map((_, i) => (
                     <Cell key={i} fill={HISTOGRAM_COLORS[i % HISTOGRAM_COLORS.length]} />
@@ -414,7 +414,7 @@ export default function Analytics() {
                 <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#64748b' }} />
                 <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
                 <Tooltip
-                  formatter={(v: number) => [v.toLocaleString(), 'Players']}
+                  formatter={(v: unknown) => [(v as number).toLocaleString(), 'Players']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: 12 }}
                 />
                 <Bar
@@ -423,7 +423,7 @@ export default function Analytics() {
                   fill="#10b981"
                   cursor="pointer"
                   minPointSize={8}
-                  onClick={(entry) => handleCategoryClick(entry)}
+                  onClick={(entry) => handleCategoryClick(entry as unknown as { n: number; label: string })}
                 />
               </BarChart>
             </ResponsiveContainer>

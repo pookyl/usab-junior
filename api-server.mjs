@@ -6,8 +6,11 @@
  */
 import { createServer } from 'http';
 import { URL } from 'url';
+import { readFileSync, existsSync, statSync } from 'fs';
+import { join, extname } from 'path';
+import { fileURLToPath } from 'url';
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const USAB_BASE = 'https://usabjrrankings.org';
 const TSW_BASE = 'https://www.tournamentsoftware.com';
 const TSW_ORG_CODE = 'C36A90FE-DFA8-414B-A8B6-F2BCF6B9B8BD'; // Badminton USA
@@ -916,6 +919,46 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(fallback));
     }
     return;
+  }
+
+  // ── Serve static files from dist/ (production build) ─────────────────────
+  const __dirname = fileURLToPath(new URL('.', import.meta.url));
+  const distDir = join(__dirname, 'dist');
+
+  if (existsSync(distDir)) {
+    const MIME_TYPES = {
+      '.html': 'text/html',
+      '.js': 'application/javascript',
+      '.css': 'text/css',
+      '.json': 'application/json',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.svg': 'image/svg+xml',
+      '.ico': 'image/x-icon',
+      '.woff': 'font/woff',
+      '.woff2': 'font/woff2',
+      '.ttf': 'font/ttf',
+    };
+
+    const filePath = join(distDir, reqUrl.pathname === '/' ? 'index.html' : reqUrl.pathname);
+
+    if (existsSync(filePath) && statSync(filePath).isFile()) {
+      const mime = MIME_TYPES[extname(filePath)] || 'application/octet-stream';
+      res.setHeader('Content-Type', mime);
+      res.writeHead(200);
+      res.end(readFileSync(filePath));
+      return;
+    }
+
+    // SPA fallback: serve index.html for client-side routes
+    const indexPath = join(distDir, 'index.html');
+    if (existsSync(indexPath)) {
+      res.setHeader('Content-Type', 'text/html');
+      res.writeHead(200);
+      res.end(readFileSync(indexPath));
+      return;
+    }
   }
 
   res.writeHead(404);
