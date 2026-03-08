@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Users, RefreshCw, ChevronRight, Wifi, WifiOff } from 'lucide-react';
 import type { AgeGroup, EventType, UniquePlayer } from '../types/junior';
 import { AGE_GROUPS, EVENT_LABELS } from '../types/junior';
@@ -93,9 +93,13 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
 
 export default function AllPlayers() {
   const { players, loading, error, source, refresh } = usePlayers();
+  const [searchParams] = useSearchParams();
+  const paramAge = searchParams.get('age_group') as AgeGroup | null;
   const [search, setSearch] = useState('');
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
-  const [ageGroupFilter, setAgeGroupFilter] = useState<AgeGroup | null>(null);
+  const [ageGroupFilter, setAgeGroupFilter] = useState<AgeGroup | null>(
+    paramAge && AGE_GROUPS.includes(paramAge) ? paramAge : null,
+  );
 
   const filtered = useMemo(() => {
     let result = players;

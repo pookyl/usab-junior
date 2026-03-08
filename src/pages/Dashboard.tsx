@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Award, ExternalLink, Trophy, Feather, Calendar } from 'lucide-react';
+import { Users, Award, Feather, Calendar } from 'lucide-react';
 import { usePlayers } from '../contexts/PlayersContext';
 import type { AgeGroup, PlayerEntry } from '../types/junior';
 import { AGE_GROUPS } from '../types/junior';
@@ -55,24 +55,33 @@ function AgeGroupCard({ ageGroup, stats }: { ageGroup: AgeGroup; stats: GroupSta
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
-      <div className={`bg-gradient-to-r ${colors.gradient} px-4 md:px-5 py-2.5 md:py-3 flex items-center justify-between`}>
+      <Link
+        to={`/directory?age_group=${ageGroup}`}
+        className={`bg-gradient-to-r ${colors.gradient} px-4 md:px-5 py-2.5 md:py-3 flex items-center justify-between hover:brightness-110 transition-all`}
+      >
         <span className="font-bold text-white text-base md:text-lg">{ageGroup}</span>
         <span className="bg-white/20 text-white text-xs md:text-sm font-semibold px-2.5 md:px-3 py-0.5 rounded-full">
           {stats.total} players
         </span>
-      </div>
+      </Link>
       <div className="p-4 md:p-5 space-y-3">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium text-blue-600">{stats.boys} Boys</span>
           <span className="font-medium text-pink-500">{stats.girls} Girls</span>
         </div>
         <GenderBar boys={stats.boys} girls={stats.girls} />
-        <Link
-          to={`/players?age_group=${ageGroup}`}
-          className={`block text-center text-sm font-medium ${colors.text} hover:underline`}
-        >
-          View {ageGroup} rankings →
-        </Link>
+        <div className="flex items-center justify-center gap-1.5 text-xs">
+          <span className="text-slate-400 font-medium">Rankings:</span>
+          {(['BS', 'GS', 'XD'] as const).map((et) => (
+            <Link
+              key={et}
+              to={`/players?age_group=${ageGroup}&event_type=${et}`}
+              className={`px-2 py-0.5 rounded-md font-semibold ${colors.text} ${colors.light} hover:opacity-80 transition-opacity`}
+            >
+              {et}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -328,41 +337,21 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Quick links */}
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 md:p-6 text-white">
-        <h2 className="text-base md:text-lg font-semibold mb-1">External Resources</h2>
-        <p className="text-slate-400 text-xs md:text-sm mb-4 md:mb-5">
-          Live rankings and full match draws from official sources
+      {/* Footer */}
+      <footer className="mt-4 pt-5 border-t border-slate-200 text-center text-xs text-slate-400 space-y-1">
+        <p>USAB Junior Badminton Hub &middot; v0.1.0</p>
+        <p>
+          A hobby project &mdash; not affiliated with USA Badminton.
+          Data sourced from{' '}
+          <a href="https://usabjrrankings.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">
+            usabjrrankings.org
+          </a>{' '}and{' '}
+          <a href="https://www.tournamentsoftware.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">
+            tournamentsoftware.com
+          </a>.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <a
-            href="https://usabjrrankings.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3.5 md:p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
-          >
-            <Trophy className="w-7 h-7 md:w-8 md:h-8 text-violet-400 shrink-0" />
-            <div className="min-w-0">
-              <p className="font-semibold text-sm md:text-base">USAB Junior Rankings</p>
-              <p className="text-xs md:text-sm text-slate-400 truncate">Official rankings for all age groups</p>
-            </div>
-            <ExternalLink className="w-4 h-4 text-slate-500 ml-auto shrink-0" />
-          </a>
-          <a
-            href="https://www.tournamentsoftware.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3.5 md:p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
-          >
-            <Award className="w-7 h-7 md:w-8 md:h-8 text-orange-400 shrink-0" />
-            <div className="min-w-0">
-              <p className="font-semibold text-sm md:text-base">Tournament Software</p>
-              <p className="text-xs md:text-sm text-slate-400 truncate">Tournament draws & match results</p>
-            </div>
-            <ExternalLink className="w-4 h-4 text-slate-500 ml-auto shrink-0" />
-          </a>
-        </div>
-      </div>
+        <p>&copy; {new Date().getFullYear()} All rights reserved.</p>
+      </footer>
     </div>
   );
 }

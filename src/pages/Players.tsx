@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search, ExternalLink, RefreshCw, Trophy, Wifi, WifiOff, Calendar } from 'lucide-react';
 import type { AgeGroup, EventType } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
@@ -201,9 +201,22 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
 }
 
 export default function Rankings() {
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('U11');
-  const [eventType, setEventType] = useState<EventType>('BS');
+  const [searchParams] = useSearchParams();
+  const paramAge = searchParams.get('age_group') as AgeGroup | null;
+  const paramEvent = searchParams.get('event_type') as EventType | null;
+
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>(
+    paramAge && AGE_GROUPS.includes(paramAge) ? paramAge : 'U11',
+  );
+  const [eventType, setEventType] = useState<EventType>(
+    paramEvent && EVENT_TYPES.includes(paramEvent) ? paramEvent : 'BS',
+  );
   const { rankingsDate } = usePlayers();
+
+  useEffect(() => {
+    if (paramAge && AGE_GROUPS.includes(paramAge)) setAgeGroup(paramAge);
+    if (paramEvent && EVENT_TYPES.includes(paramEvent)) setEventType(paramEvent);
+  }, [paramAge, paramEvent]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-5 md:space-y-6">

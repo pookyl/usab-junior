@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
 import Dashboard from './pages/Dashboard';
@@ -7,6 +8,12 @@ import AllPlayers from './pages/AllPlayers';
 import PlayerProfile from './pages/PlayerProfile';
 import Analytics from './pages/Analytics';
 import HeadToHead from './pages/HeadToHead';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 
 function PlayerRedirect() {
   const { id } = useParams();
@@ -18,6 +25,7 @@ export default function App() {
     <BrowserRouter>
       <PlayersProvider>
         <div className="min-h-screen bg-slate-50">
+          <ScrollToTop />
           <Navbar />
           <main className="pb-20 md:pb-0">
             <Routes>
