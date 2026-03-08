@@ -170,6 +170,10 @@ export default function PlayerProfile() {
   const [expandedTournaments, setExpandedTournaments] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [usabId]);
+
+  useEffect(() => {
     if (!usabId || !player) {
       setLoadingTsw(false);
       return;

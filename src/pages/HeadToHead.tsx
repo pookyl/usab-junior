@@ -13,7 +13,7 @@ import {
   fetchH2H, fetchPlayerTswStats, tswH2HUrl, tswSearchUrl,
 } from '../services/rankingsService';
 
-type Gender = 'Boy' | 'Girl';
+type Gender = 'Boy' | 'Girl' | 'All';
 
 const AGE_COLORS: Record<AgeGroup, string> = {
   U11: 'bg-violet-600',
@@ -41,10 +41,6 @@ function entriesForAge(player: UniquePlayer, ageGroup: AgeGroup | null): PlayerE
 function bestEntry(player: UniquePlayer, ageGroup: AgeGroup | null): PlayerEntry | null {
   const entries = entriesForAge(player, ageGroup);
   return entries.length > 0 ? entries[0] : null;
-}
-
-function formatScore(match: H2HMatch): string {
-  return match.scores.map(([a, b]) => `${a}-${b}`).join(' / ');
 }
 
 function eventCategory(event: string): 'Singles' | 'Doubles' | 'Mixed' {
@@ -108,9 +104,9 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
 
   const filtered = useMemo(() => {
     const pool = players.filter((p) => p.usabId !== exclude);
-    if (!query) return pool.slice(0, 20);
+    if (!query) return pool;
     const q = query.toLowerCase();
-    return pool.filter((p) => p.name.toLowerCase().includes(q) || p.usabId.includes(q)).slice(0, 20);
+    return pool.filter((p) => p.name.toLowerCase().includes(q) || p.usabId.includes(q));
   }, [players, query, exclude]);
 
   const isViolet = accent === 'violet';
@@ -179,7 +175,7 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
           </div>
 
           {open && !loading && (
-            <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 md:max-h-72 overflow-y-auto overscroll-contain">
+            <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-80 md:max-h-96 overflow-y-auto overscroll-contain">
               {filtered.length === 0 ? (
                 <div className="p-4 text-center text-slate-400 text-sm">No players found</div>
               ) : (
@@ -222,8 +218,45 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
 
 // ── MatchCard ────────────────────────────────────────────────────────────────
 
-function MatchCard({ match }: { match: H2HMatch }) {
+function PlayerNameLinks({
+  players,
+  playerLookup,
+  colorClass,
+}: {
+  players: string[];
+  playerLookup: Map<string, string>;
+  colorClass: string;
+}) {
+  return (
+    <span className={`text-xs md:text-sm truncate ${colorClass}`}>
+      {players.map((name, i) => {
+        const usabId = playerLookup.get(name.toLowerCase().trim());
+        return (
+          <span key={i}>
+            {i > 0 && ' / '}
+            {usabId ? (
+              <Link
+                to={`/directory/${usabId}`}
+                className="hover:underline"
+              >
+                {name}
+              </Link>
+            ) : (
+              name
+            )}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map<string, string> }) {
   const cat = eventCategory(match.event);
+  const tswBase = 'https://www.tournamentsoftware.com';
+  const tournamentHref = match.tournamentUrl
+    ? (match.tournamentUrl.startsWith('http') ? match.tournamentUrl : `${tswBase}${match.tournamentUrl}`)
+    : '';
 
   return (
     <div className={`border rounded-xl overflow-hidden transition-shadow hover:shadow-md ${
@@ -246,14 +279,22 @@ function MatchCard({ match }: { match: H2HMatch }) {
           </span>
           <span className="text-xs text-slate-400">·</span>
           <span className="text-xs font-medium text-slate-600">{match.round}</span>
-          {match.duration && (
-            <>
-              <span className="text-xs text-slate-400 hidden sm:inline">·</span>
-              <span className="text-xs text-slate-400 hidden sm:inline">{match.duration}</span>
-            </>
+        </div>
+        <div className="flex items-center gap-1.5 mt-1 min-w-0">
+          {tournamentHref ? (
+            <a
+              href={tournamentHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs md:text-sm font-semibold text-slate-700 hover:text-orange-600 truncate transition-colors inline-flex items-center gap-1.5"
+            >
+              {match.tournament}
+              <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-500 shrink-0" />
+            </a>
+          ) : (
+            <p className="text-xs md:text-sm font-semibold text-slate-700 truncate">{match.tournament}</p>
           )}
         </div>
-        <p className="text-xs md:text-sm font-semibold text-slate-700 mt-1 truncate">{match.tournament}</p>
       </div>
 
       <div className="px-3 md:px-4 py-2.5 md:py-3">
@@ -264,9 +305,11 @@ function MatchCard({ match }: { match: H2HMatch }) {
             {match.team1Won ? 'W' : 'L'}
           </span>
           <div className="flex-1 min-w-0">
-            <p className={`text-xs md:text-sm truncate ${match.team1Won ? 'text-violet-700' : 'text-slate-600'}`}>
-              {match.team1Players.join(' / ')}
-            </p>
+            <PlayerNameLinks
+              players={match.team1Players}
+              playerLookup={playerLookup}
+              colorClass={match.team1Won ? 'text-violet-700' : 'text-slate-600'}
+            />
           </div>
           <div className="flex gap-1.5 md:gap-2 shrink-0">
             {match.scores.map(([a], i) => (
@@ -286,9 +329,11 @@ function MatchCard({ match }: { match: H2HMatch }) {
             {match.team2Won ? 'W' : 'L'}
           </span>
           <div className="flex-1 min-w-0">
-            <p className={`text-xs md:text-sm truncate ${match.team2Won ? 'text-blue-700' : 'text-slate-600'}`}>
-              {match.team2Players.join(' / ')}
-            </p>
+            <PlayerNameLinks
+              players={match.team2Players}
+              playerLookup={playerLookup}
+              colorClass={match.team2Won ? 'text-blue-700' : 'text-slate-600'}
+            />
           </div>
           <div className="flex gap-1.5 md:gap-2 shrink-0">
             {match.scores.map(([, b], i) => (
@@ -301,11 +346,15 @@ function MatchCard({ match }: { match: H2HMatch }) {
           </div>
         </div>
 
-        <div className="mt-1.5 md:mt-2 pt-1.5 md:pt-2 border-t border-slate-50 flex items-center gap-2 text-[10px] md:text-xs text-slate-400">
-          <span className="font-mono">{formatScore(match)}</span>
-          {match.date && <><span>·</span><span>{match.date}</span></>}
-          {match.venue && <><span className="hidden sm:inline">·</span><span className="hidden sm:inline">{match.venue}</span></>}
-        </div>
+        {(match.date || match.venue || match.duration) && (
+          <div className="mt-1.5 md:mt-2 pt-1.5 md:pt-2 border-t border-slate-50 flex items-center gap-2 text-[10px] md:text-xs text-slate-400">
+            {match.date && <span>{match.date}</span>}
+            {match.date && match.duration && <span>·</span>}
+            {match.duration && <span>{match.duration}</span>}
+            {(match.date || match.duration) && match.venue && <span>·</span>}
+            {match.venue && <span>{match.venue}</span>}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -357,26 +406,75 @@ function StatsRow({
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 
+// Module-level cache — survives route changes, immune to StrictMode double-mount
+let _h2hSnap: {
+  ageGroup: AgeGroup | null;
+  gender: Gender;
+  playerAId: string;
+  playerBId: string;
+  h2hResult: H2HResult | null;
+  tswStatsA: TswPlayerStats | null;
+  tswStatsB: TswPlayerStats | null;
+  filterCat: 'All' | 'Singles' | 'Doubles' | 'Mixed';
+  scrollY: number;
+} | null = null;
+
 export default function HeadToHead() {
-  const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(null);
-  const [gender, setGender] = useState<Gender>('Boy');
-  const [playerA, setPlayerA] = useState<UniquePlayer | null>(null);
-  const [playerB, setPlayerB] = useState<UniquePlayer | null>(null);
   const { players: allPlayers, loading: playersLoading } = usePlayers();
 
-  const [h2hResult, setH2hResult] = useState<H2HResult | null>(null);
-  const [tswStatsA, setTswStatsA] = useState<TswPlayerStats | null>(null);
-  const [tswStatsB, setTswStatsB] = useState<TswPlayerStats | null>(null);
+  const snap = _h2hSnap;
+  const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(snap?.ageGroup ?? 'U13');
+  const [gender, setGender] = useState<Gender>(snap?.gender ?? 'Boy');
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const [playerA, setPlayerA] = useState<UniquePlayer | null>(null);
+  const [playerB, setPlayerB] = useState<UniquePlayer | null>(null);
+
+  const [h2hResult, setH2hResult] = useState<H2HResult | null>(snap?.h2hResult ?? null);
+  const [tswStatsA, setTswStatsA] = useState<TswPlayerStats | null>(snap?.tswStatsA ?? null);
+  const [tswStatsB, setTswStatsB] = useState<TswPlayerStats | null>(snap?.tswStatsB ?? null);
   const [comparing, setComparing] = useState(false);
-  const [compared, setCompared] = useState(false);
+  const [compared, setCompared] = useState(!!snap?.h2hResult || !!snap?.tswStatsA || !!snap?.tswStatsB);
   const [error, setError] = useState<string | null>(null);
-  const [filterCat, setFilterCat] = useState<'All' | 'Singles' | 'Doubles' | 'Mixed'>('All');
+  const [filterCat, setFilterCat] = useState<'All' | 'Singles' | 'Doubles' | 'Mixed'>(snap?.filterCat ?? 'All');
+
+  // Restore player objects from snapshot IDs once allPlayers loads
+  const restoredPlayers = useRef(false);
+  useEffect(() => {
+    if (restoredPlayers.current || playersLoading || allPlayers.length === 0) return;
+    restoredPlayers.current = true;
+    if (!snap) return;
+    const a = allPlayers.find((p) => p.usabId === snap.playerAId) ?? null;
+    const b = allPlayers.find((p) => p.usabId === snap.playerBId) ?? null;
+    if (a) setPlayerA(a);
+    if (b) setPlayerB(b);
+    if (a && b && snap.scrollY) {
+      requestAnimationFrame(() => window.scrollTo(0, snap.scrollY));
+    }
+  }, [playersLoading, allPlayers, snap]);
+
+  // Save snapshot on unmount
+  useEffect(() => {
+    return () => {
+      _h2hSnap = {
+        ageGroup,
+        gender,
+        playerAId: playerA?.usabId ?? '',
+        playerBId: playerB?.usabId ?? '',
+        h2hResult,
+        tswStatsA,
+        tswStatsB,
+        filterCat,
+        scrollY: window.scrollY,
+      };
+    };
+  });
 
   const filteredPlayers = useMemo(() => {
     return allPlayers
       .filter((p) => {
         if (ageGroup && !p.entries.some((e) => e.ageGroup === ageGroup)) return false;
-        return inferGender(p.entries) === gender;
+        if (gender !== 'All') return inferGender(p.entries) === gender;
+        return true;
       })
       .sort((a, b) => {
         const ae = bestEntry(a, ageGroup);
@@ -387,7 +485,11 @@ export default function HeadToHead() {
       });
   }, [allPlayers, ageGroup, gender]);
 
+  // Clear selections on user-initiated filter changes only
+  const prevFilters = useRef({ ageGroup, gender });
   useEffect(() => {
+    if (prevFilters.current.ageGroup === ageGroup && prevFilters.current.gender === gender) return;
+    prevFilters.current = { ageGroup, gender };
     setPlayerA(null);
     setPlayerB(null);
     setH2hResult(null);
@@ -414,14 +516,21 @@ export default function HeadToHead() {
         fetchPlayerTswStats(playerB.usabId, playerB.name),
       ]);
 
-      if (h2h.status === 'fulfilled') setH2hResult(h2h.value);
-      if (statsA.status === 'fulfilled') setTswStatsA(statsA.value);
-      if (statsB.status === 'fulfilled') setTswStatsB(statsB.value);
+      const h2hVal = h2h.status === 'fulfilled' ? h2h.value : null;
+      const statsAVal = statsA.status === 'fulfilled' ? statsA.value : null;
+      const statsBVal = statsB.status === 'fulfilled' ? statsB.value : null;
 
-      if (h2h.status === 'rejected' && statsA.status === 'rejected' && statsB.status === 'rejected') {
+      setH2hResult(h2hVal);
+      setTswStatsA(statsAVal);
+      setTswStatsB(statsBVal);
+
+      if (!h2hVal && !statsAVal && !statsBVal) {
         setError('Failed to load comparison data. Please try again.');
       } else {
         setCompared(true);
+        requestAnimationFrame(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
       }
     } catch {
       setError('Unexpected error. Please try again.');
@@ -453,6 +562,14 @@ export default function HeadToHead() {
     total: filteredMatches.length,
   }), [filteredMatches]);
 
+  const playerLookup = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const p of allPlayers) {
+      map.set(p.name.toLowerCase().trim(), p.usabId);
+    }
+    return map;
+  }, [allPlayers]);
+
   const tswCatKey: StatsCategory = filterCat === 'All' ? 'total'
     : filterCat === 'Singles' ? 'singles'
     : filterCat === 'Doubles' ? 'doubles'
@@ -483,34 +600,27 @@ export default function HeadToHead() {
 
       {/* Filters: Age Group + Gender */}
       <div className="flex flex-col gap-3 md:flex-row md:gap-4 md:items-center">
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap md:flex-1 scrollbar-hide">
-          <button
-            onClick={() => setAgeGroup(null)}
-            className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
-              ageGroup === null
-                ? 'bg-slate-700 text-white scale-105'
-                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
-            }`}
-          >
-            All
-          </button>
-          {AGE_GROUPS.map((ag) => (
-            <button
-              key={ag}
-              onClick={() => setAgeGroup(ag)}
-              className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
-                ageGroup === ag
-                  ? `${AGE_COLORS[ag]} text-white scale-105`
-                  : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
-              }`}
-            >
-              {ag}
-            </button>
-          ))}
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Filter by Age Group</p>
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+            {AGE_GROUPS.map((ag) => (
+              <button
+                key={ag}
+                onClick={() => setAgeGroup(ageGroup === ag ? null : ag)}
+                className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
+                  ageGroup === ag
+                    ? `${AGE_COLORS[ag]} text-white scale-105`
+                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+                }`}
+              >
+                {ag}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex bg-slate-100 rounded-xl p-1 shrink-0 self-start">
-          {(['Boy', 'Girl'] as Gender[]).map((g) => (
+          {(['All', 'Boy', 'Girl'] as Gender[]).map((g) => (
             <button
               key={g}
               onClick={() => setGender(g)}
@@ -520,7 +630,7 @@ export default function HeadToHead() {
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              {g === 'Boy' ? '♂ Boy' : '♀ Girl'}
+              {g === 'All' ? '⚥ All' : g === 'Boy' ? '♂ Boy' : '♀ Girl'}
             </button>
           ))}
         </div>
@@ -528,7 +638,7 @@ export default function HeadToHead() {
 
       {/* Player count */}
       <p className="text-xs text-slate-400">
-        {playersLoading ? 'Loading players…' : `${filteredPlayers.length} ${gender}${filteredPlayers.length !== 1 ? 's' : ''}${ageGroup ? ` in ${ageGroup}` : ''}`}
+        {playersLoading ? 'Loading players…' : `${filteredPlayers.length} player${filteredPlayers.length !== 1 ? 's' : ''}${gender !== 'All' ? ` (${gender}${filteredPlayers.length !== 1 ? 's' : ''})` : ''}${ageGroup ? ` in ${ageGroup}` : ''}`}
       </p>
 
       {/* Player Selection */}
@@ -599,7 +709,7 @@ export default function HeadToHead() {
 
       {/* Results */}
       {compared && playerA && playerB && !comparing && (
-        <>
+        <div ref={resultsRef} className="space-y-4 md:space-y-6">
           {/* Global Category Filter */}
           <div className="flex items-center gap-2 md:gap-3 bg-white rounded-2xl shadow-sm border border-slate-100 p-2 md:p-3">
             <span className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider pl-1 md:pl-2 shrink-0">Show</span>
@@ -781,7 +891,7 @@ export default function HeadToHead() {
               ) : (
                 <div className="space-y-2.5 md:space-y-3">
                   {filteredMatches.map((match, i) => (
-                    <MatchCard key={i} match={match} />
+                    <MatchCard key={i} match={match} playerLookup={playerLookup} />
                   ))}
                 </div>
               )}
@@ -969,42 +1079,7 @@ export default function HeadToHead() {
             </div>
           )}
 
-          {/* TSW Footer */}
-          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 md:p-5">
-            <p className="text-xs md:text-sm font-semibold text-orange-800">
-              Full match details on TournamentSoftware.com
-            </p>
-            <p className="text-[10px] md:text-xs text-orange-600 mt-0.5 mb-3">
-              View draws, scores, and brackets
-            </p>
-            <div className="flex gap-2 md:gap-3 flex-wrap">
-              <a
-                href={tswH2HUrl(playerA.usabId, playerB.usabId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-orange-500 text-white rounded-xl text-xs md:text-sm font-medium hover:bg-orange-600 transition-colors"
-              >
-                H2H on TSW <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-              <a
-                href={tswSearchUrl(playerA.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-white text-orange-700 border border-orange-200 rounded-xl text-xs md:text-sm font-medium hover:bg-orange-50 transition-colors"
-              >
-                {playerA.name.split(' ')[0]} <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-              <a
-                href={tswSearchUrl(playerB.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-white text-orange-700 border border-orange-200 rounded-xl text-xs md:text-sm font-medium hover:bg-orange-50 transition-colors"
-              >
-                {playerB.name.split(' ')[0]} <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );

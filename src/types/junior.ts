@@ -107,6 +107,7 @@ export interface TswPlayerStats {
 
 export interface H2HMatch {
   tournament: string;
+  tournamentUrl: string;
   event: string;
   round: string;
   duration: string;

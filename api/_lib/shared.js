@@ -150,6 +150,11 @@ export function parseH2HContent(html, headers) {
     const event = headerItems[1] ?? '';
     const round = headerItems[2] ?? '';
 
+    const tournamentIdMatch = block.match(/\/sport\/player\.aspx\?id=([0-9A-Fa-f-]+)/);
+    const tournamentUrl = tournamentIdMatch
+      ? `/sport/tournament.aspx?id=${tournamentIdMatch[1]}`
+      : '';
+
     const durationMatch = block.match(/<time[^>]*>([\dhmHM\s]+)<\/time>/);
     const duration = durationMatch ? durationMatch[1].trim() : '';
 
@@ -185,7 +190,7 @@ export function parseH2HContent(html, headers) {
     const venueMatch = block.match(/icon-marker[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/);
 
     matches.push({
-      tournament, event, round, duration,
+      tournament, tournamentUrl, event, round, duration,
       team1Players, team2Players, team1Won, team2Won, scores,
       date: dateMatch ? dateMatch[1].trim() : '',
       venue: venueMatch ? venueMatch[1].trim() : '',
