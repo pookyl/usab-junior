@@ -1,4 +1,4 @@
-import type { JuniorPlayer, RankingsMap, UniquePlayer } from '../types/junior';
+import type { RankingsMap, UniquePlayer } from '../types/junior';
 import cachedData from './cached-players.json';
 
 export const RANKINGS_DATE: string = cachedData.date;

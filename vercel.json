@@ -4,5 +4,9 @@
       "maxDuration": 60,
       "includeFiles": "data/**"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
