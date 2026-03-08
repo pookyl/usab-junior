@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect, useRef, useMemo, type ReactNode } from 'react';
 import type { UniquePlayer } from '../types/junior';
 import { fetchAllPlayers, fetchLatestDate, invalidateRankingsCache } from '../services/rankingsService';
-import { staticRankings, RANKINGS_DATE } from '../data/usaJuniorData';
+import { cachedAllPlayers, RANKINGS_DATE } from '../data/usaJuniorData';
 
-export type DataSource = 'live' | 'static' | 'none';
+export type DataSource = 'live' | 'cached' | 'none';
 
 interface PlayersContextValue {
   players: UniquePlayer[];
@@ -15,34 +15,13 @@ interface PlayersContextValue {
   playerNameMap: Map<string, string>;
 }
 
-function buildStaticPlayers(): UniquePlayer[] {
-  const map = new Map<string, UniquePlayer>();
-  for (const players of Object.values(staticRankings)) {
-    if (!players) continue;
-    for (const p of players) {
-      if (!map.has(p.usabId)) {
-        map.set(p.usabId, { usabId: p.usabId, name: p.name, entries: [] });
-      }
-      map.get(p.usabId)!.entries.push({
-        ageGroup: p.ageGroup,
-        eventType: p.eventType,
-        rank: p.rank,
-        rankingPoints: p.rankingPoints,
-      });
-    }
-  }
-  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
-}
-
-const staticPlayers = buildStaticPlayers();
-
 const PlayersContext = createContext<PlayersContextValue | null>(null);
 
 export function PlayersProvider({ children }: { children: ReactNode }) {
-  const [players, setPlayers] = useState<UniquePlayer[]>(staticPlayers);
-  const [loading, setLoading] = useState(true);
+  const [players, setPlayers] = useState<UniquePlayer[]>(cachedAllPlayers);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<DataSource>(staticPlayers.length > 0 ? 'static' : 'none');
+  const [source, setSource] = useState<DataSource>(cachedAllPlayers.length > 0 ? 'cached' : 'none');
   const [rankingsDate, setRankingsDate] = useState<string>(RANKINGS_DATE);
   const fetchCount = useRef(0);
 
@@ -62,9 +41,9 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
 
     doFetch().catch((err: Error) => {
       if (fetchCount.current !== id) return;
-      if (staticPlayers.length > 0) {
-        setPlayers(staticPlayers);
-        setSource('static');
+      if (cachedAllPlayers.length > 0) {
+        setPlayers(cachedAllPlayers);
+        setSource('cached');
       } else {
         setSource('none');
       }
@@ -77,16 +56,19 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     (async () => {
-      const { latestDate } = await fetchLatestDate();
+      try {
+        const { latestDate } = await fetchLatestDate();
+        if (cancelled) return;
 
-      if (cancelled) return;
-
-      if (latestDate && latestDate !== rankingsDate) {
-        invalidateRankingsCache();
-        setRankingsDate(latestDate);
-        load(latestDate);
-      } else {
-        load();
+        if (latestDate && latestDate !== RANKINGS_DATE) {
+          invalidateRankingsCache();
+          setRankingsDate(latestDate);
+          load(latestDate);
+        } else {
+          setSource('live');
+        }
+      } catch {
+        if (cancelled) return;
       }
     })();
 

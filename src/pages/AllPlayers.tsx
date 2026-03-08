@@ -173,9 +173,9 @@ export default function AllPlayers() {
             <span className="flex items-center gap-1.5 text-xs md:text-sm text-emerald-600">
               <Wifi className="w-4 h-4" /> All groups loaded
             </span>
-          ) : source === 'static' ? (
-            <span className="flex items-center gap-1.5 text-xs md:text-sm text-slate-500">
-              <WifiOff className="w-4 h-4" /> Static data
+          ) : source === 'cached' ? (
+            <span className="flex items-center gap-1.5 text-xs md:text-sm text-sky-600">
+              <WifiOff className="w-4 h-4" /> Cached data
             </span>
           ) : null}
           <button

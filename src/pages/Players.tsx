@@ -67,8 +67,8 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
             <span className="flex items-center gap-1.5 text-emerald-600">
               <Wifi className="w-4 h-4" /> Live data
             </span>
-          ) : source === 'static' ? (
-            <span className="flex items-center gap-1.5 text-slate-500">
+          ) : source === 'cached' ? (
+            <span className="flex items-center gap-1.5 text-sky-600">
               <WifiOff className="w-4 h-4" /> Cached · {formatRankingsDate(date)}
             </span>
           ) : null}

@@ -3,7 +3,7 @@ import type { JuniorPlayer, AgeGroup, EventType, RankingsKey } from '../types/ju
 import { fetchRankings } from '../services/rankingsService';
 import { staticRankings } from '../data/usaJuniorData';
 
-export type DataSource = 'live' | 'static' | 'none';
+export type DataSource = 'live' | 'cached' | 'none';
 
 export interface UseRankingsResult {
   players: JuniorPlayer[];
@@ -15,12 +15,12 @@ export interface UseRankingsResult {
 
 export function useRankings(ageGroup: AgeGroup, eventType: EventType, date?: string): UseRankingsResult {
   const key: RankingsKey = `${ageGroup}-${eventType}`;
-  const staticData = staticRankings[key] ?? [];
+  const cachedData = staticRankings[key] ?? [];
 
-  const [players, setPlayers] = useState<JuniorPlayer[]>(staticData);
-  const [loading, setLoading] = useState(staticData.length === 0);
+  const [players, setPlayers] = useState<JuniorPlayer[]>(cachedData);
+  const [loading, setLoading] = useState(cachedData.length === 0);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<DataSource>(staticData.length > 0 ? 'static' : 'none');
+  const [source, setSource] = useState<DataSource>(cachedData.length > 0 ? 'cached' : 'none');
   const fetchCount = useRef(0);
 
   const load = () => {
@@ -37,9 +37,9 @@ export function useRankings(ageGroup: AgeGroup, eventType: EventType, date?: str
       })
       .catch((err: Error) => {
         if (fetchCount.current !== id) return;
-        if (staticData.length > 0) {
-          setPlayers(staticData);
-          setSource('static');
+        if (cachedData.length > 0) {
+          setPlayers(cachedData);
+          setSource('cached');
         } else {
           setSource('none');
           setError(err.message);
@@ -52,7 +52,7 @@ export function useRankings(ageGroup: AgeGroup, eventType: EventType, date?: str
     const cached = staticRankings[key];
     if (cached) {
       setPlayers(cached);
-      setSource('static');
+      setSource('cached');
     }
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps

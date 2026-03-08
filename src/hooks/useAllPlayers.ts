@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { UniquePlayer } from '../types/junior';
 import { fetchAllPlayers } from '../services/rankingsService';
-import { staticRankings } from '../data/usaJuniorData';
+import { cachedAllPlayers } from '../data/usaJuniorData';
 import type { DataSource } from './useRankings';
 
 export interface UseAllPlayersResult {
@@ -12,32 +12,11 @@ export interface UseAllPlayersResult {
   refresh: () => void;
 }
 
-function buildStaticPlayers(): UniquePlayer[] {
-  const map = new Map<string, UniquePlayer>();
-  for (const players of Object.values(staticRankings)) {
-    if (!players) continue;
-    for (const p of players) {
-      if (!map.has(p.usabId)) {
-        map.set(p.usabId, { usabId: p.usabId, name: p.name, entries: [] });
-      }
-      map.get(p.usabId)!.entries.push({
-        ageGroup: p.ageGroup,
-        eventType: p.eventType,
-        rank: p.rank,
-        rankingPoints: p.rankingPoints,
-      });
-    }
-  }
-  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
-}
-
-const staticPlayers = buildStaticPlayers();
-
 export function useAllPlayers(): UseAllPlayersResult {
-  const [players, setPlayers] = useState<UniquePlayer[]>(staticPlayers);
-  const [loading, setLoading] = useState(true);
+  const [players, setPlayers] = useState<UniquePlayer[]>(cachedAllPlayers);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<DataSource>(staticPlayers.length > 0 ? 'static' : 'none');
+  const [source, setSource] = useState<DataSource>(cachedAllPlayers.length > 0 ? 'cached' : 'none');
   const fetchCount = useRef(0);
 
   const load = () => {
@@ -54,9 +33,9 @@ export function useAllPlayers(): UseAllPlayersResult {
       })
       .catch((err: Error) => {
         if (fetchCount.current !== id) return;
-        if (staticPlayers.length > 0) {
-          setPlayers(staticPlayers);
-          setSource('static');
+        if (cachedAllPlayers.length > 0) {
+          setPlayers(cachedAllPlayers);
+          setSource('cached');
         } else {
           setSource('none');
         }
