@@ -12,7 +12,7 @@ import {
   Area,
   Cell,
 } from 'recharts';
-import { X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import { usePlayers } from '../contexts/PlayersContext';
 import type { AgeGroup, EventType, UniquePlayer, PlayerEntry } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
@@ -36,6 +36,22 @@ const AGE_COLORS: Record<AgeGroup, string> = {
   U19: '#ef4444',
 };
 
+const AGE_BG_COLORS: Record<AgeGroup, string> = {
+  U11: 'bg-violet-600',
+  U13: 'bg-blue-600',
+  U15: 'bg-emerald-600',
+  U17: 'bg-amber-500',
+  U19: 'bg-rose-600',
+};
+
+const AGE_LIGHT: Record<AgeGroup, string> = {
+  U11: 'bg-violet-50 text-violet-700 border-violet-200',
+  U13: 'bg-blue-50 text-blue-700 border-blue-200',
+  U15: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  U17: 'bg-amber-50 text-amber-700 border-amber-200',
+  U19: 'bg-rose-50 text-rose-700 border-rose-200',
+};
+
 const HISTOGRAM_COLORS = [
   '#818cf8', '#6366f1', '#4f46e5', '#4338ca', '#3730a3',
   '#312e81', '#2e1065', '#1e1b4b', '#1a1647', '#0f0d2e',
@@ -47,6 +63,13 @@ interface ModalData {
 }
 
 function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }) {
+  const [search, setSearch] = useState('');
+  const filtered = useMemo(() => {
+    if (!search.trim()) return data.players;
+    const q = search.toLowerCase();
+    return data.players.filter((p) => p.name.toLowerCase().includes(q));
+  }, [data.players, search]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
@@ -54,22 +77,42 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
         className="relative bg-white md:rounded-2xl rounded-t-2xl shadow-xl border border-slate-200 w-full md:max-w-2xl max-h-[85vh] md:max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-slate-100">
-          <div>
-            <h3 className="text-base md:text-lg font-semibold text-slate-800">{data.title}</h3>
-            <p className="text-xs md:text-sm text-slate-400">{data.players.length} players</p>
+        <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base md:text-lg font-semibold text-slate-800">{data.title}</h3>
+              <p className="text-xs md:text-sm text-slate-400">
+                {filtered.length === data.players.length
+                  ? `${data.players.length} players`
+                  : `${filtered.length} of ${data.players.length} players`}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search player name…"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-violet-300 focus:ring-2 focus:ring-violet-100 outline-none transition-all placeholder:text-slate-400"
+            />
+          </div>
         </div>
         <div className="overflow-y-auto flex-1 overscroll-contain">
+          {filtered.length === 0 ? (
+            <p className="text-slate-400 text-sm py-8 text-center">No players match "{search}"</p>
+          ) : (
+            <>
           {/* Mobile: compact list */}
           <div className="md:hidden divide-y divide-slate-50">
-            {data.players.map((p) => {
+            {filtered.map((p) => {
               const bestPts = p.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
               const gender = inferGender(p.entries);
               return (
@@ -108,7 +151,7 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data.players.map((p) => {
+              {filtered.map((p) => {
                 const bestPts = p.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
                 const cats = new Set(p.entries.map((e) => `${e.ageGroup}-${e.eventType}`)).size;
                 const gender = inferGender(p.entries);
@@ -144,6 +187,8 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
               })}
             </tbody>
           </table>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -282,39 +327,38 @@ export default function Analytics() {
         </p>
       </div>
 
-      {/* Category selector — horizontal scroll on mobile */}
-      <div className="space-y-2 md:space-y-0 md:flex md:flex-wrap md:gap-3">
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-          {AGE_GROUPS.map((ag) => (
-            <button
-              key={ag}
-              onClick={() => setAgeGroup(ag)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap shrink-0 ${
-                ageGroup === ag
-                  ? 'text-white shadow-sm'
-                  : 'bg-white border border-slate-200 text-slate-500'
-              }`}
-              style={ageGroup === ag ? { backgroundColor: AGE_COLORS[ag] } : {}}
-            >
-              {ag}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-          {EVENT_TYPES.map((et) => (
-            <button
-              key={et}
-              onClick={() => setEventType(et)}
-              className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
-                eventType === et
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white border border-slate-200 text-slate-500'
-              }`}
-            >
-              {et} · {EVENT_LABELS[et]}
-            </button>
-          ))}
-        </div>
+      {/* Age Group Tabs — horizontal scroll on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+        {AGE_GROUPS.map((ag) => (
+          <button
+            key={ag}
+            onClick={() => setAgeGroup(ag)}
+            className={`px-5 md:px-6 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
+              ageGroup === ag
+                ? `${AGE_BG_COLORS[ag]} text-white scale-105`
+                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+            }`}
+          >
+            {ag}
+          </button>
+        ))}
+      </div>
+
+      {/* Event Type Pills — horizontal scroll on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+        {EVENT_TYPES.map((et) => (
+          <button
+            key={et}
+            onClick={() => setEventType(et)}
+            className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-colors border whitespace-nowrap shrink-0 ${
+              eventType === et
+                ? AGE_LIGHT[ageGroup]
+                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+            }`}
+          >
+            <span className="font-bold">{et}</span>
+          </button>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
@@ -396,7 +440,10 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {/* Points distribution histogram */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-          <h2 className="text-base md:text-lg font-semibold text-slate-800 mb-1">Points Distribution</h2>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-base md:text-lg font-semibold text-slate-800">Points Distribution</h2>
+            <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wide bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">All Players</span>
+          </div>
           <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
             Player count by best-points range · Tap a bar to see players
           </p>
@@ -435,7 +482,10 @@ export default function Analytics() {
         {/* Multi-event participation */}
         {multiEventData.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-            <h2 className="text-base md:text-lg font-semibold text-slate-800 mb-1">Category Participation</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-base md:text-lg font-semibold text-slate-800">Category Participation</h2>
+              <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wide bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">All Players</span>
+            </div>
             <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
               Categories per player · Tap a bar to see players
             </p>
