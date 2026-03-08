@@ -8,15 +8,15 @@ interface StatCardProps {
 
 export default function StatCard({ label, value, sub, color = 'bg-white', icon }: StatCardProps) {
   return (
-    <div className={`${color} rounded-2xl p-5 shadow-sm border border-slate-100`}>
+    <div className={`${color} rounded-2xl p-4 md:p-5 shadow-sm border border-slate-100`}>
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-slate-500 font-medium">{label}</p>
-          <p className="text-3xl font-bold text-slate-800 mt-1">{value}</p>
-          {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+        <div className="min-w-0">
+          <p className="text-xs md:text-sm text-slate-500 font-medium">{label}</p>
+          <p className="text-2xl md:text-3xl font-bold text-slate-800 mt-0.5 md:mt-1">{value}</p>
+          {sub && <p className="text-[10px] md:text-xs text-slate-400 mt-0.5 md:mt-1 truncate">{sub}</p>}
         </div>
         {icon && (
-          <div className="bg-slate-100 p-2 rounded-xl text-slate-600">{icon}</div>
+          <div className="bg-slate-100 p-1.5 md:p-2 rounded-xl text-slate-600 shrink-0">{icon}</div>
         )}
       </div>
     </div>

@@ -48,16 +48,16 @@ interface ModalData {
 
 function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
       <div
-        className="relative bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl max-h-[80vh] flex flex-col"
+        className="relative bg-white md:rounded-2xl rounded-t-2xl shadow-xl border border-slate-200 w-full md:max-w-2xl max-h-[85vh] md:max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-slate-100">
           <div>
-            <h3 className="text-lg font-semibold text-slate-800">{data.title}</h3>
-            <p className="text-sm text-slate-400">{data.players.length} players</p>
+            <h3 className="text-base md:text-lg font-semibold text-slate-800">{data.title}</h3>
+            <p className="text-xs md:text-sm text-slate-400">{data.players.length} players</p>
           </div>
           <button
             onClick={onClose}
@@ -66,8 +66,38 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="overflow-y-auto flex-1">
-          <table className="w-full text-sm">
+        <div className="overflow-y-auto flex-1 overscroll-contain">
+          {/* Mobile: compact list */}
+          <div className="md:hidden divide-y divide-slate-50">
+            {data.players.map((p) => {
+              const bestPts = p.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
+              const gender = inferGender(p.entries);
+              return (
+                <Link
+                  key={p.usabId}
+                  to={`/directory/${p.usabId}`}
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-4 py-3 active:bg-slate-50"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-800 truncate">{p.name}</p>
+                    <p className="text-[10px] text-slate-400">
+                      <span className={gender === 'Boy' ? 'text-blue-500' : gender === 'Girl' ? 'text-pink-500' : ''}>
+                        {gender}
+                      </span>
+                      {' · '}{p.usabId}
+                    </p>
+                  </div>
+                  <span className="font-bold text-emerald-600 text-sm tabular-nums shrink-0">
+                    {bestPts.toLocaleString()}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Desktop: table */}
+          <table className="hidden md:table w-full text-sm">
             <thead className="sticky top-0 bg-slate-50">
               <tr className="text-left text-slate-400 text-xs uppercase tracking-wider">
                 <th className="px-6 py-3 font-medium">Player</th>
@@ -87,6 +117,7 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
                     <td className="px-6 py-3">
                       <Link
                         to={`/directory/${p.usabId}`}
+                        onClick={onClose}
                         className="font-medium text-slate-800 hover:text-violet-600 transition-colors"
                       >
                         {p.name}
@@ -187,7 +218,7 @@ export default function Analytics() {
     }
     return Object.entries(counts)
       .map(([n, count]) => ({
-        label: Number(n) === 1 ? '1 category' : `${n} categories`,
+        label: Number(n) === 1 ? '1 cat' : `${n} cats`,
         count,
         n: Number(n),
       }))
@@ -240,25 +271,25 @@ export default function Analytics() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-5 md:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Analytics</h1>
-        <p className="text-slate-500 mt-1">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Analytics</h1>
+        <p className="text-sm md:text-base text-slate-500 mt-1">
           Rankings distribution &amp; performance insights
           {!loading && players.length > 0 && (
-            <span className="text-slate-400"> · {players.length.toLocaleString()} ranked players</span>
+            <span className="text-slate-400"> · {players.length.toLocaleString()} players</span>
           )}
         </p>
       </div>
 
-      {/* Category selector */}
-      <div className="flex flex-wrap gap-3">
-        <div className="flex gap-2">
+      {/* Category selector — horizontal scroll on mobile */}
+      <div className="space-y-2 md:space-y-0 md:flex md:flex-wrap md:gap-3">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
           {AGE_GROUPS.map((ag) => (
             <button
               key={ag}
               onClick={() => setAgeGroup(ag)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap shrink-0 ${
                 ageGroup === ag
                   ? 'text-white shadow-sm'
                   : 'bg-white border border-slate-200 text-slate-500'
@@ -269,38 +300,38 @@ export default function Analytics() {
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
           {EVENT_TYPES.map((et) => (
             <button
               key={et}
               onClick={() => setEventType(et)}
-              className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                 eventType === et
                   ? 'bg-emerald-600 text-white'
                   : 'bg-white border border-slate-200 text-slate-500'
               }`}
             >
-              {et}
+              {et} · {EVENT_LABELS[et]}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {/* Top 20 points bar chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-1">Top 20 Players — Points</h2>
-          <p className="text-sm text-slate-400 mb-4">
-            {ageGroup} {EVENT_LABELS[eventType]} · {categoryPlayerCount} ranked players
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-semibold text-slate-800 mb-1">Top 20 — Points</h2>
+          <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+            {ageGroup} {EVENT_LABELS[eventType]} · {categoryPlayerCount} players
           </p>
           {loading && top20.length === 0 ? (
             <div className="py-8 text-center text-slate-400 text-sm">Loading…</div>
           ) : top20.length > 0 ? (
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={top20} layout="vertical" margin={{ left: 70, right: 20 }}>
+            <ResponsiveContainer width="100%" height={top20.length * 22 + 40}>
+              <BarChart data={top20} layout="vertical" margin={{ left: 60, right: 10, top: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                <YAxis dataKey="shortName" type="category" tick={{ fontSize: 11, fill: '#64748b' }} width={70} />
+                <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                <YAxis dataKey="shortName" type="category" tick={{ fontSize: 10, fill: '#64748b' }} width={60} />
                 <Tooltip
                   formatter={(v: unknown) => [(v as number).toLocaleString(), 'Points']}
                   labelFormatter={(_: unknown, payload: ReadonlyArray<{ payload?: { name?: string } }>) =>
@@ -319,15 +350,15 @@ export default function Analytics() {
         </div>
 
         {/* Points Dropoff Curve */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-1">Points Dropoff Curve</h2>
-          <p className="text-sm text-slate-400 mb-4">
-            {ageGroup} {EVENT_LABELS[eventType]} · {dropoffData.length} ranked players
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-semibold text-slate-800 mb-1">Points Dropoff</h2>
+          <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+            {ageGroup} {EVENT_LABELS[eventType]} · {dropoffData.length} players
           </p>
           {loading && dropoffData.length === 0 ? (
             <div className="py-12 text-center text-slate-400 text-sm">Loading…</div>
           ) : dropoffData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={dropoffData}>
                 <defs>
                   <linearGradient id="dropoffGrad" x1="0" y1="0" x2="0" y2="1">
@@ -338,10 +369,10 @@ export default function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis
                   dataKey="rank"
-                  tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  label={{ value: 'Player Rank', position: 'insideBottom', offset: -2, fill: '#94a3b8', fontSize: 11 }}
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  label={{ value: 'Rank', position: 'insideBottom', offset: -2, fill: '#94a3b8', fontSize: 10 }}
                 />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} width={40} />
                 <Tooltip
                   formatter={(v: unknown) => [(v as number).toLocaleString(), 'Points']}
                   labelFormatter={(label: unknown) => `Rank #${label}`}
@@ -362,23 +393,23 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {/* Points distribution histogram */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-1">Points Distribution</h2>
-          <p className="text-sm text-slate-400 mb-4">
-            Player count by best-points range · Click a bar to see players
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-semibold text-slate-800 mb-1">Points Distribution</h2>
+          <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+            Player count by best-points range · Tap a bar to see players
           </p>
           {distribution.length > 0 ? (
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart data={distribution}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis
                   dataKey="range"
-                  tick={{ fontSize: 10, fill: '#94a3b8' }}
-                  label={{ value: 'Points', position: 'insideBottom', offset: -2, fill: '#94a3b8', fontSize: 11 }}
+                  tick={{ fontSize: 9, fill: '#94a3b8' }}
+                  label={{ value: 'Points', position: 'insideBottom', offset: -2, fill: '#94a3b8', fontSize: 10 }}
                 />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} width={35} />
                 <Tooltip
                   formatter={(v: unknown) => [String(v), 'Players']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: 12 }}
@@ -403,16 +434,16 @@ export default function Analytics() {
 
         {/* Multi-event participation */}
         {multiEventData.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            <h2 className="text-lg font-semibold text-slate-800 mb-1">Ranking Category Participation</h2>
-            <p className="text-sm text-slate-400 mb-4">
-              Categories per player · Click a bar to see players
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+            <h2 className="text-base md:text-lg font-semibold text-slate-800 mb-1">Category Participation</h2>
+            <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+              Categories per player · Tap a bar to see players
             </p>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart data={multiEventData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#64748b' }} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} width={35} />
                 <Tooltip
                   formatter={(v: unknown) => [(v as number).toLocaleString(), 'Players']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: 12 }}

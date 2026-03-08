@@ -54,21 +54,21 @@ const AGE_TEXT: Record<AgeGroup, string> = {
 
 function RankingCard({ entry }: { entry: PlayerEntry }) {
   return (
-    <div className={`bg-white rounded-xl border ${AGE_BORDER[entry.ageGroup]} p-4`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${AGE_GRADIENT[entry.ageGroup]} text-white`}>
+    <div className={`bg-white rounded-xl border ${AGE_BORDER[entry.ageGroup]} p-3 md:p-4`}>
+      <div className="flex items-center justify-between mb-1.5 md:mb-2">
+        <span className={`inline-flex items-center gap-1 px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-gradient-to-r ${AGE_GRADIENT[entry.ageGroup]} text-white`}>
           {entry.ageGroup} {entry.eventType}
         </span>
-        <span className={`text-2xl font-black ${AGE_TEXT[entry.ageGroup]}`}>
+        <span className={`text-xl md:text-2xl font-black ${AGE_TEXT[entry.ageGroup]}`}>
           #{entry.rank}
         </span>
       </div>
-      <p className="text-xs text-slate-400">{EVENT_LABELS[entry.eventType]}</p>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="text-lg font-bold text-slate-800">
+      <p className="text-[10px] md:text-xs text-slate-400">{EVENT_LABELS[entry.eventType]}</p>
+      <div className="mt-1.5 md:mt-2 flex items-baseline gap-1">
+        <span className="text-base md:text-lg font-bold text-slate-800">
           {entry.rankingPoints.toLocaleString()}
         </span>
-        <span className="text-xs text-slate-400">pts</span>
+        <span className="text-[10px] md:text-xs text-slate-400">pts</span>
       </div>
     </div>
   );
@@ -79,8 +79,8 @@ function WinLossBar({ wins, losses, pct }: { wins: number; losses: number; pct: 
   if (total === 0) return null;
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm font-medium text-slate-700 whitespace-nowrap">
+    <div className="flex items-center gap-2 md:gap-3">
+      <span className="text-xs md:text-sm font-medium text-slate-700 whitespace-nowrap">
         {wins} / {losses} ({total})
       </span>
       <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
@@ -89,7 +89,7 @@ function WinLossBar({ wins, losses, pct }: { wins: number; losses: number; pct: 
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="text-xs font-medium text-slate-400 whitespace-nowrap">{pct}%</span>
+      <span className="text-[10px] md:text-xs font-medium text-slate-400 whitespace-nowrap">{pct}%</span>
     </div>
   );
 }
@@ -103,15 +103,15 @@ const STATS_TABS: { key: StatsCategory; label: string }[] = [
 
 function StatsTabContent({ cat }: { cat: CategoryStats }) {
   return (
-    <div className="space-y-3 pt-4">
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-slate-500 w-20 shrink-0">Career</span>
+    <div className="space-y-3 pt-3 md:pt-4">
+      <div className="flex items-center gap-3 md:gap-4">
+        <span className="text-xs md:text-sm text-slate-500 w-16 md:w-20 shrink-0">Career</span>
         <div className="flex-1">
           <WinLossBar wins={cat.career.wins} losses={cat.career.losses} pct={cat.career.winPct} />
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-slate-500 w-20 shrink-0">This year</span>
+      <div className="flex items-center gap-3 md:gap-4">
+        <span className="text-xs md:text-sm text-slate-500 w-16 md:w-20 shrink-0">This year</span>
         <div className="flex-1">
           <WinLossBar wins={cat.thisYear.wins} losses={cat.thisYear.losses} pct={cat.thisYear.winPct} />
         </div>
@@ -244,7 +244,7 @@ export default function PlayerProfile() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
       {/* Back */}
       <Link
         to="/directory"
@@ -255,83 +255,83 @@ export default function PlayerProfile() {
       </Link>
 
       {/* Hero card */}
-      <div className={`bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white`}>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center text-2xl font-black text-white shrink-0">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 md:p-6 text-white">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center text-xl md:text-2xl font-black text-white shrink-0">
             {displayName.split(' ').map((w) => w[0]).slice(0, 2).join('')}
           </div>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold mb-2">{displayName}</h1>
-            <div className="flex flex-wrap gap-2 mb-2">
+            <h1 className="text-xl md:text-2xl font-bold mb-1.5 md:mb-2">{displayName}</h1>
+            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-1.5 md:mb-2">
               {ageGroupSet.map((ag) => (
                 <span
                   key={ag}
-                  className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${AGE_GRADIENT[ag]} text-white`}
+                  className={`px-2.5 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-gradient-to-r ${AGE_GRADIENT[ag]} text-white`}
                 >
                   {ag}
                 </span>
               ))}
             </div>
-            <div className="flex flex-wrap gap-3 text-white/60 text-sm">
-              <span>USAB ID: <span className="font-mono text-white font-semibold">{usabId}</span></span>
-              <span>·</span>
+            <div className="flex flex-wrap gap-2 md:gap-3 text-white/60 text-xs md:text-sm">
+              <span>USAB: <span className="font-mono text-white font-semibold">{usabId}</span></span>
               {gender && (
                 <>
+                  <span className="hidden sm:inline">·</span>
                   <span>{gender === 'M' ? 'Boy' : gender === 'F' ? 'Girl' : gender}</span>
-                  <span>·</span>
                 </>
               )}
+              <span className="hidden sm:inline">·</span>
               <span>{player.entries.length} ranked {player.entries.length === 1 ? 'event' : 'events'}</span>
             </div>
           </div>
 
-          <div className="flex gap-6 text-center shrink-0">
+          <div className="flex gap-5 md:gap-6 text-center shrink-0">
             <div>
-              <p className="text-3xl font-black text-violet-400">#{bestEntry.rank}</p>
-              <p className="text-xs text-white/50 mt-0.5">Best Rank</p>
+              <p className="text-2xl md:text-3xl font-black text-violet-400">#{bestEntry.rank}</p>
+              <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Best Rank</p>
             </div>
             <div>
-              <p className="text-3xl font-black">{bestEntry.rankingPoints.toLocaleString()}</p>
-              <p className="text-xs text-white/50 mt-0.5">Top Points</p>
+              <p className="text-2xl md:text-3xl font-black">{bestEntry.rankingPoints.toLocaleString()}</p>
+              <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Top Points</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-3">
+        <div className="mt-4 md:mt-5 flex flex-wrap gap-2 md:gap-3">
           <a
             href={usabPlayerUrl(usabId, bestEntry.ageGroup, bestEntry.eventType)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm transition-colors"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
           >
-            <Trophy className="w-4 h-4" />
-            USAB Rankings Profile
-            <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            <Trophy className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            USAB Profile
+            <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
           </a>
           <a
             href={tswStats?.tswProfileUrl ?? tswSearchUrl(displayName)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm transition-colors"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
           >
-            <Activity className="w-4 h-4" />
-            TournamentSoftware Profile
-            <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            <Activity className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            TSW Profile
+            <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
           </a>
         </div>
       </div>
 
       {/* Rankings overview */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Award className="w-5 h-5 text-amber-500" />
-          <h2 className="text-lg font-semibold text-slate-800">Rankings Overview</h2>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+        <div className="flex items-center gap-2 mb-3 md:mb-4">
+          <Award className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+          <h2 className="text-base md:text-lg font-semibold text-slate-800">Rankings Overview</h2>
         </div>
-        <p className="text-sm text-slate-400 mb-4">
-          Current rankings across all age groups and event categories
+        <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+          Current rankings across all age groups and events
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
           {sortedEntries.map((entry) => (
             <RankingCard
               key={`${entry.ageGroup}-${entry.eventType}`}
@@ -342,36 +342,36 @@ export default function PlayerProfile() {
       </div>
 
       {/* Match Statistics from TSW */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-emerald-500" />
-            <h2 className="text-lg font-semibold text-slate-800">Statistics</h2>
+            <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
+            <h2 className="text-base md:text-lg font-semibold text-slate-800">Statistics</h2>
           </div>
           <a
             href={tswStats?.tswProfileUrl ?? tswSearchUrl(displayName)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-sm text-orange-600 hover:underline"
+            className="flex items-center gap-1.5 text-xs md:text-sm text-orange-600 hover:underline"
           >
-            TournamentSoftware <ExternalLink className="w-3.5 h-3.5" />
+            TSW <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
 
         {loadingTsw ? (
-          <div className="py-10 text-center">
+          <div className="py-8 md:py-10 text-center">
             <RefreshCw className="w-7 h-7 text-slate-300 animate-spin mx-auto mb-3" />
             <p className="text-slate-400 text-sm">Fetching match statistics…</p>
           </div>
         ) : tswStats && tswStats.total.career.total > 0 ? (
-          <div className="space-y-6">
+          <div className="space-y-5 md:space-y-6">
             {/* Tabs */}
             <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
               {STATS_TABS.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setStatsTab(tab.key)}
-                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`flex-1 px-2 md:px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-all ${
                     statsTab === tab.key
                       ? 'bg-white text-slate-800 shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
@@ -384,20 +384,20 @@ export default function PlayerProfile() {
 
             {/* Win-Loss section */}
             <div>
-              <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Win-Loss</h5>
+              <h5 className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 md:mb-3">Win-Loss</h5>
               <StatsTabContent cat={tswStats[statsTab]} />
             </div>
 
-            {/* History indicators (Total tab only) */}
+            {/* History indicators */}
             {statsTab === 'total' && tswStats.recentHistory.length > 0 && (
               <div>
-                <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">History</h5>
-                <div className="flex gap-1.5">
+                <h5 className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 md:mb-3">History</h5>
+                <div className="flex gap-1 md:gap-1.5 overflow-x-auto scrollbar-hide">
                   {tswStats.recentHistory.map((h, i) => (
                     <span
                       key={i}
                       title={h.date}
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                      className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-[10px] md:text-xs font-bold text-white shrink-0 ${
                         h.won ? 'bg-emerald-500' : 'bg-rose-500'
                       }`}
                     >
@@ -408,7 +408,7 @@ export default function PlayerProfile() {
               </div>
             )}
 
-            {/* Recent results filtered by active tab */}
+            {/* Recent results */}
             {(() => {
               const filtered = statsTab === 'total'
                 ? tswStats.recentResults
@@ -416,21 +416,21 @@ export default function PlayerProfile() {
               if (filtered.length === 0) return null;
               return (
                 <div>
-                  <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                  <h5 className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 md:mb-3">
                     Recent Results{statsTab !== 'total' ? ` — ${STATS_TABS.find((t) => t.key === statsTab)?.label}` : ''}
                   </h5>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 md:space-y-2">
                     {filtered.slice(0, 15).map((match, i) => (
                       <div
                         key={i}
-                        className={`flex items-center gap-3 p-3 rounded-lg border ${
+                        className={`flex items-center gap-2 md:gap-3 p-2.5 md:p-3 rounded-lg border ${
                           match.won
                             ? 'bg-emerald-50 border-emerald-100'
                             : 'bg-rose-50 border-rose-100'
                         }`}
                       >
                         <span
-                          className={`px-2 py-0.5 rounded text-xs font-bold ${
+                          className={`px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-bold shrink-0 ${
                             match.won
                               ? 'bg-emerald-500 text-white'
                               : 'bg-rose-500 text-white'
@@ -439,7 +439,7 @@ export default function PlayerProfile() {
                           {match.won ? 'W' : 'L'}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-700 truncate">
+                          <p className="text-xs md:text-sm font-medium text-slate-700 truncate">
                             vs.{' '}
                             <PlayerNameLink
                               name={match.opponent}
@@ -449,7 +449,7 @@ export default function PlayerProfile() {
                             />
                           </p>
                           {match.partner && (
-                            <p className="text-xs text-blue-500 truncate">
+                            <p className="text-[10px] md:text-xs text-blue-500 truncate">
                               w/{' '}
                               <PlayerNameLink
                                 name={match.partner}
@@ -459,18 +459,18 @@ export default function PlayerProfile() {
                               />
                             </p>
                           )}
-                          <p className="text-xs text-slate-400 truncate">
+                          <p className="text-[10px] md:text-xs text-slate-400 truncate">
                             {match.tournament}
                             {match.event && ` · ${match.event}`}
                             {match.round && ` · ${match.round}`}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-sm font-mono font-medium text-slate-600">
+                          <p className="text-xs md:text-sm font-mono font-medium text-slate-600">
                             {match.score}
                           </p>
                           {match.date && (
-                            <p className="text-[10px] text-slate-400">{match.date}</p>
+                            <p className="text-[9px] md:text-[10px] text-slate-400">{match.date}</p>
                           )}
                         </div>
                       </div>
@@ -481,8 +481,8 @@ export default function PlayerProfile() {
             })()}
           </div>
         ) : (
-          <div className="py-8 text-center space-y-3">
-            <Activity className="w-10 h-10 text-slate-200 mx-auto" />
+          <div className="py-6 md:py-8 text-center space-y-3">
+            <Activity className="w-8 md:w-10 h-8 md:h-10 text-slate-200 mx-auto" />
             <p className="text-slate-400 text-sm">
               Match statistics could not be loaded automatically.
             </p>
@@ -499,24 +499,24 @@ export default function PlayerProfile() {
       </div>
 
       {/* Tournament History from TSW */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-blue-500" />
-            <h2 className="text-lg font-semibold text-slate-800">Tournament History</h2>
+            <Calendar className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
+            <h2 className="text-base md:text-lg font-semibold text-slate-800">Tournament History</h2>
           </div>
           <a
             href={tswStats?.tswProfileUrl ? `${tswStats.tswProfileUrl}/tournaments` : tswSearchUrl(displayName)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-sm text-orange-600 hover:underline"
+            className="flex items-center gap-1.5 text-xs md:text-sm text-orange-600 hover:underline"
           >
-            TournamentSoftware <ExternalLink className="w-3.5 h-3.5" />
+            TSW <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
 
         {loadingTsw ? (
-          <div className="py-10 text-center">
+          <div className="py-8 md:py-10 text-center">
             <RefreshCw className="w-7 h-7 text-slate-300 animate-spin mx-auto mb-3" />
             <p className="text-slate-400 text-sm">Loading tournament history…</p>
           </div>
@@ -535,8 +535,8 @@ export default function PlayerProfile() {
 
           if (!hasAny) {
             return (
-              <div className="py-8 text-center space-y-3">
-                <Calendar className="w-10 h-10 text-slate-200 mx-auto" />
+              <div className="py-6 md:py-8 text-center space-y-3">
+                <Calendar className="w-8 md:w-10 h-8 md:h-10 text-slate-200 mx-auto" />
                 <p className="text-slate-400 text-sm">
                   No tournament history available{statsTab !== 'total' ? ` for ${STATS_TABS.find((t) => t.key === statsTab)?.label}` : ''}.
                 </p>
@@ -545,17 +545,17 @@ export default function PlayerProfile() {
           }
 
           return (
-            <div className="space-y-6">
+            <div className="space-y-5 md:space-y-6">
               {years.map((year) => {
                 const filtered = tby[year].map(filterTournament).filter(Boolean) as TswTournament[];
                 if (filtered.length === 0) return null;
                 return (
                   <div key={year}>
-                    <h3 className="text-sm font-bold text-slate-600 mb-3 flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">{year}</span>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-600 mb-2.5 md:mb-3 flex items-center gap-2">
+                      <span className="px-2 md:px-2.5 py-0.5 bg-slate-100 rounded-full">{year}</span>
                       <span className="text-slate-400 font-normal">{filtered.length} {filtered.length === 1 ? 'tournament' : 'tournaments'}</span>
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-2.5 md:space-y-3">
                       {filtered.map((t, ti) => {
                         const tournKey = `${year}-${ti}`;
                         const isExpanded = expandedTournaments.has(tournKey);
@@ -563,24 +563,24 @@ export default function PlayerProfile() {
                           (m) => statsTab === 'total' || m.category === statsTab,
                         );
                         return (
-                          <div key={ti} className="border border-slate-100 rounded-xl p-4 hover:border-slate-200 transition-colors">
-                            <div className="flex items-start justify-between gap-3">
+                          <div key={ti} className="border border-slate-100 rounded-xl p-3 md:p-4 hover:border-slate-200 transition-colors">
+                            <div className="flex items-start justify-between gap-2 md:gap-3">
                               <div className="min-w-0">
                                 {t.url ? (
                                   <a
                                     href={t.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-sm font-semibold text-slate-800 hover:text-orange-600 transition-colors"
+                                    className="text-xs md:text-sm font-semibold text-slate-800 hover:text-orange-600 transition-colors"
                                   >
                                     {t.name}
                                   </a>
                                 ) : (
-                                  <p className="text-sm font-semibold text-slate-800">{t.name}</p>
+                                  <p className="text-xs md:text-sm font-semibold text-slate-800">{t.name}</p>
                                 )}
-                                <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-slate-400">
+                                <div className="flex flex-wrap gap-x-2 md:gap-x-3 gap-y-0.5 mt-1 text-[10px] md:text-xs text-slate-400">
                                   {t.dates && <span>{t.dates}</span>}
-                                  {t.location && <span>{t.location}</span>}
+                                  {t.location && <span className="hidden sm:inline">{t.location}</span>}
                                 </div>
                               </div>
                               {t.url && (
@@ -590,11 +590,11 @@ export default function PlayerProfile() {
                                   rel="noopener noreferrer"
                                   className="shrink-0 text-orange-500 hover:text-orange-600"
                                 >
-                                  <ExternalLink className="w-4 h-4" />
+                                  <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                 </a>
                               )}
                             </div>
-                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <div className="mt-2.5 md:mt-3 flex flex-wrap items-center gap-1.5 md:gap-2">
                               {t.events.map((ev, ei) => {
                                 const total = ev.wins + ev.losses;
                                 const allWins = ev.wins === total;
@@ -602,7 +602,7 @@ export default function PlayerProfile() {
                                 return (
                                   <span
                                     key={ei}
-                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${
+                                    className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 rounded-lg text-[10px] md:text-xs font-medium border ${
                                       allWins
                                         ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                                         : allLosses
@@ -623,33 +623,32 @@ export default function PlayerProfile() {
                                     else next.add(tournKey);
                                     return next;
                                   })}
-                                  className="ml-auto inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                                  className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-lg text-[10px] md:text-xs font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                                 >
                                   {isExpanded ? 'Hide' : 'Results'}
-                                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                  <ChevronDown className={`w-3 h-3 md:w-3.5 md:h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                                 </button>
                               )}
                             </div>
                             {isExpanded && matchesForTournament.length > 0 && (
-                              <div className="mt-3 pt-3 border-t border-slate-100 space-y-1.5">
+                              <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-slate-100 space-y-1 md:space-y-1.5">
                                 {matchesForTournament.map((match, mi) => (
                                   <div
                                     key={mi}
-                                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs ${
+                                    className={`flex items-center gap-2 md:gap-2.5 px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs ${
                                       match.won
                                         ? 'bg-emerald-50/60'
                                         : 'bg-rose-50/60'
                                     }`}
                                   >
                                     <span
-                                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                                      className={`px-1 md:px-1.5 py-0.5 rounded text-[9px] md:text-[10px] font-bold shrink-0 ${
                                         match.won ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
                                       }`}
                                     >
                                       {match.won ? 'W' : 'L'}
                                     </span>
-                                    <span className="text-slate-500 shrink-0">{match.event}</span>
-                                    <span className="text-slate-400">·</span>
+                                    <span className="text-slate-500 shrink-0 hidden sm:inline">{match.event}</span>
                                     <span className="text-slate-600 font-medium truncate">
                                       vs.{' '}
                                       <PlayerNameLink
@@ -660,7 +659,7 @@ export default function PlayerProfile() {
                                       />
                                     </span>
                                     {match.partner && (
-                                      <span className="text-blue-500 truncate">
+                                      <span className="text-blue-500 truncate hidden sm:inline">
                                         w/{' '}
                                         <PlayerNameLink
                                           name={match.partner}
@@ -672,7 +671,7 @@ export default function PlayerProfile() {
                                     )}
                                     <span className="ml-auto font-mono text-slate-600 shrink-0">{match.score}</span>
                                     {match.round && (
-                                      <span className="text-slate-400 shrink-0">{match.round}</span>
+                                      <span className="text-slate-400 shrink-0 hidden sm:inline">{match.round}</span>
                                     )}
                                   </div>
                                 ))}

@@ -19,7 +19,7 @@ export default function App() {
       <PlayersProvider>
         <div className="min-h-screen bg-slate-50">
           <Navbar />
-          <main>
+          <main className="pb-20 md:pb-0">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/players" element={<Rankings />} />

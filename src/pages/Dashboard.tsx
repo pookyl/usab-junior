@@ -55,13 +55,13 @@ function AgeGroupCard({ ageGroup, stats }: { ageGroup: AgeGroup; stats: GroupSta
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
-      <div className={`bg-gradient-to-r ${colors.gradient} px-5 py-3 flex items-center justify-between`}>
-        <span className="font-bold text-white text-lg">{ageGroup}</span>
-        <span className="bg-white/20 text-white text-sm font-semibold px-3 py-0.5 rounded-full">
+      <div className={`bg-gradient-to-r ${colors.gradient} px-4 md:px-5 py-2.5 md:py-3 flex items-center justify-between`}>
+        <span className="font-bold text-white text-base md:text-lg">{ageGroup}</span>
+        <span className="bg-white/20 text-white text-xs md:text-sm font-semibold px-2.5 md:px-3 py-0.5 rounded-full">
           {stats.total} players
         </span>
       </div>
-      <div className="p-5 space-y-3">
+      <div className="p-4 md:p-5 space-y-3">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium text-blue-600">{stats.boys} Boys</span>
           <span className="font-medium text-pink-500">{stats.girls} Girls</span>
@@ -116,17 +116,17 @@ export default function Dashboard() {
   }, [players]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-6 md:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
         <div>
-          <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center">
-              <Award className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2.5 md:gap-3 mb-1">
+            <div className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center">
+              <Award className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-slate-800">USA Junior Badminton</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-800">USA Junior Badminton</h1>
           </div>
-          <p className="text-slate-500 ml-13">
+          <p className="text-sm md:text-base text-slate-500 ml-[46px] md:ml-[52px]">
             Player Overview · Data from{' '}
             <a href="https://usabjrrankings.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
               usabjrrankings.org
@@ -142,7 +142,7 @@ export default function Dashboard() {
               </span>
             )}
           </p>
-          <p className="text-slate-400 text-sm ml-13 flex items-center gap-1.5 mt-0.5">
+          <p className="text-slate-400 text-xs md:text-sm ml-[46px] md:ml-[52px] flex items-center gap-1.5 mt-0.5">
             <Calendar className="w-3.5 h-3.5" />
             Rankings as of {formatRankingsDate(rankingsDate)}
           </p>
@@ -150,7 +150,7 @@ export default function Dashboard() {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <StatCard
           label="Total Players"
           value={loading ? '...' : totalPlayers.toLocaleString()}
@@ -181,10 +181,10 @@ export default function Dashboard() {
 
       {/* Overall gender distribution bar */}
       {totalPlayers > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Overall Gender Distribution</h2>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-bold text-slate-800 mb-3 md:mb-4">Overall Gender Distribution</h2>
           <GenderBar boys={totalBoys} girls={totalGirls} />
-          <div className="flex items-center gap-6 mt-3 text-sm">
+          <div className="flex items-center gap-4 md:gap-6 mt-3 text-xs md:text-sm">
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
               <span className="text-slate-600">Boys {totalBoys}</span>
@@ -201,16 +201,16 @@ export default function Dashboard() {
 
       {/* Age Group Breakdown */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-slate-800">Players by Age Group</h2>
+        <div className="flex items-center justify-between mb-3 md:mb-4">
+          <h2 className="text-lg md:text-xl font-bold text-slate-800">Players by Age Group</h2>
           <Link to="/directory" className="text-sm text-emerald-600 hover:underline font-medium">
-            View all players →
+            View all →
           </Link>
         </div>
         {loading ? (
           <div className="text-center py-12 text-slate-400">Loading player data...</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">
             {AGE_GROUPS.map((ag) => (
               <AgeGroupCard key={ag} ageGroup={ag} stats={groupStats[ag]} />
             ))}
@@ -218,13 +218,50 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Summary table */}
+      {/* Summary table — card view on mobile, table on desktop */}
       {!loading && totalPlayers > 0 && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="text-lg font-bold text-slate-800">Breakdown Summary</h2>
+          <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100">
+            <h2 className="text-base md:text-lg font-bold text-slate-800">Breakdown Summary</h2>
           </div>
-          <div className="overflow-x-auto">
+
+          {/* Mobile: compact card layout */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {AGE_GROUPS.map((ag) => {
+              const s = groupStats[ag];
+              const colors = AGE_COLORS[ag];
+              return (
+                <div key={ag} className="px-4 py-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`inline-flex items-center gap-2 font-semibold text-sm ${colors.text}`}>
+                      <span className={`w-2 h-2 rounded-full ${colors.bg}`} />
+                      {ag}
+                    </span>
+                    <span className="font-bold text-slate-700 text-sm">{s.total} players</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-blue-600 font-medium">{s.boys} Boys</span>
+                    <span className="text-pink-500 font-medium">{s.girls} Girls</span>
+                  </div>
+                  <GenderBar boys={s.boys} girls={s.girls} />
+                </div>
+              );
+            })}
+            <div className="px-4 py-3 bg-slate-50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-slate-700 text-sm">Total</span>
+                <span className="font-bold text-slate-700 text-sm">{totalPlayers} players</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-blue-600 font-medium">{totalBoys} Boys ({totalPlayers > 0 ? ((totalBoys / totalPlayers) * 100).toFixed(0) : 0}%)</span>
+                <span className="text-pink-500 font-medium">{totalGirls} Girls ({totalPlayers > 0 ? ((totalGirls / totalPlayers) * 100).toFixed(0) : 0}%)</span>
+              </div>
+              <GenderBar boys={totalBoys} girls={totalGirls} />
+            </div>
+          </div>
+
+          {/* Desktop: full table */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50 text-slate-500 text-left">
@@ -286,9 +323,9 @@ export default function Dashboard() {
       )}
 
       {/* Quick links */}
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white">
-        <h2 className="text-lg font-semibold mb-1">External Resources</h2>
-        <p className="text-slate-400 text-sm mb-5">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 md:p-6 text-white">
+        <h2 className="text-base md:text-lg font-semibold mb-1">External Resources</h2>
+        <p className="text-slate-400 text-xs md:text-sm mb-4 md:mb-5">
           Live rankings and full match draws from official sources
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -296,12 +333,12 @@ export default function Dashboard() {
             href="https://usabjrrankings.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
+            className="flex items-center gap-3 p-3.5 md:p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
           >
-            <Trophy className="w-8 h-8 text-violet-400 shrink-0" />
-            <div>
-              <p className="font-semibold">USAB Junior Rankings</p>
-              <p className="text-sm text-slate-400">Official rankings for all age groups & events</p>
+            <Trophy className="w-7 h-7 md:w-8 md:h-8 text-violet-400 shrink-0" />
+            <div className="min-w-0">
+              <p className="font-semibold text-sm md:text-base">USAB Junior Rankings</p>
+              <p className="text-xs md:text-sm text-slate-400 truncate">Official rankings for all age groups</p>
             </div>
             <ExternalLink className="w-4 h-4 text-slate-500 ml-auto shrink-0" />
           </a>
@@ -309,12 +346,12 @@ export default function Dashboard() {
             href="https://www.tournamentsoftware.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
+            className="flex items-center gap-3 p-3.5 md:p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
           >
-            <Award className="w-8 h-8 text-orange-400 shrink-0" />
-            <div>
-              <p className="font-semibold">Tournament Software</p>
-              <p className="text-sm text-slate-400">Tournament draws, match results & player stats</p>
+            <Award className="w-7 h-7 md:w-8 md:h-8 text-orange-400 shrink-0" />
+            <div className="min-w-0">
+              <p className="font-semibold text-sm md:text-base">Tournament Software</p>
+              <p className="text-xs md:text-sm text-slate-400 truncate">Tournament draws & match results</p>
             </div>
             <ExternalLink className="w-4 h-4 text-slate-500 ml-auto shrink-0" />
           </a>
