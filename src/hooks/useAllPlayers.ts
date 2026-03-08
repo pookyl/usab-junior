@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { UniquePlayer } from '../types/junior';
 import { fetchAllPlayers } from '../services/rankingsService';
 import { cachedAllPlayers } from '../data/usaJuniorData';
-import type { DataSource } from './useRankings';
+export type DataSource = 'live' | 'cached' | 'none';
 
 export interface UseAllPlayersResult {
   players: UniquePlayer[];

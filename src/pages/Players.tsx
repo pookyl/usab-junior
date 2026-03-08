@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Search, ExternalLink, RefreshCw, Trophy, Wifi, WifiOff, Calendar } from 'lucide-react';
 import type { AgeGroup, EventType } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
-import { useRankings } from '../hooks/useRankings';
 import { usePlayers } from '../contexts/PlayersContext';
 
 const AGE_COLORS: Record<AgeGroup, string> = {
@@ -35,7 +34,19 @@ function RankBadge({ rank }: { rank: number }) {
 
 function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; eventType: EventType; date: string }) {
   const [search, setSearch] = useState('');
-  const { players, loading, error, source, refresh } = useRankings(ageGroup, eventType, date);
+  const { players: allPlayers, loading, error, source, refresh } = usePlayers();
+
+  const players = useMemo(
+    () =>
+      allPlayers
+        .flatMap((p) =>
+          p.entries
+            .filter((e) => e.ageGroup === ageGroup && e.eventType === eventType)
+            .map((e) => ({ usabId: p.usabId, name: p.name, rank: e.rank, rankingPoints: e.rankingPoints })),
+        )
+        .sort((a, b) => a.rank - b.rank),
+    [allPlayers, ageGroup, eventType],
+  );
 
   const filtered = useMemo(
     () =>
@@ -252,13 +263,12 @@ export default function Rankings() {
             }`}
           >
             <span className="font-bold">{et}</span>
-            <span className="ml-1.5 text-xs opacity-75">· {EVENT_LABELS[et]}</span>
           </button>
         ))}
       </div>
 
       {/* Rankings Table */}
-      <RankingsTable key={`${ageGroup}-${eventType}-${rankingsDate}`} ageGroup={ageGroup} eventType={eventType} date={rankingsDate} />
+      <RankingsTable ageGroup={ageGroup} eventType={eventType} date={rankingsDate} />
     </div>
   );
 }
