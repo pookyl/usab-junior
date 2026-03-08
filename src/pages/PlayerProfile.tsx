@@ -120,6 +120,167 @@ function StatsTabContent({ cat }: { cat: CategoryStats }) {
   );
 }
 
+function parseScoreString(score: string): number[][] {
+  if (!score || score.toLowerCase() === 'walkover') return [];
+  return score
+    .split(/[,;]\s*/)
+    .map((s) => {
+      const parts = s.trim().split('-').map(Number);
+      return parts.length === 2 && parts.every((n) => !isNaN(n)) ? parts : null;
+    })
+    .filter((s): s is number[] => s !== null);
+}
+
+function TournamentMatchCard({
+  match,
+  playerName,
+  playerUsabId,
+  nameMap,
+  location,
+  showTournament = true,
+}: {
+  match: import('../types/junior').TswMatchResult;
+  playerName: string;
+  playerUsabId: string;
+  nameMap: Map<string, string>;
+  location?: string;
+  showTournament?: boolean;
+}) {
+  const scores = parseScoreString(match.score);
+  const isWalkover = match.walkover || match.score.toLowerCase() === 'walkover';
+  const catColor =
+    match.category === 'singles'
+      ? 'bg-green-100 text-green-700'
+      : match.category === 'doubles'
+      ? 'bg-orange-100 text-orange-700'
+      : 'bg-purple-100 text-purple-700';
+  const catLabel =
+    match.category === 'singles' ? 'Singles' : match.category === 'doubles' ? 'Doubles' : 'Mixed';
+
+  const tswBase = 'https://www.tournamentsoftware.com';
+  const tournamentHref = match.tournamentUrl
+    ? (match.tournamentUrl.startsWith('http') ? match.tournamentUrl : `${tswBase}${match.tournamentUrl}`)
+    : '';
+
+  return (
+    <div
+      className={`border rounded-xl overflow-hidden transition-shadow hover:shadow-md ${
+        match.won
+          ? 'border-l-4 border-l-emerald-400 border-t-slate-100 border-r-slate-100 border-b-slate-100'
+          : 'border-l-4 border-l-rose-400 border-t-slate-100 border-r-slate-100 border-b-slate-100'
+      }`}
+    >
+      <div className="bg-slate-50 px-3 md:px-4 py-2 md:py-2.5 border-b border-slate-100">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${catColor}`}>
+            {match.event || catLabel}
+          </span>
+          {match.round && (
+            <>
+              <span className="text-xs text-slate-400">·</span>
+              <span className="text-xs font-medium text-slate-600">{match.round}</span>
+            </>
+          )}
+        </div>
+        {showTournament && match.tournament && (
+          <div className="flex items-center gap-1.5 mt-1 min-w-0">
+            {tournamentHref ? (
+              <a
+                href={tournamentHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs md:text-sm font-semibold text-slate-700 hover:text-orange-600 truncate transition-colors inline-flex items-center gap-1.5"
+              >
+                {match.tournament}
+                <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-500 shrink-0" />
+              </a>
+            ) : (
+              <p className="text-xs md:text-sm font-semibold text-slate-700 truncate">{match.tournament}</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="px-3 md:px-4 py-2.5 md:py-3">
+        {/* Current player row */}
+        <div className={`flex items-center gap-2 md:gap-3 py-1 md:py-1.5 ${match.won ? 'font-bold' : ''}`}>
+          <span
+            className={`w-5 h-5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[10px] md:text-xs font-bold text-white shrink-0 ${
+              match.won ? 'bg-emerald-500' : 'bg-slate-300'
+            }`}
+          >
+            {match.won ? 'W' : 'L'}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs md:text-sm truncate ${match.won ? 'text-emerald-700' : 'text-slate-600'}`}>
+              <PlayerNameLink name={playerName} nameMap={nameMap} currentUsabId={playerUsabId} className={match.won ? 'text-emerald-700 hover:text-violet-600' : 'text-slate-600 hover:text-violet-600'} />
+              {match.partner && (
+                <span className="text-slate-400"> / <PlayerNameLink name={match.partner} nameMap={nameMap} currentUsabId={playerUsabId} className={match.won ? 'text-emerald-700 hover:text-violet-600' : 'text-slate-600 hover:text-violet-600'} /></span>
+              )}
+            </p>
+          </div>
+          <div className="flex gap-1.5 md:gap-2 shrink-0">
+            {scores.length > 0 ? (
+              scores.map(([a, b], i) => (
+                <span
+                  key={i}
+                  className={`text-xs md:text-sm font-mono tabular-nums ${
+                    a > b ? 'text-emerald-700 font-bold' : 'text-slate-600 font-normal'
+                  }`}
+                >
+                  {a}
+                </span>
+              ))
+            ) : isWalkover && !match.won ? (
+              <span className="text-xs md:text-sm font-normal text-slate-400">Walkover</span>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Opponent row */}
+        <div className={`flex items-center gap-2 md:gap-3 py-1 md:py-1.5 ${!match.won ? 'font-bold' : ''}`}>
+          <span
+            className={`w-5 h-5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[10px] md:text-xs font-bold text-white shrink-0 ${
+              !match.won ? 'bg-rose-500' : 'bg-slate-300'
+            }`}
+          >
+            {!match.won ? 'W' : 'L'}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs md:text-sm truncate ${!match.won ? 'text-rose-700' : 'text-slate-600'}`}>
+              <PlayerNameLink name={match.opponent} nameMap={nameMap} currentUsabId={playerUsabId} className={!match.won ? 'text-rose-700 hover:text-violet-600' : 'text-slate-600 hover:text-violet-600'} />
+            </p>
+          </div>
+          <div className="flex gap-1.5 md:gap-2 shrink-0">
+            {scores.length > 0 ? (
+              scores.map(([a, b], i) => (
+                <span
+                  key={i}
+                  className={`text-xs md:text-sm font-mono tabular-nums ${
+                    b > a ? 'text-rose-700 font-bold' : 'text-slate-600 font-normal'
+                  }`}
+                >
+                  {b}
+                </span>
+              ))
+            ) : isWalkover && match.won ? (
+              <span className="text-xs md:text-sm font-normal text-slate-400">Walkover</span>
+            ) : null}
+          </div>
+        </div>
+
+        {(match.date || location) && (
+          <div className="mt-1.5 md:mt-2 pt-1.5 md:pt-2 border-t border-slate-50 flex items-center gap-2 text-[10px] md:text-xs text-slate-400">
+            {match.date && <span>{match.date}</span>}
+            {match.date && location && <span>·</span>}
+            {location && <span>{location}</span>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function PlayerNameLink({
   name,
   nameMap,
@@ -168,6 +329,7 @@ export default function PlayerProfile() {
   const [loadingTsw, setLoadingTsw] = useState(true);
   const [statsTab, setStatsTab] = useState<StatsCategory>('total');
   const [expandedTournaments, setExpandedTournaments] = useState<Set<string>>(new Set());
+  const [recentResultsExpanded, setRecentResultsExpanded] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -412,74 +574,46 @@ export default function PlayerProfile() {
               </div>
             )}
 
-            {/* Recent results */}
+            {/* Recent results — collapsed by default */}
             {(() => {
               const filtered = statsTab === 'total'
                 ? tswStats.recentResults
                 : tswStats.recentResults.filter((m) => m.category === statsTab);
               if (filtered.length === 0) return null;
+
+              const tournLocationMap = new Map<string, string>();
+              for (const tournaments of Object.values(tswStats.tournamentsByYear)) {
+                for (const t of tournaments) {
+                  if (t.location) tournLocationMap.set(t.name, t.location);
+                }
+              }
+
               return (
                 <div>
-                  <h5 className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 md:mb-3">
-                    Recent Results{statsTab !== 'total' ? ` — ${STATS_TABS.find((t) => t.key === statsTab)?.label}` : ''}
-                  </h5>
-                  <div className="space-y-1.5 md:space-y-2">
-                    {filtered.slice(0, 15).map((match, i) => (
-                      <div
-                        key={i}
-                        className={`flex items-center gap-2 md:gap-3 p-2.5 md:p-3 rounded-lg border ${
-                          match.won
-                            ? 'bg-emerald-50 border-emerald-100'
-                            : 'bg-rose-50 border-rose-100'
-                        }`}
-                      >
-                        <span
-                          className={`px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-bold shrink-0 ${
-                            match.won
-                              ? 'bg-emerald-500 text-white'
-                              : 'bg-rose-500 text-white'
-                          }`}
-                        >
-                          {match.won ? 'W' : 'L'}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs md:text-sm font-medium text-slate-700 truncate">
-                            vs.{' '}
-                            <PlayerNameLink
-                              name={match.opponent}
-                              nameMap={playerNameMap}
-                              currentUsabId={usabId}
-                              className="text-slate-700 hover:text-violet-600"
-                            />
-                          </p>
-                          {match.partner && (
-                            <p className="text-[10px] md:text-xs text-blue-500 truncate">
-                              w/{' '}
-                              <PlayerNameLink
-                                name={match.partner}
-                                nameMap={playerNameMap}
-                                currentUsabId={usabId}
-                                className="text-blue-500 hover:text-violet-600"
-                              />
-                            </p>
-                          )}
-                          <p className="text-[10px] md:text-xs text-slate-400 truncate">
-                            {match.tournament}
-                            {match.event && ` · ${match.event}`}
-                            {match.round && ` · ${match.round}`}
-                          </p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-xs md:text-sm font-mono font-medium text-slate-600">
-                            {match.score}
-                          </p>
-                          {match.date && (
-                            <p className="text-[9px] md:text-[10px] text-slate-400">{match.date}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <button
+                    onClick={() => setRecentResultsExpanded((v) => !v)}
+                    className="flex items-center gap-2 w-full group"
+                  >
+                    <h5 className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      Recent Results{statsTab !== 'total' ? ` — ${STATS_TABS.find((t) => t.key === statsTab)?.label}` : ''}
+                    </h5>
+                    <span className="text-[10px] md:text-xs text-slate-400">({filtered.length})</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform ${recentResultsExpanded ? 'rotate-180' : ''}`} />
+                  </button>
+                  {recentResultsExpanded && (
+                    <div className="space-y-2 md:space-y-2.5 mt-2.5 md:mt-3">
+                      {filtered.slice(0, 15).map((match, i) => (
+                        <TournamentMatchCard
+                          key={i}
+                          match={match}
+                          playerName={displayName}
+                          playerUsabId={usabId}
+                          nameMap={playerNameMap}
+                          location={tournLocationMap.get(match.tournament)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })()}
@@ -635,49 +769,17 @@ export default function PlayerProfile() {
                               )}
                             </div>
                             {isExpanded && matchesForTournament.length > 0 && (
-                              <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-slate-100 space-y-1 md:space-y-1.5">
+                              <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-slate-100 space-y-2 md:space-y-2.5">
                                 {matchesForTournament.map((match, mi) => (
-                                  <div
+                                  <TournamentMatchCard
                                     key={mi}
-                                    className={`flex items-center gap-2 md:gap-2.5 px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs ${
-                                      match.won
-                                        ? 'bg-emerald-50/60'
-                                        : 'bg-rose-50/60'
-                                    }`}
-                                  >
-                                    <span
-                                      className={`px-1 md:px-1.5 py-0.5 rounded text-[9px] md:text-[10px] font-bold shrink-0 ${
-                                        match.won ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
-                                      }`}
-                                    >
-                                      {match.won ? 'W' : 'L'}
-                                    </span>
-                                    <span className="text-slate-500 shrink-0 hidden sm:inline">{match.event}</span>
-                                    <span className="text-slate-600 font-medium truncate">
-                                      vs.{' '}
-                                      <PlayerNameLink
-                                        name={match.opponent}
-                                        nameMap={playerNameMap}
-                                        currentUsabId={usabId}
-                                        className="text-slate-600 hover:text-violet-600"
-                                      />
-                                    </span>
-                                    {match.partner && (
-                                      <span className="text-blue-500 truncate hidden sm:inline">
-                                        w/{' '}
-                                        <PlayerNameLink
-                                          name={match.partner}
-                                          nameMap={playerNameMap}
-                                          currentUsabId={usabId}
-                                          className="text-blue-500 hover:text-violet-600"
-                                        />
-                                      </span>
-                                    )}
-                                    <span className="ml-auto font-mono text-slate-600 shrink-0">{match.score}</span>
-                                    {match.round && (
-                                      <span className="text-slate-400 shrink-0 hidden sm:inline">{match.round}</span>
-                                    )}
-                                  </div>
+                                    match={match}
+                                    playerName={displayName}
+                                    playerUsabId={usabId}
+                                    nameMap={playerNameMap}
+                                    location={t.location}
+                                    showTournament={false}
+                                  />
                                 ))}
                               </div>
                             )}

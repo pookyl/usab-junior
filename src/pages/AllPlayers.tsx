@@ -122,16 +122,6 @@ export default function AllPlayers() {
     return result;
   }, [players, search, activeLetter, ageGroupFilter]);
 
-  const ageGroupCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const ag of AGE_GROUPS) {
-      counts[ag] = players.filter((p) =>
-        p.entries.some((e) => e.ageGroup === ag),
-      ).length;
-    }
-    return counts;
-  }, [players]);
-
   const letterCounts = useMemo(() => {
     const base = ageGroupFilter
       ? players.filter((p) => p.entries.some((e) => e.ageGroup === ageGroupFilter))
@@ -193,34 +183,19 @@ export default function AllPlayers() {
       <div className="space-y-2">
         <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Filter by Age Group</p>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
-          <button
-            onClick={() => setAgeGroupFilter(null)}
-            className={`px-4 md:px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
-              ageGroupFilter === null
-                ? 'bg-slate-800 text-white scale-105'
-                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
-            }`}
-          >
-            All
-            <span className="ml-1.5 text-xs opacity-60">{players.length}</span>
-          </button>
-          {AGE_GROUPS.map((ag) => {
-            const count = ageGroupCounts[ag] ?? 0;
-            return (
-              <button
-                key={ag}
-                onClick={() => setAgeGroupFilter(ag === ageGroupFilter ? null : ag)}
-                className={`px-4 md:px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
-                  ageGroupFilter === ag
-                    ? `${AGE_FILTER_ACTIVE[ag]} scale-105`
-                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
-                }`}
-              >
-                {ag}
-                <span className="ml-1.5 text-xs opacity-60">{count}</span>
-              </button>
-            );
-          })}
+          {AGE_GROUPS.map((ag) => (
+            <button
+              key={ag}
+              onClick={() => setAgeGroupFilter(ageGroupFilter === ag ? null : ag)}
+              className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
+                ageGroupFilter === ag
+                  ? `${AGE_FILTER_ACTIVE[ag]} scale-105`
+                  : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+              }`}
+            >
+              {ag}
+            </button>
+          ))}
         </div>
       </div>
 
