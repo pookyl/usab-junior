@@ -23,6 +23,14 @@ const AGE_COLORS: Record<AgeGroup, string> = {
   U19: 'bg-rose-600',
 };
 
+const AGE_LIGHT: Record<AgeGroup, string> = {
+  U11: 'bg-violet-50 text-violet-700 border-violet-200',
+  U13: 'bg-blue-50 text-blue-700 border-blue-200',
+  U15: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  U17: 'bg-amber-50 text-amber-700 border-amber-200',
+  U19: 'bg-rose-50 text-rose-700 border-rose-200',
+};
+
 function inferGender(entries: PlayerEntry[]): Gender | null {
   for (const e of entries) {
     if (e.eventType === 'BS' || e.eventType === 'BD') return 'Boy';
@@ -675,42 +683,38 @@ export default function HeadToHead() {
         </p>
       </div>
 
-      {/* Filters: Age Group + Gender */}
-      <div className="flex flex-col gap-3 md:flex-row md:gap-4 md:items-center">
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Filter by Age Group</p>
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
-            {AGE_GROUPS.map((ag) => (
-              <button
-                key={ag}
-                onClick={() => setAgeGroup(ageGroup === ag ? null : ag)}
-                className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
-                  ageGroup === ag
-                    ? `${AGE_COLORS[ag]} text-white scale-105`
-                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
-                }`}
-              >
-                {ag}
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* Age Group Tabs — horizontal scroll on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+        {AGE_GROUPS.map((ag) => (
+          <button
+            key={ag}
+            onClick={() => setAgeGroup(ageGroup === ag ? null : ag)}
+            className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
+              ageGroup === ag
+                ? `${AGE_COLORS[ag]} text-white scale-105`
+                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+            }`}
+          >
+            {ag}
+          </button>
+        ))}
+      </div>
 
-        <div className="flex bg-slate-100 rounded-xl p-1 shrink-0 self-start">
-          {(['All', 'Boy', 'Girl'] as Gender[]).map((g) => (
-            <button
-              key={g}
-              onClick={() => setGender(g)}
-              className={`px-4 md:px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-                gender === g
-                  ? 'bg-white text-slate-800 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              {g === 'All' ? '⚥ All' : g === 'Boy' ? '♂ Boy' : '♀ Girl'}
-            </button>
-          ))}
-        </div>
+      {/* Gender Pills — horizontal scroll on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+        {(['All', 'Boy', 'Girl'] as Gender[]).map((g) => (
+          <button
+            key={g}
+            onClick={() => setGender(g)}
+            className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-colors border whitespace-nowrap shrink-0 ${
+              gender === g
+                ? (ageGroup ? AGE_LIGHT[ageGroup] : 'bg-slate-100 text-slate-700 border-slate-300')
+                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+            }`}
+          >
+            <span className="font-bold">{g === 'All' ? '⚥ All' : g === 'Boy' ? '♂ Boy' : '♀ Girl'}</span>
+          </button>
+        ))}
       </div>
 
       {/* Player count */}
