@@ -53,6 +53,7 @@ export interface UniquePlayer {
 
 export interface TswMatchResult {
   tournament: string;
+  tournamentUrl?: string;
   event: string;
   round: string;
   opponent: string;
@@ -61,6 +62,7 @@ export interface TswMatchResult {
   score: string;
   won: boolean;
   date: string;
+  walkover?: boolean;
 }
 
 export interface WinLossRecord {

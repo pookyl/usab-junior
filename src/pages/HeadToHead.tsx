@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import type {
   AgeGroup, UniquePlayer, PlayerEntry, H2HResult, H2HMatch,
-  TswPlayerStats, StatsCategory,
+  TswPlayerStats, TswMatchResult, StatsCategory,
 } from '../types/junior';
 import { AGE_GROUPS, EVENT_LABELS } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
@@ -74,6 +74,51 @@ function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
     team2Won: match.team1Won,
     scores: match.scores.map(([a, b]) => [b, a]),
   };
+}
+
+function walkoverToH2HMatch(
+  mr: TswMatchResult,
+  playerName: string,
+): H2HMatch {
+  const playerTeam = mr.partner ? [playerName, mr.partner] : [playerName];
+  const opponentTeam = mr.opponent.split(' / ').map((s) => s.trim());
+  return {
+    tournament: mr.tournament,
+    tournamentUrl: mr.tournamentUrl ?? '',
+    event: mr.event,
+    round: mr.round,
+    duration: '',
+    team1Players: mr.won ? playerTeam : opponentTeam,
+    team2Players: mr.won ? opponentTeam : playerTeam,
+    team1Won: mr.won,
+    team2Won: !mr.won,
+    scores: [],
+    date: mr.date,
+    venue: '',
+  };
+}
+
+function isWalkoverResult(mr: TswMatchResult): boolean {
+  return !!(mr.walkover || mr.score === 'Walkover' || (mr.score === '' && mr.opponent !== 'Unknown'));
+}
+
+function findWalkoversBetween(
+  statsA: TswPlayerStats | null,
+  playerAName: string,
+  playerBName: string,
+): H2HMatch[] {
+  if (!statsA) return [];
+  const bParts = playerBName.toLowerCase().split(/\s+/);
+  const bLast = bParts[bParts.length - 1] ?? '';
+  return statsA.recentResults
+    .filter((mr) => {
+      if (!isWalkoverResult(mr)) return false;
+      const opp = mr.opponent.toLowerCase();
+      if (bParts.every((p) => opp.includes(p))) return true;
+      if (bLast.length > 1 && opp.includes(bLast)) return true;
+      return false;
+    })
+    .map((mr) => walkoverToH2HMatch(mr, playerAName));
 }
 
 // ── PlayerPicker ─────────────────────────────────────────────────────────────
@@ -312,13 +357,17 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
             />
           </div>
           <div className="flex gap-1.5 md:gap-2 shrink-0">
-            {match.scores.map(([a], i) => (
+            {match.scores.length > 0 ? match.scores.map(([a, b], i) => (
               <span key={i} className={`text-xs md:text-sm font-mono tabular-nums ${
-                match.team1Won ? 'text-violet-700 font-bold' : 'text-slate-500'
+                a > b
+                  ? `${match.team1Won ? 'text-violet-700' : 'text-blue-700'} font-bold`
+                  : 'text-slate-600 font-normal'
               }`}>
                 {a}
               </span>
-            ))}
+            )) : !match.team1Won ? (
+              <span className="text-xs md:text-sm font-normal text-slate-400">Walkover</span>
+            ) : null}
           </div>
         </div>
 
@@ -336,13 +385,17 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
             />
           </div>
           <div className="flex gap-1.5 md:gap-2 shrink-0">
-            {match.scores.map(([, b], i) => (
+            {match.scores.length > 0 ? match.scores.map(([a, b], i) => (
               <span key={i} className={`text-xs md:text-sm font-mono tabular-nums ${
-                match.team2Won ? 'text-blue-700 font-bold' : 'text-slate-500'
+                b > a
+                  ? `${match.team1Won ? 'text-violet-700' : 'text-blue-700'} font-bold`
+                  : 'text-slate-600 font-normal'
               }`}>
                 {b}
               </span>
-            ))}
+            )) : !match.team2Won ? (
+              <span className="text-xs md:text-sm font-normal text-slate-400">Walkover</span>
+            ) : null}
           </div>
         </div>
 
@@ -547,9 +600,33 @@ export default function HeadToHead() {
   ];
 
   const normalizedMatches = useMemo(() => {
-    if (!h2hResult || !playerA) return [];
-    return h2hResult.matches.map((m) => normalizeMatch(m, playerA.name));
-  }, [h2hResult, playerA]);
+    if (!playerA || !playerB) return [];
+    const h2hMatches = h2hResult
+      ? h2hResult.matches.map((m) => normalizeMatch(m, playerA.name))
+      : [];
+
+    const woMatches = findWalkoversBetween(tswStatsA, playerA.name, playerB.name);
+    const woFromB = findWalkoversBetween(tswStatsB, playerB.name, playerA.name)
+      .map((m) => normalizeMatch(m, playerA.name));
+
+    const existing = new Set(
+      h2hMatches.map((m) => `${m.tournament}|${m.event}|${m.round}|${m.date}`),
+    );
+    const merged = [...h2hMatches];
+    for (const wo of [...woMatches, ...woFromB]) {
+      const key = `${wo.tournament}|${wo.event}|${wo.round}|${wo.date}`;
+      if (!existing.has(key)) {
+        existing.add(key);
+        merged.push(normalizeMatch(wo, playerA.name));
+      }
+    }
+
+    merged.sort((a, b) => {
+      if (a.date && b.date) return b.date.localeCompare(a.date);
+      return 0;
+    });
+    return merged;
+  }, [h2hResult, playerA, playerB, tswStatsA, tswStatsB]);
 
   const filteredMatches = useMemo(() => {
     if (filterCat === 'All') return normalizedMatches;

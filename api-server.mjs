@@ -236,6 +236,11 @@ function parseH2HContent(html, headers) {
     const event = headerItems[1] ?? '';
     const round = headerItems[2] ?? '';
 
+    const tournamentIdMatch = block.match(/\/sport\/player\.aspx\?id=([0-9A-Fa-f-]+)/);
+    const tournamentUrl = tournamentIdMatch
+      ? `/tournament/${tournamentIdMatch[1]}`
+      : '';
+
     // Duration
     const durationMatch = block.match(/<time[^>]*>([\dhmHM\s]+)<\/time>/);
     const duration = durationMatch ? durationMatch[1].trim() : '';
@@ -280,6 +285,7 @@ function parseH2HContent(html, headers) {
 
     matches.push({
       tournament,
+      tournamentUrl,
       event,
       round,
       duration,
@@ -451,18 +457,9 @@ function parseTswTournaments(html, playerName) {
 
         const status1 = rowBlocks[0].match(/match__status">([WL])</);
         const status2 = rowBlocks[1].match(/match__status">([WL])</);
-        if (!status1 && !status2) continue;
-        const row1IsPlayer = !!status1;
-        const playerWon = status1 ? status1[1] === 'W' : status2[1] === 'W';
+        const isWalkover = block.includes('>Walkover<');
+        if (!status1 && !status2 && !isWalkover) continue;
 
-        if (currentEvent) {
-          if (!eventMap.has(currentEvent)) eventMap.set(currentEvent, { wins: 0, losses: 0 });
-          const rec = eventMap.get(currentEvent);
-          if (playerWon) rec.wins++;
-          else rec.losses++;
-        }
-
-        // Extract names for match result
         function extractNames(rowHtml) {
           const names = [];
           const re = /nav-link__value">([^<]+)<\/span><\/a>\s*<\/span>/g;
@@ -472,6 +469,30 @@ function parseTswTournaments(html, playerName) {
         }
         const row1Names = extractNames(rowBlocks[0]);
         const row2Names = extractNames(rowBlocks[1]);
+
+        let row1IsPlayer, playerWon;
+        if (status1 || status2) {
+          row1IsPlayer = !!status1;
+          playerWon = status1 ? status1[1] === 'W' : status2[1] === 'W';
+        } else {
+          const pLower = playerName.toLowerCase();
+          const row1HasPlayer = row1Names.some((n) => {
+            const nLower = n.toLowerCase();
+            return nLower.includes(pLower) || pLower.includes(nLower)
+              || pLower.split(/\s+/).every((p) => nLower.includes(p));
+          });
+          row1IsPlayer = row1HasPlayer;
+          const row1Won = rowBlocks[0].includes('has-won');
+          playerWon = row1IsPlayer ? row1Won : !row1Won;
+        }
+
+        if (currentEvent) {
+          if (!eventMap.has(currentEvent)) eventMap.set(currentEvent, { wins: 0, losses: 0 });
+          const rec = eventMap.get(currentEvent);
+          if (playerWon) rec.wins++;
+          else rec.losses++;
+        }
+
         const opponentNames = row1IsPlayer ? row2Names : row1Names;
         const teamNames = row1IsPlayer ? row1Names : row2Names;
         const nameParts = playerName.toLowerCase().split(/\s+/);
@@ -498,14 +519,16 @@ function parseTswTournaments(html, playerName) {
 
         recentResults.push({
           tournament: name,
+          tournamentUrl: url,
           event: currentEvent,
           round,
           opponent: opponentNames.join(' / ') || 'Unknown',
           partner: partnerNames.join(' / '),
           category,
-          score: scores.map((s) => s.join('-')).join(', '),
+          score: isWalkover ? 'Walkover' : scores.map((s) => s.join('-')).join(', '),
           won: playerWon,
           date: dateM ? dateM[1].trim() : '',
+          walkover: isWalkover || undefined,
         });
       }
     }
