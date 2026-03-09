@@ -12,13 +12,6 @@ const AGE_COLORS: Record<AgeGroup, string> = {
   U17: 'bg-amber-500',
   U19: 'bg-rose-600',
 };
-const AGE_LIGHT: Record<AgeGroup, string> = {
-  U11: 'bg-violet-50 text-violet-700 border-violet-200',
-  U13: 'bg-blue-50 text-blue-700 border-blue-200',
-  U15: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  U17: 'bg-amber-50 text-amber-700 border-amber-200',
-  U19: 'bg-rose-50 text-rose-700 border-rose-200',
-};
 
 function formatRankingsDate(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');
