@@ -58,6 +58,12 @@ function eventCategory(event: string): 'Singles' | 'Doubles' | 'Mixed' {
   return 'Singles';
 }
 
+function parseMatchDate(dateStr: string): number {
+  if (!dateStr) return 0;
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
 function isPlayerOnTeam(playerName: string, teamPlayers: string[]): boolean {
   const pLower = playerName.toLowerCase().trim();
   const pLast = pLower.split(' ').pop() ?? '';
@@ -630,7 +636,11 @@ export default function HeadToHead() {
     }
 
     merged.sort((a, b) => {
-      if (a.date && b.date) return b.date.localeCompare(a.date);
+      const da = parseMatchDate(a.date);
+      const db = parseMatchDate(b.date);
+      if (da && db) return db - da;
+      if (da) return -1;
+      if (db) return 1;
       return 0;
     });
     return merged;
@@ -684,20 +694,23 @@ export default function HeadToHead() {
       </div>
 
       {/* Age Group Tabs — horizontal scroll on mobile */}
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
-        {AGE_GROUPS.map((ag) => (
-          <button
-            key={ag}
-            onClick={() => setAgeGroup(ageGroup === ag ? null : ag)}
-            className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
-              ageGroup === ag
-                ? `${AGE_COLORS[ag]} text-white scale-105`
-                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
-            }`}
-          >
-            {ag}
-          </button>
-        ))}
+      <div>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Filter by Age Group</p>
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+          {AGE_GROUPS.map((ag) => (
+            <button
+              key={ag}
+              onClick={() => setAgeGroup(ageGroup === ag ? null : ag)}
+              className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
+                ageGroup === ag
+                  ? `${AGE_COLORS[ag]} text-white scale-105`
+                  : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+              }`}
+            >
+              {ag}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Gender Pills — horizontal scroll on mobile */}
@@ -706,9 +719,9 @@ export default function HeadToHead() {
           <button
             key={g}
             onClick={() => setGender(g)}
-            className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-colors border whitespace-nowrap shrink-0 ${
+            className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-all border whitespace-nowrap shrink-0 shadow-sm ${
               gender === g
-                ? (ageGroup ? AGE_LIGHT[ageGroup] : 'bg-slate-100 text-slate-700 border-slate-300')
+                ? (ageGroup ? `${AGE_COLORS[ageGroup]} text-white border-transparent scale-105` : 'bg-slate-700 text-white border-transparent scale-105')
                 : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
             }`}
           >
@@ -810,6 +823,7 @@ export default function HeadToHead() {
               ))}
             </div>
           </div>
+
 
           {/* H2H Scorecard */}
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 md:p-8 text-white">

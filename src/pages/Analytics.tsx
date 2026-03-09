@@ -350,9 +350,9 @@ export default function Analytics() {
           <button
             key={et}
             onClick={() => setEventType(et)}
-            className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-colors border whitespace-nowrap shrink-0 ${
+            className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-all border whitespace-nowrap shrink-0 shadow-sm ${
               eventType === et
-                ? AGE_LIGHT[ageGroup]
+                ? `${AGE_BG_COLORS[ageGroup]} text-white border-transparent scale-105`
                 : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
             }`}
           >
