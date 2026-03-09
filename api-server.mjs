@@ -45,6 +45,11 @@ function loadDiskCache() {
 
 function saveDiskCache(date, rankings, allPlayers) {
   try {
+    const existing = loadDiskCache();
+    if (existing && existing.date === date) {
+      console.log(`[disk-cache] skipped save — date ${date} already cached`);
+      return;
+    }
     if (!existsSync(DISK_CACHE_DIR)) mkdirSync(DISK_CACHE_DIR, { recursive: true });
     const data = { date, rankings, allPlayers, savedAt: new Date().toISOString() };
     writeFileSync(DISK_CACHE_FILE, JSON.stringify(data, null, 2));

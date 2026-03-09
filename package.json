@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -n vite,api -c cyan,green \"vite\" \"node api-server.mjs\"",
+    "dev:restart": "lsof -ti:3001 -ti:5173 -ti:5174 | xargs kill 2>/dev/null; sleep 1 && npm run dev",
     "api": "node api-server.mjs",
     "build": "tsc -b && vite build",
     "start": "node api-server.mjs",
