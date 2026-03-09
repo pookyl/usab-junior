@@ -57,30 +57,36 @@ function parseMatchDate(dateStr: string): number {
   return isNaN(d.getTime()) ? 0 : d.getTime();
 }
 
-function isPlayerOnTeam(playerName: string, teamPlayers: string[]): boolean {
+// 3 = exact, 2 = substring, 1 = last-name-only, 0 = no match
+function playerMatchScore(playerName: string, teamPlayers: string[]): number {
   const pLower = playerName.toLowerCase().trim();
   const pLast = pLower.split(' ').pop() ?? '';
+  let best = 0;
   for (const tp of teamPlayers) {
     const tpLower = tp.toLowerCase().trim();
-    if (tpLower === pLower) return true;
-    if (tpLower.includes(pLower) || pLower.includes(tpLower)) return true;
+    if (tpLower === pLower) return 3;
+    if (tpLower.includes(pLower) || pLower.includes(tpLower)) best = Math.max(best, 2);
     const tpLast = tpLower.split(' ').pop() ?? '';
-    if (pLast.length > 1 && tpLast === pLast) return true;
+    if (pLast.length > 1 && tpLast === pLast) best = Math.max(best, 1);
   }
-  return false;
+  return best;
 }
 
 function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
-  if (isPlayerOnTeam(playerAName, match.team1Players)) return match;
-  if (!isPlayerOnTeam(playerAName, match.team2Players)) return match;
-  return {
-    ...match,
-    team1Players: match.team2Players,
-    team2Players: match.team1Players,
-    team1Won: match.team2Won,
-    team2Won: match.team1Won,
-    scores: match.scores.map(([a, b]) => [b, a]),
-  };
+  const score1 = playerMatchScore(playerAName, match.team1Players);
+  const score2 = playerMatchScore(playerAName, match.team2Players);
+  if (score1 >= score2 && score1 > 0) return match;
+  if (score2 > score1 && score2 > 0) {
+    return {
+      ...match,
+      team1Players: match.team2Players,
+      team2Players: match.team1Players,
+      team1Won: match.team2Won,
+      team2Won: match.team1Won,
+      scores: match.scores.map(([a, b]) => [b, a]),
+    };
+  }
+  return match;
 }
 
 function walkoverToH2HMatch(
