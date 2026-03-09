@@ -89,7 +89,15 @@ function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
   return match;
 }
 
-function walkoverToH2HMatch(
+function parseScoreString(score: string): number[][] {
+  if (!score || score === 'Walkover') return [];
+  return score.split(',').map((s) => s.trim()).filter(Boolean).map((game) => {
+    const parts = game.split('-').map((n) => parseInt(n.trim(), 10));
+    return parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) ? parts : [];
+  }).filter((g) => g.length === 2);
+}
+
+function matchResultToH2HMatch(
   mr: TswMatchResult,
   playerName: string,
 ): H2HMatch {
@@ -105,33 +113,33 @@ function walkoverToH2HMatch(
     team2Players: mr.won ? opponentTeam : playerTeam,
     team1Won: mr.won,
     team2Won: !mr.won,
-    scores: [],
+    scores: parseScoreString(mr.score),
     date: mr.date,
     venue: '',
   };
 }
 
-function isWalkoverResult(mr: TswMatchResult): boolean {
-  return !!(mr.walkover || mr.score === 'Walkover' || (mr.score === '' && mr.opponent !== 'Unknown'));
+function opponentMatches(
+  mr: TswMatchResult,
+  playerBName: string,
+): boolean {
+  const bParts = playerBName.toLowerCase().split(/\s+/);
+  const bLast = bParts[bParts.length - 1] ?? '';
+  const opp = mr.opponent.toLowerCase();
+  if (bParts.every((p) => opp.includes(p))) return true;
+  if (bLast.length > 1 && opp.includes(bLast)) return true;
+  return false;
 }
 
-function findWalkoversBetween(
+function findMatchesBetween(
   statsA: TswPlayerStats | null,
   playerAName: string,
   playerBName: string,
 ): H2HMatch[] {
   if (!statsA) return [];
-  const bParts = playerBName.toLowerCase().split(/\s+/);
-  const bLast = bParts[bParts.length - 1] ?? '';
   return statsA.recentResults
-    .filter((mr) => {
-      if (!isWalkoverResult(mr)) return false;
-      const opp = mr.opponent.toLowerCase();
-      if (bParts.every((p) => opp.includes(p))) return true;
-      if (bLast.length > 1 && opp.includes(bLast)) return true;
-      return false;
-    })
-    .map((mr) => walkoverToH2HMatch(mr, playerAName));
+    .filter((mr) => opponentMatches(mr, playerBName))
+    .map((mr) => matchResultToH2HMatch(mr, playerAName));
 }
 
 // ── PlayerPicker ─────────────────────────────────────────────────────────────
@@ -618,8 +626,8 @@ export default function HeadToHead() {
       ? h2hResult.matches.map((m) => normalizeMatch(m, playerA.name))
       : [];
 
-    const woMatches = findWalkoversBetween(tswStatsA, playerA.name, playerB.name);
-    const woFromB = findWalkoversBetween(tswStatsB, playerB.name, playerA.name)
+    const woMatches = findMatchesBetween(tswStatsA, playerA.name, playerB.name);
+    const woFromB = findMatchesBetween(tswStatsB, playerB.name, playerA.name)
       .map((m) => normalizeMatch(m, playerA.name));
 
     const existing = new Set(
