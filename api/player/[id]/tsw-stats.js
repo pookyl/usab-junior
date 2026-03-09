@@ -61,7 +61,7 @@ export default async function handler(req, res) {
         tournamentsByYear[years[0]] = currentYearData.tournaments;
       }
 
-      const olderYears = years.slice(1, 4);
+      const olderYears = years.slice(1);
       if (olderYears.length > 0) {
         const olderResults = await Promise.allSettled(
           olderYears.map(async (year) => {
@@ -75,10 +75,38 @@ export default async function handler(req, res) {
         );
 
         for (const r of olderResults) {
-          if (r.status === 'fulfilled' && r.value.tournaments.length > 0) {
-            tournamentsByYear[r.value.year] = r.value.tournaments;
+          if (r.status === 'fulfilled') {
+            if (r.value.tournaments.length > 0) {
+              tournamentsByYear[r.value.year] = r.value.tournaments;
+            }
+            if (r.value.results.length > 0) {
+              recentResults = recentResults.concat(r.value.results);
+            }
           }
         }
+      }
+
+      const olderTabMatch = tournamentsHtml.match(/data-href="([^"]+)"[^>]*data-tabid="older"/);
+      if (olderTabMatch) {
+        try {
+          const olderPath = olderTabMatch[1].replace(/&amp;/g, '&');
+          const olderResp = await tswFetch(olderPath);
+          if (olderResp.ok) {
+            const olderHtml = await olderResp.text();
+            const olderData = parseTswTournaments(olderHtml, playerName);
+            for (const t of olderData.tournaments) {
+              const ym = t.dates.match(/(\d{4})/);
+              if (ym) {
+                const y = parseInt(ym[1]);
+                if (!tournamentsByYear[y]) tournamentsByYear[y] = [];
+                tournamentsByYear[y].push(t);
+              }
+            }
+            if (olderData.recentResults.length > 0) {
+              recentResults = recentResults.concat(olderData.recentResults);
+            }
+          }
+        } catch (_) { /* older tab fetch is best-effort */ }
       }
     }
 
