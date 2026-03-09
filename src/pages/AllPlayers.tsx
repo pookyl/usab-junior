@@ -248,14 +248,8 @@ export default function AllPlayers() {
 
       {/* Error */}
       {error && players.length === 0 && (
-        <div className="py-16 text-center space-y-3">
+        <div className="py-16 text-center">
           <p className="text-slate-400 text-sm">{error}</p>
-          <button
-            onClick={refresh}
-            className="text-violet-600 hover:underline text-sm"
-          >
-            Try again
-          </button>
         </div>
       )}
 
