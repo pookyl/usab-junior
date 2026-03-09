@@ -20,6 +20,10 @@ The app consists of two parts that run together:
 
 In development, Vite proxies `/api/*` requests to the API server automatically.
 
+### Deployment (Vercel)
+
+In production the app is deployed to **Vercel**. The `api/` directory contains serverless functions that mirror the local API server, with shared parsing and caching logic in `api/_lib/shared.js`. The built frontend is served as a static SPA with a catch-all rewrite (see `vercel.json`).
+
 ## Getting Started
 
 ### Prerequisites
@@ -30,8 +34,8 @@ In development, Vite proxies `/api/*` requests to the API server automatically.
 
 ```bash
 # Clone the repository
-git clone https://github.com/<your-username>/badminton.git
-cd badminton
+git clone https://github.com/<your-username>/usab-junior.git
+cd usab-junior
 
 # Install dependencies (required after every fresh clone)
 npm install
@@ -55,13 +59,16 @@ The production server runs on **http://localhost:3001** and serves both the API 
 
 ## Scripts
 
-| Command           | Description                                                 |
-| ----------------- | ----------------------------------------------------------- |
-| `npm run dev`     | Start Vite dev server + API server concurrently             |
-| `npm run build`   | Type-check with TypeScript and build for production         |
-| `npm run start`   | Start API server only (serves `dist/` and API on port 3001) |
-| `npm run preview` | Preview the production build via Vite                       |
-| `npm run lint`    | Run ESLint                                                  |
+| Command                          | Description                                                    |
+| -------------------------------- | -------------------------------------------------------------- |
+| `npm run dev`                    | Start Vite dev server + API server concurrently                |
+| `npm run dev:restart`            | Kill any running dev processes and restart                     |
+| `npm run api`                    | Start the API server only (port 3001)                          |
+| `npm run build`                  | Type-check with TypeScript and build for production            |
+| `npm run start`                  | Start API server (serves `dist/` and API on port 3001)         |
+| `npm run refresh-rankings-cache` | Fetch latest rankings and write `data/rankings-cache.json`     |
+| `npm run preview`                | Preview the production build via Vite                          |
+| `npm run lint`                   | Run ESLint                                                     |
 
 ## API Endpoints
 
@@ -79,9 +86,25 @@ All endpoints are served by `api-server.mjs` on port 3001.
 ## Project Structure
 
 ```
-├── api-server.mjs            # Node.js API proxy server
+├── api-server.mjs            # Local Node.js API proxy server
+├── api/                      # Vercel serverless functions (production)
+│   ├── _lib/shared.js        # Shared parsers, caching, and TSW helpers
+│   ├── rankings.js
+│   ├── all-players.js
+│   ├── latest-date.js
+│   ├── h2h.js
+│   └── player/
+│       ├── [id].js           # Player detail
+│       └── [id]/tsw-stats.js # TournamentSoftware stats
+├── scripts/
+│   └── refresh-rankings-cache.mjs  # Fetch latest rankings into disk cache
+├── .github/workflows/
+│   └── refresh-rankings-cache.yml  # Daily GitHub Action to refresh cache
+├── data/
+│   └── rankings-cache.json   # Pre-built rankings cache (committed for Vercel fallback)
 ├── index.html                # HTML entry point
 ├── vite.config.ts            # Vite config (React, Tailwind, API proxy)
+├── vercel.json               # Vercel deployment config
 ├── package.json
 ├── tsconfig.json
 ├── src/
@@ -111,13 +134,16 @@ All endpoints are served by `api-server.mjs` on port 3001.
 │   └── data/
 │       ├── mockData.ts       # Mock/fallback data
 │       └── usaJuniorData.ts  # Static reference data
-└── data/
-    └── rankings-cache.json   # Auto-generated disk cache (git-ignored)
 ```
+
+## Data Freshness
+
+Rankings data is refreshed automatically by a [GitHub Actions workflow](.github/workflows/refresh-rankings-cache.yml) that runs daily at 08:00 UTC. The workflow executes `scripts/refresh-rankings-cache.mjs`, and if the cache has changed, commits the updated `data/rankings-cache.json` back to the repo. You can also trigger a manual refresh from the GitHub Actions UI or locally with `npm run refresh-rankings-cache`.
 
 ## Tech Stack
 
 - **Frontend:** React 19, TypeScript, Tailwind CSS 4, Recharts, React Router 7, Lucide Icons
 - **Backend:** Node.js HTTP server (zero dependencies, pure `node:http`)
+- **Deployment:** Vercel (serverless functions + static SPA)
 - **Build:** Vite 7
-- **Dev tooling:** ESLint, concurrently
+- **Dev tooling:** ESLint, Playwright, concurrently
