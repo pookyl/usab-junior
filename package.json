@@ -9,6 +9,7 @@
     "api": "node api-server.mjs",
     "build": "tsc -b && vite build",
     "start": "node api-server.mjs",
+    "refresh-rankings-cache": "node scripts/refresh-rankings-cache.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

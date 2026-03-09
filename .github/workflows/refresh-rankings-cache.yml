@@ -1,0 +1,46 @@
+name: Refresh Rankings Cache (rankings-cache.json)
+
+on:
+  schedule:
+    # Run daily at 08:00 UTC (midnight PST / 3am EST)
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Refresh rankings cache
+        id: refresh
+        run: |
+          node scripts/refresh-rankings-cache.mjs
+          echo "updated=true" >> "$GITHUB_OUTPUT"
+        continue-on-error: true
+
+      - name: Check if cache changed
+        id: check
+        run: |
+          if git diff --quiet data/rankings-cache.json 2>/dev/null; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push updated cache
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          DATE=$(jq -r .date data/rankings-cache.json)
+          git add data/rankings-cache.json
+          git commit -m "chore: refresh rankings cache for ${DATE}"
+          git push

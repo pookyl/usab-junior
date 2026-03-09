@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, Users, RefreshCw, ChevronRight, Wifi, WifiOff } from 'lucide-react';
+import { Search, Users, RefreshCw, ChevronRight } from 'lucide-react';
 import type { AgeGroup, EventType, UniquePlayer } from '../types/junior';
 import { AGE_GROUPS, EVENT_LABELS } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
@@ -92,7 +92,7 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
 }
 
 export default function AllPlayers() {
-  const { players, loading, error, source, refresh } = usePlayers();
+  const { players, loading, error } = usePlayers();
   const [searchParams] = useSearchParams();
   const paramAge = searchParams.get('age_group') as AgeGroup | null;
   const [search, setSearch] = useState('');
@@ -161,25 +161,6 @@ export default function AllPlayers() {
             Complete directory ·{' '}
             <span className="font-medium text-slate-700">{players.length.toLocaleString()}</span> players
           </p>
-        </div>
-        <div className="flex items-center gap-3">
-          {source === 'live' ? (
-            <span className="flex items-center gap-1.5 text-xs md:text-sm text-emerald-600">
-              <Wifi className="w-4 h-4" /> All groups loaded
-            </span>
-          ) : source === 'cached' ? (
-            <span className="flex items-center gap-1.5 text-xs md:text-sm text-sky-600">
-              <WifiOff className="w-4 h-4" /> Cached data
-            </span>
-          ) : null}
-          <button
-            onClick={refresh}
-            disabled={loading}
-            className="flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50 text-sm"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            {loading ? 'Loading…' : 'Refresh'}
-          </button>
         </div>
       </div>
 

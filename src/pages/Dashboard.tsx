@@ -93,7 +93,7 @@ function formatRankingsDate(dateStr: string): string {
 }
 
 export default function Dashboard() {
-  const { players, loading, source, rankingsDate } = usePlayers();
+  const { players, loading, rankingsDate } = usePlayers();
   const hasData = players.length > 0;
 
   const { totalBoys, totalGirls, totalPlayers, groupStats } = useMemo(() => {
@@ -141,21 +141,6 @@ export default function Dashboard() {
             <a href="https://usabjrrankings.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
               usabjrrankings.org
             </a>
-            {source === 'cached' && !loading && (
-              <span className="ml-2 text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-medium">
-                Cached data
-              </span>
-            )}
-            {source === 'cached' && loading && (
-              <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
-                Updating…
-              </span>
-            )}
-            {source === 'live' && (
-              <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
-                Live data
-              </span>
-            )}
           </p>
           <p className="text-slate-400 text-xs md:text-sm ml-[46px] md:ml-[52px] flex items-center gap-1.5 mt-0.5">
             <Calendar className="w-3.5 h-3.5" />

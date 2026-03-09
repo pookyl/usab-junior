@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, ExternalLink, RefreshCw, Trophy, Wifi, WifiOff, Calendar } from 'lucide-react';
+import { Search, ExternalLink, RefreshCw, Trophy, WifiOff, Calendar } from 'lucide-react';
 import type { AgeGroup, EventType } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
@@ -27,7 +27,7 @@ function RankBadge({ rank }: { rank: number }) {
 
 function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; eventType: EventType; date: string }) {
   const [search, setSearch] = useState('');
-  const { players: allPlayers, loading, error, source, refresh } = usePlayers();
+  const { players: allPlayers, loading, error } = usePlayers();
 
   const players = useMemo(
     () =>
@@ -66,25 +66,6 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
           />
         </div>
 
-        <div className="flex items-center gap-3 text-sm text-slate-500">
-          {source === 'live' ? (
-            <span className="flex items-center gap-1.5 text-emerald-600">
-              <Wifi className="w-4 h-4" /> Live data
-            </span>
-          ) : source === 'cached' ? (
-            <span className="flex items-center gap-1.5 text-sky-600">
-              <WifiOff className="w-4 h-4" /> Cached · {formatRankingsDate(date)}
-            </span>
-          ) : null}
-          <button
-            onClick={refresh}
-            disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
-        </div>
       </div>
 
       {/* Table */}
@@ -107,7 +88,7 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
         {loading && players.length === 0 ? (
           <div className="py-16 text-center">
             <RefreshCw className="w-8 h-8 text-slate-300 animate-spin mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">Fetching live rankings…</p>
+            <p className="text-slate-400 text-sm">Loading rankings…</p>
           </div>
         ) : error && players.length === 0 ? (
           <div className="py-16 text-center space-y-3">
