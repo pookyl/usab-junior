@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, useRef, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback, type ReactNode } from 'react';
 import type { UniquePlayer } from '../types/junior';
-import { fetchAllPlayers, fetchLatestDate, invalidateRankingsCache } from '../services/rankingsService';
+import { fetchAllPlayers, fetchLatestDate, fetchCachedDates, invalidateRankingsCache } from '../services/rankingsService';
 import { cachedAllPlayers, RANKINGS_DATE } from '../data/usaJuniorData';
 
 export type DataSource = 'live' | 'cached' | 'none';
@@ -11,6 +11,8 @@ interface PlayersContextValue {
   error: string | null;
   source: DataSource;
   rankingsDate: string;
+  availableDates: string[];
+  changeDate: (date: string) => void;
   refresh: () => void;
   playerNameMap: Map<string, string>;
 }
@@ -23,9 +25,10 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<DataSource>(cachedAllPlayers.length > 0 ? 'cached' : 'none');
   const [rankingsDate, setRankingsDate] = useState<string>(RANKINGS_DATE);
+  const [availableDates, setAvailableDates] = useState<string[]>([RANKINGS_DATE]);
   const fetchCount = useRef(0);
 
-  const load = (dateOverride?: string) => {
+  const load = useCallback((dateOverride?: string) => {
     const id = ++fetchCount.current;
     setLoading(true);
     setError(null);
@@ -50,15 +53,27 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
       setError(err.message);
       setLoading(false);
     });
-  };
+  }, [rankingsDate]);
+
+  const changeDate = useCallback((date: string) => {
+    if (date === rankingsDate) return;
+    invalidateRankingsCache();
+    setRankingsDate(date);
+    load(date);
+  }, [rankingsDate, load]);
 
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
       try {
-        const { latestDate } = await fetchLatestDate();
+        const [{ latestDate }, cachedDates] = await Promise.all([
+          fetchLatestDate(),
+          fetchCachedDates(),
+        ]);
         if (cancelled) return;
+
+        if (cachedDates.length > 0) setAvailableDates(cachedDates);
 
         if (latestDate && latestDate !== RANKINGS_DATE) {
           invalidateRankingsCache();
@@ -85,7 +100,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   }, [players]);
 
   return (
-    <PlayersContext.Provider value={{ players, loading, error, source, rankingsDate, refresh: () => load(), playerNameMap }}>
+    <PlayersContext.Provider value={{ players, loading, error, source, rankingsDate, availableDates, changeDate, refresh: () => load(), playerNameMap }}>
       {children}
     </PlayersContext.Provider>
   );

@@ -1,6 +1,8 @@
+import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Trophy, BarChart2, Home, Feather, Swords, Users, Moon, Sun, Monitor } from 'lucide-react';
+import { Trophy, BarChart2, Home, Feather, Swords, Users, Moon, Sun, Monitor, Calendar, RefreshCw } from 'lucide-react';
 import { useTheme, type ThemeMode } from '../contexts/ThemeContext';
+import { usePlayers } from '../contexts/PlayersContext';
 
 const navItems = [
   { path: '/', label: 'Dashboard', shortLabel: 'Home', icon: Home },
@@ -13,6 +15,80 @@ const navItems = [
 const MODE_CYCLE: ThemeMode[] = ['system', 'light', 'dark'];
 const MODE_ICON = { light: Sun, dark: Moon, system: Monitor };
 const MODE_LABEL = { light: 'Light', dark: 'Dark', system: 'Auto' };
+
+function formatShortDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatFullDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function DatePickerButton() {
+  const { rankingsDate, availableDates, changeDate, loading } = usePlayers();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const hasMultiple = availableDates.length > 1;
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => hasMultiple && setOpen((o) => !o)}
+        className={`flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg transition-colors ${
+          open
+            ? 'bg-slate-700 text-white'
+            : hasMultiple
+              ? 'text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer'
+              : 'text-slate-400 cursor-default'
+        }`}
+        aria-label={`Rankings date: ${formatFullDate(rankingsDate)}`}
+        title={`Rankings as of ${formatFullDate(rankingsDate)}`}
+      >
+        {loading ? (
+          <RefreshCw className="w-4 h-4 animate-spin" />
+        ) : (
+          <Calendar className="w-4 h-4" />
+        )}
+        <span className="hidden md:inline text-xs font-medium">{formatShortDate(rankingsDate)}</span>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1.5 w-52 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-50">
+          <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-semibold border-b border-slate-700">
+            Rankings Date
+          </div>
+          <div className="max-h-64 overflow-y-auto py-1">
+            {availableDates.map((date, i) => (
+              <button
+                key={date}
+                onClick={() => { changeDate(date); setOpen(false); }}
+                className={`w-full text-left px-3 py-2 text-sm transition-colors ${
+                  date === rankingsDate
+                    ? 'bg-violet-600 text-white font-medium'
+                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                }`}
+              >
+                {formatFullDate(date)}
+                {i === 0 && <span className="ml-1.5 text-[10px] opacity-60">(Latest)</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const location = useLocation();
@@ -62,15 +138,18 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-              <button
-                onClick={cycleMode}
-                className="ml-2 flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                aria-label={`Theme: ${MODE_LABEL[mode]}`}
-                title={`Theme: ${MODE_LABEL[mode]}`}
-              >
-                <ThemeIcon className="w-4 h-4" />
-                <span className="text-xs font-medium">{MODE_LABEL[mode]}</span>
-              </button>
+              <div className="ml-2 flex items-center gap-1">
+                <DatePickerButton />
+                <button
+                  onClick={cycleMode}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                  aria-label={`Theme: ${MODE_LABEL[mode]}`}
+                  title={`Theme: ${MODE_LABEL[mode]}`}
+                >
+                  <ThemeIcon className="w-4 h-4" />
+                  <span className="text-xs font-medium">{MODE_LABEL[mode]}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -87,6 +166,7 @@ export default function Navbar() {
             <span className="text-slate-400 font-normal text-xs ml-1">Badminton</span>
           </span>
         </Link>
+        <DatePickerButton />
         <button
           onClick={cycleMode}
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"

@@ -31,6 +31,26 @@ export async function fetchLatestDate(): Promise<{ latestDate: string; available
   return { latestDate: RANKINGS_DATE, availableDates: [RANKINGS_DATE] };
 }
 
+// ── Cached dates (only dates with files on disk) ────────────────────────────
+let cachedDatesCache: string[] | null = null;
+
+export async function fetchCachedDates(): Promise<string[]> {
+  if (cachedDatesCache) return cachedDatesCache;
+
+  try {
+    const res = await fetch('/api/cached-dates', { signal: AbortSignal.timeout(10_000) });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    if (Array.isArray(data.dates) && data.dates.length > 0) {
+      cachedDatesCache = data.dates;
+      return data.dates;
+    }
+  } catch {
+    // Fall back to current date only
+  }
+  return [RANKINGS_DATE];
+}
+
 // ── Rankings cache (keyed by date + category) ───────────────────────────────
 let rankingsCacheDate = '';
 const cache = new Map<RankingsKey, JuniorPlayer[]>();

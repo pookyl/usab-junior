@@ -1,4 +1,4 @@
-name: Refresh Rankings Cache (rankings-cache.json)
+name: Refresh Rankings Cache
 
 on:
   schedule:
@@ -26,10 +26,11 @@ jobs:
           echo "updated=true" >> "$GITHUB_OUTPUT"
         continue-on-error: true
 
-      - name: Check if cache changed
+      - name: Check if any cache files changed
         id: check
         run: |
-          if git diff --quiet data/rankings-cache.json 2>/dev/null; then
+          git add data/rankings-*.json data/rankings-cache.json 2>/dev/null || true
+          if git diff --cached --quiet 2>/dev/null; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -41,6 +42,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           DATE=$(jq -r .date data/rankings-cache.json)
-          git add data/rankings-cache.json
-          git commit -m "chore: refresh rankings cache for ${DATE}"
+          git commit -m "chore: add rankings for ${DATE}"
           git push

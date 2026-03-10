@@ -18,8 +18,13 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
-const CACHE_FILE = join(ROOT, 'data', 'rankings-cache.json');
+const DATA_DIR = join(ROOT, 'data');
+const CACHE_FILE = join(DATA_DIR, 'rankings-cache.json');
 const USAB_BASE = 'https://usabjrrankings.org';
+
+function perDateCacheFile(date) {
+  return join(DATA_DIR, `rankings-${date}.json`);
+}
 
 const BROWSER_HEADERS = {
   'User-Agent':
@@ -141,48 +146,86 @@ async function fetchAllRankings(date) {
   return { rankingsByCategory, uniquePlayers };
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────────
+// ── Fetch all available dates from the USAB homepage ─────────────────────────
 
-async function main() {
-  const forcedDate = process.argv[2];
-  const date = forcedDate || (await fetchLatestDate());
+async function fetchAllAvailableDates() {
+  console.log('[refresh] fetching all available dates from USAB homepage…');
+  const response = await fetch(USAB_BASE, { headers: BROWSER_HEADERS });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const html = await response.text();
 
-  // Check if the existing cache already has this date
-  if (existsSync(CACHE_FILE)) {
-    try {
-      const existing = JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
-      if (existing.date === date) {
-        console.log(`[refresh] cache already up-to-date for ${date} — skipping`);
-        process.exit(2);
-      }
-      console.log(`[refresh] cache has date ${existing.date}, updating to ${date}`);
-    } catch {
-      console.log('[refresh] existing cache unreadable, will overwrite');
-    }
+  const dates = [];
+  const optionRegex = /<option[^>]*value="([^"]+)"[^>]*>/gi;
+  let m;
+  while ((m = optionRegex.exec(html)) !== null) {
+    const val = m[1].trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) dates.push(val);
+  }
+  return dates;
+}
+
+// ── Write cache files for a single date ──────────────────────────────────────
+
+async function refreshDate(date, { updateLatest = false } = {}) {
+  const perDateFile = perDateCacheFile(date);
+  if (existsSync(perDateFile)) {
+    console.log(`[refresh] per-date cache already exists for ${date} — skipping`);
+    return false;
   }
 
   const { rankingsByCategory, uniquePlayers } = await fetchAllRankings(date);
 
   if (uniquePlayers.length === 0) {
-    console.error('[refresh] no players fetched — aborting to avoid writing empty cache');
-    process.exit(1);
+    console.error(`[refresh] no players fetched for ${date} — skipping`);
+    return false;
   }
 
-  const cacheDir = dirname(CACHE_FILE);
-  if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
+  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 
-  const data = {
-    date,
-    rankings: rankingsByCategory,
-    allPlayers: uniquePlayers,
-    savedAt: new Date().toISOString(),
-  };
+  // Per-date file: compact JSON, allPlayers only (no rankings duplication)
+  const lean = { date, allPlayers: uniquePlayers, savedAt: new Date().toISOString() };
+  writeFileSync(perDateFile, JSON.stringify(lean));
+  console.log(`[refresh] wrote per-date cache: ${date}, ${uniquePlayers.length} players (compact)`);
 
-  writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
+  if (updateLatest) {
+    // Latest alias: pretty-printed with rankings (used by static frontend import)
+    const full = { date, rankings: rankingsByCategory, allPlayers: uniquePlayers, savedAt: lean.savedAt };
+    writeFileSync(CACHE_FILE, JSON.stringify(full, null, 2));
+    console.log(`[refresh] updated rankings-cache.json (latest) for ${date}`);
+  }
 
-  const categories = Object.keys(rankingsByCategory).length;
-  console.log(`[refresh] wrote cache: date=${date}, ${categories} categories, ${uniquePlayers.length} players`);
-  process.exit(0);
+  return true;
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+
+async function main() {
+  const args = process.argv.slice(2);
+  const backfill = args.includes('--backfill');
+  const forcedDate = args.find((a) => /^\d{4}-\d{2}-\d{2}$/.test(a));
+
+  if (backfill) {
+    const allDates = await fetchAllAvailableDates();
+    console.log(`[refresh] backfill mode: ${allDates.length} dates available`);
+    let fetched = 0;
+    for (const date of allDates) {
+      const wrote = await refreshDate(date, { updateLatest: date === allDates[0] });
+      if (wrote) fetched++;
+    }
+    console.log(`[refresh] backfill complete: ${fetched} new date(s) cached`);
+    process.exit(fetched > 0 ? 0 : 2);
+  }
+
+  const date = forcedDate || (await fetchLatestDate());
+
+  // Check if the per-date cache already exists
+  if (existsSync(perDateCacheFile(date))) {
+    console.log(`[refresh] per-date cache already up-to-date for ${date} — skipping`);
+    process.exit(2);
+  }
+
+  const wrote = await refreshDate(date, { updateLatest: true });
+  process.exit(wrote ? 0 : 1);
 }
 
 main().catch((err) => {

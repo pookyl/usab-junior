@@ -6,7 +6,7 @@
  */
 import { createServer } from 'http';
 import { URL } from 'url';
-import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync, readdirSync } from 'fs';
 import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -27,7 +27,69 @@ const BROWSER_HEADERS = {
 };
 
 // ── Persistent disk cache ─────────────────────────────────────────────────────
-// Structure: { date, rankings: { "U11-BS": [...], ... }, allPlayers: [...], savedAt }
+// Per-date files: data/rankings-YYYY-MM-DD.json  (compact, allPlayers only)
+//   Structure: { date, allPlayers: [...], savedAt }
+// Legacy file:   data/rankings-cache.json  (pretty-printed, includes rankings)
+//   Structure: { date, rankings: { "U11-BS": [...], ... }, allPlayers: [...], savedAt }
+
+function diskCachePath(date) {
+  return join(DISK_CACHE_DIR, `rankings-${date}.json`);
+}
+
+function listCachedDates() {
+  try {
+    if (!existsSync(DISK_CACHE_DIR)) return [];
+    const files = readdirSync(DISK_CACHE_DIR);
+    const dates = [];
+    for (const f of files) {
+      const m = f.match(/^rankings-(\d{4}-\d{2}-\d{2})\.json$/);
+      if (m) dates.push(m[1]);
+    }
+    return dates.sort().reverse();
+  } catch {
+    return [];
+  }
+}
+
+function rebuildRankingsFromPlayers(allPlayers) {
+  const rankings = {};
+  for (const player of allPlayers) {
+    for (const e of player.entries) {
+      const key = `${e.ageGroup}-${e.eventType}`;
+      if (!rankings[key]) rankings[key] = [];
+      rankings[key].push({
+        usabId: player.usabId,
+        name: player.name,
+        rank: e.rank,
+        rankingPoints: e.rankingPoints,
+        ageGroup: e.ageGroup,
+        eventType: e.eventType,
+      });
+    }
+  }
+  for (const key of Object.keys(rankings)) {
+    rankings[key].sort((a, b) => a.rank - b.rank);
+  }
+  return rankings;
+}
+
+function loadDiskCacheForDate(date) {
+  try {
+    const filePath = diskCachePath(date);
+    if (existsSync(filePath)) {
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+      if (!data.rankings && data.allPlayers) {
+        data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
+      }
+      console.log(`[disk-cache] loaded per-date cache for ${date} (saved ${data.savedAt})`);
+      return data;
+    }
+  } catch (err) {
+    console.warn(`[disk-cache] failed to load per-date cache for ${date}:`, err.message);
+  }
+  return null;
+}
 
 function loadDiskCache() {
   try {
@@ -45,28 +107,33 @@ function loadDiskCache() {
 
 function saveDiskCache(date, rankings, allPlayers) {
   try {
-    const existing = loadDiskCache();
-    if (existing && existing.date === date) {
-      console.log(`[disk-cache] skipped save — date ${date} already cached`);
-      return;
-    }
     if (!existsSync(DISK_CACHE_DIR)) mkdirSync(DISK_CACHE_DIR, { recursive: true });
-    const data = { date, rankings, allPlayers, savedAt: new Date().toISOString() };
-    writeFileSync(DISK_CACHE_FILE, JSON.stringify(data, null, 2));
-    console.log(`[disk-cache] saved cache for date ${date} (${Object.keys(rankings).length} categories, ${allPlayers.length} players)`);
+
+    // Per-date file: compact JSON, allPlayers only (no rankings duplication)
+    const perDateFile = diskCachePath(date);
+    if (!existsSync(perDateFile)) {
+      const lean = { date, allPlayers, savedAt: new Date().toISOString() };
+      writeFileSync(perDateFile, JSON.stringify(lean));
+      console.log(`[disk-cache] saved per-date cache for ${date} (${allPlayers.length} players, compact)`);
+    }
+
+    // Latest alias: pretty-printed with rankings (used by static frontend import)
+    const full = { date, rankings, allPlayers, savedAt: new Date().toISOString() };
+    writeFileSync(DISK_CACHE_FILE, JSON.stringify(full, null, 2));
+    console.log(`[disk-cache] updated latest cache (rankings-cache.json) for ${date}`);
   } catch (err) {
     console.warn('[disk-cache] failed to save:', err.message);
   }
 }
 
-function getDiskCachedRankings(key) {
-  const disk = loadDiskCache();
+function getDiskCachedRankings(key, date) {
+  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
   if (disk && disk.rankings && disk.rankings[key]) return disk.rankings[key];
   return null;
 }
 
-function getDiskCachedAllPlayers() {
-  const disk = loadDiskCache();
+function getDiskCachedAllPlayers(date) {
+  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
   if (disk && disk.allPlayers) return { players: disk.allPlayers, date: disk.date };
   return null;
 }
@@ -716,6 +783,17 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    // Check per-date disk cache first
+    const diskKey = `${ageGroup}-${eventType}`;
+    const perDateDisk = getDiskCachedRankings(diskKey, date);
+    if (perDateDisk) {
+      console.log(`[rankings] serving from per-date disk cache for ${diskKey} date=${date}`);
+      setCache(cacheKey, perDateDisk);
+      res.writeHead(200, { 'X-Cache': 'DISK' });
+      res.end(JSON.stringify(perDateDisk));
+      return;
+    }
+
     try {
       const url = `${USAB_BASE}/?age_group=${ageGroup}&category=${eventType}&date=${date}`;
       console.log(`[rankings] fetching ${url}`);
@@ -729,7 +807,6 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(players));
     } catch (err) {
       console.error(`[rankings] error:`, err.message);
-      const diskKey = `${ageGroup}-${eventType}`;
       const diskData = getDiskCachedRankings(diskKey);
       if (diskData) {
         console.log(`[rankings] serving from disk cache for ${diskKey}`);
@@ -816,6 +893,15 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // GET /api/cached-dates  – returns dates that have per-date cache files on disk
+  if (reqUrl.pathname === '/api/cached-dates') {
+    const dates = listCachedDates();
+    console.log(`[cached-dates] found ${dates.length} cached date files`);
+    res.writeHead(200);
+    res.end(JSON.stringify({ dates }));
+    return;
+  }
+
   // GET /api/latest-date  – scrapes the USAB homepage for the most recent "As Of" date
   if (reqUrl.pathname === '/api/latest-date') {
     const cacheKey = 'latest-date';
@@ -875,6 +961,17 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    // Check per-date disk cache first (serves historical dates without scraping)
+    const perDateDisk = getDiskCachedAllPlayers(date);
+    if (perDateDisk) {
+      console.log(`[all-players] serving from per-date disk cache for ${date}`);
+      setCache(cacheKey, perDateDisk.players);
+      res.writeHead(200, { 'X-Cache': 'DISK' });
+      res.end(JSON.stringify(perDateDisk.players));
+      return;
+    }
+
+    // No per-date cache — fetch live from USAB (only happens for uncached dates)
     const ageGroups = ['U11', 'U13', 'U15', 'U17', 'U19'];
     const eventTypes = ['BS', 'GS', 'BD', 'GD', 'XD'];
     const allPlayers = new Map();
