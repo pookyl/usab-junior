@@ -8,6 +8,7 @@ import type {
   H2HResult,
   UniquePlayer,
   TswPlayerStats,
+  PlayerRankingTrend,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -182,4 +183,20 @@ export function tswSearchUrl(playerName: string) {
 
 export function tswTournamentUrl(tournamentId: string) {
   return `https://www.tournamentsoftware.com/sport/tournament.aspx?id=${tournamentId}`;
+}
+
+const trendCache = new Map<string, PlayerRankingTrend>();
+
+export async function fetchPlayerRankingTrend(
+  usabId: string,
+): Promise<PlayerRankingTrend> {
+  if (trendCache.has(usabId)) return trendCache.get(usabId)!;
+
+  const url = `/api/player/${usabId}/ranking-trend`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+  if (!res.ok) throw new Error(`Trend API ${res.status}`);
+
+  const data: PlayerRankingTrend = await res.json();
+  trendCache.set(usabId, data);
+  return data;
 }

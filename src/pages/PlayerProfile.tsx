@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -11,9 +11,19 @@ import {
   Activity,
   ChevronDown,
 } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import type {
   AgeGroup,
   PlayerEntry,
+  PlayerRankingTrend,
   TswPlayerStats,
   TswTournament,
   CategoryStats,
@@ -23,6 +33,7 @@ import { EVENT_LABELS, AGE_GROUPS, EVENT_TYPES } from '../types/junior';
 import {
   fetchPlayerDetail,
   fetchPlayerTswStats,
+  fetchPlayerRankingTrend,
   usabPlayerUrl,
   tswSearchUrl,
 } from '../services/rankingsService';
@@ -51,6 +62,189 @@ const AGE_TEXT: Record<AgeGroup, string> = {
   U17: 'text-amber-600',
   U19: 'text-rose-600',
 };
+
+const AGE_HEX: Record<AgeGroup, string> = {
+  U11: '#8b5cf6',
+  U13: '#3b82f6',
+  U15: '#10b981',
+  U17: '#f59e0b',
+  U19: '#ef4444',
+};
+
+function formatDateLabel(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
+}
+
+function RankingTrendChart({
+  trend,
+  entries,
+  asOfDate,
+}: {
+  trend: PlayerRankingTrend;
+  entries: PlayerEntry[];
+  asOfDate: string;
+}) {
+  const categories = useMemo(() => {
+    const sorted = [...entries].sort((a, b) => {
+      const agDiff = AGE_GROUPS.indexOf(a.ageGroup) - AGE_GROUPS.indexOf(b.ageGroup);
+      if (agDiff !== 0) return agDiff;
+      return EVENT_TYPES.indexOf(a.eventType) - EVENT_TYPES.indexOf(b.eventType);
+    });
+    return sorted.map((e) => `${e.ageGroup}-${e.eventType}`);
+  }, [entries]);
+
+  const bestCategory = useMemo(() => {
+    const best = entries.reduce((b, e) => (e.rank < b.rank ? e : b));
+    return `${best.ageGroup}-${best.eventType}`;
+  }, [entries]);
+
+  const [selectedCategory, setSelectedCategory] = useState(bestCategory);
+
+  const [ageGroup, eventType] = selectedCategory.split('-') as [AgeGroup, string];
+
+  const chartData = useMemo(() => {
+    return trend.trend
+      .filter((point) => point.date <= asOfDate)
+      .map((point) => {
+        const entry = point.entries.find(
+          (e) => e.ageGroup === ageGroup && e.eventType === eventType,
+        );
+        if (!entry) return null;
+        return {
+          date: point.date,
+          label: formatDateLabel(point.date),
+          rank: entry.rank,
+          points: entry.rankingPoints,
+        };
+      })
+      .filter(Boolean) as { date: string; label: string; rank: number; points: number }[];
+  }, [trend, ageGroup, eventType, asOfDate]);
+
+  if (chartData.length < 2) {
+    return (
+      <div className="py-6 text-center">
+        <TrendingUp className="w-8 h-8 text-slate-200 dark:text-slate-600 mx-auto mb-2" />
+        <p className="text-slate-400 dark:text-slate-500 text-sm">
+          Not enough historical data for {selectedCategory.replace('-', ' ')}
+        </p>
+      </div>
+    );
+  }
+
+  const maxRank = Math.max(...chartData.map((d) => d.rank));
+  const rankDomain = [1, Math.ceil(maxRank * 1.1)];
+  const lineColor = AGE_HEX[ageGroup];
+
+  return (
+    <div>
+      {categories.length > 1 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {categories.map((cat) => {
+            const [ag] = cat.split('-') as [AgeGroup, string];
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                  cat === selectedCategory
+                    ? `bg-gradient-to-r ${AGE_GRADIENT[ag]} text-white shadow-sm`
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+              >
+                {cat.replace('-', ' ')}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 mb-2 text-xs text-slate-500 dark:text-slate-400">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-5 h-0.5 rounded-full" style={{ backgroundColor: lineColor }} />
+          Rank <span className="text-slate-400 dark:text-slate-500">(left axis, lower is better)</span>
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-5 border-t-2 border-dashed" style={{ borderColor: lineColor }} />
+          Points <span className="text-slate-400 dark:text-slate-500">(right axis)</span>
+        </span>
+      </div>
+
+      <ResponsiveContainer width="100%" height={280}>
+        <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 11, fill: '#94a3b8' }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            yAxisId="rank"
+            reversed
+            domain={rankDomain}
+            allowDecimals={false}
+            tick={{ fontSize: 11, fill: '#94a3b8' }}
+            tickLine={false}
+            axisLine={false}
+            label={{ value: 'Rank', angle: -90, position: 'insideLeft', offset: 10, style: { fontSize: 11, fill: '#94a3b8' } }}
+          />
+          <YAxis
+            yAxisId="points"
+            orientation="right"
+            allowDecimals={false}
+            tick={{ fontSize: 11, fill: '#94a3b8' }}
+            tickLine={false}
+            axisLine={false}
+            label={{ value: 'Points', angle: 90, position: 'insideRight', offset: 10, style: { fontSize: 11, fill: '#94a3b8' } }}
+          />
+          <Tooltip
+            contentStyle={{
+              borderRadius: '10px',
+              border: '1px solid #e2e8f0',
+              fontSize: 12,
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+            }}
+            formatter={(value: unknown, name: unknown) => [
+              name === 'Rank' ? `#${value}` : (value as number).toLocaleString(),
+              name as string,
+            ]}
+            labelFormatter={(_label: unknown, payload: ReadonlyArray<{ payload?: { date?: string } }>) => {
+              const dateStr = payload[0]?.payload?.date;
+              if (!dateStr) return '';
+              const d = new Date(dateStr + 'T00:00:00');
+              return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            }}
+          />
+          <Line
+            yAxisId="rank"
+            type="monotone"
+            dataKey="rank"
+            name="Rank"
+            stroke={lineColor}
+            strokeWidth={2.5}
+            dot={{ r: 3.5, fill: lineColor, strokeWidth: 0 }}
+            activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
+            connectNulls
+          />
+          <Line
+            yAxisId="points"
+            type="monotone"
+            dataKey="points"
+            name="Points"
+            stroke={lineColor}
+            strokeWidth={1.5}
+            strokeDasharray="5 3"
+            strokeOpacity={0.7}
+            dot={false}
+            connectNulls
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 function RankingCard({ entry }: { entry: PlayerEntry }) {
   return (
@@ -321,12 +515,14 @@ function PlayerNameLink({
 
 export default function PlayerProfile() {
   const { id: usabId } = useParams<{ id: string }>();
-  const { players: allPlayers, loading: loadingAllPlayers, playerNameMap } = usePlayers();
+  const { players: allPlayers, loading: loadingAllPlayers, playerNameMap, rankingsDate } = usePlayers();
 
   const player = allPlayers.find((p) => p.usabId === usabId) ?? null;
   const [gender, setGender] = useState<string | null>(null);
   const [tswStats, setTswStats] = useState<TswPlayerStats | null>(null);
   const [loadingTsw, setLoadingTsw] = useState(true);
+  const [trendData, setTrendData] = useState<PlayerRankingTrend | null>(null);
+  const [loadingTrend, setLoadingTrend] = useState(true);
   const [statsTab, setStatsTab] = useState<StatsCategory>('total');
   const [expandedTournaments, setExpandedTournaments] = useState<Set<string>>(new Set());
   const [recentResultsExpanded, setRecentResultsExpanded] = useState(false);
@@ -338,6 +534,7 @@ export default function PlayerProfile() {
   useEffect(() => {
     if (!usabId || !player) {
       setLoadingTsw(false);
+      setLoadingTrend(false);
       return;
     }
 
@@ -346,6 +543,12 @@ export default function PlayerProfile() {
       .then(setTswStats)
       .catch(() => setTswStats(null))
       .finally(() => setLoadingTsw(false));
+
+    setLoadingTrend(true);
+    fetchPlayerRankingTrend(usabId)
+      .then(setTrendData)
+      .catch(() => setTrendData(null))
+      .finally(() => setLoadingTrend(false));
 
     const best = player.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
     fetchPlayerDetail(usabId, best.ageGroup, best.eventType)
@@ -505,6 +708,29 @@ export default function PlayerProfile() {
             />
           ))}
         </div>
+      </div>
+
+      {/* Ranking Trend */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+        <div className="flex items-center gap-2 mb-3 md:mb-4">
+          <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-violet-500" />
+          <h2 className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-100">Ranking Trend</h2>
+        </div>
+        {loadingTrend ? (
+          <div className="py-8 text-center">
+            <RefreshCw className="w-7 h-7 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Loading ranking history…</p>
+          </div>
+        ) : trendData && trendData.trend.length >= 2 ? (
+          <RankingTrendChart trend={trendData} entries={player.entries} asOfDate={rankingsDate} />
+        ) : (
+          <div className="py-6 text-center">
+            <TrendingUp className="w-8 h-8 text-slate-200 dark:text-slate-600 mx-auto mb-2" />
+            <p className="text-slate-400 dark:text-slate-500 text-sm">
+              Not enough historical data to show trends.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Match Statistics from TSW */}

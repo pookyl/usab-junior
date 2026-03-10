@@ -1058,6 +1058,46 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // GET /api/player/:id/ranking-trend — historical rank & points across all cached dates
+  const trendMatch = reqUrl.pathname.match(/^\/api\/player\/(\d+)\/ranking-trend$/);
+  if (trendMatch) {
+    const usabId = trendMatch[1];
+    const cacheKey = `trend:${usabId}`;
+
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    try {
+      const dates = listCachedDates().sort();
+      const trend = [];
+      let playerName = '';
+
+      for (const date of dates) {
+        const disk = loadDiskCacheForDate(date);
+        if (!disk || !disk.allPlayers) continue;
+        const player = disk.allPlayers.find((p) => p.usabId === usabId);
+        if (!player) continue;
+        if (!playerName && player.name) playerName = player.name;
+        trend.push({ date, entries: player.entries });
+      }
+
+      const result = { usabId, name: playerName, trend };
+      setCache(cacheKey, result);
+      console.log(`[ranking-trend] ${usabId} → ${trend.length} data points across ${dates.length} dates`);
+      res.writeHead(200, { 'X-Cache': 'MISS' });
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      console.error('[ranking-trend] error:', err.message);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
   // GET /api/player/:id/tsw-stats?name=PLAYER_NAME
   const tswStatsMatch = reqUrl.pathname.match(/^\/api\/player\/(\d+)\/tsw-stats$/);
   if (tswStatsMatch) {

@@ -107,6 +107,17 @@ export interface TswPlayerStats {
   tournamentsByYear: Record<string, TswTournament[]>;
 }
 
+export interface RankingTrendPoint {
+  date: string;
+  entries: PlayerEntry[];
+}
+
+export interface PlayerRankingTrend {
+  usabId: string;
+  name: string;
+  trend: RankingTrendPoint[];
+}
+
 export interface H2HMatch {
   tournament: string;
   tournamentUrl: string;
