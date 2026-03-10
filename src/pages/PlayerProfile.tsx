@@ -162,18 +162,18 @@ function RankingTrendChart({
 
       <div className="flex items-center justify-center gap-x-5 mb-2 text-xs text-slate-500 dark:text-slate-400">
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-5 h-0.5 rounded-full" style={{ backgroundColor: lineColor }} />
-          Rank
-        </span>
-        <span className="inline-flex items-center gap-1.5">
           <span className="inline-block w-5 border-t-2 border-dashed" style={{ borderColor: lineColor }} />
           Points
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-5 h-0.5 rounded-full" style={{ backgroundColor: lineColor }} />
+          Rank
         </span>
       </div>
 
       <div className="-mx-2 md:mx-0">
       <ResponsiveContainer width="100%" height={260}>
-        <LineChart data={chartData} margin={{ top: 5, right: 0, left: -15, bottom: 5 }}>
+        <LineChart data={chartData} margin={{ top: 5, right: -10, left: -15, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
           <XAxis
             dataKey="label"
@@ -183,7 +183,16 @@ function RankingTrendChart({
             interval="preserveStartEnd"
           />
           <YAxis
+            yAxisId="points"
+            allowDecimals={false}
+            tick={{ fontSize: 10, fill: '#94a3b8' }}
+            tickLine={false}
+            axisLine={false}
+            width={40}
+          />
+          <YAxis
             yAxisId="rank"
+            orientation="right"
             reversed
             domain={rankDomain}
             allowDecimals={false}
@@ -191,15 +200,6 @@ function RankingTrendChart({
             tickLine={false}
             axisLine={false}
             width={35}
-          />
-          <YAxis
-            yAxisId="points"
-            orientation="right"
-            allowDecimals={false}
-            tick={{ fontSize: 10, fill: '#94a3b8' }}
-            tickLine={false}
-            axisLine={false}
-            width={40}
           />
           <Tooltip
             contentStyle={{
