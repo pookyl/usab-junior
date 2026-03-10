@@ -171,33 +171,35 @@ function RankingTrendChart({
         </span>
       </div>
 
-      <ResponsiveContainer width="100%" height={280}>
-        <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+      <div className="-mx-2 md:mx-0">
+      <ResponsiveContainer width="100%" height={260}>
+        <LineChart data={chartData} margin={{ top: 5, right: 0, left: -15, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 11, fill: '#94a3b8' }}
+            tick={{ fontSize: 10, fill: '#94a3b8' }}
             tickLine={false}
             axisLine={false}
+            interval="preserveStartEnd"
           />
           <YAxis
             yAxisId="rank"
             reversed
             domain={rankDomain}
             allowDecimals={false}
-            tick={{ fontSize: 11, fill: '#94a3b8' }}
+            tick={{ fontSize: 10, fill: '#94a3b8' }}
             tickLine={false}
             axisLine={false}
-            label={{ value: 'Rank', angle: -90, position: 'insideLeft', offset: 10, style: { fontSize: 11, fill: '#94a3b8' } }}
+            width={35}
           />
           <YAxis
             yAxisId="points"
             orientation="right"
             allowDecimals={false}
-            tick={{ fontSize: 11, fill: '#94a3b8' }}
+            tick={{ fontSize: 10, fill: '#94a3b8' }}
             tickLine={false}
             axisLine={false}
-            label={{ value: 'Points', angle: 90, position: 'insideRight', offset: 10, style: { fontSize: 11, fill: '#94a3b8' } }}
+            width={40}
           />
           <Tooltip
             contentStyle={{
@@ -242,6 +244,7 @@ function RankingTrendChart({
           />
         </LineChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }
