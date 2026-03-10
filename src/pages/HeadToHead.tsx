@@ -186,24 +186,24 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
 
   const isViolet = accent === 'violet';
   const avatarBg = isViolet ? 'bg-violet-600' : 'bg-blue-600';
-  const ringColor = isViolet ? 'focus:ring-violet-400' : 'focus:ring-blue-400';
+  const ringColor = isViolet ? 'focus:ring-violet-400 dark:focus:ring-violet-600' : 'focus:ring-blue-400 dark:focus:ring-blue-600';
   const selectedBorder = isViolet ? 'border-violet-200' : 'border-blue-200';
   const itemHover = isViolet ? 'hover:bg-violet-50 active:bg-violet-50' : 'hover:bg-blue-50 active:bg-blue-50';
 
   return (
     <div ref={ref} className="relative">
-      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+      <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
         {label}
       </label>
 
       {selected ? (
-        <div className={`flex items-center gap-2.5 md:gap-3 p-3 md:p-3.5 bg-white border-2 ${selectedBorder} rounded-xl`}>
+        <div className={`flex items-center gap-2.5 md:gap-3 p-3 md:p-3.5 bg-white dark:bg-slate-900 border-2 ${selectedBorder} rounded-xl`}>
           <div className={`w-9 h-9 md:w-10 md:h-10 rounded-xl ${avatarBg} flex items-center justify-center text-white font-black text-xs md:text-sm shrink-0`}>
             {selected.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className="font-semibold text-sm text-slate-800 truncate">{selected.name}</p>
+              <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 truncate">{selected.name}</p>
               <Link
                 to={`/directory/${selected.usabId}`}
                 className="text-violet-500 hover:text-violet-700 shrink-0"
@@ -216,17 +216,17 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
               {entriesForAge(selected, ageGroup).slice(0, 3).map((e) => (
                 <span
                   key={`${e.ageGroup}-${e.eventType}`}
-                  className="text-[10px] font-medium px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded"
+                  className="text-[10px] font-medium px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded"
                 >
                   {!ageGroup ? `${e.ageGroup} ` : ''}{EVENT_LABELS[e.eventType].split(' ')[1]} #{e.rank}
                 </span>
               ))}
-              <span className="text-[10px] text-slate-400 font-mono">ID {selected.usabId}</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">ID {selected.usabId}</span>
             </div>
           </div>
           <button
             onClick={() => onSelect(null)}
-            className="text-xs text-slate-400 hover:text-red-500 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors shrink-0"
+            className="text-xs text-slate-400 dark:text-slate-500 hover:text-red-500 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors shrink-0"
           >
             Change
           </button>
@@ -234,7 +234,7 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
       ) : (
         <>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder={loading ? 'Loading players…' : `Search by name or USAB ID…`}
@@ -242,17 +242,17 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
               disabled={loading}
               onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
               onFocus={() => setOpen(true)}
-              className={`w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 ${ringColor} bg-white disabled:opacity-60`}
+              className={`w-full pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 ${ringColor} bg-white dark:bg-slate-900 disabled:opacity-60`}
             />
             {loading && (
-              <RefreshCw className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 animate-spin" />
+              <RefreshCw className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 animate-spin" />
             )}
           </div>
 
           {open && !loading && (
-            <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-80 md:max-h-96 overflow-y-auto overscroll-contain">
+            <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-80 md:max-h-96 overflow-y-auto overscroll-contain">
               {filtered.length === 0 ? (
-                <div className="p-4 text-center text-slate-400 text-sm">No players found</div>
+                <div className="p-4 text-center text-slate-400 dark:text-slate-500 text-sm">No players found</div>
               ) : (
                 filtered.map((p) => {
                   const best = bestEntry(p, ageGroup);
@@ -261,21 +261,21 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
                     <button
                       key={p.usabId}
                       onClick={() => { onSelect(p); setQuery(''); setOpen(false); }}
-                      className={`w-full text-left px-4 py-2.5 ${itemHover} flex items-center gap-3 transition-colors border-b border-slate-50 last:border-0`}
+                      className={`w-full text-left px-4 py-2.5 ${itemHover} flex items-center gap-3 transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0`}
                     >
-                      <span className="text-xs text-slate-400 w-8 text-right font-mono shrink-0">
+                        <span className="text-xs text-slate-400 dark:text-slate-500 w-8 text-right font-mono shrink-0">
                         {best ? `#${best.rank}` : '—'}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-800 truncate">{p.name}</p>
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{p.name}</p>
                         <div className="flex gap-1.5 mt-0.5 flex-wrap">
                           {ageEntries.slice(0, 3).map((e) => (
-                            <span key={`${e.ageGroup}-${e.eventType}`} className="text-[10px] text-slate-400">
+                            <span key={`${e.ageGroup}-${e.eventType}`} className="text-[10px] text-slate-400 dark:text-slate-500">
                               {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType} #{e.rank}
                             </span>
                           ))}
                           {ageEntries.length > 3 && (
-                            <span className="text-[10px] text-slate-300">+{ageEntries.length - 3}</span>
+                            <span className="text-[10px] text-slate-300 dark:text-slate-600">+{ageEntries.length - 3}</span>
                           )}
                         </div>
                       </div>
@@ -336,12 +336,12 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
   return (
     <div className={`border rounded-xl overflow-hidden transition-shadow hover:shadow-md ${
       match.team1Won
-        ? 'border-l-4 border-l-violet-400 border-t-slate-100 border-r-slate-100 border-b-slate-100'
+        ? 'border-l-4 border-l-violet-400 border-t-slate-100 dark:border-t-slate-800 border-r-slate-100 dark:border-r-slate-800 border-b-slate-100 dark:border-b-slate-800'
         : match.team2Won
-        ? 'border-l-4 border-l-blue-400 border-t-slate-100 border-r-slate-100 border-b-slate-100'
-        : 'border-slate-100'
+        ? 'border-l-4 border-l-blue-400 border-t-slate-100 dark:border-t-slate-800 border-r-slate-100 dark:border-r-slate-800 border-b-slate-100 dark:border-b-slate-800'
+        : 'border-slate-100 dark:border-slate-800'
     }`}>
-      <div className="bg-slate-50 px-3 md:px-4 py-2 md:py-2.5 border-b border-slate-100">
+      <div className="bg-slate-50 dark:bg-slate-800/50 px-3 md:px-4 py-2 md:py-2.5 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
             cat === 'Singles'
@@ -352,8 +352,8 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
           }`}>
             {match.event}
           </span>
-          <span className="text-xs text-slate-400">·</span>
-          <span className="text-xs font-medium text-slate-600">{match.round}</span>
+          <span className="text-xs text-slate-400 dark:text-slate-500">·</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{match.round}</span>
         </div>
         <div className="flex items-center gap-1.5 mt-1 min-w-0">
           {tournamentHref ? (
@@ -361,13 +361,13 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
               href={tournamentHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs md:text-sm font-semibold text-slate-700 hover:text-orange-600 truncate transition-colors inline-flex items-center gap-1.5"
+              className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-orange-600 truncate transition-colors inline-flex items-center gap-1.5"
             >
               {match.tournament}
               <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-500 shrink-0" />
             </a>
           ) : (
-            <p className="text-xs md:text-sm font-semibold text-slate-700 truncate">{match.tournament}</p>
+            <p className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">{match.tournament}</p>
           )}
         </div>
       </div>
@@ -383,7 +383,7 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
             <PlayerNameLinks
               players={match.team1Players}
               playerLookup={playerLookup}
-              colorClass={match.team1Won ? 'text-violet-700' : 'text-slate-600'}
+              colorClass={match.team1Won ? 'text-violet-700' : 'text-slate-600 dark:text-slate-300'}
             />
           </div>
           <div className="flex gap-1.5 md:gap-2 shrink-0">
@@ -391,12 +391,12 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
               <span key={i} className={`text-xs md:text-sm font-mono tabular-nums ${
                 a > b
                   ? `${match.team1Won ? 'text-violet-700' : 'text-blue-700'} font-bold`
-                  : 'text-slate-600 font-normal'
+                  : 'text-slate-600 dark:text-slate-300 font-normal'
               }`}>
                 {a}
               </span>
             )) : !match.team1Won ? (
-              <span className="text-xs md:text-sm font-normal text-slate-400">Walkover</span>
+              <span className="text-xs md:text-sm font-normal text-slate-400 dark:text-slate-500">Walkover</span>
             ) : null}
           </div>
         </div>
@@ -411,7 +411,7 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
             <PlayerNameLinks
               players={match.team2Players}
               playerLookup={playerLookup}
-              colorClass={match.team2Won ? 'text-blue-700' : 'text-slate-600'}
+              colorClass={match.team2Won ? 'text-blue-700' : 'text-slate-600 dark:text-slate-300'}
             />
           </div>
           <div className="flex gap-1.5 md:gap-2 shrink-0">
@@ -419,18 +419,18 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
               <span key={i} className={`text-xs md:text-sm font-mono tabular-nums ${
                 b > a
                   ? `${match.team1Won ? 'text-violet-700' : 'text-blue-700'} font-bold`
-                  : 'text-slate-600 font-normal'
+                  : 'text-slate-600 dark:text-slate-300 font-normal'
               }`}>
                 {b}
               </span>
             )) : !match.team2Won ? (
-              <span className="text-xs md:text-sm font-normal text-slate-400">Walkover</span>
+              <span className="text-xs md:text-sm font-normal text-slate-400 dark:text-slate-500">Walkover</span>
             ) : null}
           </div>
         </div>
 
         {(match.date || match.venue || match.duration) && (
-          <div className="mt-1.5 md:mt-2 pt-1.5 md:pt-2 border-t border-slate-50 flex items-center gap-2 text-[10px] md:text-xs text-slate-400">
+          <div className="mt-1.5 md:mt-2 pt-1.5 md:pt-2 border-t border-slate-50 dark:border-slate-800 flex items-center gap-2 text-[10px] md:text-xs text-slate-400 dark:text-slate-500">
             {match.date && <span>{match.date}</span>}
             {match.date && match.duration && <span>·</span>}
             {match.duration && <span>{match.duration}</span>}
@@ -463,25 +463,25 @@ function StatsRow({
   subB?: string;
 }) {
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 items-center py-2.5 md:py-3 border-b border-slate-50 last:border-0">
+    <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 items-center py-2.5 md:py-3 border-b border-slate-50 dark:border-slate-800 last:border-0">
       <div className="text-right space-y-1">
         <p className="text-xs md:text-sm font-bold text-violet-600">{valA}</p>
         {barA !== undefined && (
-          <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
             <div className="h-full bg-violet-400 rounded-full ml-auto" style={{ width: `${barA}%` }} />
           </div>
         )}
-        {subA && <p className="text-[10px] text-slate-400">{subA}</p>}
+        {subA && <p className="text-[10px] text-slate-400 dark:text-slate-500">{subA}</p>}
       </div>
-      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider w-12 md:w-16 text-center">{label}</p>
+      <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-12 md:w-16 text-center">{label}</p>
       <div className="space-y-1">
         <p className="text-xs md:text-sm font-bold text-blue-600">{valB}</p>
         {barB !== undefined && (
-          <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
             <div className="h-full bg-blue-400 rounded-full" style={{ width: `${barB}%` }} />
           </div>
         )}
-        {subB && <p className="text-[10px] text-slate-400">{subB}</p>}
+        {subB && <p className="text-[10px] text-slate-400 dark:text-slate-500">{subB}</p>}
       </div>
     </div>
   );
@@ -695,9 +695,9 @@ export default function HeadToHead() {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Swords className="w-5 h-5 md:w-6 md:h-6 text-violet-600" />
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Head to Head</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">Head to Head</h1>
         </div>
-        <p className="text-xs md:text-sm text-slate-500">
+        <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">
           Compare two players · Data from{' '}
           <a href="https://www.tournamentsoftware.com" target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:underline">
             TSW
@@ -711,7 +711,7 @@ export default function HeadToHead() {
 
       {/* Age Group Tabs — horizontal scroll on mobile */}
       <div>
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Filter by Age Group</p>
+        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Filter by Age Group</p>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
           {AGE_GROUPS.map((ag) => (
             <button
@@ -720,7 +720,7 @@ export default function HeadToHead() {
               className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
                 ageGroup === ag
                   ? `${AGE_COLORS[ag]} text-white scale-105`
-                  : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
               }`}
             >
               {ag}
@@ -738,7 +738,7 @@ export default function HeadToHead() {
             className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-all border whitespace-nowrap shrink-0 shadow-sm ${
               gender === g
                 ? (ageGroup ? `${AGE_COLORS[ageGroup]} text-white border-transparent scale-105` : 'bg-slate-700 text-white border-transparent scale-105')
-                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
             }`}
           >
             <span className="font-bold">{g === 'All' ? '⚥ All' : g === 'Boy' ? '♂ Boy' : '♀ Girl'}</span>
@@ -747,13 +747,13 @@ export default function HeadToHead() {
       </div>
 
       {/* Player count */}
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-slate-400 dark:text-slate-500">
         {playersLoading ? 'Loading players…' : `${filteredPlayers.length} player${filteredPlayers.length !== 1 ? 's' : ''}${gender !== 'All' ? ` (${gender}${filteredPlayers.length !== 1 ? 's' : ''})` : ''}${ageGroup ? ` in ${ageGroup}` : ''}`}
       </p>
 
       {/* Player Selection */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-        <h2 className="text-sm md:text-base font-semibold text-slate-700 mb-4 md:mb-5">Select Two Players</h2>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+        <h2 className="text-sm md:text-base font-semibold text-slate-700 dark:text-slate-200 mb-4 md:mb-5">Select Two Players</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <PlayerPicker
             label="Player 1"
@@ -794,16 +794,16 @@ export default function HeadToHead() {
 
       {/* Loading */}
       {comparing && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 md:p-12 text-center">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 md:p-12 text-center">
           <RefreshCw className="w-8 h-8 text-violet-400 animate-spin mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">Fetching match history & statistics…</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Fetching match history & statistics…</p>
         </div>
       )}
 
       {/* Error */}
       {error && !comparing && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 md:p-6 text-center">
-          <p className="text-red-700 font-medium text-sm">{error}</p>
+        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl p-4 md:p-6 text-center">
+          <p className="text-red-700 dark:text-red-300 font-medium text-sm">{error}</p>
           {playerA && playerB && (
             <a
               href={tswH2HUrl(playerA.usabId, playerB.usabId)}
@@ -821,17 +821,17 @@ export default function HeadToHead() {
       {compared && playerA && playerB && !comparing && (
         <div ref={resultsRef} className="space-y-4 md:space-y-6">
           {/* Global Category Filter */}
-          <div className="flex items-center gap-2 md:gap-3 bg-white rounded-2xl shadow-sm border border-slate-100 p-2 md:p-3">
-            <span className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider pl-1 md:pl-2 shrink-0">Show</span>
-            <div className="flex gap-1 md:gap-1.5 flex-1 bg-slate-100 rounded-xl p-1">
+          <div className="flex items-center gap-2 md:gap-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-2 md:p-3">
+            <span className="text-[10px] md:text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider pl-1 md:pl-2 shrink-0">Show</span>
+            <div className="flex gap-1 md:gap-1.5 flex-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
               {ALL_FILTER_CATS.map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setFilterCat(key)}
                   className={`flex-1 px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
                     filterCat === key
-                      ? 'bg-white text-slate-800 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                   }`}
                 >
                   {label}
@@ -915,11 +915,11 @@ export default function HeadToHead() {
 
           {/* H2H Win Rate Bar */}
           {(filteredWins.team1 > 0 || filteredWins.team2 > 0) && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-5">
-              <p className="text-xs text-slate-400 uppercase tracking-wider mb-2 md:mb-3 font-medium text-center">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-5">
+              <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 md:mb-3 font-medium text-center">
                 H2H Win Rate{filterCat !== 'All' ? ` · ${filterCat}` : ''}
               </p>
-              <div className="relative h-3 md:h-4 bg-slate-100 rounded-full overflow-hidden">
+              <div className="relative h-3 md:h-4 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div
                   className="absolute left-0 top-0 h-full bg-gradient-to-r from-violet-500 to-violet-400 rounded-full transition-all"
                   style={{
@@ -939,14 +939,14 @@ export default function HeadToHead() {
           )}
 
           {/* Direct Match History */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 bg-slate-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
               <div className="flex items-center justify-between flex-wrap gap-2 md:gap-3">
                 <div>
-                  <h2 className="text-sm md:text-base font-semibold text-slate-800">
+                  <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">
                     Match History{filterCat !== 'All' ? ` · ${filterCat}` : ''}
                   </h2>
-                  <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">
+                  <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                     {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''}
                   </p>
                 </div>
@@ -964,8 +964,8 @@ export default function HeadToHead() {
             <div className="p-3 md:p-4">
               {!h2hResult || filteredMatches.length === 0 ? (
                 <div className="py-8 md:py-12 text-center space-y-3">
-                  <Trophy className="w-8 md:w-10 h-8 md:h-10 text-slate-200 mx-auto" />
-                  <p className="text-slate-500 font-medium text-sm">
+                  <Trophy className="w-8 md:w-10 h-8 md:h-10 text-slate-200 dark:text-slate-600 mx-auto" />
+                  <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">
                     {filterCat !== 'All' && h2hResult && h2hResult.matches.length > 0
                       ? `No ${filterCat.toLowerCase()} matches`
                       : 'No direct matches found'}
@@ -987,7 +987,7 @@ export default function HeadToHead() {
                       >
                         {playerA.name.split(' ')[0]} on TSW <ExternalLink className="w-3.5 h-3.5" />
                       </a>
-                      <span className="text-slate-300">·</span>
+                      <span className="text-slate-300 dark:text-slate-600">·</span>
                       <a
                         href={tswSearchUrl(playerB.name)}
                         target="_blank"
@@ -1011,49 +1011,49 @@ export default function HeadToHead() {
 
           {/* Quick Stat Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
+              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
                 Best{ageGroup ? ` ${ageGroup}` : ''} Rank
               </p>
               <div className="flex items-center justify-center gap-1.5 md:gap-2">
                 <span className="text-base md:text-lg font-black text-violet-600">{bestA ? `#${bestA.rank}` : '—'}</span>
-                <span className="text-slate-300 text-[10px] md:text-xs">vs</span>
+                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
                 <span className="text-base md:text-lg font-black text-blue-600">{bestB ? `#${bestB.rank}` : '—'}</span>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
+              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
                 Best Points
               </p>
               <div className="flex items-center justify-center gap-1.5 md:gap-2">
                 <span className="text-sm md:text-lg font-black text-violet-600">{bestA?.rankingPoints.toLocaleString() ?? '—'}</span>
-                <span className="text-slate-300 text-[10px] md:text-xs">vs</span>
+                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
                 <span className="text-sm md:text-lg font-black text-blue-600">{bestB?.rankingPoints.toLocaleString() ?? '—'}</span>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
+              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
                 {filterCat !== 'All' ? `${filterCat} ` : ''}Career W-L
               </p>
               <div className="flex items-center justify-center gap-1.5 md:gap-2">
                 <span className="text-xs md:text-sm font-bold text-violet-600">
                   {tswStatsA ? `${tswStatsA[tswCatKey].career.wins}-${tswStatsA[tswCatKey].career.losses}` : h2hResult?.careerWL.team1 || '—'}
                 </span>
-                <span className="text-slate-300 text-[10px] md:text-xs">vs</span>
+                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
                 <span className="text-xs md:text-sm font-bold text-blue-600">
                   {tswStatsB ? `${tswStatsB[tswCatKey].career.wins}-${tswStatsB[tswCatKey].career.losses}` : h2hResult?.careerWL.team2 || '—'}
                 </span>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
+              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
                 {filterCat !== 'All' ? `${filterCat} ` : ''}Win %
               </p>
               <div className="flex items-center justify-center gap-1.5 md:gap-2">
                 <span className="text-base md:text-lg font-black text-violet-600">
                   {tswStatsA ? `${tswStatsA[tswCatKey].career.winPct}%` : '—'}
                 </span>
-                <span className="text-slate-300 text-[10px] md:text-xs">vs</span>
+                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
                 <span className="text-base md:text-lg font-black text-blue-600">
                   {tswStatsB ? `${tswStatsB[tswCatKey].career.winPct}%` : '—'}
                 </span>
@@ -1063,10 +1063,10 @@ export default function HeadToHead() {
 
           {/* Stats Comparison from TSW */}
           {(tswStatsA || tswStatsB) && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
               <div className="flex items-center gap-2 mb-4 md:mb-5">
                 <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
-                <h2 className="text-sm md:text-base font-semibold text-slate-800">
+                <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">
                   {filterCat !== 'All' ? `${filterCat} ` : ''}Stats Comparison
                 </h2>
               </div>
@@ -1099,8 +1099,8 @@ export default function HeadToHead() {
 
               {/* Recent form */}
               {(tswStatsA?.recentHistory?.length || tswStatsB?.recentHistory?.length) ? (
-                <div className="mt-4 md:mt-5 pt-4 md:pt-5 border-t border-slate-100">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Recent Form</p>
+                <div className="mt-4 md:mt-5 pt-4 md:pt-5 border-t border-slate-100 dark:border-slate-800">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Recent Form</p>
                   <div className="space-y-2.5 md:space-y-3">
                     {tswStatsA && tswStatsA.recentHistory.length > 0 && (
                       <div className="flex items-center gap-2">
@@ -1150,10 +1150,10 @@ export default function HeadToHead() {
 
           {/* Rankings comparison */}
           {playerA && playerB && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
               <div className="flex items-center gap-2 mb-3 md:mb-4">
                 <Trophy className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
-                <h2 className="text-sm md:text-base font-semibold text-slate-800">{ageGroup ? `${ageGroup} ` : ''}Rankings</h2>
+                <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">{ageGroup ? `${ageGroup} ` : ''}Rankings</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <div>
@@ -1164,9 +1164,9 @@ export default function HeadToHead() {
                         <span className="text-[10px] md:text-xs font-bold text-violet-700 bg-violet-100 px-1.5 md:px-2 py-0.5 rounded">
                           {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType}
                         </span>
-                        <span className="text-[10px] md:text-xs text-slate-500 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
+                        <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
                         <span className="ml-auto text-xs md:text-sm font-black text-violet-600">#{e.rank}</span>
-                        <span className="text-[10px] md:text-xs text-slate-400">{e.rankingPoints.toLocaleString()}</span>
+                        <span className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500">{e.rankingPoints.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
@@ -1179,9 +1179,9 @@ export default function HeadToHead() {
                         <span className="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 px-1.5 md:px-2 py-0.5 rounded">
                           {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType}
                         </span>
-                        <span className="text-[10px] md:text-xs text-slate-500 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
+                        <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
                         <span className="ml-auto text-xs md:text-sm font-black text-blue-600">#{e.rank}</span>
-                        <span className="text-[10px] md:text-xs text-slate-400">{e.rankingPoints.toLocaleString()}</span>
+                        <span className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500">{e.rankingPoints.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>

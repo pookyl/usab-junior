@@ -49,7 +49,7 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
   return (
     <Link
       to={`/directory/${player.usabId}`}
-      className="group block bg-white rounded-xl border border-slate-100 hover:border-violet-200 hover:shadow-md active:bg-slate-50 transition-all p-3.5 md:p-4"
+      className="group block bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-violet-200 dark:hover:border-violet-700 hover:shadow-md active:bg-slate-50 dark:active:bg-slate-800 transition-all p-3.5 md:p-4"
     >
       <div className="flex items-start justify-between gap-2 md:gap-3">
         <div className="flex items-center gap-2.5 md:gap-3 min-w-0">
@@ -57,10 +57,10 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
             {player.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-sm text-slate-800 group-hover:text-violet-700 transition-colors truncate">
+            <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 group-hover:text-violet-700 transition-colors truncate">
               {player.name}
             </p>
-            <p className="text-[10px] text-slate-400 font-mono">{player.usabId}</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{player.usabId}</p>
           </div>
         </div>
 
@@ -68,10 +68,10 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
           {best && (
             <div className="text-right">
               <p className="text-sm font-bold text-emerald-600">#{best.rank}</p>
-              <p className="text-[10px] text-slate-400">{best.ageGroup} {best.eventType}</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">{best.ageGroup} {best.eventType}</p>
             </div>
           )}
-          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-violet-400 transition-colors" />
+          <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-violet-400 transition-colors" />
         </div>
       </div>
 
@@ -155,18 +155,18 @@ export default function AllPlayers() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Users className="w-5 h-5 md:w-6 md:h-6 text-violet-500" />
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Players</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">Players</h1>
           </div>
-          <p className="text-sm md:text-base text-slate-500">
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
             Complete directory ·{' '}
-            <span className="font-medium text-slate-700">{players.length.toLocaleString()}</span> players
+            <span className="font-medium text-slate-700 dark:text-slate-200">{players.length.toLocaleString()}</span> players
           </p>
         </div>
       </div>
 
       {/* Age group filter — horizontal scroll on mobile */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Filter by Age Group</p>
+        <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Filter by Age Group</p>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
           {AGE_GROUPS.map((ag) => (
             <button
@@ -175,7 +175,7 @@ export default function AllPlayers() {
               className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
                 ageGroupFilter === ag
                   ? `${AGE_FILTER_ACTIVE[ag]} scale-105`
-                  : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
               }`}
             >
               {ag}
@@ -186,7 +186,7 @@ export default function AllPlayers() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
         <input
           type="text"
           placeholder="Search by name or USAB ID…"
@@ -195,7 +195,7 @@ export default function AllPlayers() {
             setSearch(e.target.value);
             if (e.target.value) setActiveLetter(null);
           }}
-          className="w-full md:max-w-md pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white"
+          className="w-full md:max-w-md pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-600 bg-white dark:bg-slate-900"
         />
       </div>
 
@@ -206,7 +206,7 @@ export default function AllPlayers() {
           className={`px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0 ${
             activeLetter === null
               ? 'bg-violet-600 text-white'
-              : 'bg-white border border-slate-200 text-slate-500 hover:border-violet-300'
+              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-violet-300 dark:hover:border-violet-600'
           }`}
         >
           A-Z
@@ -225,8 +225,8 @@ export default function AllPlayers() {
                 letter === activeLetter
                   ? 'bg-violet-600 text-white'
                   : count > 0
-                    ? 'bg-white border border-slate-200 text-slate-600 hover:border-violet-300 hover:text-violet-600'
-                    : 'bg-slate-50 border border-slate-100 text-slate-300 cursor-not-allowed'
+                    ? 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-violet-300 dark:hover:border-violet-600 hover:text-violet-600'
+                    : 'bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed'
               }`}
             >
               {letter}
@@ -238,25 +238,25 @@ export default function AllPlayers() {
       {/* Loading state */}
       {loading && players.length === 0 && (
         <div className="py-16 text-center">
-          <RefreshCw className="w-8 h-8 text-slate-300 animate-spin mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">
-            Loading players across all age groups (U11–U19)…
-          </p>
-          <p className="text-slate-300 text-xs mt-1">Fetching 25 ranking categories</p>
+          <RefreshCw className="w-8 h-8 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
+<p className="text-slate-400 dark:text-slate-500 text-sm">
+          Loading players across all age groups (U11–U19)…
+        </p>
+        <p className="text-slate-300 dark:text-slate-600 text-xs mt-1">Fetching 25 ranking categories</p>
         </div>
       )}
 
       {/* Error */}
       {error && players.length === 0 && (
         <div className="py-16 text-center">
-          <p className="text-slate-400 text-sm">{error}</p>
+          <p className="text-slate-400 dark:text-slate-500 text-sm">{error}</p>
         </div>
       )}
 
       {/* Results count */}
       {filtered.length > 0 && (
-        <p className="text-sm text-slate-400">
-          Showing <span className="font-medium text-slate-600">{filtered.length}</span>{' '}
+        <p className="text-sm text-slate-400 dark:text-slate-500">
+          Showing <span className="font-medium text-slate-600 dark:text-slate-300">{filtered.length}</span>{' '}
           {ageGroupFilter ? `${ageGroupFilter} ` : ''}
           players
           {activeLetter && ` starting with "${activeLetter}"`}
@@ -266,7 +266,7 @@ export default function AllPlayers() {
 
       {/* No results */}
       {!loading && filtered.length === 0 && players.length > 0 && (
-        <div className="py-10 text-center text-slate-400 text-sm">
+        <div className="py-10 text-center text-slate-400 dark:text-slate-500 text-sm">
           No players match your filters.
         </div>
       )}
@@ -276,11 +276,11 @@ export default function AllPlayers() {
         {grouped.map(([letter, group]) => (
           <div key={letter}>
             <div className="flex items-center gap-3 mb-2.5 md:mb-3">
-              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-600">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
                 {letter}
               </span>
-              <span className="text-xs text-slate-400">{group.length} players</span>
-              <div className="flex-1 h-px bg-slate-100" />
+              <span className="text-xs text-slate-400 dark:text-slate-500">{group.length} players</span>
+              <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
               {group.map((player) => (

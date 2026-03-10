@@ -20,9 +20,9 @@ function formatRankingsDate(dateStr: string): string {
 
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return <span className="text-xl font-black text-amber-500">🥇</span>;
-  if (rank === 2) return <span className="text-xl font-black text-slate-400">🥈</span>;
+  if (rank === 2) return <span className="text-xl font-black text-slate-400 dark:text-slate-500">🥈</span>;
   if (rank === 3) return <span className="text-xl font-black text-amber-700">🥉</span>;
-  return <span className="font-semibold text-slate-500 tabular-nums">#{rank}</span>;
+  return <span className="font-semibold text-slate-500 dark:text-slate-400 tabular-nums">#{rank}</span>;
 }
 
 function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; eventType: EventType; date: string }) {
@@ -56,24 +56,24 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <div className="relative flex-1 w-full sm:max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
             placeholder="Search name or USAB ID…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 md:py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white"
+            className="w-full pl-9 pr-4 py-2.5 md:py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:focus:ring-emerald-600 bg-white dark:bg-slate-900"
           />
         </div>
 
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-4 md:px-6 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-          <p className="text-sm text-slate-600 font-medium">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="px-4 md:px-6 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+          <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
             {ageGroup} {EVENT_LABELS[eventType]}
-            {!loading && <span className="text-slate-400 font-normal ml-2">· {filtered.length} players</span>}
+            {!loading && <span className="text-slate-400 dark:text-slate-500 font-normal ml-2">· {filtered.length} players</span>}
           </p>
           <a
             href={`https://usabjrrankings.org/?age_group=${ageGroup}&category=${eventType}&date=${date}`}
@@ -87,13 +87,13 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
 
         {loading && players.length === 0 ? (
           <div className="py-16 text-center">
-            <RefreshCw className="w-8 h-8 text-slate-300 animate-spin mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">Loading rankings…</p>
+            <RefreshCw className="w-8 h-8 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Loading rankings…</p>
           </div>
         ) : error && players.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <WifiOff className="w-8 h-8 text-slate-300 mx-auto" />
-            <p className="text-slate-400 text-sm">Could not load rankings for {ageGroup} {eventType}</p>
+            <WifiOff className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Could not load rankings for {ageGroup} {eventType}</p>
             <a
               href={`https://usabjrrankings.org/?age_group=${ageGroup}&category=${eventType}&date=${date}`}
               target="_blank"
@@ -104,23 +104,23 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
             </a>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-10 text-center text-slate-400 text-sm">No players match your search.</div>
+          <div className="py-10 text-center text-slate-400 dark:text-slate-500 text-sm">No players match your search.</div>
         ) : (
           <>
             {/* Mobile: card list */}
-            <div className="md:hidden divide-y divide-slate-50">
+            <div className="md:hidden divide-y divide-slate-50 dark:divide-slate-800">
               {filtered.map((player) => (
                 <Link
                   key={player.usabId}
                   to={`/directory/${player.usabId}`}
-                  className="flex items-center gap-3 px-4 py-3 active:bg-slate-50 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 active:bg-slate-50 dark:active:bg-slate-800 transition-colors"
                 >
                   <div className="w-8 shrink-0 text-center">
                     <RankBadge rank={player.rank} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-slate-800 text-sm truncate">{player.name}</p>
-                    <p className="text-[10px] text-slate-400 font-mono">{player.usabId}</p>
+                    <p className="font-medium text-slate-800 dark:text-slate-100 text-sm truncate">{player.name}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{player.usabId}</p>
                   </div>
                   <span className="font-bold text-emerald-600 text-sm tabular-nums shrink-0">
                     {player.rankingPoints.toLocaleString()}
@@ -133,29 +133,29 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-slate-400 text-xs uppercase tracking-wider">
+                  <tr className="text-left text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wider">
                     <th className="px-5 py-3 font-medium w-16">Rank</th>
                     <th className="px-5 py-3 font-medium">Player</th>
                     <th className="px-5 py-3 font-medium">USAB ID</th>
                     <th className="px-5 py-3 font-medium text-right">Points</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                   {filtered.map((player) => (
-                    <tr key={player.usabId} className="hover:bg-slate-50 transition-colors group">
+                    <tr key={player.usabId} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
                       <td className="px-5 py-3">
                         <RankBadge rank={player.rank} />
                       </td>
                       <td className="px-5 py-3">
                         <Link
                           to={`/directory/${player.usabId}`}
-                          className="font-medium text-slate-800 hover:text-violet-600 transition-colors"
+                          className="font-medium text-slate-800 dark:text-slate-100 hover:text-violet-600 transition-colors"
                         >
                           {player.name}
                         </Link>
                       </td>
                       <td className="px-5 py-3">
-                        <span className="font-mono text-xs text-slate-400">{player.usabId}</span>
+                        <span className="font-mono text-xs text-slate-400 dark:text-slate-500">{player.usabId}</span>
                       </td>
                       <td className="px-5 py-3 text-right">
                         <span className="font-bold text-emerald-600 tabular-nums">
@@ -199,9 +199,9 @@ export default function Rankings() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Trophy className="w-5 h-5 md:w-6 md:h-6 text-amber-500" />
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-800">USA Junior Rankings</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">USA Junior Rankings</h1>
           </div>
-          <p className="text-sm md:text-base text-slate-500">
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
             Official USAB Junior rankings · <a
               href="https://usabjrrankings.org"
               target="_blank"
@@ -213,7 +213,7 @@ export default function Rankings() {
       </div>
 
       {/* Rankings date note */}
-      <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-blue-50 border border-blue-100 rounded-xl text-xs md:text-sm text-blue-700">
+      <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 rounded-xl text-xs md:text-sm text-blue-700 dark:text-blue-300">
         <Calendar className="w-4 h-4 shrink-0" />
         <span>
           Rankings as of <span className="font-semibold">{formatRankingsDate(rankingsDate)}</span>
@@ -229,7 +229,7 @@ export default function Rankings() {
             className={`px-5 md:px-6 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
               ageGroup === ag
                 ? `${AGE_COLORS[ag]} text-white scale-105`
-                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-400'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400'
             }`}
           >
             {ag}
@@ -246,7 +246,7 @@ export default function Rankings() {
             className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-all border whitespace-nowrap shrink-0 shadow-sm ${
               eventType === et
                 ? `${AGE_COLORS[ageGroup]} text-white border-transparent scale-105`
-                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400'
             }`}
           >
             <span className="font-bold">{et}</span>

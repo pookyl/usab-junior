@@ -35,11 +35,11 @@ const AGE_COLORS: Record<AgeGroup, { bg: string; gradient: string; light: string
 
 function GenderBar({ boys, girls }: { boys: number; girls: number }) {
   const total = boys + girls;
-  if (total === 0) return <div className="h-3 bg-slate-100 rounded-full" />;
+  if (total === 0) return <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full" />;
   const bPct = (boys / total) * 100;
   const gPct = (girls / total) * 100;
   return (
-    <div className="h-3 rounded-full overflow-hidden flex bg-slate-100">
+    <div className="h-3 rounded-full overflow-hidden flex bg-slate-100 dark:bg-slate-800">
       {bPct > 0 && (
         <div className="bg-blue-500 transition-all duration-500" style={{ width: `${bPct}%` }} />
       )}
@@ -54,7 +54,7 @@ function AgeGroupCard({ ageGroup, stats }: { ageGroup: AgeGroup; stats: GroupSta
   const colors = AGE_COLORS[ageGroup];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
       <Link
         to={`/directory?age_group=${ageGroup}`}
         className={`bg-gradient-to-r ${colors.gradient} px-4 md:px-5 py-2.5 md:py-3 flex items-center justify-between hover:brightness-110 transition-all`}
@@ -71,7 +71,7 @@ function AgeGroupCard({ ageGroup, stats }: { ageGroup: AgeGroup; stats: GroupSta
         </div>
         <GenderBar boys={stats.boys} girls={stats.girls} />
         <div className="flex items-center justify-center gap-1.5 text-xs">
-          <span className="text-slate-400 font-medium">Rankings:</span>
+          <span className="text-slate-400 dark:text-slate-500 font-medium">Rankings:</span>
           {(['BS', 'GS', 'XD'] as const).map((et) => (
             <Link
               key={et}
@@ -134,15 +134,15 @@ export default function Dashboard() {
             <div className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center">
               <Award className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-800">USA Junior Badminton</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">USA Junior Badminton</h1>
           </div>
-          <p className="text-sm md:text-base text-slate-500 ml-[46px] md:ml-[52px]">
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 ml-[46px] md:ml-[52px]">
             Player Overview · Data from{' '}
             <a href="https://usabjrrankings.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
               usabjrrankings.org
             </a>
           </p>
-          <p className="text-slate-400 text-xs md:text-sm ml-[46px] md:ml-[52px] flex items-center gap-1.5 mt-0.5">
+          <p className="text-slate-400 dark:text-slate-500 text-xs md:text-sm ml-[46px] md:ml-[52px] flex items-center gap-1.5 mt-0.5">
             <Calendar className="w-3.5 h-3.5" />
             Rankings as of {formatRankingsDate(rankingsDate)}
           </p>
@@ -181,19 +181,19 @@ export default function Dashboard() {
 
       {/* Overall gender distribution bar */}
       {totalPlayers > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-          <h2 className="text-base md:text-lg font-bold text-slate-800 mb-3 md:mb-4">Overall Gender Distribution</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100 mb-3 md:mb-4">Overall Gender Distribution</h2>
           <GenderBar boys={totalBoys} girls={totalGirls} />
           <div className="flex items-center gap-4 md:gap-6 mt-3 text-xs md:text-sm">
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
-              <span className="text-slate-600">Boys {totalBoys}</span>
-              <span className="text-slate-400">({totalPlayers > 0 ? ((totalBoys / totalPlayers) * 100).toFixed(1) : 0}%)</span>
+              <span className="text-slate-600 dark:text-slate-300">Boys {totalBoys}</span>
+              <span className="text-slate-400 dark:text-slate-500">({totalPlayers > 0 ? ((totalBoys / totalPlayers) * 100).toFixed(1) : 0}%)</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-pink-400 inline-block" />
-              <span className="text-slate-600">Girls {totalGirls}</span>
-              <span className="text-slate-400">({totalPlayers > 0 ? ((totalGirls / totalPlayers) * 100).toFixed(1) : 0}%)</span>
+              <span className="text-slate-600 dark:text-slate-300">Girls {totalGirls}</span>
+              <span className="text-slate-400 dark:text-slate-500">({totalPlayers > 0 ? ((totalGirls / totalPlayers) * 100).toFixed(1) : 0}%)</span>
             </span>
           </div>
         </div>
@@ -202,13 +202,13 @@ export default function Dashboard() {
       {/* Age Group Breakdown */}
       <div>
         <div className="flex items-center justify-between mb-3 md:mb-4">
-          <h2 className="text-lg md:text-xl font-bold text-slate-800">Players by Age Group</h2>
+          <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">Players by Age Group</h2>
           <Link to="/directory" className="text-sm text-emerald-600 hover:underline font-medium">
             View all →
           </Link>
         </div>
         {!hasData && loading ? (
-          <div className="text-center py-12 text-slate-400">Loading player data...</div>
+          <div className="text-center py-12 text-slate-400 dark:text-slate-500">Loading player data...</div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">
             {AGE_GROUPS.map((ag) => (
@@ -220,13 +220,13 @@ export default function Dashboard() {
 
       {/* Summary table — card view on mobile, table on desktop */}
       {totalPlayers > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100">
-            <h2 className="text-base md:text-lg font-bold text-slate-800">Breakdown Summary</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 dark:border-slate-800">
+            <h2 className="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100">Breakdown Summary</h2>
           </div>
 
           {/* Mobile: compact card layout */}
-          <div className="md:hidden divide-y divide-slate-100">
+          <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
             {AGE_GROUPS.map((ag) => {
               const s = groupStats[ag];
               const colors = AGE_COLORS[ag];
@@ -237,7 +237,7 @@ export default function Dashboard() {
                       <span className={`w-2 h-2 rounded-full ${colors.bg}`} />
                       {ag}
                     </span>
-                    <span className="font-bold text-slate-700 text-sm">{s.total} players</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200 text-sm">{s.total} players</span>
                   </div>
                   <div className="flex items-center justify-between text-xs mb-1.5">
                     <span className="text-blue-600 font-medium">{s.boys} Boys</span>
@@ -247,10 +247,10 @@ export default function Dashboard() {
                 </div>
               );
             })}
-            <div className="px-4 py-3 bg-slate-50">
+            <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/50">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-slate-700 text-sm">Total</span>
-                <span className="font-bold text-slate-700 text-sm">{totalPlayers} players</span>
+                <span className="font-bold text-slate-700 dark:text-slate-200 text-sm">Total</span>
+                <span className="font-bold text-slate-700 dark:text-slate-200 text-sm">{totalPlayers} players</span>
               </div>
               <div className="flex items-center justify-between text-xs mb-1.5">
                 <span className="text-blue-600 font-medium">{totalBoys} Boys ({totalPlayers > 0 ? ((totalBoys / totalPlayers) * 100).toFixed(0) : 0}%)</span>
@@ -264,7 +264,7 @@ export default function Dashboard() {
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 text-left">
+                <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-left">
                   <th className="px-6 py-3 font-semibold">Age Group</th>
                   <th className="px-6 py-3 font-semibold text-right">Total</th>
                   <th className="px-6 py-3 font-semibold text-right">Boys</th>
@@ -274,25 +274,25 @@ export default function Dashboard() {
                   <th className="px-6 py-3 font-semibold">Distribution</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {AGE_GROUPS.map((ag) => {
                   const s = groupStats[ag];
                   const bPct = s.total > 0 ? ((s.boys / s.total) * 100).toFixed(0) : '—';
                   const gPct = s.total > 0 ? ((s.girls / s.total) * 100).toFixed(0) : '—';
                   const colors = AGE_COLORS[ag];
                   return (
-                    <tr key={ag} className="hover:bg-slate-50 transition-colors">
+                    <tr key={ag} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                       <td className="px-6 py-3">
                         <span className={`inline-flex items-center gap-2 font-semibold ${colors.text}`}>
                           <span className={`w-2 h-2 rounded-full ${colors.bg}`} />
                           {ag}
                         </span>
                       </td>
-                      <td className="px-6 py-3 text-right font-bold text-slate-700">{s.total}</td>
+                      <td className="px-6 py-3 text-right font-bold text-slate-700 dark:text-slate-200">{s.total}</td>
                       <td className="px-6 py-3 text-right text-blue-600 font-medium">{s.boys}</td>
                       <td className="px-6 py-3 text-right text-pink-500 font-medium">{s.girls}</td>
-                      <td className="px-6 py-3 text-right text-slate-500">{bPct}{bPct !== '—' && '%'}</td>
-                      <td className="px-6 py-3 text-right text-slate-500">{gPct}{gPct !== '—' && '%'}</td>
+                      <td className="px-6 py-3 text-right text-slate-500 dark:text-slate-400">{bPct}{bPct !== '—' && '%'}</td>
+                      <td className="px-6 py-3 text-right text-slate-500 dark:text-slate-400">{gPct}{gPct !== '—' && '%'}</td>
                       <td className="px-6 py-3 w-40">
                         <GenderBar boys={s.boys} girls={s.girls} />
                       </td>
@@ -301,15 +301,15 @@ export default function Dashboard() {
                 })}
               </tbody>
               <tfoot>
-                <tr className="bg-slate-50 font-bold">
-                  <td className="px-6 py-3 text-slate-700">Total</td>
-                  <td className="px-6 py-3 text-right text-slate-700">{totalPlayers}</td>
+                <tr className="bg-slate-50 dark:bg-slate-800/50 font-bold">
+                  <td className="px-6 py-3 text-slate-700 dark:text-slate-200">Total</td>
+                  <td className="px-6 py-3 text-right text-slate-700 dark:text-slate-200">{totalPlayers}</td>
                   <td className="px-6 py-3 text-right text-blue-600">{totalBoys}</td>
                   <td className="px-6 py-3 text-right text-pink-500">{totalGirls}</td>
-                  <td className="px-6 py-3 text-right text-slate-500">
+                  <td className="px-6 py-3 text-right text-slate-500 dark:text-slate-400">
                     {totalPlayers > 0 ? ((totalBoys / totalPlayers) * 100).toFixed(0) : '—'}%
                   </td>
-                  <td className="px-6 py-3 text-right text-slate-500">
+                  <td className="px-6 py-3 text-right text-slate-500 dark:text-slate-400">
                     {totalPlayers > 0 ? ((totalGirls / totalPlayers) * 100).toFixed(0) : '—'}%
                   </td>
                   <td className="px-6 py-3 w-40">
@@ -323,15 +323,15 @@ export default function Dashboard() {
       )}
 
       {/* Footer */}
-      <footer className="mt-4 pt-5 border-t border-slate-200 text-center text-xs text-slate-400 space-y-1">
+      <footer className="mt-4 pt-5 border-t border-slate-200 dark:border-slate-700 text-center text-xs text-slate-400 dark:text-slate-500 space-y-1">
         <p>USAB Junior Badminton Hub &middot; v0.1.0</p>
         <p>
           A hobby project &mdash; not affiliated with USA Badminton.
           Data sourced from{' '}
-          <a href="https://usabjrrankings.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">
+            <a href="https://usabjrrankings.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600 dark:hover:text-slate-300">
             usabjrrankings.org
           </a>{' '}and{' '}
-          <a href="https://www.tournamentsoftware.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">
+            <a href="https://www.tournamentsoftware.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600 dark:hover:text-slate-300">
             tournamentsoftware.com
           </a>.
         </p>
