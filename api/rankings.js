@@ -14,6 +14,14 @@ export default async function handler(req, res) {
   const cached = getCached(cacheKey);
   if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
 
+  // Check per-date disk cache first
+  const diskKey = `${ageGroup}-${eventType}`;
+  const perDateDisk = getDiskCachedRankings(diskKey, date);
+  if (perDateDisk) {
+    setCache(cacheKey, perDateDisk);
+    return res.setHeader('X-Cache', 'DISK').status(200).json(perDateDisk);
+  }
+
   try {
     const url = `${USAB_BASE}/?age_group=${ageGroup}&category=${eventType}&date=${date}`;
     const response = await fetch(url, { headers: BROWSER_HEADERS });
@@ -23,7 +31,6 @@ export default async function handler(req, res) {
     setCache(cacheKey, players);
     return res.setHeader('X-Cache', 'MISS').status(200).json(players);
   } catch (err) {
-    const diskKey = `${ageGroup}-${eventType}`;
     const diskData = getDiskCachedRankings(diskKey);
     if (diskData) {
       return res.setHeader('X-Cache', 'DISK').status(200).json(diskData);

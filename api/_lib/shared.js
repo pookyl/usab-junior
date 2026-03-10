@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -28,7 +28,60 @@ export function setCache(key, data) {
 }
 
 // ── Disk cache (bundled read-only fallback for Vercel) ───────────────────────
-const DISK_CACHE_FILE = join(process.cwd(), 'data', 'rankings-cache.json');
+const DISK_CACHE_DIR = join(process.cwd(), 'data');
+const DISK_CACHE_FILE = join(DISK_CACHE_DIR, 'rankings-cache.json');
+
+function diskCachePath(date) {
+  return join(DISK_CACHE_DIR, `rankings-${date}.json`);
+}
+
+export function listCachedDates() {
+  try {
+    if (!existsSync(DISK_CACHE_DIR)) return [];
+    const files = readdirSync(DISK_CACHE_DIR);
+    const dates = [];
+    for (const f of files) {
+      const m = f.match(/^rankings-(\d{4}-\d{2}-\d{2})\.json$/);
+      if (m) dates.push(m[1]);
+    }
+    return dates.sort().reverse();
+  } catch {
+    return [];
+  }
+}
+
+function rebuildRankingsFromPlayers(allPlayers) {
+  const rankings = {};
+  for (const player of allPlayers) {
+    for (const e of player.entries) {
+      const key = `${e.ageGroup}-${e.eventType}`;
+      if (!rankings[key]) rankings[key] = [];
+      rankings[key].push({
+        usabId: player.usabId, name: player.name,
+        rank: e.rank, rankingPoints: e.rankingPoints,
+        ageGroup: e.ageGroup, eventType: e.eventType,
+      });
+    }
+  }
+  for (const key of Object.keys(rankings)) {
+    rankings[key].sort((a, b) => a.rank - b.rank);
+  }
+  return rankings;
+}
+
+export function loadDiskCacheForDate(date) {
+  try {
+    const filePath = diskCachePath(date);
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf-8'));
+      if (!data.rankings && data.allPlayers) {
+        data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
+      }
+      return data;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
 
 export function loadDiskCache() {
   try {
@@ -39,14 +92,14 @@ export function loadDiskCache() {
   return null;
 }
 
-export function getDiskCachedRankings(key) {
-  const disk = loadDiskCache();
+export function getDiskCachedRankings(key, date) {
+  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
   if (disk?.rankings?.[key]) return disk.rankings[key];
   return null;
 }
 
-export function getDiskCachedAllPlayers() {
-  const disk = loadDiskCache();
+export function getDiskCachedAllPlayers(date) {
+  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
   if (disk?.allPlayers) return { players: disk.allPlayers, date: disk.date };
   return null;
 }

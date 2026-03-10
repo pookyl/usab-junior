@@ -14,6 +14,14 @@ export default async function handler(req, res) {
   const cached = getCached(cacheKey);
   if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
 
+  // Check per-date disk cache first (serves historical dates without scraping)
+  const perDateDisk = getDiskCachedAllPlayers(date);
+  if (perDateDisk) {
+    setCache(cacheKey, perDateDisk.players);
+    return res.setHeader('X-Cache', 'DISK').status(200).json(perDateDisk.players);
+  }
+
+  // No per-date cache — fetch live from USAB
   const ageGroups = ['U11', 'U13', 'U15', 'U17', 'U19'];
   const eventTypes = ['BS', 'GS', 'BD', 'GD', 'XD'];
   const allPlayers = new Map();
