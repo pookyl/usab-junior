@@ -160,14 +160,14 @@ function RankingTrendChart({
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 mb-2 text-xs text-slate-500 dark:text-slate-400">
+      <div className="flex items-center justify-center gap-x-5 mb-2 text-xs text-slate-500 dark:text-slate-400">
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block w-5 h-0.5 rounded-full" style={{ backgroundColor: lineColor }} />
-          Rank <span className="text-slate-400 dark:text-slate-500">(left axis, lower is better)</span>
+          Rank
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block w-5 border-t-2 border-dashed" style={{ borderColor: lineColor }} />
-          Points <span className="text-slate-400 dark:text-slate-500">(right axis)</span>
+          Points
         </span>
       </div>
 
