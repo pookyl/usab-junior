@@ -142,12 +142,11 @@ export default function Navbar() {
                 <DatePickerButton />
                 <button
                   onClick={cycleMode}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                  className="p-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                   aria-label={`Theme: ${MODE_LABEL[mode]}`}
                   title={`Theme: ${MODE_LABEL[mode]}`}
                 >
                   <ThemeIcon className="w-4 h-4" />
-                  <span className="text-xs font-medium">{MODE_LABEL[mode]}</span>
                 </button>
               </div>
             </div>
@@ -169,11 +168,11 @@ export default function Navbar() {
         <DatePickerButton />
         <button
           onClick={cycleMode}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+          className="p-1.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
           aria-label={`Theme: ${MODE_LABEL[mode]}`}
+          title={`Theme: ${MODE_LABEL[mode]}`}
         >
           <ThemeIcon className="w-4 h-4" />
-          <span className="text-[10px] font-medium">{MODE_LABEL[mode]}</span>
         </button>
       </header>
 
