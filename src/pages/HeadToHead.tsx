@@ -843,18 +843,10 @@ export default function HeadToHead() {
 
           {/* H2H Scorecard */}
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 md:p-8 text-white">
-            <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
+            <div className="flex items-center justify-center mb-4 md:mb-6">
               <p className="text-slate-400 text-[10px] md:text-xs uppercase tracking-widest">
                 Head to Head · {filterCat === 'All' ? 'All Events' : filterCat}
               </p>
-              <a
-                href={tswH2HUrl(playerA.usabId, playerB.usabId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-orange-400 hover:text-orange-300 transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
             </div>
             <div className="flex items-center justify-between gap-2 md:gap-4">
               {/* Player A */}
@@ -867,26 +859,35 @@ export default function HeadToHead() {
                 <Link to={`/directory/${playerA.usabId}`} className="hover:text-violet-300 transition-colors">
                   <p className="font-bold text-sm md:text-lg leading-tight truncate">{playerA.name}</p>
                 </Link>
-                <div className="flex flex-wrap justify-center gap-1 mt-1.5 md:mt-2">
-                  {entriesForAge(playerA, ageGroup).slice(0, 3).map((e) => (
-                    <span key={`${e.ageGroup}-${e.eventType}`} className="text-[9px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
-                      {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType} #{e.rank}
-                    </span>
-                  ))}
-                </div>
                 <p className="text-4xl md:text-6xl font-black text-violet-400 mt-3 md:mt-4 tabular-nums">
                   {filteredWins.team1}
                 </p>
                 <p className="text-slate-500 text-[10px] md:text-xs mt-1">Match wins</p>
               </div>
 
-              {/* VS */}
-              <div className="text-center shrink-0 px-1 md:px-2">
-                <p className="text-2xl md:text-3xl font-black text-slate-600">VS</p>
-                <p className="text-slate-600 text-[10px] md:text-xs mt-2 md:mt-3">
-                  {filteredWins.total} match{filteredWins.total !== 1 ? 'es' : ''}
-                </p>
-              </div>
+              {/* VS donut chart */}
+              {(() => {
+                const pctA = filteredWins.total > 0
+                  ? Math.round((filteredWins.team1 / filteredWins.total) * 100)
+                  : 50;
+                return (
+                  <div className="text-center shrink-0 px-1 md:px-2">
+                    <div
+                      className="w-32 h-32 md:w-36 md:h-36 rounded-full mx-auto relative"
+                      style={{
+                        background: filteredWins.total > 0
+                          ? `conic-gradient(from 180deg, #a78bfa 0% ${pctA}%, #60a5fa ${pctA}% 100%)`
+                          : '#475569',
+                      }}
+                    >
+                      <div className="absolute inset-6 md:inset-7 rounded-full bg-slate-800 flex items-center justify-center flex-col">
+                        <p className="text-base md:text-lg font-black text-white">{filteredWins.total}</p>
+                        <p className="text-[10px] md:text-xs text-slate-500 -mt-0.5">matches</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Player B */}
               <div className="flex-1 text-center min-w-0">
@@ -898,13 +899,6 @@ export default function HeadToHead() {
                 <Link to={`/directory/${playerB.usabId}`} className="hover:text-blue-300 transition-colors">
                   <p className="font-bold text-sm md:text-lg leading-tight truncate">{playerB.name}</p>
                 </Link>
-                <div className="flex flex-wrap justify-center gap-1 mt-1.5 md:mt-2">
-                  {entriesForAge(playerB, ageGroup).slice(0, 3).map((e) => (
-                    <span key={`${e.ageGroup}-${e.eventType}`} className="text-[9px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
-                      {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType} #{e.rank}
-                    </span>
-                  ))}
-                </div>
                 <p className="text-4xl md:text-6xl font-black text-blue-400 mt-3 md:mt-4 tabular-nums">
                   {filteredWins.team2}
                 </p>
@@ -913,30 +907,89 @@ export default function HeadToHead() {
             </div>
           </div>
 
-          {/* H2H Win Rate Bar */}
-          {(filteredWins.team1 > 0 || filteredWins.team2 > 0) && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-5">
-              <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 md:mb-3 font-medium text-center">
-                H2H Win Rate{filterCat !== 'All' ? ` · ${filterCat}` : ''}
-              </p>
-              <div className="relative h-3 md:h-4 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-violet-500 to-violet-400 rounded-full transition-all"
-                  style={{
-                    width: `${(filteredWins.team1 / (filteredWins.team1 + filteredWins.team2)) * 100}%`,
-                  }}
-                />
+          {/* Stats Comparison from TSW */}
+          {(tswStatsA || tswStatsB) && (
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+              <div className="flex items-center gap-2 mb-4 md:mb-5">
+                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
+                <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">
+                  {filterCat !== 'All' ? `${filterCat} ` : ''}Stats Comparison
+                </h2>
               </div>
-              <div className="flex justify-between mt-2">
-                <span className="text-xs font-bold text-violet-600">
-                  {playerA.name.split(' ')[0]} ({filteredWins.team1})
-                </span>
-                <span className="text-xs font-bold text-blue-600">
-                  {playerB.name.split(' ')[0]} ({filteredWins.team2})
-                </span>
+
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 mb-3 md:mb-4 px-1">
+                <p className="text-right text-[10px] md:text-xs font-bold text-violet-600 truncate">{playerA.name}</p>
+                <div className="w-12 md:w-16" />
+                <p className="text-[10px] md:text-xs font-bold text-blue-600 truncate">{playerB.name}</p>
               </div>
+
+              <StatsRow
+                label="Career"
+                valA={tswStatsA ? `${tswStatsA[tswCatKey].career.wins}W-${tswStatsA[tswCatKey].career.losses}L` : '—'}
+                valB={tswStatsB ? `${tswStatsB[tswCatKey].career.wins}W-${tswStatsB[tswCatKey].career.losses}L` : '—'}
+                barA={tswStatsA?.[tswCatKey].career.winPct}
+                barB={tswStatsB?.[tswCatKey].career.winPct}
+                subA={tswStatsA ? `${tswStatsA[tswCatKey].career.winPct}%` : undefined}
+                subB={tswStatsB ? `${tswStatsB[tswCatKey].career.winPct}%` : undefined}
+              />
+
+              <StatsRow
+                label="This Year"
+                valA={tswStatsA ? `${tswStatsA[tswCatKey].thisYear.wins}W-${tswStatsA[tswCatKey].thisYear.losses}L` : '—'}
+                valB={tswStatsB ? `${tswStatsB[tswCatKey].thisYear.wins}W-${tswStatsB[tswCatKey].thisYear.losses}L` : '—'}
+                barA={tswStatsA?.[tswCatKey].thisYear.winPct}
+                barB={tswStatsB?.[tswCatKey].thisYear.winPct}
+                subA={tswStatsA ? `${tswStatsA[tswCatKey].thisYear.winPct}%` : undefined}
+                subB={tswStatsB ? `${tswStatsB[tswCatKey].thisYear.winPct}%` : undefined}
+              />
+
             </div>
           )}
+
+          {/* Rankings comparison */}
+          {playerA && playerB && (() => {
+            const entriesA = entriesForAge(playerA, null);
+            const entriesB = entriesForAge(playerB, null);
+            const entryMapA = new Map(entriesA.map((e) => [`${e.ageGroup}-${e.eventType}`, e]));
+            const entryMapB = new Map(entriesB.map((e) => [`${e.ageGroup}-${e.eventType}`, e]));
+            const allKeys = [...new Set([...entryMapA.keys(), ...entryMapB.keys()])]
+              .filter((key) => {
+                if (filterCat === 'All') return true;
+                const ev = key.split('-')[1];
+                return eventCategory(ev) === filterCat;
+              });
+            allKeys.sort((a, b) => {
+              const [agA, evA] = a.split('-');
+              const [agB, evB] = b.split('-');
+              if (agA !== agB) return agA.localeCompare(agB);
+              return evA.localeCompare(evB);
+            });
+            if (allKeys.length === 0) return null;
+            return (
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+                <div className="flex items-center gap-2 mb-3 md:mb-4">
+                  <Trophy className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+                  <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">{filterCat !== 'All' ? `${filterCat} ` : ''}Rankings</h2>
+                </div>
+                <div>
+                  {allKeys.map((key) => {
+                    const eA = entryMapA.get(key);
+                    const eB = entryMapB.get(key);
+                    const [ag, ev] = key.split('-') as [AgeGroup, EventType];
+                    const label = `${ag} ${ev}`;
+                    return (
+                      <StatsRow
+                        key={key}
+                        label={label}
+                        valA={eA ? `#${eA.rank}` : ''}
+                        valB={eB ? `#${eB.rank}` : ''}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Direct Match History */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
@@ -1009,186 +1062,7 @@ export default function HeadToHead() {
             </div>
           </div>
 
-          {/* Quick Stat Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
-                Best{ageGroup ? ` ${ageGroup}` : ''} Rank
-              </p>
-              <div className="flex items-center justify-center gap-1.5 md:gap-2">
-                <span className="text-base md:text-lg font-black text-violet-600">{bestA ? `#${bestA.rank}` : '—'}</span>
-                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
-                <span className="text-base md:text-lg font-black text-blue-600">{bestB ? `#${bestB.rank}` : '—'}</span>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
-                Best Points
-              </p>
-              <div className="flex items-center justify-center gap-1.5 md:gap-2">
-                <span className="text-sm md:text-lg font-black text-violet-600">{bestA?.rankingPoints.toLocaleString() ?? '—'}</span>
-                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
-                <span className="text-sm md:text-lg font-black text-blue-600">{bestB?.rankingPoints.toLocaleString() ?? '—'}</span>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
-                {filterCat !== 'All' ? `${filterCat} ` : ''}Career W-L
-              </p>
-              <div className="flex items-center justify-center gap-1.5 md:gap-2">
-                <span className="text-xs md:text-sm font-bold text-violet-600">
-                  {tswStatsA ? `${tswStatsA[tswCatKey].career.wins}-${tswStatsA[tswCatKey].career.losses}` : h2hResult?.careerWL.team1 || '—'}
-                </span>
-                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
-                <span className="text-xs md:text-sm font-bold text-blue-600">
-                  {tswStatsB ? `${tswStatsB[tswCatKey].career.wins}-${tswStatsB[tswCatKey].career.losses}` : h2hResult?.careerWL.team2 || '—'}
-                </span>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 md:mb-2 font-medium">
-                {filterCat !== 'All' ? `${filterCat} ` : ''}Win %
-              </p>
-              <div className="flex items-center justify-center gap-1.5 md:gap-2">
-                <span className="text-base md:text-lg font-black text-violet-600">
-                  {tswStatsA ? `${tswStatsA[tswCatKey].career.winPct}%` : '—'}
-                </span>
-                <span className="text-slate-300 dark:text-slate-600 text-[10px] md:text-xs">vs</span>
-                <span className="text-base md:text-lg font-black text-blue-600">
-                  {tswStatsB ? `${tswStatsB[tswCatKey].career.winPct}%` : '—'}
-                </span>
-              </div>
-            </div>
-          </div>
 
-          {/* Stats Comparison from TSW */}
-          {(tswStatsA || tswStatsB) && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
-              <div className="flex items-center gap-2 mb-4 md:mb-5">
-                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
-                <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">
-                  {filterCat !== 'All' ? `${filterCat} ` : ''}Stats Comparison
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 mb-3 md:mb-4 px-1">
-                <p className="text-right text-[10px] md:text-xs font-bold text-violet-600 truncate">{playerA.name}</p>
-                <div className="w-12 md:w-16" />
-                <p className="text-[10px] md:text-xs font-bold text-blue-600 truncate">{playerB.name}</p>
-              </div>
-
-              <StatsRow
-                label="Career"
-                valA={tswStatsA ? `${tswStatsA[tswCatKey].career.wins}W-${tswStatsA[tswCatKey].career.losses}L` : '—'}
-                valB={tswStatsB ? `${tswStatsB[tswCatKey].career.wins}W-${tswStatsB[tswCatKey].career.losses}L` : '—'}
-                barA={tswStatsA?.[tswCatKey].career.winPct}
-                barB={tswStatsB?.[tswCatKey].career.winPct}
-                subA={tswStatsA ? `${tswStatsA[tswCatKey].career.winPct}%` : undefined}
-                subB={tswStatsB ? `${tswStatsB[tswCatKey].career.winPct}%` : undefined}
-              />
-
-              <StatsRow
-                label="This Year"
-                valA={tswStatsA ? `${tswStatsA[tswCatKey].thisYear.wins}W-${tswStatsA[tswCatKey].thisYear.losses}L` : '—'}
-                valB={tswStatsB ? `${tswStatsB[tswCatKey].thisYear.wins}W-${tswStatsB[tswCatKey].thisYear.losses}L` : '—'}
-                barA={tswStatsA?.[tswCatKey].thisYear.winPct}
-                barB={tswStatsB?.[tswCatKey].thisYear.winPct}
-                subA={tswStatsA ? `${tswStatsA[tswCatKey].thisYear.winPct}%` : undefined}
-                subB={tswStatsB ? `${tswStatsB[tswCatKey].thisYear.winPct}%` : undefined}
-              />
-
-              {/* Recent form */}
-              {(tswStatsA?.recentHistory?.length || tswStatsB?.recentHistory?.length) ? (
-                <div className="mt-4 md:mt-5 pt-4 md:pt-5 border-t border-slate-100 dark:border-slate-800">
-                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Recent Form</p>
-                  <div className="space-y-2.5 md:space-y-3">
-                    {tswStatsA && tswStatsA.recentHistory.length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] md:text-xs font-medium text-violet-600 w-20 md:w-28 truncate text-right shrink-0">
-                          {playerA.name.split(' ')[0]}
-                        </span>
-                        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
-                          {tswStatsA.recentHistory.slice(0, 12).map((h, i) => (
-                            <span
-                              key={i}
-                              title={h.date}
-                              className={`w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-[9px] md:text-[10px] font-bold text-white shrink-0 ${
-                                h.won ? 'bg-emerald-500' : 'bg-rose-500'
-                              }`}
-                            >
-                              {h.won ? 'W' : 'L'}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {tswStatsB && tswStatsB.recentHistory.length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] md:text-xs font-medium text-blue-600 w-20 md:w-28 truncate text-right shrink-0">
-                          {playerB.name.split(' ')[0]}
-                        </span>
-                        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
-                          {tswStatsB.recentHistory.slice(0, 12).map((h, i) => (
-                            <span
-                              key={i}
-                              title={h.date}
-                              className={`w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-[9px] md:text-[10px] font-bold text-white shrink-0 ${
-                                h.won ? 'bg-emerald-500' : 'bg-rose-500'
-                              }`}
-                            >
-                              {h.won ? 'W' : 'L'}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          )}
-
-          {/* Rankings comparison */}
-          {playerA && playerB && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
-              <div className="flex items-center gap-2 mb-3 md:mb-4">
-                <Trophy className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
-                <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">{ageGroup ? `${ageGroup} ` : ''}Rankings</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <div>
-                  <p className="text-[10px] md:text-xs font-bold text-violet-600 dark:text-violet-400 mb-2">{playerA.name}</p>
-                  <div className="space-y-1.5 md:space-y-2">
-                    {entriesForAge(playerA, ageGroup).map((e) => (
-                      <div key={`${e.ageGroup}-${e.eventType}`} className="flex items-center gap-2 md:gap-3 p-2 md:p-2.5 rounded-lg bg-violet-50/50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-800/50">
-                        <span className="text-[10px] md:text-xs font-bold text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/60 px-1.5 md:px-2 py-0.5 rounded">
-                          {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType}
-                        </span>
-                        <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
-                        <span className="ml-auto text-xs md:text-sm font-black text-violet-600 dark:text-violet-400">#{e.rank}</span>
-                        <span className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500">{e.rankingPoints.toLocaleString()}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-[10px] md:text-xs font-bold text-blue-600 dark:text-blue-400 mb-2">{playerB.name}</p>
-                  <div className="space-y-1.5 md:space-y-2">
-                    {entriesForAge(playerB, ageGroup).map((e) => (
-                      <div key={`${e.ageGroup}-${e.eventType}`} className="flex items-center gap-2 md:gap-3 p-2 md:p-2.5 rounded-lg bg-blue-50/50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/50">
-                        <span className="text-[10px] md:text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 px-1.5 md:px-2 py-0.5 rounded">
-                          {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType}
-                        </span>
-                        <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
-                        <span className="ml-auto text-xs md:text-sm font-black text-blue-600 dark:text-blue-400">#{e.rank}</span>
-                        <span className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500">{e.rankingPoints.toLocaleString()}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
         </div>
       )}
