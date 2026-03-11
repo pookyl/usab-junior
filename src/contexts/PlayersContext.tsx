@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback, type ReactNode } from 'react';
 import type { UniquePlayer } from '../types/junior';
 import { fetchAllPlayers, fetchCachedDates, invalidateRankingsCache } from '../services/rankingsService';
-import { cachedAllPlayers, RANKINGS_DATE } from '../data/usaJuniorData';
+import { RANKINGS_DATE } from '../data/usaJuniorData';
+import ToastContainer, { type ToastItem } from '../components/Toast';
 
 export type DataSource = 'live' | 'cached' | 'none';
 
@@ -19,16 +20,28 @@ interface PlayersContextValue {
 
 const PlayersContext = createContext<PlayersContextValue | null>(null);
 
+let nextToastId = 0;
+
 export function PlayersProvider({ children }: { children: ReactNode }) {
-  const [players, setPlayers] = useState<UniquePlayer[]>(cachedAllPlayers);
-  const [loading, setLoading] = useState(false);
+  const [players, setPlayers] = useState<UniquePlayer[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<DataSource>(cachedAllPlayers.length > 0 ? 'cached' : 'none');
+  const [source, setSource] = useState<DataSource>('none');
   const [rankingsDate, setRankingsDate] = useState<string>(RANKINGS_DATE);
   const [availableDates, setAvailableDates] = useState<string[]>([RANKINGS_DATE]);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
   const fetchCount = useRef(0);
-  const lastGoodPlayers = useRef<UniquePlayer[]>(cachedAllPlayers);
+  const lastGoodPlayers = useRef<UniquePlayer[]>([]);
   const lastGoodDate = useRef<string>(RANKINGS_DATE);
+
+  const pushToast = useCallback((message: string, type: ToastItem['type']) => {
+    const id = String(++nextToastId);
+    setToasts((prev) => [...prev, { id, message, type }]);
+  }, []);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   const load = useCallback((dateOverride?: string) => {
     const id = ++fetchCount.current;
@@ -37,24 +50,34 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
 
     const doFetch = async () => {
       const date = dateOverride ?? rankingsDate;
-      const data = await fetchAllPlayers(date);
+      const result = await fetchAllPlayers(date);
       if (fetchCount.current !== id) return;
-      lastGoodPlayers.current = data;
+      lastGoodPlayers.current = result.players;
       lastGoodDate.current = date;
-      setPlayers(data);
+      setPlayers(result.players);
       setSource('live');
       setLoading(false);
+
+      if (result.partial) {
+        const cats = result.failedCategories.join(', ');
+        pushToast(`Some categories could not be loaded: ${cats}`, 'warning');
+      }
     };
 
     doFetch().catch((err: Error) => {
       if (fetchCount.current !== id) return;
+      const hadData = lastGoodPlayers.current.length > 0;
       setPlayers(lastGoodPlayers.current);
       setRankingsDate(lastGoodDate.current);
-      setSource(lastGoodPlayers.current === cachedAllPlayers ? 'cached' : 'live');
+      setSource(hadData ? 'live' : 'none');
       setError(err.message);
       setLoading(false);
+
+      if (hadData) {
+        pushToast(`Could not load rankings — showing previous data`, 'error');
+      }
     });
-  }, [rankingsDate]);
+  }, [rankingsDate, pushToast]);
 
   const changeDate = useCallback((date: string) => {
     if (date === rankingsDate) return;
@@ -63,9 +86,11 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     load(date);
   }, [rankingsDate, load]);
 
+  // Auto-fetch on mount + load available dates
   useEffect(() => {
-    let cancelled = false;
+    load(RANKINGS_DATE);
 
+    let cancelled = false;
     (async () => {
       try {
         const cachedDates = await fetchCachedDates();
@@ -77,6 +102,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     })();
 
     return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const playerNameMap = useMemo(() => {
@@ -96,6 +122,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   return (
     <PlayersContext.Provider value={{ players, loading, error, source, rankingsDate, availableDates, changeDate, refresh: () => load(), playerNameMap }}>
       {children}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </PlayersContext.Provider>
   );
 }

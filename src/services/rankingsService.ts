@@ -41,9 +41,17 @@ let allPlayersCacheDate = '';
 const tswStatsCache = new Map<string, TswPlayerStats>();
 const trendCache = new Map<string, PlayerRankingTrend>();
 
+export interface FetchAllPlayersResult {
+  players: UniquePlayer[];
+  partial: boolean;
+  failedCategories: string[];
+}
+let allPlayersCacheResult: FetchAllPlayersResult | null = null;
+
 export function invalidateRankingsCache() {
   allPlayersCache = null;
   allPlayersCacheDate = '';
+  allPlayersCacheResult = null;
   cachedDatesCache = null;
   tswStatsCache.clear();
   trendCache.clear();
@@ -122,8 +130,10 @@ export function tswH2HUrl(usabId1: string, usabId2: string) {
 
 export async function fetchAllPlayers(
   date: string = RANKINGS_DATE,
-): Promise<UniquePlayer[]> {
-  if (allPlayersCache && allPlayersCacheDate === date) return allPlayersCache;
+): Promise<FetchAllPlayersResult> {
+  if (allPlayersCache && allPlayersCacheDate === date && allPlayersCacheResult) {
+    return allPlayersCacheResult;
+  }
 
   const url = `/api/all-players?date=${date}`;
   const res = await fetchWithRetry(url, 120_000);
@@ -132,9 +142,15 @@ export async function fetchAllPlayers(
   const players: UniquePlayer[] = await res.json();
   if (!Array.isArray(players)) throw new Error('Invalid response');
 
+  const partial = res.headers.get('X-Partial') === 'true';
+  const failedRaw = res.headers.get('X-Failed-Categories') ?? '';
+  const failedCategories = failedRaw ? failedRaw.split(',').map((s) => s.trim()) : [];
+
   allPlayersCache = players;
   allPlayersCacheDate = date;
-  return players;
+  const result: FetchAllPlayersResult = { players, partial, failedCategories };
+  allPlayersCacheResult = result;
+  return result;
 }
 
 export async function fetchPlayerTswStats(

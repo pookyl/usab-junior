@@ -20,6 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DATA_DIR = join(ROOT, 'data');
 const CACHE_FILE = join(DATA_DIR, 'rankings-cache.json');
+const META_FILE = join(DATA_DIR, 'rankings-meta.json');
 const USAB_BASE = 'https://usabjrrankings.org';
 
 function perDateCacheFile(date) {
@@ -188,10 +189,12 @@ async function refreshDate(date, { updateLatest = false } = {}) {
   console.log(`[refresh] wrote per-date cache: ${date}, ${uniquePlayers.length} players (compact)`);
 
   if (updateLatest) {
-    // Latest alias: pretty-printed with rankings (used by static frontend import)
     const full = { date, rankings: rankingsByCategory, allPlayers: uniquePlayers, savedAt: lean.savedAt };
     writeFileSync(CACHE_FILE, JSON.stringify(full, null, 2));
     console.log(`[refresh] updated rankings-cache.json (latest) for ${date}`);
+
+    writeFileSync(META_FILE, JSON.stringify({ date }) + '\n');
+    console.log(`[refresh] updated rankings-meta.json for ${date}`);
   }
 
   return true;
