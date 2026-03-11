@@ -142,21 +142,8 @@ function opponentMatches(
   mr: TswMatchResult,
   playerBName: string,
 ): boolean {
-  const bParts = playerBName.toLowerCase().split(/\s+/);
-  const bLast = bParts[bParts.length - 1] ?? '';
-  const bInitial = bParts[0]?.[0] ?? '';
-  const opp = mr.opponent.toLowerCase();
-  if (bParts.every((p) => opp.includes(p))) return true;
-  // Fallback for abbreviated names (e.g. "A. Wen"): require last name + first initial
-  if (bLast.length > 1 && bInitial) {
-    for (const part of opp.split('/')) {
-      const t = part.trim();
-      if (!t.includes(bLast)) continue;
-      const words = t.split(/[\s.]+/).filter(Boolean);
-      if (words.some((w) => w[0] === bInitial && w !== bLast)) return true;
-    }
-  }
-  return false;
+  const bLower = playerBName.toLowerCase().trim();
+  return mr.opponent.toLowerCase().split('/').some((part) => part.trim() === bLower);
 }
 
 function findMatchesBetween(
