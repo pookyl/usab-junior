@@ -7,7 +7,6 @@ import Dashboard from './pages/Dashboard';
 import Rankings from './pages/Players';
 import AllPlayers from './pages/AllPlayers';
 import PlayerProfile from './pages/PlayerProfile';
-import Analytics from './pages/Analytics';
 import HeadToHead from './pages/HeadToHead';
 
 function ScrollToTop() {
@@ -36,7 +35,7 @@ export default function App() {
                 <Route path="/players/:id" element={<PlayerRedirect />} />
                 <Route path="/directory" element={<AllPlayers />} />
                 <Route path="/directory/:id" element={<PlayerProfile />} />
-                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/analytics" element={<Navigate to="/players" replace />} />
                 <Route path="/head-to-head" element={<HeadToHead />} />
               </Routes>
             </main>
