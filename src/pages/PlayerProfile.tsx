@@ -173,7 +173,7 @@ function RankingTrendChart({
 
       <div className="-mx-2 md:mx-0">
       <ResponsiveContainer width="100%" height={260}>
-        <LineChart data={chartData} margin={{ top: 5, right: -10, left: -15, bottom: 5 }}>
+        <LineChart data={chartData} margin={{ top: 5, right: -10, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
           <XAxis
             dataKey="label"
