@@ -198,7 +198,7 @@ export function parseH2HContent(html, headers) {
     const headerRegex =
       /<li class="match__header-title-item">[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/g;
     let hm;
-    while ((hm = headerRegex.exec(block)) !== null) headerItems.push(hm[1].trim());
+    while ((hm = headerRegex.exec(block)) !== null) headerItems.push(hm[1].trim().replace(/&amp;/g, '&'));
     const tournament = headerItems[0] ?? '';
     const event = headerItems[1] ?? '';
     const round = headerItems[2] ?? '';

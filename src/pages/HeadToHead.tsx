@@ -806,12 +806,12 @@ export default function HeadToHead() {
     const woFromB = findMatchesBetween(tswStatsB, playerB.name, playerA.name)
       .map((m) => normalizeMatch(m, playerA.name));
 
-    const existing = new Set(
-      h2hMatches.map((m) => `${m.tournament}|${m.event}|${m.round}|${m.date}`),
-    );
+    const dedupKey = (m: H2HMatch) =>
+      `${m.tournament}|${m.event}|${m.round}|${m.date}`.replace(/&amp;/g, '&');
+    const existing = new Set(h2hMatches.map(dedupKey));
     const merged = [...h2hMatches];
     for (const wo of [...woMatches, ...woFromB]) {
-      const key = `${wo.tournament}|${wo.event}|${wo.round}|${wo.date}`;
+      const key = dedupKey(wo);
       if (!existing.has(key)) {
         existing.add(key);
         merged.push(normalizeMatch(wo, playerA.name));
