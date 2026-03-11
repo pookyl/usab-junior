@@ -33,6 +33,9 @@ const AGE_COLORS: Record<AgeGroup, string> = {
   U19: 'bg-rose-600',
 };
 
+const PLAYER_A_HEX = '#8b5cf6';
+const PLAYER_B_HEX = '#3b82f6';
+
 function formatDateLabel(dateStr: string) {
   const d = new Date(dateStr + 'T00:00:00');
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -634,20 +637,20 @@ function H2HRankingTrendChart({
               }}
             />
             <Line yAxisId="rank" type="monotone" dataKey="rankA" name={`Rank · ${nameA}`}
-              stroke="#8b5cf6" strokeWidth={2.5}
-              dot={{ r: 3, fill: '#8b5cf6', strokeWidth: 0 }}
+              stroke={PLAYER_A_HEX} strokeWidth={2.5}
+              dot={{ r: 3, fill: PLAYER_A_HEX, strokeWidth: 0 }}
               activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
               connectNulls />
             <Line yAxisId="rank" type="monotone" dataKey="rankB" name={`Rank · ${nameB}`}
-              stroke="#3b82f6" strokeWidth={2.5}
-              dot={{ r: 3, fill: '#3b82f6', strokeWidth: 0 }}
+              stroke={PLAYER_B_HEX} strokeWidth={2.5}
+              dot={{ r: 3, fill: PLAYER_B_HEX, strokeWidth: 0 }}
               activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
               connectNulls />
             <Line yAxisId="points" type="monotone" dataKey="pointsA" name={`Points · ${nameA}`}
-              stroke="#8b5cf6" strokeWidth={1.5} strokeDasharray="5 3" strokeOpacity={0.5}
+              stroke={PLAYER_A_HEX} strokeWidth={1.5} strokeDasharray="5 3" strokeOpacity={0.5}
               dot={false} connectNulls />
             <Line yAxisId="points" type="monotone" dataKey="pointsB" name={`Points · ${nameB}`}
-              stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="5 3" strokeOpacity={0.5}
+              stroke={PLAYER_B_HEX} strokeWidth={1.5} strokeDasharray="5 3" strokeOpacity={0.5}
               dot={false} connectNulls />
           </LineChart>
         </ResponsiveContainer>
