@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from '
 import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Dashboard';
 import Rankings from './pages/Players';
 import AllPlayers from './pages/AllPlayers';
 import PlayerProfile from './pages/PlayerProfile';
@@ -30,7 +30,7 @@ export default function App() {
             <Navbar />
             <main className="pb-20 md:pb-0">
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/players" element={<Rankings />} />
                 <Route path="/players/:id" element={<PlayerRedirect />} />
                 <Route path="/directory" element={<AllPlayers />} />

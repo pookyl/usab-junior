@@ -5,7 +5,7 @@ import { useTheme, type ThemeMode } from '../contexts/ThemeContext';
 import { usePlayers } from '../contexts/PlayersContext';
 
 const navItems = [
-  { path: '/', label: 'Dashboard', shortLabel: 'Home', icon: Home },
+  { path: '/', label: 'Home', shortLabel: 'Home', icon: Home },
   { path: '/players', label: 'Rankings', shortLabel: 'Rankings', icon: Trophy },
   { path: '/directory', label: 'Players', shortLabel: 'Players', icon: Users },
   { path: '/head-to-head', label: 'Head to Head', shortLabel: 'H2H', icon: Swords },
@@ -109,8 +109,8 @@ export default function Navbar() {
             <Link to="/" className="flex items-center gap-3">
               <img src="/icon-192.png" alt="" className="w-9 h-9 rounded-lg" />
               <span className="text-xl font-bold tracking-tight">
-                USA<span className="text-violet-400">Junior</span>
-                <span className="text-slate-400 font-normal text-sm ml-1.5">Badminton</span>
+                USAB<span className="text-violet-400"> Junior</span>
+                <span className="text-slate-400 font-normal text-sm ml-1.5">Hub</span>
               </span>
             </Link>
 
@@ -156,8 +156,8 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-2.5 flex-1">
           <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="text-lg font-bold tracking-tight">
-            USA<span className="text-violet-400">Junior</span>
-            <span className="text-slate-400 font-normal text-xs ml-1">Badminton</span>
+            USAB<span className="text-violet-400"> Junior</span>
+            <span className="text-slate-400 font-normal text-xs ml-1">Hub</span>
           </span>
         </Link>
         <DatePickerButton />
