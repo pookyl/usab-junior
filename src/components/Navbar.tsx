@@ -104,7 +104,7 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop top nav (md+) */}
-      <nav className="hidden md:block bg-slate-900 text-white shadow-lg sticky top-0 z-40">
+      <nav className="hidden md:block bg-slate-900 text-white shadow-lg sticky top-0 z-40 pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile top bar (< md) — compact branding only */}
-      <header className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
+      <header className="md:hidden bg-slate-900 text-white px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3 sticky top-0 z-40">
         <Link to="/" className="flex items-center gap-2.5 flex-1">
           <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="text-lg font-bold tracking-tight">
