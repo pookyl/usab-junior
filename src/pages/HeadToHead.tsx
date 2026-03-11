@@ -274,7 +274,8 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
                       </span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{p.name}</p>
-                        <div className="flex gap-1.5 mt-0.5 flex-wrap">
+                        <div className="flex gap-1.5 mt-0.5 flex-wrap items-center">
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{p.usabId}</span>
                           {ageEntries.slice(0, 3).map((e) => (
                             <span key={`${e.ageGroup}-${e.eventType}`} className="text-[10px] text-slate-400 dark:text-slate-500">
                               {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType} #{e.rank}

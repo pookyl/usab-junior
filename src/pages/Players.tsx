@@ -219,7 +219,9 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
   const filtered = useMemo(() => {
     if (!search.trim()) return data.players;
     const q = search.toLowerCase();
-    return data.players.filter((p) => p.name.toLowerCase().includes(q));
+    return data.players.filter(
+      (p) => p.name.toLowerCase().includes(q) || p.usabId.toLowerCase().includes(q),
+    );
   }, [data.players, search]);
 
   return (
@@ -352,19 +354,30 @@ function AnalyticsView({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
   const [modal, setModal] = useState<ModalData | null>(null);
 
   const top20 = useMemo(() => {
-    return players
+    const raw = players
       .flatMap((p) =>
         p.entries
           .filter((e) => e.ageGroup === ageGroup && e.eventType === eventType)
           .map((e) => ({
             name: p.name,
-            shortName: p.name.split(' ')[0],
+            usabId: p.usabId,
             points: e.rankingPoints,
             rank: e.rank,
           })),
       )
       .sort((a, b) => a.rank - b.rank)
       .slice(0, 20);
+
+    const nameCounts = new Map<string, number>();
+    for (const r of raw) nameCounts.set(r.name, (nameCounts.get(r.name) ?? 0) + 1);
+
+    return raw.map((r) => ({
+      ...r,
+      shortName:
+        nameCounts.get(r.name)! > 1
+          ? `${r.name.split(' ')[0]} (${r.usabId.slice(-4)})`
+          : r.name.split(' ')[0],
+    }));
   }, [players, ageGroup, eventType]);
 
   const dropoffData = useMemo(() => {
