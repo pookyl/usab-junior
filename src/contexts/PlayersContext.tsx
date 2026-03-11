@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback, type ReactNode } from 'react';
 import type { UniquePlayer } from '../types/junior';
-import { fetchAllPlayers, fetchLatestDate, fetchCachedDates, invalidateRankingsCache } from '../services/rankingsService';
+import { fetchAllPlayers, fetchCachedDates, invalidateRankingsCache } from '../services/rankingsService';
 import { cachedAllPlayers, RANKINGS_DATE } from '../data/usaJuniorData';
 
 export type DataSource = 'live' | 'cached' | 'none';
@@ -67,28 +67,15 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        const [{ latestDate }, cachedDates] = await Promise.all([
-          fetchLatestDate(),
-          fetchCachedDates(),
-        ]);
+        const cachedDates = await fetchCachedDates();
         if (cancelled) return;
-
         if (cachedDates.length > 0) setAvailableDates(cachedDates);
-
-        if (latestDate && latestDate !== RANKINGS_DATE) {
-          invalidateRankingsCache();
-          setRankingsDate(latestDate);
-          load(latestDate);
-        } else {
-          setSource('live');
-        }
       } catch {
-        if (cancelled) return;
+        // keep default availableDates
       }
     })();
 
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const playerNameMap = useMemo(() => {

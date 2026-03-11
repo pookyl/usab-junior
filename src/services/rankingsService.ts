@@ -1,36 +1,14 @@
 import type {
-  JuniorPlayer,
   JuniorPlayerDetail,
   TournamentEntry,
   AgeGroup,
   EventType,
-  RankingsKey,
   H2HResult,
   UniquePlayer,
   TswPlayerStats,
   PlayerRankingTrend,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
-
-// ── Latest date detection ───────────────────────────────────────────────────
-let latestDateCache: { latestDate: string; availableDates: string[] } | null = null;
-
-export async function fetchLatestDate(): Promise<{ latestDate: string; availableDates: string[] }> {
-  if (latestDateCache) return latestDateCache;
-
-  try {
-    const res = await fetch('/api/latest-date', { signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data = await res.json();
-    if (data.latestDate) {
-      latestDateCache = data;
-      return data;
-    }
-  } catch {
-    // Fall back to the static date
-  }
-  return { latestDate: RANKINGS_DATE, availableDates: [RANKINGS_DATE] };
-}
 
 // ── Cached dates (only dates with files on disk) ────────────────────────────
 let cachedDatesCache: string[] | null = null;
@@ -52,40 +30,9 @@ export async function fetchCachedDates(): Promise<string[]> {
   return [RANKINGS_DATE];
 }
 
-// ── Rankings cache (keyed by date + category) ───────────────────────────────
-let rankingsCacheDate = '';
-const cache = new Map<RankingsKey, JuniorPlayer[]>();
-
 export function invalidateRankingsCache() {
-  cache.clear();
   allPlayersCache = null;
   allPlayersCacheDate = '';
-}
-
-export async function fetchRankings(
-  ageGroup: AgeGroup,
-  eventType: EventType,
-  date: string = RANKINGS_DATE,
-): Promise<JuniorPlayer[]> {
-  if (date !== rankingsCacheDate) {
-    cache.clear();
-    rankingsCacheDate = date;
-  }
-
-  const key: RankingsKey = `${ageGroup}-${eventType}`;
-  if (cache.has(key)) return cache.get(key)!;
-
-  const url = `/api/rankings?age_group=${ageGroup}&category=${eventType}&date=${date}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
-  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
-
-  const players: JuniorPlayer[] = await res.json();
-  if (!Array.isArray(players) || players.length === 0) {
-    throw new Error('No ranking data returned');
-  }
-
-  cache.set(key, players);
-  return players;
 }
 
 export async function fetchPlayerDetail(
