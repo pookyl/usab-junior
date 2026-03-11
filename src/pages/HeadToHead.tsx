@@ -1157,30 +1157,30 @@ export default function HeadToHead() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <p className="text-[10px] md:text-xs font-bold text-violet-600 mb-2">{playerA.name}</p>
+                  <p className="text-[10px] md:text-xs font-bold text-violet-600 dark:text-violet-400 mb-2">{playerA.name}</p>
                   <div className="space-y-1.5 md:space-y-2">
                     {entriesForAge(playerA, ageGroup).map((e) => (
-                      <div key={`${e.ageGroup}-${e.eventType}`} className="flex items-center gap-2 md:gap-3 p-2 md:p-2.5 rounded-lg bg-violet-50/50 border border-violet-100">
-                        <span className="text-[10px] md:text-xs font-bold text-violet-700 bg-violet-100 px-1.5 md:px-2 py-0.5 rounded">
+                      <div key={`${e.ageGroup}-${e.eventType}`} className="flex items-center gap-2 md:gap-3 p-2 md:p-2.5 rounded-lg bg-violet-50/50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-800/50">
+                        <span className="text-[10px] md:text-xs font-bold text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/60 px-1.5 md:px-2 py-0.5 rounded">
                           {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType}
                         </span>
                         <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
-                        <span className="ml-auto text-xs md:text-sm font-black text-violet-600">#{e.rank}</span>
+                        <span className="ml-auto text-xs md:text-sm font-black text-violet-600 dark:text-violet-400">#{e.rank}</span>
                         <span className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500">{e.rankingPoints.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] md:text-xs font-bold text-blue-600 mb-2">{playerB.name}</p>
+                  <p className="text-[10px] md:text-xs font-bold text-blue-600 dark:text-blue-400 mb-2">{playerB.name}</p>
                   <div className="space-y-1.5 md:space-y-2">
                     {entriesForAge(playerB, ageGroup).map((e) => (
-                      <div key={`${e.ageGroup}-${e.eventType}`} className="flex items-center gap-2 md:gap-3 p-2 md:p-2.5 rounded-lg bg-blue-50/50 border border-blue-100">
-                        <span className="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 px-1.5 md:px-2 py-0.5 rounded">
+                      <div key={`${e.ageGroup}-${e.eventType}`} className="flex items-center gap-2 md:gap-3 p-2 md:p-2.5 rounded-lg bg-blue-50/50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/50">
+                        <span className="text-[10px] md:text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 px-1.5 md:px-2 py-0.5 rounded">
                           {!ageGroup ? `${e.ageGroup} ` : ''}{e.eventType}
                         </span>
                         <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">{EVENT_LABELS[e.eventType]}</span>
-                        <span className="ml-auto text-xs md:text-sm font-black text-blue-600">#{e.rank}</span>
+                        <span className="ml-auto text-xs md:text-sm font-black text-blue-600 dark:text-blue-400">#{e.rank}</span>
                         <span className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500">{e.rankingPoints.toLocaleString()}</span>
                       </div>
                     ))}
