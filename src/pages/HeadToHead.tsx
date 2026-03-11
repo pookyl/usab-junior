@@ -63,7 +63,7 @@ function bestEntry(player: UniquePlayer, ageGroup: AgeGroup | null): PlayerEntry
   return entries.length > 0 ? entries[0] : null;
 }
 
-function eventCategory(event: string): 'Singles' | 'Doubles' | 'Mixed' {
+export function eventCategory(event: string): 'Singles' | 'Doubles' | 'Mixed' {
   const e = event.toUpperCase();
   if (e.includes('XD') || e.includes('MIXED')) return 'Mixed';
   if (e.includes('BD') || e.includes('GD') || e.includes('DOUBLES')) return 'Doubles';
@@ -77,7 +77,7 @@ function parseMatchDate(dateStr: string): number {
 }
 
 // 3 = exact, 2 = substring, 1 = last-name-only, 0 = no match
-function playerMatchScore(playerName: string, teamPlayers: string[]): number {
+export function playerMatchScore(playerName: string, teamPlayers: string[]): number {
   const pLower = playerName.toLowerCase().trim();
   const pLast = pLower.split(' ').pop() ?? '';
   let best = 0;
@@ -91,7 +91,7 @@ function playerMatchScore(playerName: string, teamPlayers: string[]): number {
   return best;
 }
 
-function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
+export function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
   const score1 = playerMatchScore(playerAName, match.team1Players);
   const score2 = playerMatchScore(playerAName, match.team2Players);
   if (score1 >= score2 && score1 > 0) return match;
@@ -108,7 +108,7 @@ function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
   return match;
 }
 
-function parseScoreString(score: string): number[][] {
+export function parseScoreString(score: string): number[][] {
   if (!score || score === 'Walkover') return [];
   return score.split(',').map((s) => s.trim()).filter(Boolean).map((game) => {
     const parts = game.split('-').map((n) => parseInt(n.trim(), 10));
@@ -138,7 +138,7 @@ function matchResultToH2HMatch(
   };
 }
 
-function opponentMatches(
+export function opponentMatches(
   mr: TswMatchResult,
   playerBName: string,
 ): boolean {
@@ -146,7 +146,7 @@ function opponentMatches(
   return mr.opponent.toLowerCase().split('/').some((part) => part.trim() === bLower);
 }
 
-function findMatchesBetween(
+export function findMatchesBetween(
   statsA: TswPlayerStats | null,
   playerAName: string,
   playerBName: string,
