@@ -37,6 +37,17 @@ const BROWSER_HEADERS = {
 const AGE_GROUPS = ['U11', 'U13', 'U15', 'U17', 'U19'];
 const EVENT_TYPES = ['BS', 'GS', 'BD', 'GD', 'XD'];
 
+// ── HTML entity decoder ──────────────────────────────────────────────────────
+const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'" };
+function decodeHtmlEntities(str) {
+  return str.replace(/&(#?\w+);/g, (m, code) => {
+    if (ENTITY_MAP[code]) return ENTITY_MAP[code];
+    if (code.startsWith('#x')) return String.fromCharCode(parseInt(code.slice(2), 16));
+    if (code.startsWith('#')) return String.fromCharCode(parseInt(code.slice(1), 10));
+    return m;
+  });
+}
+
 // ── HTML parser (same logic as api-server.mjs) ──────────────────────────────
 
 function parseRankings(html, ageGroup, eventType) {
@@ -56,7 +67,7 @@ function parseRankings(html, ageGroup, eventType) {
     if (cells.length < 4) continue;
     const rank = parseInt(cells[0], 10);
     const usabId = cells[1].trim();
-    const name = cells[2].trim();
+    const name = decodeHtmlEntities(cells[2].trim());
     const pts = parseInt(cells[3].replace(/,/g, ''), 10);
     if (rank > 0 && usabId && name) {
       players.push({ usabId, name, rank, rankingPoints: pts, ageGroup, eventType });

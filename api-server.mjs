@@ -156,6 +156,17 @@ function setCache(key, data) {
   cache.set(key, { data, timestamp: Date.now() });
 }
 
+// ── HTML entity decoder ──────────────────────────────────────────────────────
+const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'" };
+function decodeHtmlEntities(str) {
+  return str.replace(/&(#?\w+);/g, (m, code) => {
+    if (ENTITY_MAP[code]) return ENTITY_MAP[code];
+    if (code.startsWith('#x')) return String.fromCharCode(parseInt(code.slice(2), 16));
+    if (code.startsWith('#')) return String.fromCharCode(parseInt(code.slice(1), 10));
+    return m;
+  });
+}
+
 // ── Rankings HTML parser ──────────────────────────────────────────────────────
 // Table structure:
 //   <td>1</td>  <td>397901</td>  <td><a href="...">Name</a></td>  <td>6495</td>
@@ -177,7 +188,7 @@ function parseRankings(html, ageGroup, eventType) {
     if (cells.length < 4) continue;
     const rank = parseInt(cells[0], 10);
     const usabId = cells[1].trim();
-    const name = cells[2].trim();
+    const name = decodeHtmlEntities(cells[2].trim());
     const pts = parseInt(cells[3].replace(/,/g, ''), 10);
     if (rank > 0 && usabId && name) {
       players.push({ usabId, name, rank, rankingPoints: pts, ageGroup, eventType });
@@ -211,8 +222,8 @@ function parsePlayerDetail(html) {
     if (!tlMatch) continue;
 
     const tournamentId = tlMatch[1];
-    const tournamentName = tlMatch[2];
-    const location = tlMatch[3];
+    const tournamentName = decodeHtmlEntities(tlMatch[2]);
+    const location = decodeHtmlEntities(tlMatch[3]);
 
     // Extract remaining cells (position, points)
     const cells = [];
