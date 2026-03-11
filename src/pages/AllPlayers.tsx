@@ -195,7 +195,7 @@ export default function AllPlayers() {
             setSearch(e.target.value);
             if (e.target.value) setActiveLetter(null);
           }}
-          className="w-full md:max-w-md pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-600 bg-white dark:bg-slate-900"
+          className="w-full md:max-w-md pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-600 bg-white dark:bg-slate-900"
         />
       </div>
 

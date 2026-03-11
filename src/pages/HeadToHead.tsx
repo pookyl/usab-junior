@@ -188,7 +188,7 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
   const avatarBg = isViolet ? 'bg-violet-600' : 'bg-blue-600';
   const ringColor = isViolet ? 'focus:ring-violet-400 dark:focus:ring-violet-600' : 'focus:ring-blue-400 dark:focus:ring-blue-600';
   const selectedBorder = isViolet ? 'border-violet-200' : 'border-blue-200';
-  const itemHover = isViolet ? 'hover:bg-violet-50 active:bg-violet-50' : 'hover:bg-blue-50 active:bg-blue-50';
+  const itemHover = isViolet ? 'hover:bg-violet-50 active:bg-violet-50 dark:hover:bg-violet-900/40 dark:active:bg-violet-900/40' : 'hover:bg-blue-50 active:bg-blue-50 dark:hover:bg-blue-900/40 dark:active:bg-blue-900/40';
 
   return (
     <div ref={ref} className="relative">
@@ -242,7 +242,7 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
               disabled={loading}
               onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
               onFocus={() => setOpen(true)}
-              className={`w-full pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 ${ringColor} bg-white dark:bg-slate-900 disabled:opacity-60`}
+              className={`w-full pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 ${ringColor} bg-white dark:bg-slate-900 disabled:opacity-60`}
             />
             {loading && (
               <RefreshCw className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 animate-spin" />

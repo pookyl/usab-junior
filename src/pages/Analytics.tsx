@@ -94,7 +94,7 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search player name…"
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:border-violet-300 dark:focus:border-violet-600 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              className="w-full pl-9 pr-3 py-2 text-sm text-slate-900 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:border-violet-300 dark:focus:border-violet-600 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
           </div>
         </div>
