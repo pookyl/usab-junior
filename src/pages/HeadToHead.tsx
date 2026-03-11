@@ -3,14 +3,24 @@ import { Link } from 'react-router-dom';
 import {
   Swords, Search, RefreshCw, Trophy, ExternalLink, TrendingUp,
 } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import type {
-  AgeGroup, UniquePlayer, PlayerEntry, H2HResult, H2HMatch,
+  AgeGroup, EventType, UniquePlayer, PlayerEntry, PlayerRankingTrend,
+  H2HResult, H2HMatch,
   TswPlayerStats, TswMatchResult, StatsCategory,
 } from '../types/junior';
 import { AGE_GROUPS, EVENT_LABELS } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
 import {
-  fetchH2H, fetchPlayerTswStats, tswH2HUrl, tswSearchUrl,
+  fetchH2H, fetchPlayerTswStats, fetchPlayerRankingTrend, tswH2HUrl, tswSearchUrl,
 } from '../services/rankingsService';
 
 type Gender = 'Boy' | 'Girl' | 'All';
@@ -22,6 +32,12 @@ const AGE_COLORS: Record<AgeGroup, string> = {
   U17: 'bg-amber-500',
   U19: 'bg-rose-600',
 };
+
+function formatDateLabel(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
+}
 
 
 function inferGender(entries: PlayerEntry[]): Gender | null {
@@ -453,6 +469,7 @@ function StatsRow({
   barB,
   subA,
   subB,
+  gapClass,
 }: {
   label: string;
   valA: string;
@@ -461,9 +478,10 @@ function StatsRow({
   barB?: number;
   subA?: string;
   subB?: string;
+  gapClass?: string;
 }) {
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 items-center py-2.5 md:py-3 border-b border-slate-50 dark:border-slate-800 last:border-0">
+    <div className={`grid grid-cols-[1fr_auto_1fr] ${gapClass ?? 'gap-2 md:gap-3'} items-center py-2.5 md:py-3 border-b border-slate-50 dark:border-slate-800 last:border-0`}>
       <div className="text-right space-y-1">
         <p className="text-xs md:text-sm font-bold text-violet-600">{valA}</p>
         {barA !== undefined && (
@@ -482,6 +500,157 @@ function StatsRow({
           </div>
         )}
         {subB && <p className="text-[10px] text-slate-400 dark:text-slate-500">{subB}</p>}
+      </div>
+    </div>
+  );
+}
+
+// ── H2H Ranking Trend Chart ──────────────────────────────────────────────────
+
+function H2HRankingTrendChart({
+  trendA,
+  trendB,
+  nameA,
+  nameB,
+  ageGroup,
+  eventType,
+  asOfDate,
+}: {
+  trendA: PlayerRankingTrend;
+  trendB: PlayerRankingTrend;
+  nameA: string;
+  nameB: string;
+  ageGroup: AgeGroup;
+  eventType: EventType;
+  asOfDate: string;
+}) {
+  const buildSeries = (trend: PlayerRankingTrend) =>
+    trend.trend
+      .filter((point) => point.date <= asOfDate)
+      .map((point) => {
+        const entry = point.entries.find(
+          (e) => e.ageGroup === ageGroup && e.eventType === eventType,
+        );
+        if (!entry) return null;
+        return { date: point.date, rank: entry.rank, points: entry.rankingPoints };
+      })
+      .filter(Boolean) as { date: string; rank: number; points: number }[];
+
+  const seriesA = buildSeries(trendA);
+  const seriesB = buildSeries(trendB);
+
+  const allDates = [...new Set([...seriesA.map((d) => d.date), ...seriesB.map((d) => d.date)])].sort();
+
+  const mapA = new Map(seriesA.map((d) => [d.date, d]));
+  const mapB = new Map(seriesB.map((d) => [d.date, d]));
+
+  const chartData = allDates.map((date) => ({
+    date,
+    label: formatDateLabel(date),
+    rankA: mapA.get(date)?.rank ?? null,
+    rankB: mapB.get(date)?.rank ?? null,
+    pointsA: mapA.get(date)?.points ?? null,
+    pointsB: mapB.get(date)?.points ?? null,
+  }));
+
+  if (chartData.length < 2) {
+    return (
+      <div className="py-4 text-center">
+        <TrendingUp className="w-6 h-6 text-slate-200 dark:text-slate-600 mx-auto mb-1" />
+        <p className="text-slate-400 dark:text-slate-500 text-xs">
+          Not enough historical data for {ageGroup} {eventType}
+        </p>
+      </div>
+    );
+  }
+
+  const allRanks = chartData.flatMap((d) => [d.rankA, d.rankB]).filter((r): r is number => r !== null);
+  const maxRank = Math.max(...allRanks);
+  const rankDomain: [number, number] = [1, Math.ceil(maxRank * 1.1)];
+
+  return (
+    <div className="pt-3 pb-1">
+      <div className="flex items-center justify-center gap-x-5 mb-2 text-[10px] md:text-xs text-slate-500 dark:text-slate-400">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-5 h-0.5 rounded-full bg-violet-500" />
+          {nameA}
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-5 h-0.5 rounded-full bg-blue-500" />
+          {nameB}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-slate-400 dark:text-slate-500">
+          <span className="inline-block w-5 border-t-2 border-dashed border-current" />
+          Points
+        </span>
+      </div>
+      <div className="-mx-2 md:mx-0">
+        <ResponsiveContainer width="100%" height={240}>
+          <LineChart data={chartData} margin={{ top: 5, right: -10, left: -15, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 10, fill: '#94a3b8' }}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+            />
+            <YAxis
+              yAxisId="points"
+              allowDecimals={false}
+              tick={{ fontSize: 10, fill: '#94a3b8' }}
+              tickLine={false}
+              axisLine={false}
+              width={40}
+            />
+            <YAxis
+              yAxisId="rank"
+              orientation="right"
+              reversed
+              domain={rankDomain}
+              allowDecimals={false}
+              tick={{ fontSize: 10, fill: '#94a3b8' }}
+              tickLine={false}
+              axisLine={false}
+              width={35}
+            />
+            <Tooltip
+              contentStyle={{
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0',
+                fontSize: 12,
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              }}
+              formatter={(value: unknown, name: unknown) => {
+                const n = name as string;
+                if (value === null || value === undefined) return ['—', n];
+                return [n.startsWith('Rank') ? `#${value}` : (value as number).toLocaleString(), n];
+              }}
+              labelFormatter={(_label: unknown, payload: ReadonlyArray<{ payload?: { date?: string } }>) => {
+                const dateStr = payload[0]?.payload?.date;
+                if (!dateStr) return '';
+                const d = new Date(dateStr + 'T00:00:00');
+                return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+              }}
+            />
+            <Line yAxisId="rank" type="monotone" dataKey="rankA" name={`Rank · ${nameA}`}
+              stroke="#8b5cf6" strokeWidth={2.5}
+              dot={{ r: 3, fill: '#8b5cf6', strokeWidth: 0 }}
+              activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
+              connectNulls />
+            <Line yAxisId="rank" type="monotone" dataKey="rankB" name={`Rank · ${nameB}`}
+              stroke="#3b82f6" strokeWidth={2.5}
+              dot={{ r: 3, fill: '#3b82f6', strokeWidth: 0 }}
+              activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
+              connectNulls />
+            <Line yAxisId="points" type="monotone" dataKey="pointsA" name={`Points · ${nameA}`}
+              stroke="#8b5cf6" strokeWidth={1.5} strokeDasharray="5 3" strokeOpacity={0.5}
+              dot={false} connectNulls />
+            <Line yAxisId="points" type="monotone" dataKey="pointsB" name={`Points · ${nameB}`}
+              stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="5 3" strokeOpacity={0.5}
+              dot={false} connectNulls />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
@@ -515,10 +684,15 @@ export default function HeadToHead() {
   const [h2hResult, setH2hResult] = useState<H2HResult | null>(snap?.h2hResult ?? null);
   const [tswStatsA, setTswStatsA] = useState<TswPlayerStats | null>(snap?.tswStatsA ?? null);
   const [tswStatsB, setTswStatsB] = useState<TswPlayerStats | null>(snap?.tswStatsB ?? null);
+  const [trendA, setTrendA] = useState<PlayerRankingTrend | null>(null);
+  const [trendB, setTrendB] = useState<PlayerRankingTrend | null>(null);
+  const [loadingTrends, setLoadingTrends] = useState(false);
   const [comparing, setComparing] = useState(false);
   const [compared, setCompared] = useState(!!snap?.h2hResult || !!snap?.tswStatsA || !!snap?.tswStatsB);
   const [error, setError] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState<'All' | 'Singles' | 'Doubles' | 'Mixed'>(snap?.filterCat ?? 'All');
+  const [expandedRankingKey, setExpandedRankingKey] = useState<string | null>(null);
+  const { rankingsDate } = usePlayers();
 
   // Restore player objects from snapshot IDs once allPlayers loads
   const restoredPlayers = useRef(false);
@@ -589,8 +763,11 @@ export default function HeadToHead() {
     setH2hResult(null);
     setTswStatsA(null);
     setTswStatsB(null);
+    setTrendA(null);
+    setTrendB(null);
     setError(null);
     setFilterCat('All');
+    setExpandedRankingKey(null);
 
     try {
       const [h2h, statsA, statsB] = await Promise.allSettled([
@@ -685,9 +862,6 @@ export default function HeadToHead() {
     : filterCat === 'Singles' ? 'singles'
     : filterCat === 'Doubles' ? 'doubles'
     : 'mixed';
-
-  const bestA = playerA ? bestEntry(playerA, ageGroup) : null;
-  const bestB = playerB ? bestEntry(playerB, ageGroup) : null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
@@ -977,13 +1151,62 @@ export default function HeadToHead() {
                     const eB = entryMapB.get(key);
                     const [ag, ev] = key.split('-') as [AgeGroup, EventType];
                     const label = `${ag} ${ev}`;
+                    const bothRanked = !!eA && !!eB;
+                    const isExpanded = expandedRankingKey === key;
+
+                    const handleRankingClick = async () => {
+                      if (!bothRanked || !playerA || !playerB) return;
+                      if (isExpanded) { setExpandedRankingKey(null); return; }
+                      setExpandedRankingKey(key);
+                      if (trendA && trendB) return;
+                      setLoadingTrends(true);
+                      try {
+                        const [trA, trB] = await Promise.allSettled([
+                          fetchPlayerRankingTrend(playerA.usabId),
+                          fetchPlayerRankingTrend(playerB.usabId),
+                        ]);
+                        setTrendA(trA.status === 'fulfilled' ? trA.value : null);
+                        setTrendB(trB.status === 'fulfilled' ? trB.value : null);
+                      } finally {
+                        setLoadingTrends(false);
+                      }
+                    };
+
                     return (
-                      <StatsRow
-                        key={key}
-                        label={label}
-                        valA={eA ? `#${eA.rank}` : ''}
-                        valB={eB ? `#${eB.rank}` : ''}
-                      />
+                      <div key={key}>
+                        <div
+                          role={bothRanked ? 'button' : undefined}
+                          tabIndex={bothRanked ? 0 : undefined}
+                          onClick={handleRankingClick}
+                          onKeyDown={(e) => { if (bothRanked && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); handleRankingClick(); } }}
+                          className={bothRanked ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors rounded-lg' : ''}
+                        >
+                          <StatsRow
+                            label={label}
+                            valA={eA ? `#${eA.rank}` : ''}
+                            valB={eB ? `#${eB.rank}` : ''}
+                            gapClass="gap-6 md:gap-8"
+                          />
+                        </div>
+                        {isExpanded && loadingTrends && (
+                          <div className="py-4 text-center">
+                            <RefreshCw className="w-5 h-5 text-slate-300 dark:text-slate-600 animate-spin mx-auto" />
+                          </div>
+                        )}
+                        {isExpanded && !loadingTrends && trendA && trendB && (
+                          <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
+                            <H2HRankingTrendChart
+                              trendA={trendA}
+                              trendB={trendB}
+                              nameA={playerA.name.split(' ')[0]}
+                              nameB={playerB.name.split(' ')[0]}
+                              ageGroup={ag}
+                              eventType={ev}
+                              asOfDate={rankingsDate}
+                            />
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
