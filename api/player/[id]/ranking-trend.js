@@ -4,7 +4,7 @@ import {
   setCors,
 } from '../../_lib/shared.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
@@ -15,12 +15,12 @@ export default function handler(req, res) {
   if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
 
   try {
-    const dates = listCachedDates().sort();
+    const dates = (await listCachedDates()).sort();
     const trend = [];
     let playerName = '';
 
     for (const date of dates) {
-      const disk = loadDiskCacheForDate(date);
+      const disk = await loadDiskCacheForDate(date);
       if (!disk || !disk.allPlayers) continue;
       const player = disk.allPlayers.find((p) => p.usabId === usabId);
       if (!player) continue;

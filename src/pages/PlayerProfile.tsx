@@ -338,7 +338,7 @@ function TournamentMatchCard({
   match: import('../types/junior').TswMatchResult;
   playerName: string;
   playerUsabId: string;
-  nameMap: Map<string, string>;
+  nameMap: Map<string, string[]>;
   location?: string;
   showTournament?: boolean;
 }) {
@@ -484,7 +484,7 @@ function PlayerNameLink({
   className,
 }: {
   name: string;
-  nameMap: Map<string, string>;
+  nameMap: Map<string, string[]>;
   currentUsabId: string;
   className?: string;
 }) {
@@ -493,13 +493,14 @@ function PlayerNameLink({
     <>
       {parts.map((part, i) => {
         const trimmed = part.trim();
-        const foundId = nameMap.get(trimmed.toLowerCase());
+        const foundIds = nameMap.get(trimmed.toLowerCase());
+        const uniqueId = foundIds?.length === 1 && foundIds[0] !== currentUsabId ? foundIds[0] : null;
         return (
           <span key={i}>
             {i > 0 && ' / '}
-            {foundId && foundId !== currentUsabId ? (
+            {uniqueId ? (
               <Link
-                to={`/directory/${foundId}`}
+                to={`/directory/${uniqueId}`}
                 className={`no-underline hover:text-violet-600 transition-colors ${className ?? ''}`}
                 onClick={(e) => e.stopPropagation()}
               >

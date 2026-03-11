@@ -1,6 +1,6 @@
 import {
   USAB_BASE, BROWSER_HEADERS,
-  getCached, setCache, getDiskCachedRankings,
+  getCached, setCache, getDiskCachedRankings, getDiskCachedDate,
   parseRankings, setCors,
 } from './_lib/shared.js';
 
@@ -8,7 +8,8 @@ export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const { age_group: ageGroup = 'U11', category: eventType = 'BS', date = '2026-03-01' } = req.query;
+  const defaultDate = await getDiskCachedDate() || new Date().toISOString().slice(0, 10);
+  const { age_group: ageGroup = 'U11', category: eventType = 'BS', date = defaultDate } = req.query;
   const cacheKey = `rankings:${ageGroup}:${eventType}:${date}`;
 
   const cached = getCached(cacheKey);
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
 
   // Check per-date disk cache first
   const diskKey = `${ageGroup}-${eventType}`;
-  const perDateDisk = getDiskCachedRankings(diskKey, date);
+  const perDateDisk = await getDiskCachedRankings(diskKey, date);
   if (perDateDisk) {
     setCache(cacheKey, perDateDisk);
     return res.setHeader('X-Cache', 'DISK').status(200).json(perDateDisk);
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
     setCache(cacheKey, players);
     return res.setHeader('X-Cache', 'MISS').status(200).json(players);
   } catch (err) {
-    const diskData = getDiskCachedRankings(diskKey);
+    const diskData = await getDiskCachedRankings(diskKey);
     if (diskData) {
       return res.setHeader('X-Cache', 'DISK').status(200).json(diskData);
     }

@@ -14,7 +14,7 @@ interface PlayersContextValue {
   availableDates: string[];
   changeDate: (date: string) => void;
   refresh: () => void;
-  playerNameMap: Map<string, string>;
+  playerNameMap: Map<string, string[]>;
 }
 
 const PlayersContext = createContext<PlayersContextValue | null>(null);
@@ -27,6 +27,8 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   const [rankingsDate, setRankingsDate] = useState<string>(RANKINGS_DATE);
   const [availableDates, setAvailableDates] = useState<string[]>([RANKINGS_DATE]);
   const fetchCount = useRef(0);
+  const lastGoodPlayers = useRef<UniquePlayer[]>(cachedAllPlayers);
+  const lastGoodDate = useRef<string>(RANKINGS_DATE);
 
   const load = useCallback((dateOverride?: string) => {
     const id = ++fetchCount.current;
@@ -37,6 +39,8 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
       const date = dateOverride ?? rankingsDate;
       const data = await fetchAllPlayers(date);
       if (fetchCount.current !== id) return;
+      lastGoodPlayers.current = data;
+      lastGoodDate.current = date;
       setPlayers(data);
       setSource('live');
       setLoading(false);
@@ -44,12 +48,9 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
 
     doFetch().catch((err: Error) => {
       if (fetchCount.current !== id) return;
-      if (cachedAllPlayers.length > 0) {
-        setPlayers(cachedAllPlayers);
-        setSource('cached');
-      } else {
-        setSource('none');
-      }
+      setPlayers(lastGoodPlayers.current);
+      setRankingsDate(lastGoodDate.current);
+      setSource(lastGoodPlayers.current === cachedAllPlayers ? 'cached' : 'live');
       setError(err.message);
       setLoading(false);
     });
@@ -79,9 +80,15 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const playerNameMap = useMemo(() => {
-    const map = new Map<string, string>();
+    const map = new Map<string, string[]>();
     for (const p of players) {
-      map.set(p.name.toLowerCase(), p.usabId);
+      const key = p.name.toLowerCase();
+      const ids = map.get(key);
+      if (ids) {
+        ids.push(p.usabId);
+      } else {
+        map.set(key, [p.usabId]);
+      }
     }
     return map;
   }, [players]);

@@ -1,4 +1,4 @@
-import { readFileSync, existsSync, readdirSync } from 'fs';
+import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -35,10 +35,9 @@ function diskCachePath(date) {
   return join(DISK_CACHE_DIR, `rankings-${date}.json`);
 }
 
-export function listCachedDates() {
+export async function listCachedDates() {
   try {
-    if (!existsSync(DISK_CACHE_DIR)) return [];
-    const files = readdirSync(DISK_CACHE_DIR);
+    const files = await readdir(DISK_CACHE_DIR);
     const dates = [];
     for (const f of files) {
       const m = f.match(/^rankings-(\d{4}-\d{2}-\d{2})\.json$/);
@@ -69,43 +68,42 @@ function rebuildRankingsFromPlayers(allPlayers) {
   return rankings;
 }
 
-export function loadDiskCacheForDate(date) {
+export async function loadDiskCacheForDate(date) {
   try {
     const filePath = diskCachePath(date);
-    if (existsSync(filePath)) {
-      const data = JSON.parse(readFileSync(filePath, 'utf-8'));
-      if (!data.rankings && data.allPlayers) {
-        data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
-      }
-      return data;
+    const raw = await readFile(filePath, 'utf-8');
+    const data = JSON.parse(raw);
+    if (!data.rankings && data.allPlayers) {
+      data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
     }
-  } catch { /* ignore */ }
+    return data;
+  } catch { /* ignore — file may not exist */ }
   return null;
 }
 
-export function loadDiskCache() {
+export async function loadDiskCache() {
   try {
-    if (existsSync(DISK_CACHE_FILE)) {
-      return JSON.parse(readFileSync(DISK_CACHE_FILE, 'utf-8'));
-    }
-  } catch { /* ignore */ }
+    const raw = await readFile(DISK_CACHE_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch { /* ignore — file may not exist */ }
   return null;
 }
 
-export function getDiskCachedRankings(key, date) {
-  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
+export async function getDiskCachedRankings(key, date) {
+  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
   if (disk?.rankings?.[key]) return disk.rankings[key];
   return null;
 }
 
-export function getDiskCachedAllPlayers(date) {
-  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
+export async function getDiskCachedAllPlayers(date) {
+  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
   if (disk?.allPlayers) return { players: disk.allPlayers, date: disk.date };
   return null;
 }
 
-export function getDiskCachedDate() {
-  return loadDiskCache()?.date ?? null;
+export async function getDiskCachedDate() {
+  const disk = await loadDiskCache();
+  return disk?.date ?? null;
 }
 
 // ── CORS helper ──────────────────────────────────────────────────────────────

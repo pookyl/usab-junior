@@ -1,6 +1,6 @@
 import {
   USAB_BASE, BROWSER_HEADERS,
-  getCached, setCache, getDiskCachedAllPlayers,
+  getCached, setCache, getDiskCachedAllPlayers, getDiskCachedDate,
   parseRankings, setCors,
 } from './_lib/shared.js';
 
@@ -8,14 +8,15 @@ export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const { date = '2026-03-01' } = req.query;
+  const defaultDate = await getDiskCachedDate() || new Date().toISOString().slice(0, 10);
+  const { date = defaultDate } = req.query;
   const cacheKey = `all-players:${date}`;
 
   const cached = getCached(cacheKey);
   if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
 
   // Check per-date disk cache first (serves historical dates without scraping)
-  const perDateDisk = getDiskCachedAllPlayers(date);
+  const perDateDisk = await getDiskCachedAllPlayers(date);
   if (perDateDisk) {
     setCache(cacheKey, perDateDisk.players);
     return res.setHeader('X-Cache', 'DISK').status(200).json(perDateDisk.players);
@@ -32,6 +33,8 @@ export default async function handler(req, res) {
       tasks.push({ ag, et });
     }
   }
+
+  const failedCategories = [];
 
   try {
     for (let i = 0; i < tasks.length; i += 5) {
@@ -52,7 +55,8 @@ export default async function handler(req, res) {
         }),
       );
 
-      for (const result of results) {
+      for (let j = 0; j < results.length; j++) {
+        const result = results[j];
         if (result.status === 'fulfilled' && result.value) {
           const { players } = result.value;
           for (const player of players) {
@@ -64,6 +68,8 @@ export default async function handler(req, res) {
               rank: player.rank, rankingPoints: player.rankingPoints,
             });
           }
+        } else {
+          failedCategories.push(`${batch[j].ag}-${batch[j].et}`);
         }
       }
     }
@@ -71,14 +77,18 @@ export default async function handler(req, res) {
     const uniquePlayers = [...allPlayers.values()].sort((a, b) => a.name.localeCompare(b.name));
 
     if (uniquePlayers.length > 0) {
+      if (failedCategories.length > 0) {
+        res.setHeader('X-Partial', 'true');
+        res.setHeader('X-Failed-Categories', failedCategories.join(','));
+      }
       setCache(cacheKey, uniquePlayers);
       return res.setHeader('X-Cache', 'MISS').status(200).json(uniquePlayers);
     }
   } catch { /* fall through to disk cache */ }
 
-  const diskData = getDiskCachedAllPlayers();
+  const diskData = await getDiskCachedAllPlayers();
   if (diskData) {
     return res.setHeader('X-Cache', 'DISK').status(200).json(diskData.players);
   }
-  return res.status(200).json([]);
+  return res.status(503).json({ error: 'No data available' });
 }

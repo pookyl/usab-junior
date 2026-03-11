@@ -1,6 +1,6 @@
 import {
   USAB_BASE, BROWSER_HEADERS,
-  getCached, setCache,
+  getCached, setCache, getDiskCachedDate,
   parsePlayerDetail, parsePlayerGender,
   setCors,
 } from '../_lib/shared.js';
@@ -9,7 +9,8 @@ export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const { id: usabId, age_group: ageGroup = 'U11', category: eventType = 'BS', date = '2026-03-01' } = req.query;
+  const defaultDate = await getDiskCachedDate() || new Date().toISOString().slice(0, 10);
+  const { id: usabId, age_group: ageGroup = 'U11', category: eventType = 'BS', date = defaultDate } = req.query;
   const cacheKey = `player:${usabId}:${ageGroup}:${eventType}:${date}`;
 
   const cached = getCached(cacheKey);

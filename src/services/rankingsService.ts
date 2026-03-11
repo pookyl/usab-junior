@@ -10,14 +10,52 @@ import type {
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
-// ── Cached dates (only dates with files on disk) ────────────────────────────
+// ── Fetch with retry ────────────────────────────────────────────────────────
+async function fetchWithRetry(url: string, timeoutMs: number, retries = 2): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+      if (res.ok || attempt >= retries) return res;
+    } catch (err) {
+      if (attempt >= retries) throw err;
+    }
+    await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
+  }
+}
+
+// ── Cache helpers ────────────────────────────────────────────────────────────
+const MAX_CACHE_SIZE = 200;
+
+function cappedSet<K, V>(map: Map<K, V>, key: K, value: V) {
+  if (map.size >= MAX_CACHE_SIZE) {
+    const oldest = map.keys().next().value;
+    if (oldest !== undefined) map.delete(oldest);
+  }
+  map.set(key, value);
+}
+
+// ── Module-level caches ─────────────────────────────────────────────────────
 let cachedDatesCache: string[] | null = null;
+let allPlayersCache: UniquePlayer[] | null = null;
+let allPlayersCacheDate = '';
+const tswStatsCache = new Map<string, TswPlayerStats>();
+const trendCache = new Map<string, PlayerRankingTrend>();
+
+export function invalidateRankingsCache() {
+  allPlayersCache = null;
+  allPlayersCacheDate = '';
+  cachedDatesCache = null;
+  tswStatsCache.clear();
+  trendCache.clear();
+}
+
+// ── Cached dates (only dates with files on disk) ────────────────────────────
 
 export async function fetchCachedDates(): Promise<string[]> {
   if (cachedDatesCache) return cachedDatesCache;
 
   try {
-    const res = await fetch('/api/cached-dates', { signal: AbortSignal.timeout(10_000) });
+    const res = await fetchWithRetry('/api/cached-dates', 10_000);
     if (!res.ok) throw new Error(`API ${res.status}`);
     const data = await res.json();
     if (Array.isArray(data.dates) && data.dates.length > 0) {
@@ -28,11 +66,6 @@ export async function fetchCachedDates(): Promise<string[]> {
     // Fall back to current date only
   }
   return [RANKINGS_DATE];
-}
-
-export function invalidateRankingsCache() {
-  allPlayersCache = null;
-  allPlayersCacheDate = '';
 }
 
 export async function fetchPlayerDetail(
@@ -87,16 +120,13 @@ export function tswH2HUrl(usabId1: string, usabId2: string) {
   return `https://www.tournamentsoftware.com/head-2-head?OrganizationCode=C36A90FE-DFA8-414B-A8B6-F2BCF6B9B8BD&T1P1MemberID=${usabId1}&T2P1MemberID=${usabId2}`;
 }
 
-let allPlayersCache: UniquePlayer[] | null = null;
-let allPlayersCacheDate = '';
-
 export async function fetchAllPlayers(
   date: string = RANKINGS_DATE,
 ): Promise<UniquePlayer[]> {
   if (allPlayersCache && allPlayersCacheDate === date) return allPlayersCache;
 
   const url = `/api/all-players?date=${date}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
+  const res = await fetchWithRetry(url, 120_000);
   if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
 
   const players: UniquePlayer[] = await res.json();
@@ -106,8 +136,6 @@ export async function fetchAllPlayers(
   allPlayersCacheDate = date;
   return players;
 }
-
-let tswStatsCache = new Map<string, TswPlayerStats>();
 
 export async function fetchPlayerTswStats(
   usabId: string,
@@ -120,7 +148,7 @@ export async function fetchPlayerTswStats(
   if (!res.ok) throw new Error(`TSW stats API ${res.status}`);
 
   const stats: TswPlayerStats = await res.json();
-  tswStatsCache.set(usabId, stats);
+  cappedSet(tswStatsCache, usabId, stats);
   return stats;
 }
 
@@ -132,8 +160,6 @@ export function tswTournamentUrl(tournamentId: string) {
   return `https://www.tournamentsoftware.com/sport/tournament.aspx?id=${tournamentId}`;
 }
 
-const trendCache = new Map<string, PlayerRankingTrend>();
-
 export async function fetchPlayerRankingTrend(
   usabId: string,
 ): Promise<PlayerRankingTrend> {
@@ -144,6 +170,6 @@ export async function fetchPlayerRankingTrend(
   if (!res.ok) throw new Error(`Trend API ${res.status}`);
 
   const data: PlayerRankingTrend = await res.json();
-  trendCache.set(usabId, data);
+  cappedSet(trendCache, usabId, data);
   return data;
 }

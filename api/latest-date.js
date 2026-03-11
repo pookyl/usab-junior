@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     setCache(cacheKey, result);
     return res.setHeader('X-Cache', 'MISS').status(200).json(result);
   } catch (err) {
-    const diskDate = getDiskCachedDate();
+    const diskDate = await getDiskCachedDate();
     if (diskDate) {
       return res.setHeader('X-Cache', 'DISK').status(200).json({
         latestDate: diskDate,
