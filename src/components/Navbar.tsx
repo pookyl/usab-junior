@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Trophy, BarChart2, Home, Feather, Swords, Users, Moon, Sun, Monitor, Calendar, RefreshCw } from 'lucide-react';
+import { Trophy, BarChart2, Home, Swords, Users, Moon, Sun, Monitor, Calendar, RefreshCw } from 'lucide-react';
 import { useTheme, type ThemeMode } from '../contexts/ThemeContext';
 import { usePlayers } from '../contexts/PlayersContext';
 
@@ -108,9 +108,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-violet-500 to-blue-600 p-2 rounded-lg">
-                <Feather className="w-5 h-5 text-white" />
-              </div>
+              <img src="/icon-192.png" alt="" className="w-9 h-9 rounded-lg" />
               <span className="text-xl font-bold tracking-tight">
                 USA<span className="text-violet-400">Junior</span>
                 <span className="text-slate-400 font-normal text-sm ml-1.5">Badminton</span>
@@ -157,9 +155,7 @@ export default function Navbar() {
       {/* Mobile top bar (< md) — compact branding only */}
       <header className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
         <Link to="/" className="flex items-center gap-2.5 flex-1">
-          <div className="bg-gradient-to-br from-violet-500 to-blue-600 p-1.5 rounded-lg">
-            <Feather className="w-4 h-4 text-white" />
-          </div>
+          <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="text-lg font-bold tracking-tight">
             USA<span className="text-violet-400">Junior</span>
             <span className="text-slate-400 font-normal text-xs ml-1">Badminton</span>
