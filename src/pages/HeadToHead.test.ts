@@ -240,6 +240,19 @@ describe('findMatchesBetween', () => {
     expect(matches.map((m) => m.date)).toContain('Sun 9/1/2024');
   });
 
+  it('preserves correct win/loss from player perspective', () => {
+    const matches = findMatchesBetween(statsA, 'Daniel Li', 'Kennedy Y Wu');
+    const singles = matches.find((m) => m.date === 'Fri 3/21/2025')!;
+    expect(singles.team1Players).toContain('Daniel Li');
+    expect(singles.team1Won).toBe(false);
+    expect(singles.team2Won).toBe(true);
+
+    const doubles = matches.find((m) => m.date === 'Sun 9/1/2024')!;
+    expect(doubles.team1Players).toContain('Daniel Li');
+    expect(doubles.team1Won).toBe(false);
+    expect(doubles.team2Won).toBe(true);
+  });
+
   it('does not match similarly-named players', () => {
     const matches = findMatchesBetween(statsA, 'Daniel Li', 'Daniel Li');
     expect(matches).toHaveLength(0);
