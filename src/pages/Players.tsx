@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, ExternalLink, RefreshCw, Trophy, WifiOff, Calendar } from 'lucide-react';
 import type { AgeGroup, EventType } from '../types/junior';
-import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
+import { AGE_GROUPS, EVENT_TYPES } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
 
 const AGE_COLORS: Record<AgeGroup, string> = {
@@ -72,7 +72,7 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="px-4 md:px-6 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
           <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
-            {ageGroup} {EVENT_LABELS[eventType]}
+            {ageGroup} {eventType}
             {!loading && <span className="text-slate-400 dark:text-slate-500 font-normal ml-2">· {filtered.length} players</span>}
           </p>
           <a
@@ -93,7 +93,7 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
         ) : error && players.length === 0 ? (
           <div className="py-16 text-center space-y-3">
             <WifiOff className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
-            <p className="text-slate-400 dark:text-slate-500 text-sm">Could not load rankings for {ageGroup} {eventType}</p>
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Could not load rankings for {ageGroup} {eventType.toUpperCase()}</p>
             <a
               href={`https://usabjrrankings.org/?age_group=${ageGroup}&category=${eventType}&date=${date}`}
               target="_blank"

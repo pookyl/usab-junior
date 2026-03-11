@@ -29,7 +29,7 @@ import type {
   CategoryStats,
   StatsCategory,
 } from '../types/junior';
-import { EVENT_LABELS, AGE_GROUPS, EVENT_TYPES } from '../types/junior';
+import { AGE_GROUPS, EVENT_TYPES } from '../types/junior';
 import {
   fetchPlayerDetail,
   fetchPlayerTswStats,
@@ -260,7 +260,6 @@ function RankingCard({ entry }: { entry: PlayerEntry }) {
           #{entry.rank}
         </span>
       </div>
-      <p className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500">{EVENT_LABELS[entry.eventType]}</p>
       <div className="mt-1.5 md:mt-2 flex items-baseline gap-1">
         <span className="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100">
           {entry.rankingPoints.toLocaleString()}

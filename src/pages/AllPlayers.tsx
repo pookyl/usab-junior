@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Users, RefreshCw, ChevronRight } from 'lucide-react';
 import type { AgeGroup, EventType, UniquePlayer } from '../types/junior';
-import { AGE_GROUPS, EVENT_LABELS } from '../types/junior';
+import { AGE_GROUPS } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -83,7 +83,7 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
         ))}
         {events.map((et) => (
           <span key={et} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${EVENT_BADGE_COLORS[et]}`}>
-            {EVENT_LABELS[et]}
+            {et}
           </span>
         ))}
       </div>
