@@ -806,16 +806,15 @@ export default function HeadToHead() {
     const woFromB = findMatchesBetween(tswStatsB, playerB.name, playerA.name)
       .map((m) => normalizeMatch(m, playerA.name));
 
-    const dedupKey = (m: H2HMatch) =>
-      `${m.tournament}|${m.event}|${m.round}|${m.date}`.replace(/&amp;/g, '&');
-    const existing = new Set(h2hMatches.map(dedupKey));
+    const h2hDates = new Set(h2hMatches.map((m) => m.date));
     const merged = [...h2hMatches];
+    const added = new Set<string>();
     for (const wo of [...woMatches, ...woFromB]) {
-      const key = dedupKey(wo);
-      if (!existing.has(key)) {
-        existing.add(key);
-        merged.push(normalizeMatch(wo, playerA.name));
-      }
+      if (h2hDates.has(wo.date)) continue;
+      const key = `${wo.event}|${wo.date}`;
+      if (added.has(key)) continue;
+      added.add(key);
+      merged.push(normalizeMatch(wo, playerA.name));
     }
 
     merged.sort((a, b) => {
