@@ -407,7 +407,7 @@ function TournamentMatchCard({
           >
             {match.won ? 'W' : 'L'}
           </span>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <p className={`text-xs md:text-sm truncate ${match.won ? 'text-emerald-700' : 'text-slate-600 dark:text-slate-300'}`}>
               <PlayerNameLink name={playerName} nameMap={nameMap} currentUsabId={playerUsabId} className={match.won ? 'text-emerald-700 hover:text-violet-600' : 'text-slate-600 dark:text-slate-300 hover:text-violet-600'} />
               {match.partner && (
@@ -442,7 +442,7 @@ function TournamentMatchCard({
           >
             {!match.won ? 'W' : 'L'}
           </span>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <p className={`text-xs md:text-sm truncate ${!match.won ? 'text-rose-700' : 'text-slate-600 dark:text-slate-300'}`}>
               <PlayerNameLink name={match.opponent} nameMap={nameMap} currentUsabId={playerUsabId} className={!match.won ? 'text-rose-700 hover:text-violet-600' : 'text-slate-600 dark:text-slate-300 hover:text-violet-600'} />
             </p>

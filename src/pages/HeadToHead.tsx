@@ -310,7 +310,7 @@ function PlayerNameLinks({
   colorClass: string;
 }) {
   return (
-    <span className={`text-xs md:text-sm truncate ${colorClass}`}>
+    <p className={`text-xs md:text-sm truncate ${colorClass}`}>
       {players.map((name, i) => {
         const usabId = playerLookup.get(name.toLowerCase().trim());
         return (
@@ -329,7 +329,7 @@ function PlayerNameLinks({
           </span>
         );
       })}
-    </span>
+    </p>
   );
 }
 
@@ -386,7 +386,7 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
           }`}>
             {match.team1Won ? 'W' : 'L'}
           </span>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <PlayerNameLinks
               players={match.team1Players}
               playerLookup={playerLookup}
@@ -414,7 +414,7 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
           }`}>
             {match.team2Won ? 'W' : 'L'}
           </span>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <PlayerNameLinks
               players={match.team2Players}
               playerLookup={playerLookup}
