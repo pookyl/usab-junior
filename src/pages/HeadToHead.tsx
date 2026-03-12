@@ -663,7 +663,7 @@ let _h2hSnap: {
 } | null = null;
 
 export default function HeadToHead() {
-  const { players: allPlayers, loading: playersLoading } = usePlayers();
+  const { players: allPlayers, directoryPlayers, directoryLoading, loading: playersLoading } = usePlayers();
 
   const snap = _h2hSnap;
   const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(snap?.ageGroup ?? 'U13');
@@ -685,20 +685,32 @@ export default function HeadToHead() {
   const [expandedRankingKey, setExpandedRankingKey] = useState<string | null>(null);
   const { rankingsDate } = usePlayers();
 
+  const allDirectoryPool: UniquePlayer[] = useMemo(() => {
+    if (directoryPlayers.length === 0) return allPlayers;
+    const rankedMap = new Map(allPlayers.map((p) => [p.usabId, p.entries]));
+    return directoryPlayers.map((dp) => ({
+      usabId: dp.usabId,
+      name: dp.name,
+      entries: rankedMap.get(dp.usabId) ?? [],
+    }));
+  }, [directoryPlayers, allPlayers]);
+
   // Restore player objects from snapshot IDs once allPlayers loads
   const restoredPlayers = useRef(false);
   useEffect(() => {
     if (restoredPlayers.current || playersLoading || allPlayers.length === 0) return;
     restoredPlayers.current = true;
     if (!snap) return;
-    const a = allPlayers.find((p) => p.usabId === snap.playerAId) ?? null;
-    const b = allPlayers.find((p) => p.usabId === snap.playerBId) ?? null;
+    const findPlayer = (id: string) =>
+      allDirectoryPool.find((p) => p.usabId === id) ?? allPlayers.find((p) => p.usabId === id) ?? null;
+    const a = findPlayer(snap.playerAId);
+    const b = findPlayer(snap.playerBId);
     if (a) setPlayerA(a);
     if (b) setPlayerB(b);
     if (a && b && snap.scrollY) {
       requestAnimationFrame(() => window.scrollTo(0, snap.scrollY));
     }
-  }, [playersLoading, allPlayers, snap]);
+  }, [playersLoading, allPlayers, allDirectoryPool, snap]);
 
   // Save snapshot on unmount
   useEffect(() => {
@@ -718,7 +730,8 @@ export default function HeadToHead() {
   });
 
   const filteredPlayers = useMemo(() => {
-    return allPlayers
+    const pool = (ageGroup === null && gender === 'All') ? allDirectoryPool : allPlayers;
+    return pool
       .filter((p) => {
         if (ageGroup && !p.entries.some((e) => e.ageGroup === ageGroup)) return false;
         if (gender !== 'All') return inferGender(p.entries) === gender;
@@ -731,7 +744,9 @@ export default function HeadToHead() {
         if (!be) return -1;
         return ae.rank - be.rank;
       });
-  }, [allPlayers, ageGroup, gender]);
+  }, [allPlayers, allDirectoryPool, ageGroup, gender]);
+
+  const pickerLoading = playersLoading || (ageGroup === null && gender === 'All' && directoryLoading);
 
   // Clear selections on user-initiated filter changes only
   const prevFilters = useRef({ ageGroup, gender });
@@ -912,7 +927,7 @@ export default function HeadToHead() {
 
       {/* Player count */}
       <p className="text-xs text-slate-400 dark:text-slate-500">
-        {playersLoading ? 'Loading players…' : `${filteredPlayers.length} player${filteredPlayers.length !== 1 ? 's' : ''}${gender !== 'All' ? ` (${gender}${filteredPlayers.length !== 1 ? 's' : ''})` : ''}${ageGroup ? ` in ${ageGroup}` : ''}`}
+        {pickerLoading ? 'Loading players…' : `${filteredPlayers.length} player${filteredPlayers.length !== 1 ? 's' : ''}${gender !== 'All' ? ` (${gender}${filteredPlayers.length !== 1 ? 's' : ''})` : ''}${ageGroup ? ` in ${ageGroup}` : ''}`}
       </p>
 
       {/* Player Selection */}
@@ -925,7 +940,7 @@ export default function HeadToHead() {
             players={filteredPlayers}
             selected={playerA}
             onSelect={(p) => { setPlayerA(p); setCompared(false); }}
-            loading={playersLoading}
+            loading={pickerLoading}
             exclude={playerB?.usabId ?? null}
             ageGroup={ageGroup}
           />
@@ -935,7 +950,7 @@ export default function HeadToHead() {
             players={filteredPlayers}
             selected={playerB}
             onSelect={(p) => { setPlayerB(p); setCompared(false); }}
-            loading={playersLoading}
+            loading={pickerLoading}
             exclude={playerA?.usabId ?? null}
             ageGroup={ageGroup}
           />

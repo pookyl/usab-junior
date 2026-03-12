@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback, type ReactNode } from 'react';
-import type { UniquePlayer } from '../types/junior';
-import { fetchAllPlayers, fetchCachedDates, invalidateRankingsCache } from '../services/rankingsService';
+import type { UniquePlayer, DirectoryPlayer } from '../types/junior';
+import { fetchAllPlayers, fetchCachedDates, fetchPlayerDirectory, invalidateRankingsCache } from '../services/rankingsService';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 import ToastContainer, { type ToastItem } from '../components/Toast';
 
@@ -8,6 +8,8 @@ export type DataSource = 'live' | 'cached' | 'none';
 
 interface PlayersContextValue {
   players: UniquePlayer[];
+  directoryPlayers: DirectoryPlayer[];
+  directoryLoading: boolean;
   loading: boolean;
   error: string | null;
   source: DataSource;
@@ -24,6 +26,8 @@ let nextToastId = 0;
 
 export function PlayersProvider({ children }: { children: ReactNode }) {
   const [players, setPlayers] = useState<UniquePlayer[]>([]);
+  const [directoryPlayers, setDirectoryPlayers] = useState<DirectoryPlayer[]>([]);
+  const [directoryLoading, setDirectoryLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<DataSource>('none');
@@ -86,7 +90,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     load(date);
   }, [rankingsDate, load]);
 
-  // Auto-fetch on mount + load available dates
+  // Auto-fetch on mount: rankings, directory, and available dates
   useEffect(() => {
     load(RANKINGS_DATE);
 
@@ -101,26 +105,42 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
       }
     })();
 
+    (async () => {
+      try {
+        const dir = await fetchPlayerDirectory();
+        if (cancelled) return;
+        if (dir.length > 0) setDirectoryPlayers(dir);
+      } catch {
+        // directory is best-effort
+      } finally {
+        if (!cancelled) setDirectoryLoading(false);
+      }
+    })();
+
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const playerNameMap = useMemo(() => {
     const map = new Map<string, string[]>();
-    for (const p of players) {
-      const key = p.name.toLowerCase();
-      const ids = map.get(key);
-      if (ids) {
-        ids.push(p.usabId);
-      } else {
-        map.set(key, [p.usabId]);
+    const source = directoryPlayers.length > 0 ? directoryPlayers : players;
+    for (const p of source) {
+      const allNames = 'names' in p && Array.isArray(p.names) ? p.names : [p.name];
+      for (const name of allNames) {
+        const key = name.toLowerCase();
+        const ids = map.get(key);
+        if (ids) {
+          if (!ids.includes(p.usabId)) ids.push(p.usabId);
+        } else {
+          map.set(key, [p.usabId]);
+        }
       }
     }
     return map;
-  }, [players]);
+  }, [directoryPlayers, players]);
 
   return (
-    <PlayersContext.Provider value={{ players, loading, error, source, rankingsDate, availableDates, changeDate, refresh: () => load(), playerNameMap }}>
+    <PlayersContext.Provider value={{ players, directoryPlayers, directoryLoading, loading, error, source, rankingsDate, availableDates, changeDate, refresh: () => load(), playerNameMap }}>
       {children}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </PlayersContext.Provider>

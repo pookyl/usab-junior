@@ -51,6 +51,16 @@ export interface UniquePlayer {
   entries: PlayerEntry[];
 }
 
+export interface DirectoryPlayer {
+  usabId: string;
+  name: string;
+  names: string[];
+  firstName?: string;
+  lastName?: string;
+  location?: string;
+  club?: string;
+}
+
 export interface TswMatchResult {
   tournament: string;
   tournamentUrl?: string;

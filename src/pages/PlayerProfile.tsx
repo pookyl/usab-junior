@@ -22,6 +22,7 @@ import {
 } from 'recharts';
 import type {
   AgeGroup,
+  EventType,
   PlayerEntry,
   PlayerRankingTrend,
   TswPlayerStats,
@@ -87,18 +88,35 @@ function RankingTrendChart({
   asOfDate: string;
 }) {
   const categories = useMemo(() => {
-    const sorted = [...entries].sort((a, b) => {
-      const agDiff = AGE_GROUPS.indexOf(a.ageGroup) - AGE_GROUPS.indexOf(b.ageGroup);
+    if (entries.length > 0) {
+      const sorted = [...entries].sort((a, b) => {
+        const agDiff = AGE_GROUPS.indexOf(a.ageGroup) - AGE_GROUPS.indexOf(b.ageGroup);
+        if (agDiff !== 0) return agDiff;
+        return EVENT_TYPES.indexOf(a.eventType) - EVENT_TYPES.indexOf(b.eventType);
+      });
+      return sorted.map((e) => `${e.ageGroup}-${e.eventType}`);
+    }
+    const catSet = new Set<string>();
+    for (const point of trend.trend) {
+      for (const e of point.entries) catSet.add(`${e.ageGroup}-${e.eventType}`);
+    }
+    return [...catSet].sort((a, b) => {
+      const [agA, evA] = a.split('-');
+      const [agB, evB] = b.split('-');
+      const agDiff = AGE_GROUPS.indexOf(agA as AgeGroup) - AGE_GROUPS.indexOf(agB as AgeGroup);
       if (agDiff !== 0) return agDiff;
-      return EVENT_TYPES.indexOf(a.eventType) - EVENT_TYPES.indexOf(b.eventType);
+      return EVENT_TYPES.indexOf(evA as EventType) - EVENT_TYPES.indexOf(evB as EventType);
     });
-    return sorted.map((e) => `${e.ageGroup}-${e.eventType}`);
-  }, [entries]);
+  }, [entries, trend]);
 
   const bestCategory = useMemo(() => {
-    const best = entries.reduce((b, e) => (e.rank < b.rank ? e : b));
-    return `${best.ageGroup}-${best.eventType}`;
-  }, [entries]);
+    if (entries.length > 0) {
+      const best = entries.reduce((b, e) => (e.rank < b.rank ? e : b));
+      return `${best.ageGroup}-${best.eventType}`;
+    }
+    if (categories.length > 0) return categories[0];
+    return '';
+  }, [entries, categories]);
 
   const [selectedCategory, setSelectedCategory] = useState(bestCategory);
 
@@ -518,9 +536,14 @@ function PlayerNameLink({
 
 export default function PlayerProfile() {
   const { id: usabId } = useParams<{ id: string }>();
-  const { players: allPlayers, loading: loadingAllPlayers, playerNameMap, rankingsDate } = usePlayers();
+  const { players: allPlayers, directoryPlayers, directoryLoading, loading: loadingAllPlayers, playerNameMap, rankingsDate } = usePlayers();
 
-  const player = allPlayers.find((p) => p.usabId === usabId) ?? null;
+  const rankedPlayer = allPlayers.find((p) => p.usabId === usabId) ?? null;
+  const dirPlayer = directoryPlayers.find((p) => p.usabId === usabId) ?? null;
+  const isRanked = rankedPlayer !== null && rankedPlayer.entries.length > 0;
+  const playerName = rankedPlayer?.name ?? dirPlayer?.name ?? '';
+  const playerFound = rankedPlayer !== null || dirPlayer !== null;
+
   const [gender, setGender] = useState<string | null>(null);
   const [tswStats, setTswStats] = useState<TswPlayerStats | null>(null);
   const [loadingTsw, setLoadingTsw] = useState(true);
@@ -535,14 +558,14 @@ export default function PlayerProfile() {
   }, [usabId]);
 
   useEffect(() => {
-    if (!usabId || !player) {
+    if (!usabId || !playerName) {
       setLoadingTsw(false);
       setLoadingTrend(false);
       return;
     }
 
     setLoadingTsw(true);
-    fetchPlayerTswStats(usabId, player.name)
+    fetchPlayerTswStats(usabId, playerName)
       .then(setTswStats)
       .catch(() => setTswStats(null))
       .finally(() => setLoadingTsw(false));
@@ -553,11 +576,13 @@ export default function PlayerProfile() {
       .catch(() => setTrendData(null))
       .finally(() => setLoadingTrend(false));
 
-    const best = player.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
-    fetchPlayerDetail(usabId, best.ageGroup, best.eventType)
-      .then((d) => setGender(d?.gender ?? null))
-      .catch(() => {});
-  }, [usabId, player]);
+    if (rankedPlayer && rankedPlayer.entries.length > 0) {
+      const best = rankedPlayer.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
+      fetchPlayerDetail(usabId, best.ageGroup, best.eventType)
+        .then((d) => setGender(d?.gender ?? null))
+        .catch(() => {});
+    }
+  }, [usabId, playerName, rankedPlayer]);
 
   if (!usabId) {
     return (
@@ -570,7 +595,7 @@ export default function PlayerProfile() {
     );
   }
 
-  if (loadingAllPlayers && !player) {
+  if ((loadingAllPlayers || directoryLoading) && !playerFound) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
         <RefreshCw className="w-8 h-8 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
@@ -579,7 +604,7 @@ export default function PlayerProfile() {
     );
   }
 
-  if (!player) {
+  if (!playerFound) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
         <Link
@@ -589,7 +614,7 @@ export default function PlayerProfile() {
           <ArrowLeft className="w-4 h-4" /> Back to Players
         </Link>
         <div className="py-16 text-center">
-          <p className="text-slate-400 dark:text-slate-500 text-lg">Player USAB #{usabId} not found in current rankings.</p>
+          <p className="text-slate-400 dark:text-slate-500 text-lg">Player USAB #{usabId} not found.</p>
           <a
             href={`https://usabjrrankings.org/${usabId}/details`}
             target="_blank"
@@ -603,15 +628,16 @@ export default function PlayerProfile() {
     );
   }
 
-  const displayName = player.name;
-  const bestEntry = player.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
-  const sortedEntries = [...player.entries].sort((a, b) => {
+  const displayName = playerName;
+  const entries = rankedPlayer?.entries ?? [];
+  const bestEntry = entries.length > 0 ? entries.reduce((b, e) => (e.rank < b.rank ? e : b)) : null;
+  const sortedEntries = [...entries].sort((a, b) => {
     const agOrder = AGE_GROUPS.indexOf(a.ageGroup) - AGE_GROUPS.indexOf(b.ageGroup);
     if (agOrder !== 0) return agOrder;
     return EVENT_TYPES.indexOf(a.eventType) - EVENT_TYPES.indexOf(b.eventType);
   });
 
-  const ageGroupSet = [...new Set(player.entries.map((e) => e.ageGroup))].sort(
+  const ageGroupSet = [...new Set(entries.map((e) => e.ageGroup))].sort(
     (a, b) => AGE_GROUPS.indexOf(a) - AGE_GROUPS.indexOf(b),
   );
 
@@ -629,21 +655,25 @@ export default function PlayerProfile() {
       {/* Hero card */}
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 md:p-6 text-white">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
-          <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center text-xl md:text-2xl font-black text-white shrink-0">
+          <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br flex items-center justify-center text-xl md:text-2xl font-black text-white shrink-0 ${isRanked ? 'from-violet-500 to-blue-600' : 'from-slate-400 to-slate-500'}`}>
             {displayName.split(' ').map((w) => w[0]).slice(0, 2).join('')}
           </div>
 
           <div className="flex-1 min-w-0">
             <h1 className="text-xl md:text-2xl font-bold mb-1.5 md:mb-2">{displayName}</h1>
             <div className="flex flex-wrap gap-1.5 md:gap-2 mb-1.5 md:mb-2">
-              {ageGroupSet.map((ag) => (
+              {isRanked ? ageGroupSet.map((ag) => (
                 <span
                   key={ag}
                   className={`px-2.5 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-gradient-to-r ${AGE_GRADIENT[ag]} text-white`}
                 >
                   {ag}
                 </span>
-              ))}
+              )) : (
+                <span className="px-2.5 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-slate-600 text-slate-300">
+                  Currently Unranked
+                </span>
+              )}
             </div>
             <div className="flex flex-wrap gap-2 md:gap-3 text-white/60 text-xs md:text-sm">
               <span>USAB: <span className="font-mono text-white font-semibold">{usabId}</span></span>
@@ -653,34 +683,42 @@ export default function PlayerProfile() {
                   <span>{gender === 'M' ? 'Boy' : gender === 'F' ? 'Girl' : gender}</span>
                 </>
               )}
-              <span className="hidden sm:inline">·</span>
-              <span>{player.entries.length} ranked {player.entries.length === 1 ? 'event' : 'events'}</span>
+              {isRanked && (
+                <>
+                  <span className="hidden sm:inline">·</span>
+                  <span>{entries.length} ranked {entries.length === 1 ? 'event' : 'events'}</span>
+                </>
+              )}
             </div>
           </div>
 
-          <div className="flex gap-5 md:gap-6 text-center shrink-0">
-            <div>
-              <p className="text-2xl md:text-3xl font-black text-violet-400">#{bestEntry.rank}</p>
-              <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Best Rank</p>
+          {bestEntry && (
+            <div className="flex gap-5 md:gap-6 text-center shrink-0">
+              <div>
+                <p className="text-2xl md:text-3xl font-black text-violet-400">#{bestEntry.rank}</p>
+                <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Best Rank</p>
+              </div>
+              <div>
+                <p className="text-2xl md:text-3xl font-black">{bestEntry.rankingPoints.toLocaleString()}</p>
+                <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Top Points</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl md:text-3xl font-black">{bestEntry.rankingPoints.toLocaleString()}</p>
-              <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Top Points</p>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-4 md:mt-5 flex flex-wrap gap-2 md:gap-3">
-          <a
-            href={usabPlayerUrl(usabId, bestEntry.ageGroup, bestEntry.eventType)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
-          >
-            <Trophy className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            USAB Profile
-            <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
-          </a>
+          {bestEntry && (
+            <a
+              href={usabPlayerUrl(usabId, bestEntry.ageGroup, bestEntry.eventType)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
+            >
+              <Trophy className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              USAB Profile
+              <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
+            </a>
+          )}
           <a
             href={tswStats?.tswProfileUrl ?? tswSearchUrl(displayName)}
             target="_blank"
@@ -694,30 +732,34 @@ export default function PlayerProfile() {
         </div>
       </div>
 
-      {/* Rankings overview */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
-        <div className="flex items-center gap-2 mb-3 md:mb-4">
-          <Award className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
-          <h2 className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-100">Rankings Overview</h2>
+      {/* Rankings overview — only shown for currently ranked players */}
+      {isRanked && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+          <div className="flex items-center gap-2 mb-3 md:mb-4">
+            <Award className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+            <h2 className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-100">Rankings Overview</h2>
+          </div>
+          <p className="text-xs md:text-sm text-slate-400 dark:text-slate-500 mb-3 md:mb-4">
+            Current rankings across all age groups and events
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
+            {sortedEntries.map((entry) => (
+              <RankingCard
+                key={`${entry.ageGroup}-${entry.eventType}`}
+                entry={entry}
+              />
+            ))}
+          </div>
         </div>
-        <p className="text-xs md:text-sm text-slate-400 dark:text-slate-500 mb-3 md:mb-4">
-          Current rankings across all age groups and events
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
-          {sortedEntries.map((entry) => (
-            <RankingCard
-              key={`${entry.ageGroup}-${entry.eventType}`}
-              entry={entry}
-            />
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Ranking Trend */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
         <div className="flex items-center gap-2 mb-3 md:mb-4">
           <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-violet-500" />
-          <h2 className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-100">Ranking Trend</h2>
+          <h2 className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-100">
+            {isRanked ? 'Ranking Trend' : 'Historical Ranking Trend'}
+          </h2>
         </div>
         {loadingTrend ? (
           <div className="py-8 text-center">
@@ -725,7 +767,7 @@ export default function PlayerProfile() {
             <p className="text-slate-400 dark:text-slate-500 text-sm">Loading ranking history…</p>
           </div>
         ) : trendData && trendData.trend.length >= 2 ? (
-          <RankingTrendChart trend={trendData} entries={player.entries} asOfDate={rankingsDate} />
+          <RankingTrendChart trend={trendData} entries={entries} asOfDate={rankingsDate} />
         ) : (
           <div className="py-6 text-center">
             <TrendingUp className="w-8 h-8 text-slate-200 dark:text-slate-600 mx-auto mb-2" />

@@ -5,6 +5,7 @@ import type {
   EventType,
   H2HResult,
   UniquePlayer,
+  DirectoryPlayer,
   TswPlayerStats,
   PlayerRankingTrend,
 } from '../types/junior';
@@ -55,6 +56,27 @@ export function invalidateRankingsCache() {
   cachedDatesCache = null;
   tswStatsCache.clear();
   trendCache.clear();
+}
+
+// ── Player directory (cumulative across all dates, NOT invalidated on date change)
+
+let directoryCache: DirectoryPlayer[] | null = null;
+
+export async function fetchPlayerDirectory(): Promise<DirectoryPlayer[]> {
+  if (directoryCache) return directoryCache;
+
+  try {
+    const res = await fetchWithRetry('/api/player-directory', 30_000);
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data: DirectoryPlayer[] = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      directoryCache = data;
+      return data;
+    }
+  } catch {
+    // fall through
+  }
+  return [];
 }
 
 // ── Cached dates (only dates with files on disk) ────────────────────────────

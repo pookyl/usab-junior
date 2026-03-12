@@ -1,9 +1,15 @@
 import { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Users, RefreshCw, ChevronRight } from 'lucide-react';
-import type { AgeGroup, EventType, UniquePlayer } from '../types/junior';
+import type { AgeGroup, EventType, PlayerEntry } from '../types/junior';
 import { AGE_GROUPS } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
+
+interface DirectoryViewPlayer {
+  usabId: string;
+  name: string;
+  entries: PlayerEntry[];
+}
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -31,7 +37,7 @@ const EVENT_BADGE_COLORS: Record<EventType, string> = {
   XD: 'bg-teal-50 text-teal-600',
 };
 
-function bestRankingForGroup(player: UniquePlayer, ageGroup: AgeGroup | null) {
+function bestRankingForGroup(player: DirectoryViewPlayer, ageGroup: AgeGroup | null) {
   const entries = ageGroup
     ? player.entries.filter((e) => e.ageGroup === ageGroup)
     : player.entries;
@@ -39,8 +45,9 @@ function bestRankingForGroup(player: UniquePlayer, ageGroup: AgeGroup | null) {
   return entries.reduce((best, e) => (e.rank < best.rank ? e : best));
 }
 
-function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroupFilter: AgeGroup | null }) {
+function PlayerCard({ player, ageGroupFilter }: { player: DirectoryViewPlayer; ageGroupFilter: AgeGroup | null }) {
   const best = bestRankingForGroup(player, ageGroupFilter);
+  const isRanked = player.entries.length > 0;
   const ageGroups = [...new Set(player.entries.map((e) => e.ageGroup))].sort(
     (a, b) => AGE_GROUPS.indexOf(a) - AGE_GROUPS.indexOf(b),
   );
@@ -53,7 +60,9 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
     >
       <div className="flex items-start justify-between gap-2 md:gap-3">
         <div className="flex items-center gap-2.5 md:gap-3 min-w-0">
-          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white font-bold text-xs md:text-sm shrink-0">
+          <div className={`w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-white font-bold text-xs md:text-sm shrink-0 ${
+            isRanked ? 'from-violet-500 to-blue-500' : 'from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-700'
+          }`}>
             {player.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
           </div>
           <div className="min-w-0">
@@ -65,34 +74,40 @@ function PlayerCard({ player, ageGroupFilter }: { player: UniquePlayer; ageGroup
         </div>
 
         <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
-          {best && (
+          {best ? (
             <div className="text-right">
               <p className="text-sm font-bold text-emerald-600">#{best.rank}</p>
               <p className="text-[10px] text-slate-400 dark:text-slate-500">{best.ageGroup} {best.eventType}</p>
             </div>
+          ) : (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
+              Unranked
+            </span>
           )}
           <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-violet-400 transition-colors" />
         </div>
       </div>
 
-      <div className="mt-2.5 md:mt-3 flex flex-wrap gap-1 md:gap-1.5">
-        {ageGroups.map((ag) => (
-          <span key={ag} className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${AGE_BADGE_COLORS[ag]}`}>
-            {ag}
-          </span>
-        ))}
-        {events.map((et) => (
-          <span key={et} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${EVENT_BADGE_COLORS[et]}`}>
-            {et}
-          </span>
-        ))}
-      </div>
+      {isRanked && (
+        <div className="mt-2.5 md:mt-3 flex flex-wrap gap-1 md:gap-1.5">
+          {ageGroups.map((ag) => (
+            <span key={ag} className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${AGE_BADGE_COLORS[ag]}`}>
+              {ag}
+            </span>
+          ))}
+          {events.map((et) => (
+            <span key={et} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${EVENT_BADGE_COLORS[et]}`}>
+              {et}
+            </span>
+          ))}
+        </div>
+      )}
     </Link>
   );
 }
 
 export default function AllPlayers() {
-  const { players, loading, error } = usePlayers();
+  const { players, directoryPlayers, directoryLoading, loading, error } = usePlayers();
   const [searchParams] = useSearchParams();
   const paramAge = searchParams.get('age_group') as AgeGroup | null;
   const [search, setSearch] = useState('');
@@ -101,8 +116,25 @@ export default function AllPlayers() {
     paramAge && AGE_GROUPS.includes(paramAge) ? paramAge : null,
   );
 
+  const rankedMap = useMemo(() => {
+    const map = new Map<string, PlayerEntry[]>();
+    for (const p of players) map.set(p.usabId, p.entries);
+    return map;
+  }, [players]);
+
+  const allDirectoryViewPlayers: DirectoryViewPlayer[] = useMemo(() => {
+    if (directoryPlayers.length > 0) {
+      return directoryPlayers.map((dp) => ({
+        usabId: dp.usabId,
+        name: dp.name,
+        entries: rankedMap.get(dp.usabId) ?? [],
+      }));
+    }
+    return players.map((p) => ({ usabId: p.usabId, name: p.name, entries: p.entries }));
+  }, [directoryPlayers, players, rankedMap]);
+
   const filtered = useMemo(() => {
-    let result = players;
+    let result = allDirectoryViewPlayers;
 
     if (ageGroupFilter) {
       result = result.filter((p) =>
@@ -124,22 +156,22 @@ export default function AllPlayers() {
     }
 
     return result;
-  }, [players, search, activeLetter, ageGroupFilter]);
+  }, [allDirectoryViewPlayers, search, activeLetter, ageGroupFilter]);
 
   const letterCounts = useMemo(() => {
     const base = ageGroupFilter
-      ? players.filter((p) => p.entries.some((e) => e.ageGroup === ageGroupFilter))
-      : players;
+      ? allDirectoryViewPlayers.filter((p) => p.entries.some((e) => e.ageGroup === ageGroupFilter))
+      : allDirectoryViewPlayers;
     const counts: Record<string, number> = {};
     for (const p of base) {
       const first = p.name[0]?.toUpperCase();
       if (first) counts[first] = (counts[first] ?? 0) + 1;
     }
     return counts;
-  }, [players, ageGroupFilter]);
+  }, [allDirectoryViewPlayers, ageGroupFilter]);
 
   const grouped = useMemo(() => {
-    const groups: Record<string, UniquePlayer[]> = {};
+    const groups: Record<string, DirectoryViewPlayer[]> = {};
     for (const p of filtered) {
       const letter = p.name[0]?.toUpperCase() ?? '#';
       if (!groups[letter]) groups[letter] = [];
@@ -147,6 +179,8 @@ export default function AllPlayers() {
     }
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [filtered]);
+
+  const isLoading = directoryLoading && loading;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
@@ -159,7 +193,7 @@ export default function AllPlayers() {
           </div>
           <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
             Complete directory ·{' '}
-            <span className="font-medium text-slate-700 dark:text-slate-200">{players.length.toLocaleString()}</span> players
+            <span className="font-medium text-slate-700 dark:text-slate-200">{allDirectoryViewPlayers.length.toLocaleString()}</span> players
           </p>
         </div>
       </div>
@@ -236,18 +270,15 @@ export default function AllPlayers() {
       </div>
 
       {/* Loading state */}
-      {loading && players.length === 0 && (
+      {isLoading && allDirectoryViewPlayers.length === 0 && (
         <div className="py-16 text-center">
           <RefreshCw className="w-8 h-8 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
-<p className="text-slate-400 dark:text-slate-500 text-sm">
-          Loading players across all age groups (U11–U19)…
-        </p>
-        <p className="text-slate-300 dark:text-slate-600 text-xs mt-1">Fetching 25 ranking categories</p>
+          <p className="text-slate-400 dark:text-slate-500 text-sm">Loading player directory…</p>
         </div>
       )}
 
       {/* Error */}
-      {error && players.length === 0 && (
+      {error && allDirectoryViewPlayers.length === 0 && (
         <div className="py-16 text-center">
           <p className="text-slate-400 dark:text-slate-500 text-sm">{error}</p>
         </div>
@@ -265,7 +296,7 @@ export default function AllPlayers() {
       )}
 
       {/* No results */}
-      {!loading && filtered.length === 0 && players.length > 0 && (
+      {!isLoading && filtered.length === 0 && allDirectoryViewPlayers.length > 0 && (
         <div className="py-10 text-center text-slate-400 dark:text-slate-500 text-sm">
           No players match your filters.
         </div>
@@ -292,10 +323,10 @@ export default function AllPlayers() {
       </div>
 
       {/* Loading overlay for refresh */}
-      {loading && players.length > 0 && (
+      {loading && allDirectoryViewPlayers.length > 0 && (
         <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 bg-slate-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 z-40">
           <RefreshCw className="w-4 h-4 animate-spin" />
-          Loading all age groups…
+          Updating rankings…
         </div>
       )}
     </div>

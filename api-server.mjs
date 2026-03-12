@@ -960,6 +960,60 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // GET /api/player-directory — cumulative directory of all players across all dates
+  if (reqUrl.pathname === '/api/player-directory') {
+    const cacheKey = 'player-directory';
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    try {
+      const dates = listCachedDates().sort();
+      const playerMap = new Map();
+
+      for (const date of dates) {
+        const disk = loadDiskCacheForDate(date);
+        if (!disk || !disk.allPlayers) continue;
+
+        for (const p of disk.allPlayers) {
+          const existing = playerMap.get(p.usabId);
+          if (existing) {
+            existing.latestName = p.name;
+            if (!existing.nameSet.has(p.name)) {
+              existing.nameSet.add(p.name);
+            }
+          } else {
+            playerMap.set(p.usabId, {
+              usabId: p.usabId,
+              latestName: p.name,
+              nameSet: new Set([p.name]),
+            });
+          }
+        }
+      }
+
+      const directory = [...playerMap.values()]
+        .map((entry) => {
+          const names = [entry.latestName, ...[...entry.nameSet].filter((n) => n !== entry.latestName)];
+          return { usabId: entry.usabId, name: entry.latestName, names };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      console.log(`[player-directory] ${directory.length} unique players across ${dates.length} dates`);
+      setCache(cacheKey, directory);
+      res.writeHead(200, { 'X-Cache': 'MISS' });
+      res.end(JSON.stringify(directory));
+    } catch (err) {
+      console.error('[player-directory] error:', err.message);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
   // GET /api/all-players?date=2026-03-01
   if (reqUrl.pathname === '/api/all-players') {
     const date = reqUrl.searchParams.get('date') ?? '2026-03-01';
