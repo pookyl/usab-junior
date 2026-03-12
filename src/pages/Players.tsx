@@ -929,7 +929,7 @@ export default function Rankings() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Trophy className="w-5 h-5 md:w-6 md:h-6 text-amber-500" />
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">USAB Junior Hub</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">Rankings & Insights</h1>
           </div>
           <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
             Data from{' '}
