@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Trophy, Home, Swords, Users, Moon, Sun, Monitor, Calendar, RefreshCw } from 'lucide-react';
+import { Trophy, Home, Swords, Users, Moon, Sun, Monitor, Calendar, RefreshCw, CalendarDays } from 'lucide-react';
 import { useTheme, type ThemeMode } from '../contexts/ThemeContext';
 import { usePlayers } from '../contexts/PlayersContext';
 
@@ -8,6 +8,7 @@ const navItems = [
   { path: '/', label: 'Home', shortLabel: 'Home', icon: Home },
   { path: '/players', label: 'Rankings', shortLabel: 'Rankings', icon: Trophy },
   { path: '/directory', label: 'Players', shortLabel: 'Players', icon: Users },
+  { path: '/tournaments', label: 'Tournaments', shortLabel: 'Events', icon: CalendarDays },
   { path: '/head-to-head', label: 'Head to Head', shortLabel: 'H2H', icon: Swords },
 ];
 

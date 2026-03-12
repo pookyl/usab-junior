@@ -14,7 +14,7 @@ dist-ssr
 *.local
 
 # Runtime disk cache (tracked for Vercel deployment as bundled fallback)
-# data/rankings-cache.json
+# data/rankings-*.json, data/tournaments-*.json
 
 # Editor directories and files
 .vscode/*

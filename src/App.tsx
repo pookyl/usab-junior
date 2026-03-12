@@ -8,6 +8,8 @@ import Rankings from './pages/Players';
 import AllPlayers from './pages/AllPlayers';
 import PlayerProfile from './pages/PlayerProfile';
 import HeadToHead from './pages/HeadToHead';
+import Tournaments from './pages/Tournaments';
+import TournamentDetail from './pages/TournamentDetail';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -37,6 +39,8 @@ export default function App() {
                 <Route path="/directory/:id" element={<PlayerProfile />} />
                 <Route path="/analytics" element={<Navigate to="/players" replace />} />
                 <Route path="/head-to-head" element={<HeadToHead />} />
+                <Route path="/tournaments" element={<Tournaments />} />
+                <Route path="/tournaments/:tswId" element={<TournamentDetail />} />
               </Routes>
             </main>
           </div>

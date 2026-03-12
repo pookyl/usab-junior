@@ -494,6 +494,36 @@ function deriveCategoryFromEvent(eventName) {
   return 'singles';
 }
 
+function parseTswDrawsList(html) {
+  const draws = [];
+  const re = /draw=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const name = m[2].replace(/<[^>]*>/g, '').trim();
+    if (name) draws.push({ drawId: parseInt(m[1], 10), name });
+  }
+  const mainDraws = draws.filter(d => !/ - Group [A-Z]$/i.test(d.name));
+  return mainDraws.length > 0 ? mainDraws : draws;
+}
+
+function parseTswTournamentInfo(html) {
+  const nameMatch = html.match(/<h3[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h3>/i)
+    || html.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
+  const name = nameMatch ? nameMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+
+  const dateMatch = html.match(/<time[^>]*>([^<]+)<\/time>\s*(?:to|-)\s*<time[^>]*>([^<]+)<\/time>/i)
+    || html.match(/<time[^>]*>([^<]+)<\/time>/i);
+  const dates = dateMatch
+    ? (dateMatch[2] ? `${dateMatch[1].trim()} - ${dateMatch[2].trim()}` : dateMatch[1].trim())
+    : '';
+
+  const locMatch = html.match(/icon-marker[\s\S]*?<span[^>]*>([^<]+)<\/span>/i)
+    || html.match(/icon-lang[\s\S]*?([^<]+)/);
+  const location = locMatch ? locMatch[1].trim().replace(/^\|\s*/, '') : '';
+
+  return { name, dates, location };
+}
+
 function parseTswTournaments(html, playerName) {
   const tournaments = [];
   const recentResults = [];
@@ -898,6 +928,126 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(data));
     } catch (err) {
       console.error('[h2h] error:', err.message);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // GET /api/tournaments?season=2025-2026
+  if (reqUrl.pathname === '/api/tournaments') {
+    const season = reqUrl.searchParams.get('season');
+    const cacheKey = `tournaments:${season || 'all'}`;
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    try {
+      // Discover available seasons from per-season files
+      const tournamentDir = join(__dirname, 'data');
+      const availableSeasons = [];
+      if (existsSync(tournamentDir)) {
+        for (const f of readdirSync(tournamentDir)) {
+          const m = f.match(/^tournaments-(\d{4}-\d{4})\.json$/);
+          if (m) availableSeasons.push(m[1]);
+        }
+      }
+      availableSeasons.sort().reverse();
+
+      if (availableSeasons.length === 0) {
+        res.writeHead(200);
+        res.end(JSON.stringify({ seasons: {}, availableSeasons: [] }));
+        return;
+      }
+
+      const today = new Date().toISOString().slice(0, 10);
+      function recomputeStatuses(tournaments) {
+        return tournaments.map(t => {
+          if (!t.startDate) return { ...t, status: 'upcoming' };
+          let status;
+          if (today > t.endDate) status = 'completed';
+          else if (today >= t.startDate) status = 'in-progress';
+          else status = 'upcoming';
+          return { ...t, status };
+        });
+      }
+
+      function loadSeason(s) {
+        try {
+          const raw = readFileSync(join(tournamentDir, `tournaments-${s}.json`), 'utf-8');
+          return JSON.parse(raw);
+        } catch { return null; }
+      }
+
+      let result;
+      if (season) {
+        const data = loadSeason(season);
+        result = {
+          season,
+          tournaments: data ? recomputeStatuses(data.tournaments) : [],
+          availableSeasons,
+        };
+      } else {
+        const allSeasons = {};
+        for (const s of availableSeasons) {
+          const data = loadSeason(s);
+          if (data) allSeasons[s] = { tournaments: recomputeStatuses(data.tournaments) };
+        }
+        result = { seasons: allSeasons, availableSeasons };
+      }
+
+      setCache(cacheKey, result);
+      console.log(`[tournaments] serving ${season || 'all'} (${availableSeasons.length} seasons available)`);
+      res.writeHead(200, { 'X-Cache': 'MISS' });
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      console.error('[tournaments] error:', err.message);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // GET /api/tournaments/:tswId — on-demand tournament detail from TSW
+  const tournamentDetailMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)$/);
+  if (tournamentDetailMatch) {
+    const tswId = tournamentDetailMatch[1];
+    const cacheKey = `tournament-detail:${tswId}`;
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    try {
+      const drawsPath = `/sport/draws.aspx?id=${tswId}`;
+      console.log(`[tournament-detail] fetching ${TSW_BASE}${drawsPath}`);
+      const resp = await tswFetch(drawsPath);
+      if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
+      const html = await resp.text();
+
+      const info = parseTswTournamentInfo(html);
+      const draws = parseTswDrawsList(html);
+
+      const result = {
+        tswId,
+        name: info.name,
+        dates: info.dates,
+        location: info.location,
+        draws,
+        tswUrl: `https://www.tournamentsoftware.com/tournament/${tswId}`,
+      };
+
+      console.log(`[tournament-detail] ${tswId}: "${info.name}", ${draws.length} draws`);
+      setCache(cacheKey, result);
+      res.writeHead(200, { 'X-Cache': 'MISS' });
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      console.error('[tournament-detail] error:', err.message);
       res.writeHead(500);
       res.end(JSON.stringify({ error: err.message }));
     }

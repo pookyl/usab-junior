@@ -39,12 +39,11 @@ const features: Feature[] = [
   },
   {
     title: 'Tournaments',
-    description: 'Tournament schedules, draws, and results',
+    description: 'Browse the junior tournament schedule with results and links',
     icon: Calendar,
-    to: '#',
-    iconBg: 'bg-slate-100 dark:bg-slate-800',
-    iconColor: 'text-slate-400 dark:text-slate-500',
-    comingSoon: true,
+    to: '/tournaments',
+    iconBg: 'bg-sky-100 dark:bg-sky-900/30',
+    iconColor: 'text-sky-600 dark:text-sky-400',
   },
 ];
 

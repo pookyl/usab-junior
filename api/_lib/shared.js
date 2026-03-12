@@ -400,6 +400,39 @@ export function parseTswOverviewStats(html) {
   return stats;
 }
 
+// ── TSW tournament draws list parser ─────────────────────────────────────────
+
+export function parseTswDrawsList(html) {
+  const draws = [];
+  const re = /draw=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const name = m[2].replace(/<[^>]*>/g, '').trim();
+    if (name) draws.push({ drawId: parseInt(m[1], 10), name });
+  }
+  // Deduplicate: keep only main draws (no "Group A/B" variants unless that's all there is)
+  const mainDraws = draws.filter(d => !/ - Group [A-Z]$/i.test(d.name));
+  return mainDraws.length > 0 ? mainDraws : draws;
+}
+
+export function parseTswTournamentInfo(html) {
+  const nameMatch = html.match(/<h3[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h3>/i)
+    || html.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
+  const name = nameMatch ? nameMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+
+  const dateMatch = html.match(/<time[^>]*>([^<]+)<\/time>\s*(?:to|-)\s*<time[^>]*>([^<]+)<\/time>/i)
+    || html.match(/<time[^>]*>([^<]+)<\/time>/i);
+  const dates = dateMatch
+    ? (dateMatch[2] ? `${dateMatch[1].trim()} - ${dateMatch[2].trim()}` : dateMatch[1].trim())
+    : '';
+
+  const locMatch = html.match(/icon-marker[\s\S]*?<span[^>]*>([^<]+)<\/span>/i)
+    || html.match(/icon-lang[\s\S]*?([^<]+)/);
+  const location = locMatch ? locMatch[1].trim().replace(/^\|\s*/, '') : '';
+
+  return { name, dates, location };
+}
+
 // ── TSW tournament history parser ────────────────────────────────────────────
 export function deriveCategoryFromEvent(eventName) {
   const ev = eventName.toLowerCase();

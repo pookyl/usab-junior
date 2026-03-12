@@ -8,6 +8,8 @@ import type {
   DirectoryPlayer,
   TswPlayerStats,
   PlayerRankingTrend,
+  TournamentsResponse,
+  TournamentDetail,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -209,5 +211,42 @@ export async function fetchPlayerRankingTrend(
 
   const data: PlayerRankingTrend = await res.json();
   cappedSet(trendCache, usabId, data);
+  return data;
+}
+
+// ── Tournaments ──────────────────────────────────────────────────────────────
+
+let tournamentsCache: TournamentsResponse | null = null;
+let tournamentsCacheSeason = '';
+
+export async function fetchTournaments(
+  season?: string,
+): Promise<TournamentsResponse> {
+  const cacheKey = season || '__all__';
+  if (tournamentsCache && tournamentsCacheSeason === cacheKey) return tournamentsCache;
+
+  const url = season ? `/api/tournaments?season=${encodeURIComponent(season)}` : '/api/tournaments';
+  const res = await fetchWithRetry(url, 15_000);
+  if (!res.ok) throw new Error(`Tournaments API ${res.status}`);
+
+  const data: TournamentsResponse = await res.json();
+  tournamentsCache = data;
+  tournamentsCacheSeason = cacheKey;
+  return data;
+}
+
+const tournamentDetailCache = new Map<string, TournamentDetail>();
+
+export async function fetchTournamentDetail(
+  tswId: string,
+): Promise<TournamentDetail> {
+  if (tournamentDetailCache.has(tswId)) return tournamentDetailCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament detail API ${res.status}`);
+
+  const data: TournamentDetail = await res.json();
+  cappedSet(tournamentDetailCache, tswId, data);
   return data;
 }

@@ -150,3 +150,51 @@ export interface H2HResult {
   yearWL: { team1: string; team2: string };
   matches: H2HMatch[];
 }
+
+// ── Tournament Schedule types ─────────────────────────────────────────────────
+
+export type TournamentType = 'ORC' | 'OLC' | 'CRC' | 'National' | 'Selection' | 'JDT';
+export type TournamentStatus = 'upcoming' | 'in-progress' | 'completed';
+export type TournamentRegion = 'NW' | 'NE' | 'NorCal' | 'SoCal' | 'MW' | 'South' | 'National';
+
+export const TOURNAMENT_REGIONS: TournamentRegion[] = ['NW', 'NE', 'NorCal', 'SoCal', 'MW', 'South', 'National'];
+export const TOURNAMENT_TYPES: TournamentType[] = ['ORC', 'OLC', 'CRC', 'National', 'Selection'];
+
+export interface ScheduledTournament {
+  name: string;
+  startDate: string | null;
+  endDate: string | null;
+  region: string;
+  hostClub: string;
+  type: string;
+  tswId: string | null;
+  tswUrl: string | null;
+  usabUrl: string | null;
+  prospectusUrl: string | null;
+  status: TournamentStatus;
+}
+
+export interface TournamentSeasonData {
+  tournaments: ScheduledTournament[];
+}
+
+export interface TournamentsResponse {
+  season?: string;
+  tournaments?: ScheduledTournament[];
+  seasons?: Record<string, TournamentSeasonData>;
+  availableSeasons: string[];
+}
+
+export interface TournamentDraw {
+  drawId: number;
+  name: string;
+}
+
+export interface TournamentDetail {
+  tswId: string;
+  name: string;
+  dates: string;
+  location: string;
+  draws: TournamentDraw[];
+  tswUrl: string;
+}

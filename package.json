@@ -10,6 +10,8 @@
     "build": "tsc -b && vite build",
     "start": "node api-server.mjs",
     "refresh-rankings-cache": "node scripts/refresh-rankings-cache.mjs",
+    "refresh-tournaments-cache": "node scripts/refresh-tournaments-cache.mjs",
+    "patch-tournaments-tsw": "node scripts/patch-tournaments-tsw.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
