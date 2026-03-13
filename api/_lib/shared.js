@@ -310,11 +310,13 @@ export async function ensureTswCookies() {
   }
 }
 
-export async function tswFetch(path) {
+export async function tswFetch(path, opts = {}) {
   await ensureTswCookies();
   const url = `${TSW_BASE}${path}`;
   return fetch(url, {
-    headers: { ...BROWSER_HEADERS, Cookie: tswCookies, 'X-Requested-With': 'XMLHttpRequest' },
+    method: opts.method || 'GET',
+    headers: { ...BROWSER_HEADERS, Cookie: tswCookies, 'X-Requested-With': 'XMLHttpRequest', ...opts.extraHeaders },
+    body: opts.body !== undefined ? opts.body : undefined,
   });
 }
 
@@ -565,4 +567,77 @@ export function parseTswTournaments(html, playerName) {
   }
 
   return { tournaments, recentResults };
+}
+
+// ── TSW Winners page parser ─────────────────────────────────────────────────
+// Parses /sport/winners.aspx?id=<tswId>
+// Returns array of { eventName, results: [{ place, players: [{ name, playerId }] }] }
+
+export function parseTswWinners(html) {
+  const events = [];
+  const tableRegex = /<table[^>]*class="ruler seeding"[^>]*>([\s\S]*?)<\/table>/gi;
+  let tableMatch;
+
+  while ((tableMatch = tableRegex.exec(html)) !== null) {
+    const tableHtml = tableMatch[1];
+    let currentEvent = null;
+
+    const rowRegex = /<tr>([\s\S]*?)<\/tr>/gi;
+    let rowMatch;
+    while ((rowMatch = rowRegex.exec(tableHtml)) !== null) {
+      const rowHtml = rowMatch[1];
+
+      const headerMatch = rowHtml.match(/<th[^>]*colspan="2"[^>]*>[\s\S]*?<a[^>]*>([^<]+)<\/a>/i);
+      if (headerMatch) {
+        currentEvent = { eventName: headerMatch[1].trim(), results: [] };
+        events.push(currentEvent);
+        continue;
+      }
+
+      if (!currentEvent) continue;
+
+      const placeMatch = rowHtml.match(/<td>([^<]+)<\/td>/);
+      if (!placeMatch) continue;
+      const placeStr = placeMatch[1].trim();
+      if (!placeStr || !/\d/.test(placeStr)) continue;
+
+      const players = [];
+      const playerRegex = /<a\s+href="[^"]*player=(\d+)[^"]*">([^<]+)<\/a>/gi;
+      let pm;
+      while ((pm = playerRegex.exec(rowHtml)) !== null) {
+        const name = pm[2].replace(/\s*\[[\d/]+\]\s*$/, '').trim();
+        players.push({ name, playerId: parseInt(pm[1], 10) });
+      }
+
+      if (players.length > 0) {
+        currentEvent.results.push({ place: placeStr, players });
+      }
+    }
+  }
+
+  return events;
+}
+
+// ── TSW Tournament Players page parser ───────────────────────────────────────
+// Parses the AJAX content from POST /tournament/<tswId>/Players/GetPlayersContent
+// Each player block: <a href="...player=ID">Last, First</a> then <small> with club
+// Returns Map<playerId, { name, club }>
+
+export function parseTswTournamentPlayers(html) {
+  const players = new Map();
+  const blockRegex = /player=(\d+)[^"]*"[^>]*class="nav-link media__link"[^>]*><span[^>]*>([^<]+)<\/span><\/a>[\s\S]*?<small class="media__subheading">\s*\n?\s*<span[^>]*><span[^>]*>([^<]*)<\/span>/gi;
+  let m;
+  while ((m = blockRegex.exec(html)) !== null) {
+    const playerId = parseInt(m[1], 10);
+    const rawName = m[2].trim();
+    const club = m[3].trim();
+    const commaIdx = rawName.indexOf(',');
+    const name = commaIdx > -1
+      ? `${rawName.slice(commaIdx + 1).trim()} ${rawName.slice(0, commaIdx).trim()}`
+      : rawName;
+    if (!players.has(playerId)) {
+      players.set(playerId, { name, club });
+    }
+  }
+  return players;
 }

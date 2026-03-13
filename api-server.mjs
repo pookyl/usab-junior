@@ -1011,6 +1011,15 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // GET /api/tournaments/:tswId/medals — tournament medal results
+  const tournamentMedalsMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/medals$/);
+  if (tournamentMedalsMatch) {
+    const { default: medalsHandler } = await import('./api/tournaments/[tswId]/medals.js');
+    req.query = { tswId: tournamentMedalsMatch[1] };
+    await medalsHandler(req, res);
+    return;
+  }
+
   // GET /api/tournaments/:tswId — on-demand tournament detail from TSW
   const tournamentDetailMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)$/);
   if (tournamentDetailMatch) {

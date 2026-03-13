@@ -198,3 +198,38 @@ export interface TournamentDetail {
   draws: TournamentDraw[];
   tswUrl: string;
 }
+
+// ── Tournament Medals types ───────────────────────────────────────────────────
+
+export interface MedalPlayer {
+  name: string;
+  club: string;
+  playerId: number;
+  usabId?: string;
+}
+
+export interface DrawMedals {
+  drawName: string;
+  ageGroup: string;
+  eventType: string;
+  gold: MedalPlayer[];
+  silver: MedalPlayer[];
+  bronze: MedalPlayer[][];
+}
+
+export interface ClubMedalSummary {
+  club: string;
+  gold: number;
+  silver: number;
+  bronze: number;
+  total: number;
+  playerCount: number;
+  players: string[];
+}
+
+export interface TournamentMedals {
+  tswId: string;
+  tournamentName: string;
+  clubs: ClubMedalSummary[];
+  medals: DrawMedals[];
+}

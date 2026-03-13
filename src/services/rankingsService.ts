@@ -10,6 +10,7 @@ import type {
   PlayerRankingTrend,
   TournamentsResponse,
   TournamentDetail,
+  TournamentMedals,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -248,5 +249,23 @@ export async function fetchTournamentDetail(
 
   const data: TournamentDetail = await res.json();
   cappedSet(tournamentDetailCache, tswId, data);
+  return data;
+}
+
+// ── Tournament Medals ─────────────────────────────────────────────────────────
+
+const tournamentMedalsCache = new Map<string, TournamentMedals>();
+
+export async function fetchTournamentMedals(
+  tswId: string,
+): Promise<TournamentMedals> {
+  if (tournamentMedalsCache.has(tswId)) return tournamentMedalsCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/medals`;
+  const res = await fetchWithRetry(url, 120_000);
+  if (!res.ok) throw new Error(`Tournament medals API ${res.status}`);
+
+  const data: TournamentMedals = await res.json();
+  cappedSet(tournamentMedalsCache, tswId, data);
   return data;
 }

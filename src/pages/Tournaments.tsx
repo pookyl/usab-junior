@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar, MapPin, ChevronDown, ExternalLink, FileText,
-  Clock, CheckCircle2, Loader2, Trophy, Filter,
+  Clock, CheckCircle2, Loader2, Trophy, Filter, Medal,
 } from 'lucide-react';
 import { fetchTournaments } from '../services/rankingsService';
 import type { ScheduledTournament, TournamentsResponse } from '../types/junior';
@@ -222,6 +222,15 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
             {tournament.status === 'completed' ? 'Results' : 'Draw'}
           </Link>
         )}
+        {tournament.tswId && tournament.status === 'completed' && (
+          <Link
+            to={`/tournaments/${tournament.tswId}`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
+          >
+            <Medal className="w-3 h-3" />
+            Medals
+          </Link>
+        )}
         {tournament.prospectusUrl && (
           <a
             href={tournament.prospectusUrl}
@@ -363,14 +372,12 @@ export default function Tournaments() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        {regions.length > 1 && (
-          <FilterPills label="Region" options={regions} selected={regionFilter} onChange={setRegionFilter} />
-        )}
-        {types.length > 1 && (
-          <FilterPills label="Type" options={types} selected={typeFilter} onChange={setTypeFilter} />
-        )}
-      </div>
+      {regions.length > 1 && (
+        <FilterPills label="Region" options={regions} selected={regionFilter} onChange={setRegionFilter} />
+      )}
+      {types.length > 1 && (
+        <FilterPills label="Type" options={types} selected={typeFilter} onChange={setTypeFilter} />
+      )}
 
       {/* Tournament list grouped by month */}
       {grouped.length === 0 ? (
