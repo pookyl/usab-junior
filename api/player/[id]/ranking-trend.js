@@ -1,7 +1,7 @@
 import {
   getCached, setCache,
   listCachedDates, loadDiskCacheForDate,
-  setCors,
+  setCors, isValidUsabId,
 } from '../../_lib/shared.js';
 
 export default async function handler(req, res) {
@@ -9,6 +9,8 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   const { id: usabId } = req.query;
+  if (!usabId || !isValidUsabId(usabId)) return res.status(400).json({ error: 'Invalid player ID' });
+
   const cacheKey = `trend:${usabId}`;
 
   const cached = getCached(cacheKey);

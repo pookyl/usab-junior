@@ -73,7 +73,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
       const hadData = lastGoodPlayers.current.length > 0;
       setPlayers(lastGoodPlayers.current);
       setRankingsDate(lastGoodDate.current);
-      setSource(hadData ? 'live' : 'none');
+      setSource(hadData ? 'cached' : 'none');
       setError(err.message);
       setLoading(false);
 
@@ -139,8 +139,16 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     return map;
   }, [directoryPlayers, players]);
 
+  const refresh = useCallback(() => load(), [load]);
+
+  const contextValue = useMemo(() => ({
+    players, directoryPlayers, directoryLoading, loading, error,
+    source, rankingsDate, availableDates, changeDate, refresh, playerNameMap,
+  }), [players, directoryPlayers, directoryLoading, loading, error,
+       source, rankingsDate, availableDates, changeDate, refresh, playerNameMap]);
+
   return (
-    <PlayersContext.Provider value={{ players, directoryPlayers, directoryLoading, loading, error, source, rankingsDate, availableDates, changeDate, refresh: () => load(), playerNameMap }}>
+    <PlayersContext.Provider value={contextValue}>
       {children}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </PlayersContext.Provider>

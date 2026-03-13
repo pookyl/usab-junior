@@ -115,6 +115,10 @@ function RankingTrendChart({
 
   const [selectedCategory, setSelectedCategory] = useState(bestCategory);
 
+  useEffect(() => {
+    if (bestCategory) setSelectedCategory(bestCategory);
+  }, [bestCategory]);
+
   const [ageGroup, eventType] = selectedCategory.split('-') as [AgeGroup, string];
 
   const chartData = useMemo(() => {
@@ -549,24 +553,28 @@ export default function PlayerProfile() {
       return;
     }
 
+    let cancelled = false;
+
     setLoadingTsw(true);
     fetchPlayerTswStats(usabId, playerName)
-      .then(setTswStats)
-      .catch(() => setTswStats(null))
-      .finally(() => setLoadingTsw(false));
+      .then((data) => { if (!cancelled) setTswStats(data); })
+      .catch(() => { if (!cancelled) setTswStats(null); })
+      .finally(() => { if (!cancelled) setLoadingTsw(false); });
 
     setLoadingTrend(true);
     fetchPlayerRankingTrend(usabId)
-      .then(setTrendData)
-      .catch(() => setTrendData(null))
-      .finally(() => setLoadingTrend(false));
+      .then((data) => { if (!cancelled) setTrendData(data); })
+      .catch(() => { if (!cancelled) setTrendData(null); })
+      .finally(() => { if (!cancelled) setLoadingTrend(false); });
 
     if (rankedPlayer && rankedPlayer.entries.length > 0) {
       const best = rankedPlayer.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
       fetchPlayerDetail(usabId, best.ageGroup, best.eventType)
-        .then((d) => setGender(d?.gender ?? null))
+        .then((d) => { if (!cancelled) setGender(d?.gender ?? null); })
         .catch(() => {});
     }
+
+    return () => { cancelled = true; };
   }, [usabId, playerName, rankedPlayer]);
 
   if (!usabId) {

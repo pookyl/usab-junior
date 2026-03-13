@@ -65,8 +65,8 @@ function PlayerRedirect() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <ThemeProvider>
         <BrowserRouter>
           <PlayersProvider>
             <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -83,12 +83,13 @@ export default function App() {
                   <Route path="/head-to-head" element={<HeadToHead />} />
                   <Route path="/tournaments" element={<Tournaments />} />
                   <Route path="/tournaments/:tswId" element={<TournamentDetail />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
             </div>
           </PlayersProvider>
         </BrowserRouter>
-      </ErrorBoundary>
-    </ThemeProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

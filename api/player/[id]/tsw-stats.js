@@ -118,7 +118,7 @@ export default async function handler(req, res) {
     setCache(cacheKey, stats);
     return res.setHeader('X-Cache', 'MISS').status(200).json(stats);
   } catch (err) {
-    setCache(cacheKey, fallback);
+    console.error('[tsw-stats] error:', err.message);
     return res.status(200).json(fallback);
   }
 }

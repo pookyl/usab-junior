@@ -49,7 +49,7 @@ async function ensureTswCookies() {
   );
   const sportCookies = sportResp.headers.getSetCookie?.() ?? [];
   if (sportCookies.length) {
-    const existing = new Map(tswCookies.split('; ').map(c => c.split('=')));
+    const existing = new Map(tswCookies.split('; ').map(c => { const idx = c.indexOf('='); return idx > -1 ? [c.slice(0, idx), c.slice(idx + 1)] : [c, '']; }));
     for (const sc of sportCookies) {
       const [kv] = sc.split(';');
       const [k, ...rest] = kv.split('=');

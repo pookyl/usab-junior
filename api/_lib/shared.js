@@ -16,14 +16,27 @@ export const BROWSER_HEADERS = {
 // ── In-memory cache (persists across warm invocations) ───────────────────────
 const cache = new Map();
 const CACHE_TTL_MS = 10 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 500;
 
 export function getCached(key) {
   const entry = cache.get(key);
-  if (entry && Date.now() - entry.timestamp < CACHE_TTL_MS) return entry.data;
-  return null;
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp >= CACHE_TTL_MS) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.data;
 }
 
 export function setCache(key, data) {
+  if (cache.size >= MAX_CACHE_ENTRIES) {
+    let oldestKey = null;
+    let oldestTs = Infinity;
+    for (const [k, v] of cache) {
+      if (v.timestamp < oldestTs) { oldestTs = v.timestamp; oldestKey = k; }
+    }
+    if (oldestKey) cache.delete(oldestKey);
+  }
   cache.set(key, { data, timestamp: Date.now() });
 }
 
@@ -111,6 +124,21 @@ export function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 }
+
+// ── Input validation helpers ─────────────────────────────────────────────────
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const USAB_ID_RE = /^\d+$/;
+const AGE_GROUP_RE = /^U\d{1,2}$/;
+const EVENT_TYPE_RE = /^[A-Z]{2}$/;
+const TSW_ID_RE = /^[0-9A-Fa-f-]+$/;
+const SEASON_RE = /^\d{4}-\d{4}$/;
+
+export function isValidDate(v) { return typeof v === 'string' && DATE_RE.test(v); }
+export function isValidUsabId(v) { return typeof v === 'string' && USAB_ID_RE.test(v); }
+export function isValidAgeGroup(v) { return typeof v === 'string' && AGE_GROUP_RE.test(v); }
+export function isValidEventType(v) { return typeof v === 'string' && EVENT_TYPE_RE.test(v); }
+export function isValidTswId(v) { return typeof v === 'string' && TSW_ID_RE.test(v); }
+export function isValidSeason(v) { return typeof v === 'string' && SEASON_RE.test(v); }
 
 // ── HTML entity decoder ──────────────────────────────────────────────────────
 const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'" };
@@ -275,9 +303,22 @@ export function parseH2HContent(html, headers) {
 
 // ── TSW cookie manager ───────────────────────────────────────────────────────
 let tswCookies = '';
+let tswCookiesTimestamp = 0;
+const COOKIE_TTL_MS = 30 * 60 * 1000;
+let cookiePromise = null;
 
-export async function ensureTswCookies() {
-  if (tswCookies) return;
+function parseCookieMap(cookieStr) {
+  const map = new Map();
+  if (!cookieStr) return map;
+  for (const c of cookieStr.split('; ')) {
+    const idx = c.indexOf('=');
+    if (idx > -1) map.set(c.slice(0, idx), c.slice(idx + 1));
+    else map.set(c, '');
+  }
+  return map;
+}
+
+async function fetchTswCookies() {
   try {
     const resp = await fetch(`${TSW_BASE}/cookiewall/Save`, {
       method: 'POST',
@@ -297,7 +338,7 @@ export async function ensureTswCookies() {
     );
     const sportCookies = sportResp.headers.getSetCookie?.() ?? [];
     if (sportCookies.length) {
-      const existing = new Map(tswCookies.split('; ').map((c) => c.split('=')));
+      const existing = parseCookieMap(tswCookies);
       for (const sc of sportCookies) {
         const [kv] = sc.split(';');
         const [k, ...rest] = kv.split('=');
@@ -305,9 +346,19 @@ export async function ensureTswCookies() {
       }
       tswCookies = [...existing].map(([k, v]) => `${k}=${v}`).join('; ');
     }
+    tswCookiesTimestamp = Date.now();
   } catch (err) {
     console.error('[tsw] cookie setup failed:', err.message);
+  } finally {
+    cookiePromise = null;
   }
+}
+
+export async function ensureTswCookies() {
+  if (tswCookies && (Date.now() - tswCookiesTimestamp) < COOKIE_TTL_MS) return;
+  tswCookies = '';
+  if (!cookiePromise) cookiePromise = fetchTswCookies();
+  await cookiePromise;
 }
 
 export async function tswFetch(path, opts = {}) {

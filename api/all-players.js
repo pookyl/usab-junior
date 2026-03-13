@@ -1,6 +1,6 @@
 import {
   getCached, setCache, getDiskCachedAllPlayers, getDiskCachedDate,
-  setCors,
+  setCors, isValidDate,
 } from './_lib/shared.js';
 
 export default async function handler(req, res) {
@@ -9,6 +9,9 @@ export default async function handler(req, res) {
 
   const defaultDate = await getDiskCachedDate() || new Date().toISOString().slice(0, 10);
   const { date = defaultDate } = req.query;
+
+  if (!isValidDate(date)) return res.status(400).json({ error: 'Invalid date format' });
+
   const cacheKey = `all-players:${date}`;
 
   const cached = getCached(cacheKey);

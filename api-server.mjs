@@ -6,8 +6,9 @@
  */
 import { createServer } from 'http';
 import { URL } from 'url';
-import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync, readdirSync } from 'fs';
-import { join, extname } from 'path';
+import { readFile, writeFile, stat, mkdir, readdir } from 'fs/promises';
+import { existsSync } from 'fs';
+import { join, extname, resolve, normalize } from 'path';
 import { fileURLToPath } from 'url';
 
 import {
@@ -30,10 +31,10 @@ function diskCachePath(date) {
   return join(DISK_CACHE_DIR, `rankings-${date}.json`);
 }
 
-function listCachedDates() {
+async function listCachedDates() {
   try {
     if (!existsSync(DISK_CACHE_DIR)) return [];
-    const files = readdirSync(DISK_CACHE_DIR);
+    const files = await readdir(DISK_CACHE_DIR);
     const dates = [];
     for (const f of files) {
       const m = f.match(/^rankings-(\d{4}-\d{2}-\d{2})\.json$/);
@@ -67,76 +68,74 @@ function rebuildRankingsFromPlayers(allPlayers) {
   return rankings;
 }
 
-function loadDiskCacheForDate(date) {
+async function loadDiskCacheForDate(date) {
   try {
     const filePath = diskCachePath(date);
-    if (existsSync(filePath)) {
-      const raw = readFileSync(filePath, 'utf-8');
-      const data = JSON.parse(raw);
-      if (!data.rankings && data.allPlayers) {
-        data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
-      }
-      console.log(`[disk-cache] loaded per-date cache for ${date} (saved ${data.savedAt})`);
-      return data;
+    const raw = await readFile(filePath, 'utf-8');
+    const data = JSON.parse(raw);
+    if (!data.rankings && data.allPlayers) {
+      data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
     }
+    console.log(`[disk-cache] loaded per-date cache for ${date} (saved ${data.savedAt})`);
+    return data;
   } catch (err) {
-    console.warn(`[disk-cache] failed to load per-date cache for ${date}:`, err.message);
+    if (err.code !== 'ENOENT') console.warn(`[disk-cache] failed to load per-date cache for ${date}:`, err.message);
   }
   return null;
 }
 
-function loadDiskCache() {
+async function loadDiskCache() {
   try {
-    if (existsSync(DISK_CACHE_FILE)) {
-      const raw = readFileSync(DISK_CACHE_FILE, 'utf-8');
-      const data = JSON.parse(raw);
-      console.log(`[disk-cache] loaded cache for date ${data.date} (saved ${data.savedAt})`);
-      return data;
-    }
+    const raw = await readFile(DISK_CACHE_FILE, 'utf-8');
+    const data = JSON.parse(raw);
+    console.log(`[disk-cache] loaded cache for date ${data.date} (saved ${data.savedAt})`);
+    return data;
   } catch (err) {
-    console.warn('[disk-cache] failed to load:', err.message);
+    if (err.code !== 'ENOENT') console.warn('[disk-cache] failed to load:', err.message);
   }
   return null;
 }
 
-function saveDiskCache(date, rankings, allPlayers) {
+async function saveDiskCache(date, rankings, allPlayers) {
   try {
-    if (!existsSync(DISK_CACHE_DIR)) mkdirSync(DISK_CACHE_DIR, { recursive: true });
+    await mkdir(DISK_CACHE_DIR, { recursive: true });
 
     const perDateFile = diskCachePath(date);
-    if (!existsSync(perDateFile)) {
+    try {
+      await stat(perDateFile);
+    } catch {
       const lean = { date, allPlayers, savedAt: new Date().toISOString() };
-      writeFileSync(perDateFile, JSON.stringify(lean));
+      await writeFile(perDateFile, JSON.stringify(lean));
       console.log(`[disk-cache] saved per-date cache for ${date} (${allPlayers.length} players, compact)`);
     }
 
     const full = { date, rankings, allPlayers, savedAt: new Date().toISOString() };
-    writeFileSync(DISK_CACHE_FILE, JSON.stringify(full, null, 2));
+    await writeFile(DISK_CACHE_FILE, JSON.stringify(full, null, 2));
     console.log(`[disk-cache] updated latest cache (rankings-cache.json) for ${date}`);
   } catch (err) {
     console.warn('[disk-cache] failed to save:', err.message);
   }
 }
 
-function getDiskCachedRankings(key, date) {
-  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
+async function getDiskCachedRankings(key, date) {
+  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
   if (disk?.rankings?.[key]) return disk.rankings[key];
   return null;
 }
 
-function getDiskCachedAllPlayers(date) {
-  const disk = date ? loadDiskCacheForDate(date) : loadDiskCache();
+async function getDiskCachedAllPlayers(date) {
+  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
   if (disk?.allPlayers) return { players: disk.allPlayers, date: disk.date };
   return null;
 }
 
-function getDiskCachedDate() {
-  const disk = loadDiskCache();
+async function getDiskCachedDate() {
+  const disk = await loadDiskCache();
   return disk?.date ?? null;
 }
 
-function getDefaultDate() {
-  const dates = listCachedDates();
+async function getDefaultDate() {
+  const dates = await listCachedDates();
   return dates[0] ?? null;
 }
 
@@ -153,7 +152,7 @@ const server = createServer(async (req, res) => {
   }
 
   const reqUrl = new URL(req.url, `http://localhost:${PORT}`);
-  const defaultDate = getDefaultDate();
+  const defaultDate = await getDefaultDate();
 
   // GET /api/rankings?age_group=U13&category=BS&date=2026-03-01
   if (reqUrl.pathname === '/api/rankings') {
@@ -180,7 +179,7 @@ const server = createServer(async (req, res) => {
     }
 
     try {
-      const url = `${USAB_BASE}/?age_group=${ageGroup}&category=${eventType}&date=${date}`;
+      const url = `${USAB_BASE}/?age_group=${encodeURIComponent(ageGroup)}&category=${encodeURIComponent(eventType)}&date=${encodeURIComponent(date)}`;
       console.log(`[rankings] fetching ${url}`);
       const response = await fetch(url, { headers: BROWSER_HEADERS });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -222,7 +221,7 @@ const server = createServer(async (req, res) => {
     }
 
     try {
-      const url = `${USAB_BASE}/${usabId}/details?age_group=${ageGroup}&category=${eventType}&date=${date}`;
+      const url = `${USAB_BASE}/${encodeURIComponent(usabId)}/details?age_group=${encodeURIComponent(ageGroup)}&category=${encodeURIComponent(eventType)}&date=${encodeURIComponent(date)}`;
       console.log(`[player] fetching ${url}`);
       const response = await fetch(url, { headers: BROWSER_HEADERS });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -260,7 +259,7 @@ const server = createServer(async (req, res) => {
     }
 
     try {
-      const path = `/head-2-head/Head2HeadContent?OrganizationCode=${TSW_ORG_CODE}&t1p1memberid=${p1}&t2p1memberid=${p2}`;
+      const path = `/head-2-head/Head2HeadContent?OrganizationCode=${TSW_ORG_CODE}&t1p1memberid=${encodeURIComponent(p1)}&t2p1memberid=${encodeURIComponent(p2)}`;
       console.log(`[h2h] fetching ${TSW_BASE}${path}`);
       const resp = await tswFetch(path);
       if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
@@ -293,7 +292,7 @@ const server = createServer(async (req, res) => {
       const tournamentDir = join(__dirname, 'data');
       const availableSeasons = [];
       if (existsSync(tournamentDir)) {
-        for (const f of readdirSync(tournamentDir)) {
+        for (const f of await readdir(tournamentDir)) {
           const m = f.match(/^tournaments-(\d{4}-\d{4})\.json$/);
           if (m) availableSeasons.push(m[1]);
         }
@@ -310,24 +309,25 @@ const server = createServer(async (req, res) => {
       function recomputeStatuses(tournaments) {
         return tournaments.map(t => {
           if (!t.startDate) return { ...t, status: 'upcoming' };
+          const end = t.endDate || t.startDate;
           let status;
-          if (today > t.endDate) status = 'completed';
+          if (today > end) status = 'completed';
           else if (today >= t.startDate) status = 'in-progress';
           else status = 'upcoming';
           return { ...t, status };
         });
       }
 
-      function loadSeason(s) {
+      async function loadSeason(s) {
         try {
-          const raw = readFileSync(join(tournamentDir, `tournaments-${s}.json`), 'utf-8');
+          const raw = await readFile(join(tournamentDir, `tournaments-${s}.json`), 'utf-8');
           return JSON.parse(raw);
         } catch { return null; }
       }
 
       let result;
       if (season) {
-        const data = loadSeason(season);
+        const data = await loadSeason(season);
         result = {
           season,
           tournaments: data ? recomputeStatuses(data.tournaments) : [],
@@ -336,7 +336,7 @@ const server = createServer(async (req, res) => {
       } else {
         const allSeasons = {};
         for (const s of availableSeasons) {
-          const data = loadSeason(s);
+          const data = await loadSeason(s);
           if (data) allSeasons[s] = { tournaments: recomputeStatuses(data.tournaments) };
         }
         result = { seasons: allSeasons, availableSeasons };
@@ -376,7 +376,7 @@ const server = createServer(async (req, res) => {
     }
 
     try {
-      const drawsPath = `/sport/draws.aspx?id=${tswId}`;
+      const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
       console.log(`[tournament-detail] fetching ${TSW_BASE}${drawsPath}`);
       const resp = await tswFetch(drawsPath);
       if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
@@ -408,7 +408,7 @@ const server = createServer(async (req, res) => {
 
   // GET /api/cached-dates  – returns dates that have per-date cache files on disk
   if (reqUrl.pathname === '/api/cached-dates') {
-    const dates = listCachedDates();
+    const dates = await listCachedDates();
     console.log(`[cached-dates] found ${dates.length} cached date files`);
     res.writeHead(200);
     res.end(JSON.stringify({ dates }));
@@ -472,11 +472,11 @@ const server = createServer(async (req, res) => {
     }
 
     try {
-      const dates = listCachedDates().sort();
+      const dates = (await listCachedDates()).sort();
       const playerMap = new Map();
 
       for (const date of dates) {
-        const disk = loadDiskCacheForDate(date);
+        const disk = await loadDiskCacheForDate(date);
         if (!disk || !disk.allPlayers) continue;
 
         for (const p of disk.allPlayers) {
@@ -559,7 +559,7 @@ const server = createServer(async (req, res) => {
           const rankCached = getCached(rankCacheKey);
           if (rankCached) return { players: rankCached, ag, et, fromWeb: false };
 
-          const url = `${USAB_BASE}/?age_group=${ag}&category=${et}&date=${date}`;
+          const url = `${USAB_BASE}/?age_group=${encodeURIComponent(ag)}&category=${encodeURIComponent(et)}&date=${encodeURIComponent(date)}`;
           const response = await fetch(url, { headers: BROWSER_HEADERS });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const html = await response.text();
@@ -603,7 +603,7 @@ const server = createServer(async (req, res) => {
       setCache(cacheKey, uniquePlayers);
 
       if (fetchedFromWeb) {
-        saveDiskCache(date, rankingsByCategory, uniquePlayers);
+        await saveDiskCache(date, rankingsByCategory, uniquePlayers);
       }
 
       res.writeHead(200, { 'X-Cache': 'MISS' });
@@ -636,12 +636,12 @@ const server = createServer(async (req, res) => {
     }
 
     try {
-      const dates = listCachedDates().sort();
+      const dates = (await listCachedDates()).sort();
       const trend = [];
       let playerName = '';
 
       for (const date of dates) {
-        const disk = loadDiskCacheForDate(date);
+        const disk = await loadDiskCacheForDate(date);
         if (!disk || !disk.allPlayers) continue;
         const player = disk.allPlayers.find((p) => p.usabId === usabId);
         if (!player) continue;
@@ -793,7 +793,6 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(stats));
     } catch (err) {
       console.error('[tsw-stats] error:', err.message);
-      setCache(cacheKey, fallback);
       res.writeHead(200);
       res.end(JSON.stringify(fallback));
     }
@@ -801,7 +800,7 @@ const server = createServer(async (req, res) => {
   }
 
   // ── Serve static files from dist/ (production build) ─────────────────────
-  const distDir = join(__dirname, 'dist');
+  const distDir = resolve(__dirname, 'dist');
 
   if (existsSync(distDir)) {
     const MIME_TYPES = {
@@ -819,23 +818,34 @@ const server = createServer(async (req, res) => {
       '.ttf': 'font/ttf',
     };
 
-    const filePath = join(distDir, reqUrl.pathname === '/' ? 'index.html' : reqUrl.pathname);
+    const filePath = resolve(distDir, normalize(reqUrl.pathname === '/' ? 'index.html' : '.' + reqUrl.pathname));
 
-    if (existsSync(filePath) && statSync(filePath).isFile()) {
-      const mime = MIME_TYPES[extname(filePath)] || 'application/octet-stream';
-      res.setHeader('Content-Type', mime);
-      res.writeHead(200);
-      res.end(readFileSync(filePath));
+    if (!filePath.startsWith(distDir)) {
+      res.writeHead(403);
+      res.end(JSON.stringify({ error: 'Forbidden' }));
       return;
     }
+
+    try {
+      const fileStat = await stat(filePath);
+      if (fileStat.isFile()) {
+        const mime = MIME_TYPES[extname(filePath)] || 'application/octet-stream';
+        const content = await readFile(filePath);
+        res.setHeader('Content-Type', mime);
+        res.writeHead(200);
+        res.end(content);
+        return;
+      }
+    } catch { /* file doesn't exist — fall through to SPA index */ }
 
     const indexPath = join(distDir, 'index.html');
-    if (existsSync(indexPath)) {
+    try {
+      const content = await readFile(indexPath);
       res.setHeader('Content-Type', 'text/html');
       res.writeHead(200);
-      res.end(readFileSync(indexPath));
+      res.end(content);
       return;
-    }
+    } catch { /* no index.html */ }
   }
 
   res.writeHead(404);

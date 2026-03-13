@@ -1,6 +1,6 @@
 import {
   getCached, setCache, getDiskCachedRankings, getDiskCachedDate,
-  setCors,
+  setCors, isValidDate, isValidAgeGroup, isValidEventType,
 } from './_lib/shared.js';
 
 export default async function handler(req, res) {
@@ -9,6 +9,11 @@ export default async function handler(req, res) {
 
   const defaultDate = await getDiskCachedDate() || new Date().toISOString().slice(0, 10);
   const { age_group: ageGroup = 'U11', category: eventType = 'BS', date = defaultDate } = req.query;
+
+  if (!isValidAgeGroup(ageGroup)) return res.status(400).json({ error: 'Invalid age_group' });
+  if (!isValidEventType(eventType)) return res.status(400).json({ error: 'Invalid category' });
+  if (!isValidDate(date)) return res.status(400).json({ error: 'Invalid date format' });
+
   const cacheKey = `rankings:${ageGroup}:${eventType}:${date}`;
 
   const cached = getCached(cacheKey);

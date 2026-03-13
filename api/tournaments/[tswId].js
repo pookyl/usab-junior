@@ -1,6 +1,7 @@
 import {
   setCors, getCached, setCache,
   tswFetch, parseTswDrawsList, parseTswTournamentInfo,
+  isValidTswId,
 } from '../_lib/shared.js';
 
 export default async function handler(req, res) {
@@ -8,7 +9,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
   const tswId = req.query?.tswId || req.url?.match(/\/tournaments\/([^/?]+)/)?.[1];
-  if (!tswId) {
+  if (!tswId || !isValidTswId(tswId)) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'tswId parameter required' }));
     return;
@@ -23,7 +24,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const drawsPath = `/sport/draws.aspx?id=${tswId}`;
+    const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
     const resp = await tswFetch(drawsPath);
     if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
     const html = await resp.text();

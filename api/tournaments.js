@@ -31,8 +31,9 @@ function recomputeStatuses(tournaments) {
   const today = new Date().toISOString().slice(0, 10);
   return tournaments.map(t => {
     if (!t.startDate) return { ...t, status: 'upcoming' };
+    const end = t.endDate || t.startDate;
     let status;
-    if (today > t.endDate) status = 'completed';
+    if (today > end) status = 'completed';
     else if (today >= t.startDate) status = 'in-progress';
     else status = 'upcoming';
     return { ...t, status };
@@ -45,6 +46,12 @@ export default async function handler(req, res) {
 
   const url = new URL(req.url, `http://${req.headers.host}`);
   const season = url.searchParams.get('season');
+
+  if (season && !/^\d{4}-\d{4}$/.test(season)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Invalid season format' }));
+    return;
+  }
 
   const cacheKey = `tournaments:${season || 'all'}`;
   const cached = getCached(cacheKey);

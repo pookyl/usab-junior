@@ -59,6 +59,11 @@ export function invalidateRankingsCache() {
   cachedDatesCache = null;
   tswStatsCache.clear();
   trendCache.clear();
+  directoryCache = null;
+  tournamentsCache = null;
+  tournamentsCacheSeason = '';
+  tournamentDetailCache.clear();
+  tournamentMedalsCache.clear();
 }
 
 // ── Player directory (cumulative across all dates, NOT invalidated on date change)
@@ -146,7 +151,7 @@ export async function fetchH2H(
   const url = `/api/h2h?player1=${usabId1}&player2=${usabId2}`;
   const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
   if (!res.ok) throw new Error(`H2H API ${res.status}: ${await res.text()}`);
-  return res.json();
+  return await res.json();
 }
 
 export function tswH2HUrl(usabId1: string, usabId2: string) {
