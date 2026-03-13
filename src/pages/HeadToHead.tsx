@@ -22,6 +22,8 @@ import { usePlayers } from '../contexts/PlayersContext';
 import {
   fetchH2H, fetchPlayerTswStats, fetchPlayerRankingTrend, tswH2HUrl, tswSearchUrl,
 } from '../services/rankingsService';
+import { formatDateLabel, inferGender, parseScoreString } from '../utils/playerUtils';
+export { parseScoreString } from '../utils/playerUtils';
 
 type Gender = 'Boy' | 'Girl' | 'All';
 
@@ -35,21 +37,6 @@ const AGE_COLORS: Record<AgeGroup, string> = {
 
 const PLAYER_A_HEX = '#8b5cf6';
 const PLAYER_B_HEX = '#3b82f6';
-
-function formatDateLabel(dateStr: string) {
-  const d = new Date(dateStr + 'T00:00:00');
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${months[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
-}
-
-
-function inferGender(entries: PlayerEntry[]): Gender | null {
-  for (const e of entries) {
-    if (e.eventType === 'BS' || e.eventType === 'BD') return 'Boy';
-    if (e.eventType === 'GS' || e.eventType === 'GD') return 'Girl';
-  }
-  return null;
-}
 
 function entriesForAge(player: UniquePlayer, ageGroup: AgeGroup | null): PlayerEntry[] {
   const filtered = ageGroup
@@ -106,14 +93,6 @@ export function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
     };
   }
   return match;
-}
-
-export function parseScoreString(score: string): number[][] {
-  if (!score || score === 'Walkover') return [];
-  return score.split(',').map((s) => s.trim()).filter(Boolean).map((game) => {
-    const parts = game.split('-').map((n) => parseInt(n.trim(), 10));
-    return parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) ? parts : [];
-  }).filter((g) => g.length === 2);
 }
 
 function matchResultToH2HMatch(
@@ -663,7 +642,7 @@ let _h2hSnap: {
 } | null = null;
 
 export default function HeadToHead() {
-  const { players: allPlayers, directoryPlayers, directoryLoading, loading: playersLoading } = usePlayers();
+  const { players: allPlayers, directoryPlayers, directoryLoading, loading: playersLoading, rankingsDate } = usePlayers();
 
   const snap = _h2hSnap;
   const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(snap?.ageGroup ?? 'U13');
@@ -683,7 +662,6 @@ export default function HeadToHead() {
   const [error, setError] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState<'All' | 'Singles' | 'Doubles' | 'Mixed'>(snap?.filterCat ?? 'All');
   const [expandedRankingKey, setExpandedRankingKey] = useState<string | null>(null);
-  const { rankingsDate } = usePlayers();
 
   const allDirectoryPool: UniquePlayer[] = useMemo(() => {
     if (directoryPlayers.length === 0) return allPlayers;

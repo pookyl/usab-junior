@@ -164,9 +164,9 @@ export interface ScheduledTournament {
   name: string;
   startDate: string | null;
   endDate: string | null;
-  region: string;
+  region: TournamentRegion | string;
   hostClub: string;
-  type: string;
+  type: TournamentType | string;
   tswId: string | null;
   tswUrl: string | null;
   usabUrl: string | null;

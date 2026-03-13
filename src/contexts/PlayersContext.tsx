@@ -123,8 +123,8 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
 
   const playerNameMap = useMemo(() => {
     const map = new Map<string, string[]>();
-    const source = directoryPlayers.length > 0 ? directoryPlayers : players;
-    for (const p of source) {
+    const nameSource = directoryPlayers.length > 0 ? directoryPlayers : players;
+    for (const p of nameSource) {
       const allNames = 'names' in p && Array.isArray(p.names) ? p.names : [p.name];
       for (const name of allNames) {
         const key = name.toLowerCase();

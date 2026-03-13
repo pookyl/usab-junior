@@ -13,10 +13,11 @@ import {
   Cell,
 } from 'recharts';
 import { Search, ExternalLink, RefreshCw, Trophy, WifiOff, Calendar, X, BarChart2, ListOrdered, Users, Feather, LayoutDashboard } from 'lucide-react';
-import type { AgeGroup, EventType, UniquePlayer, PlayerEntry } from '../types/junior';
+import type { AgeGroup, EventType, UniquePlayer } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
 import { usePlayers } from '../contexts/PlayersContext';
 import StatCard from '../components/StatCard';
+import { inferGender } from '../utils/playerUtils';
 
 const AGE_COLORS: Record<AgeGroup, string> = {
   U11: 'bg-violet-600',
@@ -262,17 +263,6 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
 
 /* ─── Analytics: Player Modal ─── */
 
-const BOY_EVENTS = new Set(['BS', 'BD']);
-const GIRL_EVENTS = new Set(['GS', 'GD']);
-
-function inferGender(entries: PlayerEntry[]): 'Boy' | 'Girl' | '—' {
-  for (const e of entries) {
-    if (BOY_EVENTS.has(e.eventType)) return 'Boy';
-    if (GIRL_EVENTS.has(e.eventType)) return 'Girl';
-  }
-  return '—';
-}
-
 interface ModalData {
   title: string;
   players: UniquePlayer[];
@@ -343,7 +333,7 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
                     <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{p.name}</p>
                     <p className="text-[10px] text-slate-400 dark:text-slate-500">
                       <span className={gender === 'Boy' ? 'text-blue-500' : gender === 'Girl' ? 'text-pink-500' : ''}>
-                        {gender}
+                        {gender ?? '—'}
                       </span>
                       {' · '}{p.usabId}
                     </p>
@@ -388,7 +378,7 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
                         gender === 'Girl' ? 'bg-pink-50 text-pink-600' :
                         'text-slate-400 dark:text-slate-500'
                       }`}>
-                        {gender}
+                        {gender ?? '—'}
                       </span>
                     </td>
                     <td className="px-6 py-3">
@@ -715,7 +705,7 @@ function PlayerStatsView() {
 
     for (const player of players) {
       const gender = inferGender(player.entries);
-      if (gender === '—') continue;
+      if (!gender) continue;
       if (gender === 'Boy') boys++;
       else girls++;
       const ageGroupsForPlayer = new Set(player.entries.map((e) => e.ageGroup));
