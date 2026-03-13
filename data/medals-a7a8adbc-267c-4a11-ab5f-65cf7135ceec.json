@@ -1,242 +1,13 @@
 {
   "tswId": "A7A8ADBC-267C-4A11-AB5F-65CF7135CEEC",
   "tournamentName": "2024 YONEX BELLEVUE NORTHWEST OPEN REGIONAL CHAMPIONSHIPS",
-  "clubs": [
-    {
-      "club": "Bintang",
-      "gold": 10,
-      "silver": 9,
-      "bronze": 5,
-      "total": 24
-    },
-    {
-      "club": "HBB",
-      "gold": 4,
-      "silver": 4,
-      "bronze": 7,
-      "total": 15
-    },
-    {
-      "club": "Synergy",
-      "gold": 4,
-      "silver": 5,
-      "bronze": 5,
-      "total": 14
-    },
-    {
-      "club": "Bellevue Badminton Club",
-      "gold": 3,
-      "silver": 3,
-      "bronze": 8,
-      "total": 14
-    },
-    {
-      "club": "EBC",
-      "gold": 4,
-      "silver": 3,
-      "bronze": 6,
-      "total": 13
-    },
-    {
-      "club": "USBA",
-      "gold": 4,
-      "silver": 1,
-      "bronze": 5,
-      "total": 10
-    },
-    {
-      "club": "Plano Badminton center",
-      "gold": 1,
-      "silver": 4,
-      "bronze": 5,
-      "total": 10
-    },
-    {
-      "club": "GBA",
-      "gold": 1,
-      "silver": 1,
-      "bronze": 5,
-      "total": 7
-    },
-    {
-      "club": "Frisco Badminton Academy",
-      "gold": 1,
-      "silver": 0,
-      "bronze": 5,
-      "total": 6
-    },
-    {
-      "club": "Houston Badminton academy",
-      "gold": 3,
-      "silver": 0,
-      "bronze": 1,
-      "total": 4
-    },
-    {
-      "club": "Capital Badminton Academy",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 4,
-      "total": 4
-    },
-    {
-      "club": "PBC",
-      "gold": 1,
-      "silver": 2,
-      "bronze": 0,
-      "total": 3
-    },
-    {
-      "club": "NEBC",
-      "gold": 1,
-      "silver": 1,
-      "bronze": 1,
-      "total": 3
-    },
-    {
-      "club": "Egret",
-      "gold": 1,
-      "silver": 0,
-      "bronze": 2,
-      "total": 3
-    },
-    {
-      "club": "HANA",
-      "gold": 1,
-      "silver": 0,
-      "bronze": 2,
-      "total": 3
-    },
-    {
-      "club": "SCA",
-      "gold": 0,
-      "silver": 1,
-      "bronze": 2,
-      "total": 3
-    },
-    {
-      "club": "NVBC",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 3,
-      "total": 3
-    },
-    {
-      "club": "AC Academy",
-      "gold": 1,
-      "silver": 1,
-      "bronze": 0,
-      "total": 2
-    },
-    {
-      "club": "Happy Birdie",
-      "gold": 0,
-      "silver": 2,
-      "bronze": 0,
-      "total": 2
-    },
-    {
-      "club": "CanAm",
-      "gold": 0,
-      "silver": 1,
-      "bronze": 1,
-      "total": 2
-    },
-    {
-      "club": "Royal Badminton Academy",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 2,
-      "total": 2
-    },
-    {
-      "club": "HBA",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 2,
-      "total": 2
-    },
-    {
-      "club": "BBC",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 2,
-      "total": 2
-    },
-    {
-      "club": "RBA",
-      "gold": 0,
-      "silver": 1,
-      "bronze": 0,
-      "total": 1
-    },
-    {
-      "club": "CBA",
-      "gold": 0,
-      "silver": 1,
-      "bronze": 0,
-      "total": 1
-    },
-    {
-      "club": "Schafer badminton Academy",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "ABC",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "WZQ",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "Midwest Badminton Club",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "New Hope Badminton Academy",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "03 IBC",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "bintang sunnyvale",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    }
-  ],
   "medals": [
     {
       "drawName": "BS U11",
-      "ageGroup": "U11",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Vignan Chandrasekaran",
           "club": "Houston Badminton academy",
-          "playerId": 31,
           "usabId": "398159"
         }
       ],
@@ -244,7 +15,6 @@
         {
           "name": "Reyansh Chalamalasetti",
           "club": "Plano Badminton center",
-          "playerId": 26,
           "usabId": "403661"
         }
       ],
@@ -253,7 +23,6 @@
           {
             "name": "Aayush Jaladurgam",
             "club": "Plano Badminton center",
-            "playerId": 109,
             "usabId": "415387"
           }
         ]
@@ -263,7 +32,6 @@
           {
             "name": "Leo Ye",
             "club": "EBC",
-            "playerId": 339,
             "usabId": "440222"
           }
         ]
@@ -271,13 +39,10 @@
     },
     {
       "drawName": "BS U13",
-      "ageGroup": "U13",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Michael Yufu Sun",
           "club": "USBA",
-          "playerId": 270,
           "usabId": "408717"
         }
       ],
@@ -285,7 +50,6 @@
         {
           "name": "Vishnu Anand",
           "club": "EBC",
-          "playerId": 4,
           "usabId": "1022299"
         }
       ],
@@ -294,7 +58,6 @@
           {
             "name": "Aditya Namboodiripad",
             "club": "NVBC",
-            "playerId": 208,
             "usabId": "1023257"
           }
         ]
@@ -304,7 +67,6 @@
           {
             "name": "Kayden Hossain",
             "club": "Bintang",
-            "playerId": 98,
             "usabId": "1023020"
           }
         ]
@@ -312,13 +74,10 @@
     },
     {
       "drawName": "BS U15",
-      "ageGroup": "U15",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Terence Cai",
           "club": "Bintang",
-          "playerId": 23,
           "usabId": "1020785"
         }
       ],
@@ -326,7 +85,6 @@
         {
           "name": "Allen Yang",
           "club": "Synergy",
-          "playerId": 331,
           "usabId": "1019933"
         }
       ],
@@ -335,7 +93,6 @@
           {
             "name": "Mark w Wu",
             "club": "Schafer badminton Academy",
-            "playerId": 318,
             "usabId": "398384"
           }
         ]
@@ -345,7 +102,6 @@
           {
             "name": "Gavin Le",
             "club": "SCA",
-            "playerId": 139,
             "usabId": "1020943"
           }
         ]
@@ -353,13 +109,10 @@
     },
     {
       "drawName": "BS U17",
-      "ageGroup": "U17",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Max Zhang",
           "club": "EBC",
-          "playerId": 359,
           "usabId": "1020103"
         }
       ],
@@ -367,7 +120,6 @@
         {
           "name": "Napat Srisalaipaisal",
           "club": "PBC",
-          "playerId": 260,
           "usabId": "1019781"
         }
       ],
@@ -376,7 +128,6 @@
           {
             "name": "Daniel Seungchan Park",
             "club": "Bellevue Badminton Club",
-            "playerId": 218,
             "usabId": "1020416"
           }
         ]
@@ -386,7 +137,6 @@
           {
             "name": "Justin Kan",
             "club": "Bintang",
-            "playerId": 120,
             "usabId": "47891"
           }
         ]
@@ -394,13 +144,10 @@
     },
     {
       "drawName": "BS U19",
-      "ageGroup": "U19",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Shriyans Bhagavatula",
           "club": "Bintang",
-          "playerId": 19,
           "usabId": "1002506"
         }
       ],
@@ -408,7 +155,6 @@
         {
           "name": "Vaughn Zhao",
           "club": "EBC",
-          "playerId": 364,
           "usabId": "1018951"
         }
       ],
@@ -417,7 +163,6 @@
           {
             "name": "Rocky Yang",
             "club": "HBB",
-            "playerId": 335,
             "usabId": "1018123"
           }
         ]
@@ -427,7 +172,6 @@
           {
             "name": "Ansen Liu",
             "club": "Plano Badminton center",
-            "playerId": 166,
             "usabId": "1020206"
           }
         ]
@@ -435,13 +179,10 @@
     },
     {
       "drawName": "GS U11",
-      "ageGroup": "U11",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Grace Eunhye Park",
           "club": "Bellevue Badminton Club",
-          "playerId": 219,
           "usabId": "405643"
         }
       ],
@@ -449,7 +190,6 @@
         {
           "name": "Arundhathi Padma Mohan",
           "club": "Bintang",
-          "playerId": 204,
           "usabId": "447604"
         }
       ],
@@ -458,7 +198,6 @@
           {
             "name": "Yuki Guan",
             "club": "ABC",
-            "playerId": 86,
             "usabId": "436416"
           }
         ]
@@ -468,7 +207,6 @@
           {
             "name": "Zelenia Shen",
             "club": "EBC",
-            "playerId": 250,
             "usabId": "425572"
           }
         ]
@@ -476,13 +214,10 @@
     },
     {
       "drawName": "GS U13",
-      "ageGroup": "U13",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Shraddha Prakash",
           "club": "Frisco Badminton Academy",
-          "playerId": 225,
           "usabId": "1023209"
         }
       ],
@@ -490,7 +225,6 @@
         {
           "name": "Mihika Jaiswal",
           "club": "Synergy",
-          "playerId": 108,
           "usabId": "1021327"
         }
       ],
@@ -499,7 +233,6 @@
           {
             "name": "Sophia Li",
             "club": "USBA",
-            "playerId": 156,
             "usabId": "403026"
           }
         ]
@@ -509,7 +242,6 @@
           {
             "name": "Sahasra Reddy",
             "club": "USBA",
-            "playerId": 241,
             "usabId": "1022239"
           }
         ]
@@ -517,13 +249,10 @@
     },
     {
       "drawName": "GS U15",
-      "ageGroup": "U15",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Vivian Feng",
           "club": "NEBC",
-          "playerId": 67,
           "usabId": "1022354"
         }
       ],
@@ -531,7 +260,6 @@
         {
           "name": "Michelle Yourong Zhang",
           "club": "Happy Birdie",
-          "playerId": 360,
           "usabId": "400724"
         }
       ],
@@ -540,7 +268,6 @@
           {
             "name": "Lexuan Wen",
             "club": "HBB",
-            "playerId": 310,
             "usabId": "1021785"
           }
         ]
@@ -550,7 +277,6 @@
           {
             "name": "Sophia Sun",
             "club": "USBA",
-            "playerId": 271,
             "usabId": "1021782"
           }
         ]
@@ -558,13 +284,10 @@
     },
     {
       "drawName": "GS U17",
-      "ageGroup": "U17",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Cinra Mei",
           "club": "Bintang",
-          "playerId": 198,
           "usabId": "1022768"
         }
       ],
@@ -572,7 +295,6 @@
         {
           "name": "Aadya Pitani",
           "club": "RBA",
-          "playerId": 224,
           "usabId": "1020191"
         }
       ],
@@ -581,7 +303,6 @@
           {
             "name": "Lydia Ng",
             "club": "Synergy",
-            "playerId": 211,
             "usabId": "1020761"
           }
         ]
@@ -591,7 +312,6 @@
           {
             "name": "Riya Suresh",
             "club": "Frisco Badminton Academy",
-            "playerId": 274,
             "usabId": "1022451"
           }
         ]
@@ -599,13 +319,10 @@
     },
     {
       "drawName": "GS U19",
-      "ageGroup": "U19",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Annie Meng",
           "club": "USBA",
-          "playerId": 202,
           "usabId": "1021777"
         }
       ],
@@ -613,7 +330,6 @@
         {
           "name": "Brianna Y Lee",
           "club": "HBB",
-          "playerId": 142,
           "usabId": "1020501"
         }
       ],
@@ -622,7 +338,6 @@
           {
             "name": "Suneri Krishna Chinthalapati",
             "club": "Synergy",
-            "playerId": 46,
             "usabId": "1018440"
           }
         ]
@@ -632,7 +347,6 @@
           {
             "name": "Coco Cenke Tao",
             "club": "Bellevue Badminton Club",
-            "playerId": 278,
             "usabId": "1020530"
           }
         ]
@@ -640,19 +354,15 @@
     },
     {
       "drawName": "XD U11",
-      "ageGroup": "U11",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Vignan Chandrasekaran",
           "club": "Houston Badminton academy",
-          "playerId": 31,
           "usabId": "398159"
         },
         {
           "name": "Sophia Coco Wang",
           "club": "HBB",
-          "playerId": 306,
           "usabId": "435534"
         }
       ],
@@ -660,13 +370,11 @@
         {
           "name": "Satvikram Parvathaneni",
           "club": "Bintang",
-          "playerId": 221,
           "usabId": "474410"
         },
         {
           "name": "Shaoxuan Gong",
           "club": "CanAm",
-          "playerId": 81,
           "usabId": "444639"
         }
       ],
@@ -675,13 +383,11 @@
           {
             "name": "Michael Yufu Sun",
             "club": "USBA",
-            "playerId": 270,
             "usabId": "408717"
           },
           {
             "name": "Claire QiuChen Li",
             "club": "Plano Badminton center",
-            "playerId": 150,
             "usabId": "415604"
           }
         ]
@@ -691,13 +397,11 @@
           {
             "name": "Derek Huang",
             "club": "Bellevue Badminton Club",
-            "playerId": 102,
             "usabId": "451709"
           },
           {
             "name": "Seanna Yang",
             "club": "Bellevue Badminton Club",
-            "playerId": 337,
             "usabId": "1023281"
           }
         ]
@@ -705,19 +409,15 @@
     },
     {
       "drawName": "XD U13",
-      "ageGroup": "U13",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Zisheng (GaoGao) Fan",
           "club": "AC Academy",
-          "playerId": 65,
           "usabId": "1023293"
         },
         {
           "name": "Abhigna Parvathaneni",
           "club": "Bintang",
-          "playerId": 220,
           "usabId": "1022668"
         }
       ],
@@ -725,13 +425,11 @@
         {
           "name": "Prathik Nemani",
           "club": "Bintang",
-          "playerId": 210,
           "usabId": "1021796"
         },
         {
           "name": "Sophia Li",
           "club": "USBA",
-          "playerId": 156,
           "usabId": "403026"
         }
       ],
@@ -740,13 +438,11 @@
           {
             "name": "Jacob Ma",
             "club": "Egret",
-            "playerId": 187,
             "usabId": "463222"
           },
           {
             "name": "Sophia Sun",
             "club": "USBA",
-            "playerId": 271,
             "usabId": "1021782"
           }
         ]
@@ -756,13 +452,11 @@
           {
             "name": "Vishnu Anand",
             "club": "EBC",
-            "playerId": 4,
             "usabId": "1022299"
           },
           {
             "name": "Mihika Jaiswal",
             "club": "Synergy",
-            "playerId": 108,
             "usabId": "1021327"
           }
         ]
@@ -770,19 +464,15 @@
     },
     {
       "drawName": "XD U15",
-      "ageGroup": "U15",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Hanyi Zhang",
           "club": "Plano Badminton center",
-          "playerId": 350,
           "usabId": "1021224"
         },
         {
           "name": "Katie Wong",
           "club": "Bintang",
-          "playerId": 313,
           "usabId": "1022259"
         }
       ],
@@ -790,13 +480,11 @@
         {
           "name": "Terence Cai",
           "club": "Bintang",
-          "playerId": 23,
           "usabId": "1020785"
         },
         {
           "name": "Michelle Yourong Zhang",
           "club": "Happy Birdie",
-          "playerId": 360,
           "usabId": "400724"
         }
       ],
@@ -805,13 +493,11 @@
           {
             "name": "Gavin Le",
             "club": "SCA",
-            "playerId": 139,
             "usabId": "1020943"
           },
           {
             "name": "Angela Wang",
             "club": "HANA",
-            "playerId": 295,
             "usabId": "400396"
           }
         ]
@@ -821,13 +507,11 @@
           {
             "name": "William Geng",
             "club": "Bellevue Badminton Club",
-            "playerId": 78,
             "usabId": "1022594"
           },
           {
             "name": "Stephanie Jiayi Song",
             "club": "Bellevue Badminton Club",
-            "playerId": 257,
             "usabId": "1022185"
           }
         ]
@@ -835,19 +519,15 @@
     },
     {
       "drawName": "XD U17",
-      "ageGroup": "U17",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Shriyans Bhagavatula",
           "club": "Bintang",
-          "playerId": 19,
           "usabId": "1002506"
         },
         {
           "name": "Brianna Y Lee",
           "club": "HBB",
-          "playerId": 142,
           "usabId": "1020501"
         }
       ],
@@ -855,13 +535,11 @@
         {
           "name": "Alex Anlai Song",
           "club": "Bellevue Badminton Club",
-          "playerId": 255,
           "usabId": "1019779"
         },
         {
           "name": "Zimeng Zhou",
           "club": "Bellevue Badminton Club",
-          "playerId": 374,
           "usabId": "1021966"
         }
       ],
@@ -870,13 +548,11 @@
           {
             "name": "Adhyaan Balaji",
             "club": "Frisco Badminton Academy",
-            "playerId": 14,
             "usabId": "1020888"
           },
           {
             "name": "Sasha Suman",
             "club": "Royal Badminton Academy",
-            "playerId": 267,
             "usabId": "1020911"
           }
         ]
@@ -886,13 +562,11 @@
           {
             "name": "Vaughn Zhao",
             "club": "EBC",
-            "playerId": 364,
             "usabId": "1018951"
           },
           {
             "name": "Xinyan Zeng",
             "club": "EBC",
-            "playerId": 345,
             "usabId": "1017675"
           }
         ]
@@ -900,19 +574,15 @@
     },
     {
       "drawName": "XD U19",
-      "ageGroup": "U19",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Kevin Zhou",
           "club": "EBC",
-          "playerId": 373,
           "usabId": "47885"
         },
         {
           "name": "Annabelle Zhou",
           "club": "Synergy",
-          "playerId": 368,
           "usabId": "1019940"
         }
       ],
@@ -920,13 +590,11 @@
         {
           "name": "Ansen Liu",
           "club": "Plano Badminton center",
-          "playerId": 166,
           "usabId": "1020206"
         },
         {
           "name": "Jessica Wu",
           "club": "HBB",
-          "playerId": 315,
           "usabId": "1019255"
         }
       ],
@@ -935,13 +603,11 @@
           {
             "name": "Alex He",
             "club": "HBA",
-            "playerId": 89,
             "usabId": "1021976"
           },
           {
             "name": "Ziyan Zhao",
             "club": "GBA",
-            "playerId": 365,
             "usabId": "1019845"
           }
         ]
@@ -951,13 +617,11 @@
           {
             "name": "Linden Wang",
             "club": "Capital Badminton Academy",
-            "playerId": 304,
             "usabId": "47613"
           },
           {
             "name": "Eva Wang",
             "club": "Capital Badminton Academy",
-            "playerId": 299,
             "usabId": "1018891"
           }
         ]
@@ -965,19 +629,15 @@
     },
     {
       "drawName": "BD U11",
-      "ageGroup": "U11",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Vignan Chandrasekaran",
           "club": "Houston Badminton academy",
-          "playerId": 31,
           "usabId": "398159"
         },
         {
           "name": "Michael Yufu Sun",
           "club": "USBA",
-          "playerId": 270,
           "usabId": "408717"
         }
       ],
@@ -985,13 +645,11 @@
         {
           "name": "Aayush Jaladurgam",
           "club": "Plano Badminton center",
-          "playerId": 109,
           "usabId": "415387"
         },
         {
           "name": "Leo Ye",
           "club": "EBC",
-          "playerId": 339,
           "usabId": "440222"
         }
       ],
@@ -1000,13 +658,11 @@
           {
             "name": "Jeremy Wang",
             "club": "HANA",
-            "playerId": 301,
             "usabId": "460793"
           },
           {
             "name": "Leslie Wang",
             "club": "WZQ",
-            "playerId": 303,
             "usabId": "437369"
           }
         ]
@@ -1016,13 +672,11 @@
           {
             "name": "Reyansh Chalamalasetti",
             "club": "Plano Badminton center",
-            "playerId": 26,
             "usabId": "403661"
           },
           {
             "name": "Jason Zhu",
             "club": "BBC",
-            "playerId": 375,
             "usabId": "432713"
           }
         ]
@@ -1030,19 +684,15 @@
     },
     {
       "drawName": "BD U13",
-      "ageGroup": "U13",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Vishnu Anand",
           "club": "EBC",
-          "playerId": 4,
           "usabId": "1022299"
         },
         {
           "name": "Jacob Ma",
           "club": "Egret",
-          "playerId": 187,
           "usabId": "463222"
         }
       ],
@@ -1050,13 +700,11 @@
         {
           "name": "Zisheng (GaoGao) Fan",
           "club": "AC Academy",
-          "playerId": 65,
           "usabId": "1023293"
         },
         {
           "name": "Prathik Nemani",
           "club": "Bintang",
-          "playerId": 210,
           "usabId": "1021796"
         }
       ],
@@ -1065,13 +713,11 @@
           {
             "name": "Kayden Hossain",
             "club": "Bintang",
-            "playerId": 98,
             "usabId": "1023020"
           },
           {
             "name": "Phillip You",
             "club": "GBA",
-            "playerId": 340,
             "usabId": "1022330"
           }
         ]
@@ -1081,13 +727,11 @@
           {
             "name": "Melvin Cui",
             "club": "Midwest Badminton Club",
-            "playerId": 52,
             "usabId": "399249"
           },
           {
             "name": "Aditya Namboodiripad",
             "club": "NVBC",
-            "playerId": 208,
             "usabId": "1023257"
           }
         ]
@@ -1095,19 +739,15 @@
     },
     {
       "drawName": "BD U15",
-      "ageGroup": "U15",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Saatvik Shetty",
           "club": "Bintang",
-          "playerId": 251,
           "usabId": "1022252"
         },
         {
           "name": "Allen Yang",
           "club": "Synergy",
-          "playerId": 331,
           "usabId": "1019933"
         }
       ],
@@ -1115,13 +755,11 @@
         {
           "name": "Gavin Le",
           "club": "SCA",
-          "playerId": 139,
           "usabId": "1020943"
         },
         {
           "name": "Hanyi Zhang",
           "club": "Plano Badminton center",
-          "playerId": 350,
           "usabId": "1021224"
         }
       ],
@@ -1130,13 +768,11 @@
           {
             "name": "Terence Cai",
             "club": "Bintang",
-            "playerId": 23,
             "usabId": "1020785"
           },
           {
             "name": "Seth Li",
             "club": "New Hope Badminton Academy",
-            "playerId": 155,
             "usabId": "1022500"
           }
         ]
@@ -1146,13 +782,11 @@
           {
             "name": "Christopher Gunawan",
             "club": "GBA",
-            "playerId": 88,
             "usabId": "1020480"
           },
           {
             "name": "Jayden Mar",
             "club": "Synergy",
-            "playerId": 195,
             "usabId": "1020729"
           }
         ]
@@ -1160,19 +794,15 @@
     },
     {
       "drawName": "BD U17",
-      "ageGroup": "U17",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Shriyans Bhagavatula",
           "club": "Bintang",
-          "playerId": 19,
           "usabId": "1002506"
         },
         {
           "name": "Aagnaey Gulla Pulijal",
           "club": "EBC",
-          "playerId": 228,
           "usabId": "1018691"
         }
       ],
@@ -1180,13 +810,11 @@
         {
           "name": "Kaustub Gautam",
           "club": "Bellevue Badminton Club",
-          "playerId": 77,
           "usabId": "461359"
         },
         {
           "name": "Napat Srisalaipaisal",
           "club": "PBC",
-          "playerId": 260,
           "usabId": "1019781"
         }
       ],
@@ -1195,13 +823,11 @@
           {
             "name": "Adhyaan Balaji",
             "club": "Frisco Badminton Academy",
-            "playerId": 14,
             "usabId": "1020888"
           },
           {
             "name": "Akshay Jalwadi",
             "club": "Frisco Badminton Academy",
-            "playerId": 110,
             "usabId": "1020885"
           }
         ]
@@ -1211,13 +837,11 @@
           {
             "name": "Tsun Him Lam",
             "club": "HBB",
-            "playerId": 135,
             "usabId": "1020935"
           },
           {
             "name": "Andy Xu Zhang",
             "club": "HBB",
-            "playerId": 347,
             "usabId": "1019564"
           }
         ]
@@ -1225,19 +849,15 @@
     },
     {
       "drawName": "BD U19",
-      "ageGroup": "U19",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Arden Q Lee",
           "club": "Synergy",
-          "playerId": 141,
           "usabId": "2441"
         },
         {
           "name": "Stanley Xing",
           "club": "Synergy",
-          "playerId": 322,
           "usabId": "1018221"
         }
       ],
@@ -1245,13 +865,11 @@
         {
           "name": "Nihal Kadamba",
           "club": "Bintang",
-          "playerId": 118,
           "usabId": "1018888"
         },
         {
           "name": "Justin Kan",
           "club": "Bintang",
-          "playerId": 120,
           "usabId": "47891"
         }
       ],
@@ -1260,13 +878,11 @@
           {
             "name": "Thomas Wang",
             "club": "03 IBC",
-            "playerId": 307,
             "usabId": "1020659"
           },
           {
             "name": "Rocky Yang",
             "club": "HBB",
-            "playerId": 335,
             "usabId": "1018123"
           }
         ]
@@ -1276,13 +892,11 @@
           {
             "name": "Ansen Liu",
             "club": "Plano Badminton center",
-            "playerId": 166,
             "usabId": "1020206"
           },
           {
             "name": "Linden Wang",
             "club": "Capital Badminton Academy",
-            "playerId": 304,
             "usabId": "47613"
           }
         ]
@@ -1290,19 +904,15 @@
     },
     {
       "drawName": "GD U11",
-      "ageGroup": "U11",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Grace Eunhye Park",
           "club": "Bellevue Badminton Club",
-          "playerId": 219,
           "usabId": "405643"
         },
         {
           "name": "Seanna Yang",
           "club": "Bellevue Badminton Club",
-          "playerId": 337,
           "usabId": "1023281"
         }
       ],
@@ -1310,13 +920,11 @@
         {
           "name": "Grace Li",
           "club": "CBA",
-          "playerId": 152,
           "usabId": "444640"
         },
         {
           "name": "Arundhathi Padma Mohan",
           "club": "Bintang",
-          "playerId": 204,
           "usabId": "447604"
         }
       ],
@@ -1325,13 +933,11 @@
           {
             "name": "Shaoxuan Gong",
             "club": "CanAm",
-            "playerId": 81,
             "usabId": "444639"
           },
           {
             "name": "Hannah Xiao",
             "club": "BBC",
-            "playerId": 320,
             "usabId": "432148"
           }
         ]
@@ -1341,13 +947,11 @@
           {
             "name": "Ellie Chen",
             "club": "HBB",
-            "playerId": 36,
             "usabId": "449734"
           },
           {
             "name": "Sophia Z Liu",
             "club": "bintang sunnyvale",
-            "playerId": 176,
             "usabId": "451805"
           }
         ]
@@ -1355,19 +959,15 @@
     },
     {
       "drawName": "GD U13",
-      "ageGroup": "U13",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Haziqa H Mathani",
           "club": "PBC",
-          "playerId": 196,
           "usabId": "411803"
         },
         {
           "name": "Abhigna Parvathaneni",
           "club": "Bintang",
-          "playerId": 220,
           "usabId": "1022668"
         }
       ],
@@ -1375,13 +975,11 @@
         {
           "name": "Bella Liu",
           "club": "GBA",
-          "playerId": 167,
           "usabId": "412662"
         },
         {
           "name": "Sophia Liu",
           "club": "Bintang",
-          "playerId": 175,
           "usabId": "399616"
         }
       ],
@@ -1390,13 +988,11 @@
           {
             "name": "Katherine F Xu",
             "club": "GBA",
-            "playerId": 328,
             "usabId": "398240"
           },
           {
             "name": "Elena Zhang",
             "club": "Egret",
-            "playerId": 349,
             "usabId": "436697"
           }
         ]
@@ -1406,13 +1002,11 @@
           {
             "name": "Alaina Benjamin",
             "club": "NVBC",
-            "playerId": 18,
             "usabId": "453351"
           },
           {
             "name": "Lilian Feng",
             "club": "NEBC",
-            "playerId": 66,
             "usabId": "1023272"
           }
         ]
@@ -1420,19 +1014,15 @@
     },
     {
       "drawName": "GD U15",
-      "ageGroup": "U15",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Angela Wang",
           "club": "HANA",
-          "playerId": 295,
           "usabId": "400396"
         },
         {
           "name": "Selina Xu",
           "club": "Bintang",
-          "playerId": 330,
           "usabId": "1021758"
         }
       ],
@@ -1440,13 +1030,11 @@
         {
           "name": "Vivian Feng",
           "club": "NEBC",
-          "playerId": 67,
           "usabId": "1022354"
         },
         {
           "name": "Lexuan Wen",
           "club": "HBB",
-          "playerId": 310,
           "usabId": "1021785"
         }
       ],
@@ -1455,13 +1043,11 @@
           {
             "name": "Diksha Chandrasekaran",
             "club": "Houston Badminton academy",
-            "playerId": 30,
             "usabId": "1022559"
           },
           {
             "name": "Jade Hu",
             "club": "HBA",
-            "playerId": 100,
             "usabId": "440613"
           }
         ]
@@ -1471,13 +1057,11 @@
           {
             "name": "Celine Ao",
             "club": "Bellevue Badminton Club",
-            "playerId": 6,
             "usabId": "1021844"
           },
           {
             "name": "Cynthia Wang",
             "club": "Bintang",
-            "playerId": 298,
             "usabId": "399003"
           }
         ]
@@ -1485,19 +1069,15 @@
     },
     {
       "drawName": "GD U17",
-      "ageGroup": "U17",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Annie Meng",
           "club": "USBA",
-          "playerId": 202,
           "usabId": "1021777"
         },
         {
           "name": "Ziyan Zhao",
           "club": "GBA",
-          "playerId": 365,
           "usabId": "1019845"
         }
       ],
@@ -1505,13 +1085,11 @@
         {
           "name": "Suneri Krishna Chinthalapati",
           "club": "Synergy",
-          "playerId": 46,
           "usabId": "1018440"
         },
         {
           "name": "Anvita Jamsandekar",
           "club": "Synergy",
-          "playerId": 113,
           "usabId": "1020287"
         }
       ],
@@ -1520,13 +1098,11 @@
           {
             "name": "Sasha Suman",
             "club": "Royal Badminton Academy",
-            "playerId": 267,
             "usabId": "1020911"
           },
           {
             "name": "Yalan Zhu",
             "club": "GBA",
-            "playerId": 377,
             "usabId": "1020604"
           }
         ]
@@ -1536,13 +1112,11 @@
           {
             "name": "Lydia Ng",
             "club": "Synergy",
-            "playerId": 211,
             "usabId": "1020761"
           },
           {
             "name": "Riya Suresh",
             "club": "Frisco Badminton Academy",
-            "playerId": 274,
             "usabId": "1022451"
           }
         ]
@@ -1550,19 +1124,15 @@
     },
     {
       "drawName": "GD U19",
-      "ageGroup": "U19",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Chang He",
           "club": "HBB",
-          "playerId": 90,
           "usabId": "1019080"
         },
         {
           "name": "Jessica Wu",
           "club": "HBB",
-          "playerId": 315,
           "usabId": "1019255"
         }
       ],
@@ -1570,13 +1140,11 @@
         {
           "name": "Xiaoyue Liu",
           "club": "HBB",
-          "playerId": 178,
           "usabId": "1020653"
         },
         {
           "name": "Annabelle Zhou",
           "club": "Synergy",
-          "playerId": 368,
           "usabId": "1019940"
         }
       ],
@@ -1585,13 +1153,11 @@
           {
             "name": "Brianna Y Lee",
             "club": "HBB",
-            "playerId": 142,
             "usabId": "1020501"
           },
           {
             "name": "Xinyan Zeng",
             "club": "EBC",
-            "playerId": 345,
             "usabId": "1017675"
           }
         ]
@@ -1601,13 +1167,11 @@
           {
             "name": "Coco Cenke Tao",
             "club": "Bellevue Badminton Club",
-            "playerId": 278,
             "usabId": "1020530"
           },
           {
             "name": "Eva Wang",
             "club": "Capital Badminton Academy",
-            "playerId": 299,
             "usabId": "1018891"
           }
         ]

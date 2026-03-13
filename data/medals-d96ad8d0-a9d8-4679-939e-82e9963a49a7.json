@@ -1,207 +1,13 @@
 {
   "tswId": "D96AD8D0-A9D8-4679-939E-82E9963A49A7",
   "tournamentName": "2025 YONEX BELLEVUE NORTHWEST OPEN REGIONAL CHAMPIONSHIPS",
-  "clubs": [
-    {
-      "club": "BIN",
-      "gold": 6,
-      "silver": 8,
-      "bronze": 10,
-      "total": 24
-    },
-    {
-      "club": "SYN",
-      "gold": 4,
-      "silver": 7,
-      "bronze": 9,
-      "total": 20
-    },
-    {
-      "club": "EGR",
-      "gold": 1,
-      "silver": 4,
-      "bronze": 10,
-      "total": 15
-    },
-    {
-      "club": "GBA",
-      "gold": 4,
-      "silver": 4,
-      "bronze": 5,
-      "total": 13
-    },
-    {
-      "club": "BBC",
-      "gold": 3,
-      "silver": 1,
-      "bronze": 8,
-      "total": 12
-    },
-    {
-      "club": "21BC",
-      "gold": 3,
-      "silver": 1,
-      "bronze": 4,
-      "total": 8
-    },
-    {
-      "club": "EBC",
-      "gold": 2,
-      "silver": 2,
-      "bronze": 3,
-      "total": 7
-    },
-    {
-      "club": "PBC",
-      "gold": 1,
-      "silver": 3,
-      "bronze": 3,
-      "total": 7
-    },
-    {
-      "club": "HB",
-      "gold": 3,
-      "silver": 2,
-      "bronze": 1,
-      "total": 6
-    },
-    {
-      "club": "HBA",
-      "gold": 2,
-      "silver": 1,
-      "bronze": 3,
-      "total": 6
-    },
-    {
-      "club": "NEBC",
-      "gold": 2,
-      "silver": 0,
-      "bronze": 4,
-      "total": 6
-    },
-    {
-      "club": "HFB",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 5,
-      "total": 5
-    },
-    {
-      "club": "C-A",
-      "gold": 2,
-      "silver": 1,
-      "bronze": 1,
-      "total": 4
-    },
-    {
-      "club": "SBA",
-      "gold": 1,
-      "silver": 0,
-      "bronze": 3,
-      "total": 4
-    },
-    {
-      "club": "USBA",
-      "gold": 2,
-      "silver": 1,
-      "bronze": 0,
-      "total": 3
-    },
-    {
-      "club": "NHBA",
-      "gold": 1,
-      "silver": 2,
-      "bronze": 0,
-      "total": 3
-    },
-    {
-      "club": "HBB",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 3,
-      "total": 3
-    },
-    {
-      "club": "HANA",
-      "gold": 1,
-      "silver": 0,
-      "bronze": 1,
-      "total": 2
-    },
-    {
-      "club": "NVBC",
-      "gold": 0,
-      "silver": 1,
-      "bronze": 1,
-      "total": 2
-    },
-    {
-      "club": "MBBC",
-      "gold": 0,
-      "silver": 1,
-      "bronze": 1,
-      "total": 2
-    },
-    {
-      "club": "IBC",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 2,
-      "total": 2
-    },
-    {
-      "club": "WZQ",
-      "gold": 1,
-      "silver": 0,
-      "bronze": 0,
-      "total": 1
-    },
-    {
-      "club": "TTBA",
-      "gold": 1,
-      "silver": 0,
-      "bronze": 0,
-      "total": 1
-    },
-    {
-      "club": "ABC",
-      "gold": 0,
-      "silver": 1,
-      "bronze": 0,
-      "total": 1
-    },
-    {
-      "club": "BAY",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "OBA",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    },
-    {
-      "club": "SCA",
-      "gold": 0,
-      "silver": 0,
-      "bronze": 1,
-      "total": 1
-    }
-  ],
   "medals": [
     {
       "drawName": "BS U11",
-      "ageGroup": "U11",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Naksh Shetty",
           "club": "SYN",
-          "playerId": 229,
           "usabId": "446477"
         }
       ],
@@ -209,7 +15,6 @@
         {
           "name": "Devaansh Mahato",
           "club": "SYN",
-          "playerId": 167,
           "usabId": "487475"
         }
       ],
@@ -218,7 +23,6 @@
           {
             "name": "Shrihayagrivan Karthigayan",
             "club": "SYN",
-            "playerId": 105,
             "usabId": "471572"
           }
         ]
@@ -228,7 +32,6 @@
           {
             "name": "Mingyuan Zang",
             "club": "HFB",
-            "playerId": 326,
             "usabId": "470241"
           }
         ]
@@ -236,13 +39,10 @@
     },
     {
       "drawName": "BS U13",
-      "ageGroup": "U13",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Chiranjeev Deepak",
           "club": "SYN",
-          "playerId": 51,
           "usabId": "423963"
         }
       ],
@@ -250,7 +50,6 @@
         {
           "name": "Daiwik Reddy",
           "club": "SYN",
-          "playerId": 213,
           "usabId": "433241"
         }
       ],
@@ -259,7 +58,6 @@
           {
             "name": "Eli You",
             "club": "HBB",
-            "playerId": 321,
             "usabId": "442094"
           }
         ]
@@ -269,7 +67,6 @@
           {
             "name": "Ethan Qiu",
             "club": "NEBC",
-            "playerId": 200,
             "usabId": "1023045"
           }
         ]
@@ -277,13 +74,10 @@
     },
     {
       "drawName": "BS U15",
-      "ageGroup": "U15",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Seth Li",
           "club": "NHBA",
-          "playerId": 131,
           "usabId": "1022500"
         }
       ],
@@ -291,7 +85,6 @@
         {
           "name": "Ayaaz Muhammed Baig",
           "club": "PBC",
-          "playerId": 12,
           "usabId": "1023199"
         }
       ],
@@ -300,7 +93,6 @@
           {
             "name": "Jacob Ma",
             "club": "EGR",
-            "playerId": 165,
             "usabId": "463222"
           }
         ]
@@ -310,7 +102,6 @@
           {
             "name": "Pranav Vivek",
             "club": "SYN",
-            "playerId": 269,
             "usabId": "406937"
           }
         ]
@@ -318,13 +109,10 @@
     },
     {
       "drawName": "BS U17",
-      "ageGroup": "U17",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Hanyi Zhang",
           "club": "PBC",
-          "playerId": 334,
           "usabId": "1021224"
         }
       ],
@@ -332,7 +120,6 @@
         {
           "name": "Terence Cai",
           "club": "BIN",
-          "playerId": 20,
           "usabId": "1020785"
         }
       ],
@@ -341,7 +128,6 @@
           {
             "name": "Alex Wen",
             "club": "21BC",
-            "playerId": 283,
             "usabId": "1021663"
           }
         ]
@@ -351,7 +137,6 @@
           {
             "name": "Krish Ashok",
             "club": "BIN",
-            "playerId": 9,
             "usabId": "1022220"
           }
         ]
@@ -359,13 +144,10 @@
     },
     {
       "drawName": "BS U19",
-      "ageGroup": "U19",
-      "eventType": "BS",
       "gold": [
         {
           "name": "Jay Chun",
           "club": "BBC",
-          "playerId": 49,
           "usabId": "1020446"
         }
       ],
@@ -373,7 +155,6 @@
         {
           "name": "Vaughn Zhao",
           "club": "EBC",
-          "playerId": 347,
           "usabId": "1018951"
         }
       ],
@@ -382,7 +163,6 @@
           {
             "name": "Suraj Rajesh Kumar",
             "club": "BIN",
-            "playerId": 206,
             "usabId": "1020917"
           }
         ]
@@ -392,7 +172,6 @@
           {
             "name": "Napat Srisalaipaisal",
             "club": "PBC",
-            "playerId": 241,
             "usabId": "1019781"
           }
         ]
@@ -400,13 +179,10 @@
     },
     {
       "drawName": "GS U11",
-      "ageGroup": "U11",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Xiner Hu",
           "club": "C-A",
-          "playerId": 84,
           "usabId": "519584"
         }
       ],
@@ -414,7 +190,6 @@
         {
           "name": "Aadya Yanamandra",
           "club": "HB",
-          "playerId": 309,
           "usabId": "479557"
         }
       ],
@@ -423,7 +198,6 @@
           {
             "name": "Eesha Vikram",
             "club": "HBA",
-            "playerId": 266,
             "usabId": "478026"
           }
         ]
@@ -433,7 +207,6 @@
           {
             "name": "Emily Feng",
             "club": "HBA",
-            "playerId": 60,
             "usabId": "475311"
           }
         ]
@@ -441,13 +214,10 @@
     },
     {
       "drawName": "GS U13",
-      "ageGroup": "U13",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Bella Liu",
           "club": "GBA",
-          "playerId": 146,
           "usabId": "412662"
         }
       ],
@@ -455,7 +225,6 @@
         {
           "name": "Hanyi (Sissi) Lei",
           "club": "EGR",
-          "playerId": 126,
           "usabId": "417829"
         }
       ],
@@ -464,7 +233,6 @@
           {
             "name": "Alaina Benjamin",
             "club": "NVBC",
-            "playerId": 16,
             "usabId": "453351"
           }
         ]
@@ -474,7 +242,6 @@
           {
             "name": "Hannah Xiao",
             "club": "BAY",
-            "playerId": 297,
             "usabId": "432148"
           }
         ]
@@ -482,13 +249,10 @@
     },
     {
       "drawName": "GS U15",
-      "ageGroup": "U15",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Lexuan Wen",
           "club": "21BC",
-          "playerId": 284,
           "usabId": "1021785"
         }
       ],
@@ -496,7 +260,6 @@
         {
           "name": "Jessica Zhang",
           "club": "HB",
-          "playerId": 336,
           "usabId": "1022512"
         }
       ],
@@ -505,7 +268,6 @@
           {
             "name": "Charvi Srivastava",
             "club": "EGR",
-            "playerId": 242,
             "usabId": "437387"
           }
         ]
@@ -515,7 +277,6 @@
           {
             "name": "Elena Zhang",
             "club": "EGR",
-            "playerId": 332,
             "usabId": "436697"
           }
         ]
@@ -523,13 +284,10 @@
     },
     {
       "drawName": "GS U17",
-      "ageGroup": "U17",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Alice Meng",
           "club": "USBA",
-          "playerId": 176,
           "usabId": "1023021"
         }
       ],
@@ -537,7 +295,6 @@
         {
           "name": "Selena Wei",
           "club": "GBA",
-          "playerId": 282,
           "usabId": "1022633"
         }
       ],
@@ -546,7 +303,6 @@
           {
             "name": "Ishi Reddy",
             "club": "EGR",
-            "playerId": 214,
             "usabId": "1022660"
           }
         ]
@@ -556,7 +312,6 @@
           {
             "name": "Jennifer Bangcaya",
             "club": "BIN",
-            "playerId": 13,
             "usabId": "1021757"
           }
         ]
@@ -564,13 +319,10 @@
     },
     {
       "drawName": "GS U19",
-      "ageGroup": "U19",
-      "eventType": "GS",
       "gold": [
         {
           "name": "Sophia Wu",
           "club": "NEBC",
-          "playerId": 295,
           "usabId": "1018674"
         }
       ],
@@ -578,7 +330,6 @@
         {
           "name": "Sydney Li",
           "club": "NHBA",
-          "playerId": 134,
           "usabId": "1019774"
         }
       ],
@@ -587,7 +338,6 @@
           {
             "name": "Coco Cenke Tao",
             "club": "BBC",
-            "playerId": 255,
             "usabId": "1020530"
           }
         ]
@@ -597,7 +347,6 @@
           {
             "name": "Xinyan Zeng",
             "club": "EBC",
-            "playerId": 328,
             "usabId": "1017675"
           }
         ]
@@ -605,19 +354,15 @@
     },
     {
       "drawName": "XD U11",
-      "ageGroup": "U11",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Naksh Shetty",
           "club": "SYN",
-          "playerId": 229,
           "usabId": "446477"
         },
         {
           "name": "Xiner Hu",
           "club": "C-A",
-          "playerId": 84,
           "usabId": "519584"
         }
       ],
@@ -625,13 +370,11 @@
         {
           "name": "Devaansh Mahato",
           "club": "SYN",
-          "playerId": 167,
           "usabId": "487475"
         },
         {
           "name": "Venba Senkadir",
           "club": "BIN",
-          "playerId": 225,
           "usabId": "475181"
         }
       ],
@@ -640,13 +383,11 @@
           {
             "name": "Shrihayagrivan Karthigayan",
             "club": "SYN",
-            "playerId": 105,
             "usabId": "471572"
           },
           {
             "name": "Shreya Rajesh Kumar",
             "club": "BIN",
-            "playerId": 205,
             "usabId": "468396"
           }
         ]
@@ -656,13 +397,11 @@
           {
             "name": "Mingyuan Zang",
             "club": "HFB",
-            "playerId": 326,
             "usabId": "470241"
           },
           {
             "name": "Nina Kuan",
             "club": "BBC",
-            "playerId": 118,
             "usabId": "463350"
           }
         ]
@@ -670,19 +409,15 @@
     },
     {
       "drawName": "XD U13",
-      "ageGroup": "U13",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Yian Yang",
           "club": "GBA",
-          "playerId": 317,
           "usabId": "403350"
         },
         {
           "name": "Sophia Liu",
           "club": "BIN",
-          "playerId": 152,
           "usabId": "399616"
         }
       ],
@@ -690,13 +425,11 @@
         {
           "name": "Joey Wang",
           "club": "GBA",
-          "playerId": 276,
           "usabId": "436411"
         },
         {
           "name": "Daisy Xu",
           "club": "MBBC",
-          "playerId": 303,
           "usabId": "433543"
         }
       ],
@@ -705,13 +438,11 @@
           {
             "name": "Michael Yufu Sun",
             "club": "BIN",
-            "playerId": 247,
             "usabId": "408717"
           },
           {
             "name": "Grace Cheng",
             "club": "BIN",
-            "playerId": 38,
             "usabId": "440346"
           }
         ]
@@ -721,13 +452,11 @@
           {
             "name": "Chiranjeev Deepak",
             "club": "SYN",
-            "playerId": 51,
             "usabId": "423963"
           },
           {
             "name": "Siddhi Thorat",
             "club": "21BC",
-            "playerId": 257,
             "usabId": "410339"
           }
         ]
@@ -735,19 +464,15 @@
     },
     {
       "drawName": "XD U15",
-      "ageGroup": "U15",
-      "eventType": "XD",
       "gold": [
         {
           "name": "William Geng",
           "club": "BBC",
-          "playerId": 64,
           "usabId": "1022594"
         },
         {
           "name": "Stephanie Jiayi Song",
           "club": "BBC",
-          "playerId": 238,
           "usabId": "1022185"
         }
       ],
@@ -755,13 +480,11 @@
         {
           "name": "Jacob Zhou",
           "club": "GBA",
-          "playerId": 352,
           "usabId": "1022669"
         },
         {
           "name": "Alice Meng",
           "club": "USBA",
-          "playerId": 176,
           "usabId": "1023021"
         }
       ],
@@ -770,13 +493,11 @@
           {
             "name": "Jacob Ma",
             "club": "EGR",
-            "playerId": 165,
             "usabId": "463222"
           },
           {
             "name": "Lexuan Wen",
             "club": "21BC",
-            "playerId": 284,
             "usabId": "1021785"
           }
         ]
@@ -786,13 +507,11 @@
           {
             "name": "Mikael Chang",
             "club": "BIN",
-            "playerId": 28,
             "usabId": "1021789"
           },
           {
             "name": "Janice Chen",
             "club": "EBC",
-            "playerId": 33,
             "usabId": "1022639"
           }
         ]
@@ -800,19 +519,15 @@
     },
     {
       "drawName": "XD U17",
-      "ageGroup": "U17",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Terence Cai",
           "club": "BIN",
-          "playerId": 20,
           "usabId": "1020785"
         },
         {
           "name": "Selena Wei",
           "club": "GBA",
-          "playerId": 282,
           "usabId": "1022633"
         }
       ],
@@ -820,13 +535,11 @@
         {
           "name": "Yifan Liu",
           "club": "21BC",
-          "playerId": 156,
           "usabId": "1020914"
         },
         {
           "name": "Maggie Zang",
           "club": "GBA",
-          "playerId": 325,
           "usabId": "1020950"
         }
       ],
@@ -835,13 +548,11 @@
           {
             "name": "Raymond Haiwen Song",
             "club": "SBA",
-            "playerId": 236,
             "usabId": "1022370"
           },
           {
             "name": "Savannah Kam",
             "club": "PBC",
-            "playerId": 99,
             "usabId": "1007760"
           }
         ]
@@ -851,13 +562,11 @@
           {
             "name": "Gavin Le",
             "club": "HFB",
-            "playerId": 122,
             "usabId": "1020943"
           },
           {
             "name": "Angela Wang",
             "club": "HANA",
-            "playerId": 272,
             "usabId": "400396"
           }
         ]
@@ -865,19 +574,15 @@
     },
     {
       "drawName": "XD U19",
-      "ageGroup": "U19",
-      "eventType": "XD",
       "gold": [
         {
           "name": "Vaughn Zhao",
           "club": "EBC",
-          "playerId": 347,
           "usabId": "1018951"
         },
         {
           "name": "Jennifer Xu",
           "club": "HB",
-          "playerId": 304,
           "usabId": "1020469"
         }
       ],
@@ -885,13 +590,11 @@
         {
           "name": "Kevin Guowei Yang",
           "club": "C-A",
-          "playerId": 390,
           "usabId": "551314"
         },
         {
           "name": "Sydney Li",
           "club": "NHBA",
-          "playerId": 134,
           "usabId": "1019774"
         }
       ],
@@ -900,13 +603,11 @@
           {
             "name": "Suraj Rajesh Kumar",
             "club": "BIN",
-            "playerId": 206,
             "usabId": "1020917"
           },
           {
             "name": "Sophia Wu",
             "club": "NEBC",
-            "playerId": 295,
             "usabId": "1018674"
           }
         ]
@@ -916,13 +617,11 @@
           {
             "name": "Napat Srisalaipaisal",
             "club": "PBC",
-            "playerId": 241,
             "usabId": "1019781"
           },
           {
             "name": "Coco Cenke Tao",
             "club": "BBC",
-            "playerId": 255,
             "usabId": "1020530"
           }
         ]
@@ -930,19 +629,15 @@
     },
     {
       "drawName": "BD U11",
-      "ageGroup": "U11",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Keaton Ou",
           "club": "WZQ",
-          "playerId": 187,
           "usabId": "437699"
         },
         {
           "name": "Naksh Shetty",
           "club": "SYN",
-          "playerId": 229,
           "usabId": "446477"
         }
       ],
@@ -950,13 +645,11 @@
         {
           "name": "Franklin Xu Cheng",
           "club": "HBA",
-          "playerId": 37,
           "usabId": "475425"
         },
         {
           "name": "Adrian Zhang",
           "club": "EGR",
-          "playerId": 329,
           "usabId": "444619"
         }
       ],
@@ -965,13 +658,11 @@
           {
             "name": "Eden Wong",
             "club": "HFB",
-            "playerId": 288,
             "usabId": "444836"
           },
           {
             "name": "Mingyuan Zang",
             "club": "HFB",
-            "playerId": 326,
             "usabId": "470241"
           }
         ]
@@ -981,13 +672,11 @@
           {
             "name": "Shrihayagrivan Karthigayan",
             "club": "SYN",
-            "playerId": 105,
             "usabId": "471572"
           },
           {
             "name": "Toby Liu",
             "club": "SYN",
-            "playerId": 154,
             "usabId": "448818"
           }
         ]
@@ -995,19 +684,15 @@
     },
     {
       "drawName": "BD U13",
-      "ageGroup": "U13",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Vignan Chandrasekaran",
           "club": "SBA",
-          "playerId": 25,
           "usabId": "398159"
         },
         {
           "name": "Michael Yufu Sun",
           "club": "BIN",
-          "playerId": 247,
           "usabId": "408717"
         }
       ],
@@ -1015,13 +700,11 @@
         {
           "name": "Chiranjeev Deepak",
           "club": "SYN",
-          "playerId": 51,
           "usabId": "423963"
         },
         {
           "name": "Anshu Gowda",
           "club": "SYN",
-          "playerId": 68,
           "usabId": "424083"
         }
       ],
@@ -1030,13 +713,11 @@
           {
             "name": "Leon Luo",
             "club": "NEBC",
-            "playerId": 162,
             "usabId": "406502"
           },
           {
             "name": "Ethan Qiu",
             "club": "NEBC",
-            "playerId": 200,
             "usabId": "1023045"
           }
         ]
@@ -1046,13 +727,11 @@
           {
             "name": "Arnav Satish",
             "club": "HB",
-            "playerId": 222,
             "usabId": "444741"
           },
           {
             "name": "Joey Wang",
             "club": "GBA",
-            "playerId": 276,
             "usabId": "436411"
           }
         ]
@@ -1060,19 +739,15 @@
     },
     {
       "drawName": "BD U15",
-      "ageGroup": "U15",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Zaph J-Din Bayona",
           "club": "TTBA",
-          "playerId": 15,
           "usabId": "403804"
         },
         {
           "name": "Yifei Zhang",
           "club": "HBA",
-          "playerId": 344,
           "usabId": "1022254"
         }
       ],
@@ -1080,13 +755,11 @@
         {
           "name": "Ayaaz Muhammed Baig",
           "club": "PBC",
-          "playerId": 12,
           "usabId": "1023199"
         },
         {
           "name": "Mikael Chang",
           "club": "BIN",
-          "playerId": 28,
           "usabId": "1021789"
         }
       ],
@@ -1095,13 +768,11 @@
           {
             "name": "Jacob Ma",
             "club": "EGR",
-            "playerId": 165,
             "usabId": "463222"
           },
           {
             "name": "Jacob Zhou",
             "club": "GBA",
-            "playerId": 352,
             "usabId": "1022669"
           }
         ]
@@ -1111,13 +782,11 @@
           {
             "name": "Cayden Wang",
             "club": "21BC",
-            "playerId": 273,
             "usabId": "1021794"
           },
           {
             "name": "Anthony Cheng Xu",
             "club": "HBA",
-            "playerId": 301,
             "usabId": "1022430"
           }
         ]
@@ -1125,19 +794,15 @@
     },
     {
       "drawName": "BD U17",
-      "ageGroup": "U17",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Brendan Chen",
           "club": "EGR",
-          "playerId": 30,
           "usabId": "1020365"
         },
         {
           "name": "Yifan Liu",
           "club": "21BC",
-          "playerId": 156,
           "usabId": "1020914"
         }
       ],
@@ -1145,13 +810,11 @@
         {
           "name": "Ethan Wu",
           "club": "ABC",
-          "playerId": 293,
           "usabId": "1022057"
         },
         {
           "name": "Hanyi Zhang",
           "club": "PBC",
-          "playerId": 334,
           "usabId": "1021224"
         }
       ],
@@ -1160,13 +823,11 @@
           {
             "name": "Raymond Haiwen Song",
             "club": "SBA",
-            "playerId": 236,
             "usabId": "1022370"
           },
           {
             "name": "Micah Wei",
             "club": "SBA",
-            "playerId": 281,
             "usabId": "1022337"
           }
         ]
@@ -1176,13 +837,11 @@
           {
             "name": "Christopher Gunawan",
             "club": "GBA",
-            "playerId": 74,
             "usabId": "1020480"
           },
           {
             "name": "Jayden Mar",
             "club": "SYN",
-            "playerId": 172,
             "usabId": "1020729"
           }
         ]
@@ -1190,19 +849,15 @@
     },
     {
       "drawName": "BD U19",
-      "ageGroup": "U19",
-      "eventType": "BD",
       "gold": [
         {
           "name": "Suraj Rajesh Kumar",
           "club": "BIN",
-          "playerId": 206,
           "usabId": "1020917"
         },
         {
           "name": "Vaughn Zhao",
           "club": "EBC",
-          "playerId": 347,
           "usabId": "1018951"
         }
       ],
@@ -1210,13 +865,11 @@
         {
           "name": "Nihal Kadamba",
           "club": "BIN",
-          "playerId": 98,
           "usabId": "1018888"
         },
         {
           "name": "Justin Kan",
           "club": "BIN",
-          "playerId": 100,
           "usabId": "47891"
         }
       ],
@@ -1225,13 +878,11 @@
           {
             "name": "Jay Chun",
             "club": "BBC",
-            "playerId": 49,
             "usabId": "1020446"
           },
           {
             "name": "David Zuo",
             "club": "BBC",
-            "playerId": 355,
             "usabId": "1019625"
           }
         ]
@@ -1241,13 +892,11 @@
           {
             "name": "Nikhil Kandalam",
             "club": "SYN",
-            "playerId": 101,
             "usabId": "466412"
           },
           {
             "name": "Oliver Lien Strayer",
             "club": "OBA",
-            "playerId": 245,
             "usabId": "417317"
           }
         ]
@@ -1255,19 +904,15 @@
     },
     {
       "drawName": "GD U11",
-      "ageGroup": "U11",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Harseerat K Arora",
           "club": "BIN",
-          "playerId": 7,
           "usabId": "497223"
         },
         {
           "name": "Eesha Vikram",
           "club": "HBA",
-          "playerId": 266,
           "usabId": "478026"
         }
       ],
@@ -1275,13 +920,11 @@
         {
           "name": "Shreya Rajesh Kumar",
           "club": "BIN",
-          "playerId": 205,
           "usabId": "468396"
         },
         {
           "name": "Venba Senkadir",
           "club": "BIN",
-          "playerId": 225,
           "usabId": "475181"
         }
       ],
@@ -1290,13 +933,11 @@
           {
             "name": "Yvonne Chen Yang",
             "club": "IBC",
-            "playerId": 318,
             "usabId": "418257"
           },
           {
             "name": "Thea Yuan",
             "club": "BIN",
-            "playerId": 324,
             "usabId": "479136"
           }
         ]
@@ -1306,13 +947,11 @@
           {
             "name": "Sarah Lin",
             "club": "C-A",
-            "playerId": 140,
             "usabId": "531234"
           },
           {
             "name": "Julia Zhang",
             "club": "GBA",
-            "playerId": 340,
             "usabId": "531174"
           }
         ]
@@ -1320,19 +959,15 @@
     },
     {
       "drawName": "GD U13",
-      "ageGroup": "U13",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Mizuki Ikeuchi",
           "club": "HB",
-          "playerId": 92,
           "usabId": "488171"
         },
         {
           "name": "Bella Liu",
           "club": "GBA",
-          "playerId": 146,
           "usabId": "412662"
         }
       ],
@@ -1340,13 +975,11 @@
         {
           "name": "Alaina Benjamin",
           "club": "NVBC",
-          "playerId": 16,
           "usabId": "453351"
         },
         {
           "name": "Sophia Liu",
           "club": "BIN",
-          "playerId": 152,
           "usabId": "399616"
         }
       ],
@@ -1355,13 +988,11 @@
           {
             "name": "Hanyi (Sissi) Lei",
             "club": "EGR",
-            "playerId": 126,
             "usabId": "417829"
           },
           {
             "name": "Daisy Xu",
             "club": "MBBC",
-            "playerId": 303,
             "usabId": "433543"
           }
         ]
@@ -1371,13 +1002,11 @@
           {
             "name": "Grace Cheng",
             "club": "BIN",
-            "playerId": 38,
             "usabId": "440346"
           },
           {
             "name": "Sophia Z Liu",
             "club": "HBB",
-            "playerId": 153,
             "usabId": "451805"
           }
         ]
@@ -1385,19 +1014,15 @@
     },
     {
       "drawName": "GD U15",
-      "ageGroup": "U15",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Alice Meng",
           "club": "USBA",
-          "playerId": 176,
           "usabId": "1023021"
         },
         {
           "name": "Lexuan Wen",
           "club": "21BC",
-          "playerId": 284,
           "usabId": "1021785"
         }
       ],
@@ -1405,13 +1030,11 @@
         {
           "name": "Janice Chen",
           "club": "EBC",
-          "playerId": 33,
           "usabId": "1022639"
         },
         {
           "name": "Stephanie Jiayi Song",
           "club": "BBC",
-          "playerId": 238,
           "usabId": "1022185"
         }
       ],
@@ -1420,13 +1043,11 @@
           {
             "name": "Charvi Srivastava",
             "club": "EGR",
-            "playerId": 242,
             "usabId": "437387"
           },
           {
             "name": "Elena Zhang",
             "club": "EGR",
-            "playerId": 332,
             "usabId": "436697"
           }
         ]
@@ -1436,13 +1057,11 @@
           {
             "name": "Mihika Jaiswal",
             "club": "SYN",
-            "playerId": 93,
             "usabId": "1021327"
           },
           {
             "name": "Sahasra Reddy",
             "club": "HBB",
-            "playerId": 215,
             "usabId": "1022239"
           }
         ]
@@ -1450,19 +1069,15 @@
     },
     {
       "drawName": "GD U17",
-      "ageGroup": "U17",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Angela Wang",
           "club": "HANA",
-          "playerId": 272,
           "usabId": "400396"
         },
         {
           "name": "Selina Xu",
           "club": "BIN",
-          "playerId": 307,
           "usabId": "1021758"
         }
       ],
@@ -1470,13 +1085,11 @@
         {
           "name": "Clarinda Jin",
           "club": "EGR",
-          "playerId": 96,
           "usabId": "1022685"
         },
         {
           "name": "Ishi Reddy",
           "club": "EGR",
-          "playerId": 214,
           "usabId": "1022660"
         }
       ],
@@ -1485,13 +1098,11 @@
           {
             "name": "Daby Huang",
             "club": "IBC",
-            "playerId": 85,
             "usabId": "1022076"
           },
           {
             "name": "Meghana Nishant",
             "club": "SCA",
-            "playerId": 185,
             "usabId": "1006358"
           }
         ]
@@ -1501,13 +1112,11 @@
           {
             "name": "Erica Chen Lin",
             "club": "EGR",
-            "playerId": 139,
             "usabId": "400050"
           },
           {
             "name": "Selena Wei",
             "club": "GBA",
-            "playerId": 282,
             "usabId": "1022633"
           }
         ]
@@ -1515,19 +1124,15 @@
     },
     {
       "drawName": "GD U19",
-      "ageGroup": "U19",
-      "eventType": "GD",
       "gold": [
         {
           "name": "Sophia Wu",
           "club": "NEBC",
-          "playerId": 295,
           "usabId": "1018674"
         },
         {
           "name": "Jennifer Xu",
           "club": "HB",
-          "playerId": 304,
           "usabId": "1020469"
         }
       ],
@@ -1535,13 +1140,11 @@
         {
           "name": "Suneri Krishna Chinthalapati",
           "club": "SYN",
-          "playerId": 360,
           "usabId": "1018440"
         },
         {
           "name": "Anvita Jamsandekar",
           "club": "SYN",
-          "playerId": 363,
           "usabId": "1020287"
         }
       ],
@@ -1550,13 +1153,11 @@
           {
             "name": "Coco Cenke Tao",
             "club": "BBC",
-            "playerId": 255,
             "usabId": "1020530"
           },
           {
             "name": "Xinyan Zeng",
             "club": "EBC",
-            "playerId": 328,
             "usabId": "1017675"
           }
         ]
@@ -1566,13 +1167,11 @@
           {
             "name": "Jocelyn (Youran) Zhang",
             "club": "BBC",
-            "playerId": 338,
             "usabId": "1021968"
           },
           {
             "name": "Zimeng Zhou",
             "club": "BBC",
-            "playerId": 353,
             "usabId": "1021966"
           }
         ]

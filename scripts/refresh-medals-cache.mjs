@@ -52,16 +52,6 @@ if (!all && !season && tswIds.length === 0) {
 
 // ── Helpers (same logic as medals.js) ────────────────────────────────────────
 
-function getAgeGroup(eventName) {
-  const m = eventName.match(/U\d+/i);
-  return m ? m[0].toUpperCase() : '';
-}
-
-function getEventType(eventName) {
-  const m = eventName.match(/^(BS|GS|BD|GD|XD)/i);
-  return m ? m[1].toUpperCase() : '';
-}
-
 function normalizePlaces(results) {
   const gold = [], silver = [], bronze = [], fourth = [];
   for (const r of results) {
@@ -153,7 +143,6 @@ async function scrapeMedals(tswId) {
   const memberIdMap = await fetchPlayerMemberIds(tswId, [...uniquePlayerIds]);
   console.log(`  resolved ${memberIdMap.size}/${uniquePlayerIds.size} USAB IDs`);
 
-  const clubStats = new Map();
   const medals = [];
 
   function enrichPlayers(resultEntries) {
@@ -161,7 +150,7 @@ async function scrapeMedals(tswId) {
       r.players.map(p => {
         const entry = playersMap.get(p.playerId);
         const usabId = memberIdMap.get(p.playerId) || '';
-        return { name: p.name, club: entry?.club || '', playerId: p.playerId, usabId };
+        return { name: p.name, club: entry?.club || '', usabId };
       }),
     );
   }
@@ -171,56 +160,24 @@ async function scrapeMedals(tswId) {
       r.players.map(p => {
         const entry = playersMap.get(p.playerId);
         const usabId = memberIdMap.get(p.playerId) || '';
-        return { name: p.name, club: entry?.club || '', playerId: p.playerId, usabId };
+        return { name: p.name, club: entry?.club || '', usabId };
       }),
     );
   }
 
-  function countMedal(players, medalType) {
-    for (const p of players) {
-      const club = p.club || 'N/A';
-      if (!clubStats.has(club)) clubStats.set(club, { gold: 0, silver: 0, bronze: 0 });
-      clubStats.get(club)[medalType]++;
-    }
-  }
-
   for (const event of winnerEvents) {
-    const ageGroup = getAgeGroup(event.eventName);
-    const eventType = getEventType(event.eventName);
     const { gold, silver, bronze, fourth } = normalizePlaces(event.results);
-
-    const goldPlayers = enrichPlayers(gold);
-    const silverPlayers = enrichPlayers(silver);
-    const bronzePlayers = enrichBronze(bronze);
-    const fourthPlayers = enrichBronze(fourth);
 
     medals.push({
       drawName: event.eventName,
-      ageGroup,
-      eventType,
-      gold: goldPlayers,
-      silver: silverPlayers,
-      bronze: bronzePlayers,
-      fourth: fourthPlayers,
+      gold: enrichPlayers(gold),
+      silver: enrichPlayers(silver),
+      bronze: enrichBronze(bronze),
+      fourth: enrichBronze(fourth),
     });
-
-    countMedal(goldPlayers, 'gold');
-    countMedal(silverPlayers, 'silver');
-    for (const team of bronzePlayers) countMedal(team, 'bronze');
-    for (const team of fourthPlayers) countMedal(team, 'bronze');
   }
 
-  const clubs = [...clubStats.entries()]
-    .map(([club, stats]) => ({
-      club,
-      gold: stats.gold,
-      silver: stats.silver,
-      bronze: stats.bronze,
-      total: stats.gold + stats.silver + stats.bronze,
-    }))
-    .sort((a, b) => b.total - a.total || b.gold - a.gold || b.silver - a.silver);
-
-  return { tswId, tournamentName, clubs, medals };
+  return { tswId, tournamentName, medals };
 }
 
 // ── Collect tswIds from tournament cache files ───────────────────────────────
@@ -278,7 +235,7 @@ async function main() {
     try {
       const result = await scrapeMedals(id);
       await saveMedalsDiskCache(id, result);
-      console.log(`  saved medals-${id.toLowerCase()}.json (${result.medals.length} events, ${result.clubs.length} clubs)`);
+      console.log(`  saved medals-${id.toLowerCase()}.json (${result.medals.length} events)`);
       scraped++;
     } catch (err) {
       console.error(`  FAILED: ${err.message}`);

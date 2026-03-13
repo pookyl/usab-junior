@@ -204,7 +204,6 @@ export interface TournamentDetail {
 export interface MedalPlayer {
   name: string;
   club: string;
-  playerId: number;
   usabId?: string;
 }
 
