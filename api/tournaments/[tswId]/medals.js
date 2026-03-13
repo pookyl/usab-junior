@@ -2,6 +2,7 @@ import {
   setCors, getCached, setCache,
   tswFetch, parseTswWinners, parseTswTournamentPlayers,
   parseTswTournamentInfo, isValidTswId,
+  loadMedalsDiskCache,
 } from '../../_lib/shared.js';
 
 import { TSW_BASE } from '../../_lib/shared.js';
@@ -17,22 +18,23 @@ function getEventType(eventName) {
 }
 
 function normalizePlaces(results) {
-  const gold = [], silver = [], bronze = [];
+  const gold = [], silver = [], bronze = [], fourth = [];
   for (const r of results) {
     const p = r.place.replace(/\s/g, '');
     if (p === '1') gold.push(r);
     else if (p === '1/2') { (gold.length === 0 ? gold : silver).push(r); }
     else if (p === '2') silver.push(r);
-    else if (p === '3' || p === '3/4' || p === '4') bronze.push(r);
+    else if (p === '3' || p === '3/4') bronze.push(r);
+    else if (p === '4') fourth.push(r);
   }
   if (gold.length === 0 && results.length > 0) gold.push(results[0]);
   if (silver.length === 0 && results.length > 1) silver.push(results[1]);
   if (bronze.length === 0 && results.length > 2) bronze.push(results[2]);
-  if (results.length > 3 && bronze.length < 2) {
+  if (fourth.length === 0 && results.length > 3) {
     const r3 = results[3];
-    if (r3 && !bronze.includes(r3)) bronze.push(r3);
+    if (r3 && !bronze.includes(r3)) fourth.push(r3);
   }
-  return { gold, silver, bronze };
+  return { gold, silver, bronze, fourth };
 }
 
 async function fetchTournamentPlayers(tswId) {
@@ -69,6 +71,16 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Check disk cache (pre-scraped by scripts/refresh-medals-cache.mjs)
+  const diskCached = await loadMedalsDiskCache(tswId);
+  if (diskCached) {
+    setCache(cacheKey, diskCached);
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'DISK' });
+    res.end(JSON.stringify(diskCached));
+    return;
+  }
+
+  // Live scrape fallback (no USAB ID resolution — client falls back to name matching)
   try {
     const [winnersResp, playersMap] = await Promise.all([
       tswFetch(`/sport/winners.aspx?id=${encodeURIComponent(tswId)}`),
@@ -86,14 +98,13 @@ export default async function handler(req, res) {
     const winnerEvents = parseTswWinners(winnersHtml);
 
     const clubStats = new Map();
-    const clubPlayers = new Map();
     const medals = [];
 
     function enrichPlayers(resultEntries, pMap) {
       return resultEntries.flatMap(r =>
         r.players.map(p => {
           const entry = pMap.get(p.playerId);
-          return { name: p.name, club: entry?.club || '', playerId: p.playerId };
+          return { name: p.name, club: entry?.club || '', playerId: p.playerId, usabId: '' };
         }),
       );
     }
@@ -102,7 +113,7 @@ export default async function handler(req, res) {
       return resultEntries.map(r =>
         r.players.map(p => {
           const entry = pMap.get(p.playerId);
-          return { name: p.name, club: entry?.club || '', playerId: p.playerId };
+          return { name: p.name, club: entry?.club || '', playerId: p.playerId, usabId: '' };
         }),
       );
     }
@@ -118,11 +129,12 @@ export default async function handler(req, res) {
     for (const event of winnerEvents) {
       const ageGroup = getAgeGroup(event.eventName);
       const eventType = getEventType(event.eventName);
-      const { gold, silver, bronze } = normalizePlaces(event.results);
+      const { gold, silver, bronze, fourth } = normalizePlaces(event.results);
 
       const goldPlayers = enrichPlayers(gold, playersMap);
       const silverPlayers = enrichPlayers(silver, playersMap);
       const bronzePlayers = enrichBronze(bronze, playersMap);
+      const fourthPlayers = enrichBronze(fourth, playersMap);
 
       medals.push({
         drawName: event.eventName,
@@ -131,45 +143,24 @@ export default async function handler(req, res) {
         gold: goldPlayers,
         silver: silverPlayers,
         bronze: bronzePlayers,
+        fourth: fourthPlayers,
       });
 
       countMedal(goldPlayers, 'gold', clubStats);
       countMedal(silverPlayers, 'silver', clubStats);
       for (const team of bronzePlayers) countMedal(team, 'bronze', clubStats);
-    }
-
-    for (const [, info] of playersMap) {
-      const club = info.club || 'N/A';
-      if (!clubPlayers.has(club)) clubPlayers.set(club, new Set());
-      clubPlayers.get(club).add(info.name);
+      for (const team of fourthPlayers) countMedal(team, 'bronze', clubStats);
     }
 
     const clubs = [...clubStats.entries()]
-      .map(([club, stats]) => {
-        const names = clubPlayers.get(club);
-        const sorted = names ? [...names].sort((a, b) => a.localeCompare(b)) : [];
-        return {
-          club,
-          gold: stats.gold,
-          silver: stats.silver,
-          bronze: stats.bronze,
-          total: stats.gold + stats.silver + stats.bronze,
-          playerCount: sorted.length,
-          players: sorted,
-        };
-      })
+      .map(([club, stats]) => ({
+        club,
+        gold: stats.gold,
+        silver: stats.silver,
+        bronze: stats.bronze,
+        total: stats.gold + stats.silver + stats.bronze,
+      }))
       .sort((a, b) => b.total - a.total || b.gold - a.gold || b.silver - a.silver);
-
-    for (const [club, players] of clubPlayers) {
-      if (!clubStats.has(club)) {
-        const sorted = [...players].sort((a, b) => a.localeCompare(b));
-        clubs.push({
-          club, gold: 0, silver: 0, bronze: 0, total: 0,
-          playerCount: sorted.length,
-          players: sorted,
-        });
-      }
-    }
 
     const result = {
       tswId,

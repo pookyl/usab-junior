@@ -18,6 +18,7 @@ interface PlayersContextValue {
   changeDate: (date: string) => void;
   refresh: () => void;
   playerNameMap: Map<string, string[]>;
+  playerIdSet: Set<string>;
 }
 
 const PlayersContext = createContext<PlayersContextValue | null>(null);
@@ -139,13 +140,20 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     return map;
   }, [directoryPlayers, players]);
 
+  const playerIdSet = useMemo(() => {
+    const set = new Set<string>();
+    const source = directoryPlayers.length > 0 ? directoryPlayers : players;
+    for (const p of source) set.add(p.usabId);
+    return set;
+  }, [directoryPlayers, players]);
+
   const refresh = useCallback(() => load(), [load]);
 
   const contextValue = useMemo(() => ({
     players, directoryPlayers, directoryLoading, loading, error,
-    source, rankingsDate, availableDates, changeDate, refresh, playerNameMap,
+    source, rankingsDate, availableDates, changeDate, refresh, playerNameMap, playerIdSet,
   }), [players, directoryPlayers, directoryLoading, loading, error,
-       source, rankingsDate, availableDates, changeDate, refresh, playerNameMap]);
+       source, rankingsDate, availableDates, changeDate, refresh, playerNameMap, playerIdSet]);
 
   return (
     <PlayersContext.Provider value={contextValue}>

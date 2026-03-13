@@ -1,4 +1,4 @@
-import { readFile, readdir } from 'fs/promises';
+import { readFile, readdir, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -117,6 +117,24 @@ export async function getDiskCachedAllPlayers(date) {
 export async function getDiskCachedDate() {
   const disk = await loadDiskCache();
   return disk?.date ?? null;
+}
+
+// ── Medals disk cache ────────────────────────────────────────────────────────
+
+function medalsCachePath(tswId) {
+  return join(DISK_CACHE_DIR, `medals-${tswId.toLowerCase()}.json`);
+}
+
+export async function loadMedalsDiskCache(tswId) {
+  try {
+    const raw = await readFile(medalsCachePath(tswId), 'utf-8');
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+export async function saveMedalsDiskCache(tswId, data) {
+  await mkdir(DISK_CACHE_DIR, { recursive: true });
+  await writeFile(medalsCachePath(tswId), JSON.stringify(data, null, 2));
 }
 
 // ── CORS helper ──────────────────────────────────────────────────────────────
@@ -691,4 +709,16 @@ export function parseTswTournamentPlayers(html) {
     }
   }
   return players;
+}
+
+// ── TSW Player profile MemberID extractor ─────────────────────────────────────
+// The player profile page contains the USAB MemberID in two places:
+//   <span class="media__title-aside">(1022633)</span>
+//   href="/head-2-head?...&T1P1MemberID=1022633&..."
+export function parseTswPlayerMemberId(html) {
+  const titleAside = html.match(/<span[^>]*class="media__title-aside"[^>]*>\((\d+)\)<\/span>/i);
+  if (titleAside) return titleAside[1];
+  const h2h = html.match(/MemberID=(\d+)/);
+  if (h2h) return h2h[1];
+  return null;
 }

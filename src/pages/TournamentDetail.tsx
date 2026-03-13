@@ -29,11 +29,11 @@ function getEventColor(name: string) {
   return { bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-600 dark:text-slate-300' };
 }
 
-type SortKey = 'gold' | 'silver' | 'bronze' | 'total' | 'playerCount' | 'club';
+type SortKey = 'gold' | 'silver' | 'bronze' | 'total' | 'club';
 
-function PlayerName({ player, nameMap }: { player: MedalPlayer; nameMap: Map<string, string[]> }) {
-  const usabIds = nameMap.get(player.name.toLowerCase());
-  const usabId = usabIds?.[0];
+function PlayerName({ player, nameMap, playerIdSet }: { player: MedalPlayer; nameMap: Map<string, string[]>; playerIdSet: Set<string> }) {
+  const idMatch = player.usabId && playerIdSet.has(player.usabId) ? player.usabId : null;
+  const usabId = idMatch ?? nameMap.get(player.name.toLowerCase())?.[0] ?? null;
   if (usabId) {
     return (
       <Link
@@ -56,7 +56,7 @@ function MedalIcon({ type, size = 16 }: { type: 'gold' | 'silver' | 'bronze'; si
   return <Medal className={`${colors[type]} shrink-0`} style={{ width: size, height: size }} />;
 }
 
-type ExpandMode = 'medals' | 'gold' | 'silver' | 'bronze' | 'players' | null;
+type ExpandMode = 'medals' | 'gold' | 'silver' | 'bronze' | null;
 type DetailSortKey = 'event' | 'place' | 'player';
 const PLACE_ORDER: Record<string, number> = { gold: 1, silver: 2, bronze: 3 };
 
@@ -65,11 +65,13 @@ function ClubMedalRow({
   rank,
   medals,
   nameMap,
+  playerIdSet,
 }: {
   club: ClubMedalSummary;
   rank: number;
   medals: DrawMedals[];
   nameMap: Map<string, string[]>;
+  playerIdSet: Set<string>;
 }) {
   const [expandMode, setExpandMode] = useState<ExpandMode>(null);
   const [detailSort, setDetailSort] = useState<DetailSortKey>('event');
@@ -104,7 +106,7 @@ function ClubMedalRow({
           results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'silver', players: m.silver });
         }
       }
-      for (const team of m.bronze) {
+      for (const team of [...m.bronze, ...(m.fourth ?? [])]) {
         for (const p of team) {
           if (p.club === club.club) {
             results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'bronze', players: team });
@@ -190,59 +192,11 @@ function ClubMedalRow({
             {club.total}
           </span>
         </td>
-        <td
-          className={`px-3 py-2.5 text-center ${cellClickCls}`}
-          onClick={() => toggle('players')}
-        >
-          <span className={`text-sm text-slate-500 dark:text-slate-400 px-1 hover:underline ${activeRing('players')}`}>
-            {club.playerCount}
-          </span>
-        </td>
       </tr>
 
-      {expandMode === 'players' && (
+      {expandMode !== null && filteredMedals.length > 0 && (
         <tr>
-          <td colSpan={7} className="px-0 py-0">
-            <div className="bg-slate-50 dark:bg-slate-800/40 px-6 py-3 border-y border-slate-100 dark:border-slate-700/50">
-              {(club.players?.length ?? 0) > 0 ? (
-                <>
-                  <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
-                    All players ({club.players.length})
-                  </p>
-                  <div className="flex flex-col gap-0.5 text-sm text-slate-700 dark:text-slate-200">
-                    {club.players.map((name, i) => {
-                      const usabIds = nameMap.get(name.toLowerCase());
-                      const usabId = usabIds?.[0];
-                      return (
-                        <div key={i} className="py-0.5">
-                          {usabId ? (
-                            <Link
-                              to={`/directory/${usabId}`}
-                              className="text-violet-600 dark:text-violet-400 hover:underline"
-                            >
-                              {name}
-                            </Link>
-                          ) : (
-                            <span>{name}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              ) : (
-                <p className="text-xs text-slate-400 dark:text-slate-500">
-                  Player list not available. Try refreshing the page.
-                </p>
-              )}
-            </div>
-          </td>
-        </tr>
-      )}
-
-      {expandMode !== null && expandMode !== 'players' && filteredMedals.length > 0 && (
-        <tr>
-          <td colSpan={7} className="px-0 py-0">
+          <td colSpan={6} className="px-0 py-0">
             <div className="bg-slate-50 dark:bg-slate-800/40 px-6 py-3 border-y border-slate-100 dark:border-slate-700/50">
               <table className="w-full text-sm">
                 <thead>
@@ -281,7 +235,7 @@ function ClubMedalRow({
                             return show.map((p, j) => (
                               <span key={j}>
                                 {j > 0 && <span className="text-slate-400 dark:text-slate-500"> / </span>}
-                                <PlayerName player={p} nameMap={nameMap} />
+                                <PlayerName player={p} nameMap={nameMap} playerIdSet={playerIdSet} />
                               </span>
                             ));
                           })()}
@@ -306,7 +260,7 @@ export default function TournamentDetail() {
   const [error, setError] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('total');
   const [sortAsc, setSortAsc] = useState(false);
-  const { playerNameMap } = usePlayers();
+  const { playerNameMap, playerIdSet } = usePlayers();
 
   useEffect(() => {
     if (!tswId) return;
@@ -437,9 +391,6 @@ export default function TournamentDetail() {
                   <th className={`${headerCls} text-center`} onClick={() => handleSort('total')}>
                     Total{sortArrow('total')}
                   </th>
-                  <th className={`${headerCls} text-center`} onClick={() => handleSort('playerCount')}>
-                    Players{sortArrow('playerCount')}
-                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
@@ -450,6 +401,7 @@ export default function TournamentDetail() {
                     rank={idx + 1}
                     medals={data.medals}
                     nameMap={playerNameMap}
+                    playerIdSet={playerIdSet}
                   />
                 ))}
               </tbody>

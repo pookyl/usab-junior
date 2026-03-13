@@ -215,6 +215,7 @@ export interface DrawMedals {
   gold: MedalPlayer[];
   silver: MedalPlayer[];
   bronze: MedalPlayer[][];
+  fourth: MedalPlayer[][];
 }
 
 export interface ClubMedalSummary {
@@ -223,8 +224,6 @@ export interface ClubMedalSummary {
   silver: number;
   bronze: number;
   total: number;
-  playerCount: number;
-  players: string[];
 }
 
 export interface TournamentMedals {
