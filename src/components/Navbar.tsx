@@ -9,7 +9,7 @@ const navItems = [
   { path: '/players', label: 'Rankings', shortLabel: 'Rankings', icon: Trophy },
   { path: '/directory', label: 'Players', shortLabel: 'Players', icon: Users },
   { path: '/tournaments', label: 'Tournaments', shortLabel: 'Tournaments', icon: Award },
-  { path: '/head-to-head', label: 'Head to Head', shortLabel: 'H2H', icon: Swords },
+  { path: '/head-to-head', label: 'H2H', shortLabel: 'H2H', icon: Swords },
 ];
 
 const MODE_CYCLE: ThemeMode[] = ['system', 'light', 'dark'];
