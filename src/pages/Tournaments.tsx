@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar, MapPin, ChevronDown, ExternalLink, FileText,
-  Clock, CheckCircle2, Loader2, Trophy, Filter, Medal,
+  Clock, CheckCircle2, Loader2, Filter, Medal,
 } from 'lucide-react';
 import { fetchTournaments } from '../services/rankingsService';
 import type { ScheduledTournament, TournamentsResponse } from '../types/junior';
@@ -213,15 +213,6 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        {tournament.tswId && (
-          <Link
-            to={`/tournaments/${tournament.tswId}`}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
-          >
-            <Trophy className="w-3 h-3" />
-            {tournament.status === 'completed' ? 'Results' : 'Draw'}
-          </Link>
-        )}
         {tournament.tswId && tournament.status === 'completed' && (
           <Link
             to={`/tournaments/${tournament.tswId}`}

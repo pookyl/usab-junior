@@ -47,18 +47,21 @@ function PlayerName({ player, nameMap, playerIdSet }: { player: MedalPlayer; nam
   return <span>{player.name}</span>;
 }
 
-function MedalIcon({ type, size = 16 }: { type: 'gold' | 'silver' | 'bronze'; size?: number }) {
+function MedalIcon({ type, size = 16 }: { type: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number }) {
   const colors = {
     gold: 'text-yellow-500',
     silver: 'text-slate-400',
     bronze: 'text-amber-700 dark:text-amber-600',
+    fourth: 'text-amber-700 dark:text-amber-600',
   };
   return <Medal className={`${colors[type]} shrink-0`} style={{ width: size, height: size }} />;
 }
 
+const PLACE_LABEL: Record<string, string> = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze', fourth: '4th' };
+
 type ExpandMode = 'medals' | 'gold' | 'silver' | 'bronze' | null;
 type DetailSortKey = 'event' | 'place' | 'player';
-const PLACE_ORDER: Record<string, number> = { gold: 1, silver: 2, bronze: 3 };
+const PLACE_ORDER: Record<string, number> = { gold: 1, silver: 2, bronze: 3, fourth: 4 };
 
 function ClubMedalRow({
   club,
@@ -91,7 +94,7 @@ function ClubMedalRow({
       drawName: string;
       ageGroup: string;
       eventType: string;
-      place: 'gold' | 'silver' | 'bronze';
+      place: 'gold' | 'silver' | 'bronze' | 'fourth';
       players: MedalPlayer[];
     }> = [];
 
@@ -106,10 +109,17 @@ function ClubMedalRow({
           results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'silver', players: m.silver });
         }
       }
-      for (const team of [...m.bronze, ...(m.fourth ?? [])]) {
+      for (const team of m.bronze) {
         for (const p of team) {
           if (p.club === club.club) {
             results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'bronze', players: team });
+          }
+        }
+      }
+      for (const team of (m.fourth ?? [])) {
+        for (const p of team) {
+          if (p.club === club.club) {
+            results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'fourth', players: team });
           }
         }
       }
@@ -126,8 +136,10 @@ function ClubMedalRow({
 
   const filteredMedals = useMemo(() => {
     let list = clubMedals;
-    if (expandMode === 'gold' || expandMode === 'silver' || expandMode === 'bronze') {
+    if (expandMode === 'gold' || expandMode === 'silver') {
       list = clubMedals.filter(cm => cm.place === expandMode);
+    } else if (expandMode === 'bronze') {
+      list = clubMedals.filter(cm => cm.place === 'bronze' || cm.place === 'fourth');
     }
     const sorted = [...list].sort((a, b) => {
       let cmp = 0;
@@ -225,7 +237,7 @@ function ClubMedalRow({
                         <td className="py-1.5 pr-3">
                           <div className="flex items-center gap-1">
                             <MedalIcon type={cm.place} size={14} />
-                            <span className="text-xs capitalize text-slate-600 dark:text-slate-300">{cm.place}</span>
+                            <span className="text-xs text-slate-600 dark:text-slate-300">{PLACE_LABEL[cm.place] ?? cm.place}</span>
                           </div>
                         </td>
                         <td className="py-1.5 text-slate-700 dark:text-slate-200">
