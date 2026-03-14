@@ -12,7 +12,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=122A5677-AC44-4D7F-8805-5BD299103C82",
       "usabUrl": "https://usabadminton.org/2021-usab-open-local-championship-for-midwest-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/10/2021-Egret-OLC-Prospectus-FINAL.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 139,
+      "venueClub": "Egret Badminton",
+      "venueLocation": "1251 Basswood Rd., Schaumburg, IL 60173, U.S.A."
     },
     {
       "name": "2021 NorCal CRC",
@@ -25,7 +28,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=162A5244-5E15-4991-A673-F934A7DCD6E9",
       "usabUrl": "https://usabadminton.org/2021-usab-closed-regional-championship-for-northern-california-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/10/2021-NorCal-EBC-CRC-Prospectus-FINAL.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 266,
+      "venueClub": "Elite Badminton Center",
+      "venueLocation": "33540 Central Ave, Union City, CA 94587, U.S.A."
     },
     {
       "name": "2021 NW CRC",
@@ -38,7 +44,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=840622A6-46B1-4C0E-A1C0-716967736F7F",
       "usabUrl": "https://usabadminton.org/2021-usab-closed-regional-championship-for-northwest-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/10/2021-Northwest-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 124,
+      "venueClub": "Seattle Badminton Club",
+      "venueLocation": "10858 117th Pl, Kirkland, WA 98033, U.S.A."
     },
     {
       "name": "2021 NE ORC",
@@ -51,7 +60,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=9F86740D-8443-47A1-93AA-CB1CFC6C8F97",
       "usabUrl": "https://usabadminton.org/2021-usab-open-regional-championship-for-northeast-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/11/NE-IBC-ORC-2021-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 73,
+      "venueClub": "International Badminton Center",
+      "venueLocation": "3775 Park Ave, Unt 8A, Edison, NJ 08820, U.S.A."
     },
     {
       "name": "2021 HPBC NW ORC",
@@ -64,7 +76,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=9538C0B6-8BA1-4446-B900-821DD2AD5D1D",
       "usabUrl": null,
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/11/2021-NW-BBC-ORC-Prospectus-Final.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 335,
+      "venueClub": "Bellevue Badminton Club (Harbour Pointe)",
+      "venueLocation": "3616 South Road, Building D, Mukilteo, WA 98275, U.S.A."
     },
     {
       "name": "2021 SoCal ORC",
@@ -77,7 +92,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=AC640A87-C191-4A6C-964C-EEEDE448B5A2",
       "usabUrl": "https://usabadminton.org/2021-socal-sgvbc-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/12/2021-SoCal-SGVBC-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 450,
+      "venueClub": "San Gabriel Valley Badminton Club",
+      "venueLocation": "9255 Telstar Ave, El Monte, CA 91731, U.S.A."
     },
     {
       "name": "2022 South Frisco ORC",
@@ -90,7 +108,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=A2E49C64-3C68-46DA-B4A3-2AF1D2C758CB",
       "usabUrl": "https://usabadminton.org/2022-usab-south-frisco-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/12/2022-FRISCO-BADMINTON-SOUTH-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 464,
+      "venueClub": "Frisco Badminton",
+      "venueLocation": "6226 All Stars Ave, Frisco, TX 75033, U.S.A."
     },
     {
       "name": "2022 NE CRC",
@@ -103,7 +124,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=E31BC008-0B26-435B-B007-DCAA2B111C67",
       "usabUrl": "https://usabadminton.org/2022-ne-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/01/2022-Northeast-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 115,
+      "venueClub": "South Jersey Indoor Sports Club",
+      "venueLocation": "545 NJ-73, West Berlin, NJ 08091, U.S.A."
     },
     {
       "name": "2022 Synergy NorCal ORC",
@@ -116,7 +140,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=E61953B0-2EDB-418D-9FE7-AA7893723087",
       "usabUrl": "https://usabadminton.org/2022-synergy-norcal-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/01/2022-Synergy-NorCal-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 437,
+      "venueClub": "Synergy Badminton",
+      "venueLocation": "44380 Old Warm Springs Blvd, Fremont, CA 94538, U.S.A."
     },
     {
       "name": "2022 MBC CRC",
@@ -129,7 +156,10 @@
       "tswUrl": "https://tournamentsoftware.com/sport/tournament?id=461D5C31-33DE-41C2-BF3C-AF53FA59F58C",
       "usabUrl": "https://usabadminton.org/2022-midwest-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/01/2022-Midwest-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 144,
+      "venueClub": "Midwest Badminton Club",
+      "venueLocation": "8202 Lemont Rd, Woodridge, IL 60517, U.S.A."
     },
     {
       "name": "2022 SoCal Dave Freeman OLC",
@@ -142,7 +172,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=7D736C11-8572-4BA4-AF92-558021586DCE",
       "usabUrl": "https://usabadminton.org/2022-dave-freeman-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/01/2022-Dave-Freeman-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 177,
+      "venueClub": "Balboa Park Activity Center",
+      "venueLocation": "2145 Park Blvd., San Diego, CA 92101"
     },
     {
       "name": "2022 SoCal Arena CRC",
@@ -155,7 +188,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=A9E88A79-6344-4A00-B154-E76A0D304DA0",
       "usabUrl": "https://usabadminton.org/2022-socal-arena-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/02/2022-SoCal-Arena-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 131,
+      "venueClub": "Arena Badminton & Sports Club",
+      "venueLocation": "2780 S. Reservoir St, Pomona, CA 91766, U.S.A."
     },
     {
       "name": "2022 South CRC",
@@ -168,7 +204,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=7CCA3375-4F51-431D-89A2-BF6A80727DE8",
       "usabUrl": "https://usabadminton.org/2022-south-houston-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/02/2022-South-Houston-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 174,
+      "venueClub": "Houston Badminton Center",
+      "venueLocation": "10550 W Airport Blvd, Stafford, TX 77477, U.S.A."
     },
     {
       "name": "Collegiate National Championship & Selection Event for World University Games",
@@ -181,7 +220,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=2332137E-28D3-42F5-A63B-64CA3D51C643",
       "usabUrl": "https://usabadminton.org/prospectus-released-for-collegiate-nationals-individual-selection-event-for-world-university-games/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/03/2022-Collegiate-National-Championships-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 30,
+      "venueClub": "Triangle Badminton & Table Tennis",
+      "venueLocation": "2900 Perimeter Park Dr, #200, Morrisville, NC 27560, U.S.A."
     },
     {
       "name": "2022 NE NJBC OLC",
@@ -194,7 +236,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=7DB07BDF-87DE-4061-B0DA-E5C391A62B89",
       "usabUrl": "https://usabadminton.org/2022-northeast-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/03/2022-NE-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 154,
+      "venueClub": "New Jersey Badminton CLub",
+      "venueLocation": "2 Changebridge Rd, Montville, NJ, U.S.A."
     },
     {
       "name": "Selection Event for Junior Pan Am Championships & Junior World Championships",
@@ -207,7 +252,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=D049FB41-9E0F-4741-AF06-3C1A61E981A4",
       "usabUrl": "https://usabadminton.org/2022-selection-event-for-pan-am-junior-world-junior-championships-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/03/2022-USAB-Junior-Selection-Event-for-Pan-Am-Junior-and-World-Junior-Championships-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 261,
+      "venueClub": "Frisco Badminton",
+      "venueLocation": "6226 All Stars Ave, Frisco, TX 75033, U.S.A."
     },
     {
       "name": "2022 South Frisco U11 Only OLC",
@@ -220,7 +268,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=733C0B86-6C3A-48DC-8353-A11D5E181FC6",
       "usabUrl": "https://usabadminton.org/2022-frisco-south-u11-only-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/03/2022-South-Frisco-U11-Only-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 31,
+      "venueClub": "Frisco Badminton",
+      "venueLocation": "6226 All Stars Ave, Frisco, TX 75033, U.S.A."
     },
     {
       "name": "2022 Boston NE OLC (CANCELLED)",
@@ -233,7 +284,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2022 NW Oregon OLC",
@@ -246,7 +300,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=A4F63553-4106-46DA-954F-6AB2794E1498",
       "usabUrl": "https://usabadminton.org/2022-northwest-oregon-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/04/2022-NW-Oregon-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 121,
+      "venueClub": "Oregon Badminton Academy",
+      "venueLocation": "11150 SW Allen Blvd, Suite 200, Beaverton, OR, U.S.A."
     },
     {
       "name": "2022 SPBA MW ORC",
@@ -259,7 +316,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=15617B9A-42E2-4961-9D2D-ED9ABA8041BB",
       "usabUrl": "https://usabadminton.org/2022-spba-midwest-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/04/2022-MW-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 437,
+      "venueClub": "Shannon Pohl Badminton Academy",
+      "venueLocation": "710-720 Corporate Woods Parkway, Vernon Hills, IL, U.S.A."
     },
     {
       "name": "2022 Junior National Championships",
@@ -272,8 +332,11 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/114E4A90-5D9B-4D50-98AF-0551965B6CAA",
       "usabUrl": "https://usabadminton.org/athletes/juniors/junior-national-championships/2022-junior-nationals/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2022/05/2022-Junior-Nationals-Prospectus-Final.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 619,
+      "venueClub": "Fieldhouse USA",
+      "venueLocation": "6155 Sports Village Road, Frisco, TX, U.S.A."
     }
   ],
-  "savedAt": "2026-03-12T17:01:01.987Z"
+  "savedAt": "2026-03-14T06:20:02.598Z"
 }

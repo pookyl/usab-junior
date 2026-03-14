@@ -23,6 +23,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DATA_DIR = join(ROOT, 'data');
 
+process.chdir(ROOT);
+const {
+  tswFetch,
+  parseTswTournamentPlayers,
+  TSW_BASE,
+} = await import('../api/_lib/shared.js');
+
 const USAB_SCHEDULE_URL = 'https://usabadminton.org/athletes/juniors/junior-tournament-schedule/';
 
 const BROWSER_HEADERS = {
@@ -189,6 +196,7 @@ function parseSeasonTable(html) {
       tournaments.push({
         name, startDate, endDate, region, hostClub, type,
         tswId, tswUrl, usabUrl, prospectusUrl, status,
+        totalPlayers: null, venueClub: null, venueLocation: null,
       });
     }
   }
@@ -233,6 +241,94 @@ async function enrichWithTswIds(tournaments) {
     if (found === 0 && batch.length > 0) {
       console.log(`  (batch ${Math.floor(i / 3) + 1}: no TSW links found)`);
     }
+
+    if (i + 3 < toFetch.length) {
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+}
+
+// ── Fetch venue info and total players from TSW ──────────────────────────────
+
+function parseTswVenueInfo(html) {
+  const venueTitleMatch = html.match(/module__title-main">\s*Venue\s*</);
+  if (!venueTitleMatch) return { venueClub: null, venueLocation: null };
+
+  const venueSection = html.substring(venueTitleMatch.index, venueTitleMatch.index + 3000);
+
+  const clubMatch = venueSection.match(/media__title[\s\S]*?nav-link__value">([^<]+)/);
+  const venueClub = clubMatch ? decodeHtmlEntities(clubMatch[1].trim()) : null;
+
+  const streetMatch = venueSection.match(/p-street-address[^>]*>([\s\S]*?)<\/div>/);
+  const postalMatch = venueSection.match(/p-postal-code[^>]*>([^<]+)/);
+  const localityMatch = venueSection.match(/p-locality[^>]*>([^<]+)/);
+  const regionMatch = venueSection.match(/p-region[^>]*>([^<]+)/);
+  const countryMatch = venueSection.match(/p-country-name[^>]*>([^<]+)/);
+
+  const street = streetMatch
+    ? decodeHtmlEntities(streetMatch[1].replace(/<br\s*\/?>/gi, ',').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').replace(/\s*,\s*/g, ', ').trim())
+    : null;
+  const city = localityMatch ? decodeHtmlEntities(localityMatch[1].trim()) : null;
+  const state = regionMatch ? decodeHtmlEntities(regionMatch[1].trim()) : null;
+  const postalCode = postalMatch ? decodeHtmlEntities(postalMatch[1].trim()) : null;
+  const country = countryMatch ? decodeHtmlEntities(countryMatch[1].trim()) : null;
+
+  const addressParts = [];
+  if (street) addressParts.push(street);
+  if (city && state && postalCode) addressParts.push(`${city}, ${state} ${postalCode}`);
+  else if (city && state) addressParts.push(`${city}, ${state}`);
+  else if (city) addressParts.push(city);
+  if (country) addressParts.push(country);
+
+  const venueLocation = addressParts.length > 0 ? addressParts.join(', ') : null;
+
+  return { venueClub, venueLocation };
+}
+
+async function enrichWithTswDetails(tournaments) {
+  const toFetch = tournaments.filter(t => t.tswId && t.totalPlayers == null);
+  if (toFetch.length === 0) return;
+
+  console.log(`[tsw-details] fetching venue & player info for ${toFetch.length} tournaments…`);
+
+  for (let i = 0; i < toFetch.length; i += 3) {
+    const batch = toFetch.slice(i, i + 3);
+    await Promise.allSettled(
+      batch.map(async (tournament) => {
+        try {
+          const tswId = tournament.tswId;
+
+          const [mainResp, playersResp] = await Promise.all([
+            tswFetch(`/tournament/${tswId}`),
+            tswFetch(`/tournament/${tswId.toLowerCase()}/Players/GetPlayersContent`, {
+              method: 'POST',
+              extraHeaders: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Referer: `${TSW_BASE}/tournament/${tswId}/players`,
+              },
+              body: '',
+            }),
+          ]);
+
+          if (mainResp.ok) {
+            const mainHtml = await mainResp.text();
+            const venueInfo = parseTswVenueInfo(mainHtml);
+            tournament.venueClub = venueInfo.venueClub;
+            tournament.venueLocation = venueInfo.venueLocation;
+          }
+
+          if (playersResp.ok) {
+            const playersHtml = await playersResp.text();
+            const playersMap = parseTswTournamentPlayers(playersHtml);
+            tournament.totalPlayers = playersMap.size > 0 ? playersMap.size : null;
+          }
+
+          console.log(`  ✓ ${tournament.name}: ${tournament.totalPlayers ?? '?'} players, venue: ${tournament.venueClub || 'N/A'} (${tournament.venueLocation || 'N/A'})`);
+        } catch (err) {
+          console.log(`  ✗ ${tournament.name}: ${err.message}`);
+        }
+      }),
+    );
 
     if (i + 3 < toFetch.length) {
       await new Promise(r => setTimeout(r, 500));
@@ -299,12 +395,22 @@ async function main() {
               t.tswId = prev.tswId;
               t.tswUrl = prev.tswUrl;
             }
+            if (prev?.totalPlayers != null && t.totalPlayers == null) {
+              t.totalPlayers = prev.totalPlayers;
+            }
+            if (prev?.venueClub && !t.venueClub) {
+              t.venueClub = prev.venueClub;
+            }
+            if (prev?.venueLocation && !t.venueLocation && /\d/.test(prev.venueLocation)) {
+              t.venueLocation = prev.venueLocation;
+            }
           }
         }
       } catch { /* ignore */ }
     }
 
     await enrichWithTswIds(data.tournaments);
+    await enrichWithTswDetails(data.tournaments);
 
     const cache = {
       season,

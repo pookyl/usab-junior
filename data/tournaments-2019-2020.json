@@ -12,7 +12,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/C79547D3-E54C-40A9-8792-EA996047CA83",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 91,
+      "venueClub": "International Badminton Club",
+      "venueLocation": "3775 Park Ave, Edison, New Jersey 08820, U.S.A."
     },
     {
       "name": "2019 YONEX HPBC NW Open Regional Championships",
@@ -25,7 +28,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2019 Smash SoCal OLC #1",
@@ -38,7 +44,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2019 SBC Open Local Championships #1",
@@ -51,7 +60,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/68B7C7B0-80E4-4C34-98D6-E26D14D86FCD",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 131,
+      "venueClub": "Seattle Badminton Club",
+      "venueLocation": "10858 117th Pl NE, Kirkland, WA 98033, U.S.A."
     },
     {
       "name": "2019 YONEX BBC NE Open Regional Championships",
@@ -64,7 +76,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2019 NW Oregon OLC #2",
@@ -77,7 +92,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2019 ZBTC Open Local Championships #1",
@@ -90,7 +108,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/DEBD49B8-D412-41F7-BEF6-E147FEF60CEA",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 261,
+      "venueClub": "Z Badminton Training Center",
+      "venueLocation": "33540 Central Ave, Union City, CA 94587, U.S.A."
     },
     {
       "name": "2019 MBC Open Local Championships #1",
@@ -103,7 +124,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/A0D7E530-D1F9-4AA3-98EC-B080A51833AA",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 146,
+      "venueClub": "Midwest Badminton Club",
+      "venueLocation": "2019 Corporate Lane #103, Naperville, IL 60563, U.S.A."
     },
     {
       "name": "2019 YONEX CBA NorCal Open Regional Championships",
@@ -116,7 +140,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/F08DA6EA-6F46-4ED3-BF57-A9790A6F88A6",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 413,
+      "venueClub": "California Badminton Academy",
+      "venueLocation": "46049 Warm Springs Blvd, Fremont, CA 94539, U.S.A."
     },
     {
       "name": "2019 QBC Open Local Championships",
@@ -129,7 +156,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/95A7785C-EB69-43B6-B2DA-17AA2978DDF0",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 60,
+      "venueClub": "Long Island Sport center",
+      "venueLocation": "20-24, 119th street, College Point, NY 11356, U.S.A."
     },
     {
       "name": "2019 DFW South Open Local Championships #1",
@@ -142,7 +172,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2019 Arena SoCal CRC",
@@ -155,7 +188,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 NorCal CRC",
@@ -168,7 +204,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 Egret CRC",
@@ -181,7 +220,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 NE CRC",
@@ -194,7 +236,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 YONEX FB South Open Regional Championships",
@@ -207,7 +252,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 NW CRC",
@@ -220,7 +268,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 MBC Open Local Championships #2",
@@ -233,7 +284,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/BFA2CE16-93D3-4E72-A040-1DD54EF1D5BA",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 155,
+      "venueClub": "Midwest Badminton Club",
+      "venueLocation": "2019 Corporate Lane #103, Naperville, IL 60563, U.S.A."
     },
     {
       "name": "2020 HBC South CRC",
@@ -246,7 +300,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 YONEX SoCal Open Regional Championships",
@@ -259,7 +316,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/FBB0D749-1FCD-47CD-8116-C76F1AE69787",
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 463,
+      "venueClub": "Los Angeles Badminton Club",
+      "venueLocation": "10410 Valley Blvd, El Monte, CA 91731, U.S.A."
     },
     {
       "name": "2020 Dave Freeman OLC",
@@ -272,7 +332,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 JIT – Pan Am Junior Championships",
@@ -285,7 +348,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 USBA Open Local Championships",
@@ -298,7 +364,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 YONEX SPBA MW Open Regional Championships",
@@ -311,7 +380,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 NorCal UBC OLC #2",
@@ -324,7 +396,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 USAB Junior National Championships",
@@ -337,7 +412,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2020 JIT – World Junior Championships",
@@ -350,8 +428,27 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
+    },
+    {
+      "name": "2020 South OLC #2",
+      "startDate": null,
+      "endDate": null,
+      "region": "South",
+      "hostClub": "TBD",
+      "type": "OLC",
+      "tswId": null,
+      "tswUrl": null,
+      "usabUrl": null,
+      "prospectusUrl": null,
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     }
   ],
-  "savedAt": "2026-03-12T17:00:46.361Z"
+  "savedAt": "2026-03-14T06:20:01.465Z"
 }

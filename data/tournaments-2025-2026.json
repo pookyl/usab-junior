@@ -12,7 +12,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/D96AD8D0-A9D8-4679-939E-82E9963A49A7",
       "usabUrl": "https://usabadminton.org/2025-yonex-bellevue-nw-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/07/2025-YONEX-BELLEVUE-NW-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 386,
+      "venueClub": "Bellevue Badminton Club @ Muliteo",
+      "venueLocation": "3616 S Road, Building D, Mulkiteo, WA 98275, U.S.A."
     },
     {
       "name": "2025 AUSTIN LEANDER SOUTH OLC",
@@ -25,7 +28,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/376A120B-F979-495B-9799-ED548D9A1E7E",
       "usabUrl": "https://usabadminton.org/2025-austin-leander-badminton-south-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/08/2025-AUSTIN-BADMINTON-LEANDER-SOUTH-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 202,
+      "venueClub": "Austin Badminton",
+      "venueLocation": "11561 Hero Way W Building 2, Leander, TX 78641, U.S.A."
     },
     {
       "name": "2025 YONEX LIBC NORTHEAST ORC",
@@ -38,7 +44,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/40CE63A2-430A-4C56-80C7-2DBD701A9019",
       "usabUrl": "https://usabadminton.org/2025-yonex-libc-ne-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/08/2025-YONEX-LIBC-NE-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 434,
+      "venueClub": "Long Island Badminton Center",
+      "venueLocation": "260 Spagnoli Rd, Melville, NY, U.S.A."
     },
     {
       "name": "2025 YONEX SYNERGY NORCAL ORC",
@@ -51,7 +60,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/A3D197AE-C74C-41BF-9C66-F91B7576B77A",
       "usabUrl": "https://usabadminton.org/2025-yonex-synergy-norcal-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/09/2025-YONEX-SYNERGY-NorCal-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 627,
+      "venueClub": "Synergy Badminton Academy (Automall)",
+      "venueLocation": "44380 Old Warm Springs Blvd, Fremont, CA 94539, U.S.A."
     },
     {
       "name": "2025 EGRET MIDWEST OLC",
@@ -64,7 +76,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/F1D5FE50-3A8A-4C5A-8A55-71BE130B6EC3",
       "usabUrl": "https://usabadminton.org/2025-egret-midwest-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/10/2025-Egret-Midwest-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 147,
+      "venueClub": "Egret Badminton Center",
+      "venueLocation": "1251 Basswood Rd, Schaumburg, IL 60173, U.S.A."
     },
     {
       "name": "2025 SCHAFER SLG SOUTH OLC",
@@ -77,7 +92,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/75548892-B29A-420B-9951-973C8C9F2D68",
       "usabUrl": "https://usabadminton.org/2025-schafer-slg-south-olc-prospectus-released-2/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/10/2025-Schafer-SLG-South-OLC-Prospectus-2.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 180,
+      "venueClub": "Schafer Badminton Academy",
+      "venueLocation": "24825 Roesner Rd, Katy, TX 77494, U.S.A."
     },
     {
       "name": "2025 FORTIUS SOUTH CRC",
@@ -90,7 +108,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/22C92233-478E-4239-BCF3-A3A9A054BA2C",
       "usabUrl": "https://usabadminton.org/2025-fortius-south-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/10/2025-Fortius-South-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 164,
+      "venueClub": "Fortius",
+      "venueLocation": "5905 Ronald Reagan Blvd, Alpharetta, GA 30005, U.S.A."
     },
     {
       "name": "2025 SGVBC SOCAL CRC",
@@ -103,7 +124,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/FEAC4C02-C295-4225-AA82-CFCBA83B2834",
       "usabUrl": "https://usabadminton.org/2025-yonex-sgvbc-socal-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/10/2025-YONEX-SGVBC-SOCAL-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 149,
+      "venueClub": "San Gabriel Valley Badminton Club",
+      "venueLocation": "9255Telstar Avenue, El Monte, CA 91731, U.S.A."
     },
     {
       "name": "2025 CAPITAL NE OLC",
@@ -116,7 +140,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/86C3EAAF-BA94-42DB-9110-7CD31A5810FD",
       "usabUrl": "https://usabadminton.org/2025-capital-badminton-ne-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/11/2025-Capital-NE-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 187,
+      "venueClub": "Capital Badminton Academy",
+      "venueLocation": "9188 Red Branch Rd. Suite 450, Columbia, MD 21045, U.S.A."
     },
     {
       "name": "2025 PEAK SPORTS SOUTH OLC",
@@ -129,7 +156,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/78DDAE7C-34D9-4775-81F2-23C18EAC9265",
       "usabUrl": "https://usabadminton.org/2025-peak-sports-south-olc-prospectus-released-2/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/11/2025-Peak-Sports-South-OLC-Prospectus-2.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 161,
+      "venueClub": "Peak Sports Morrisville (Triangle Badminton & Table Tennis)",
+      "venueLocation": "2900 Perimeter Park Dr, #200, Morrisville, NC 27560, U.S.A."
     },
     {
       "name": "2026 WAYSIDE NE CRC",
@@ -142,7 +172,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/937ACE29-5F1C-4E39-B3FC-DE5DC9F67A6E",
       "usabUrl": "https://usabadminton.org/2026-wayside-ne-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/12/2026-Wayside-NE-CRC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 149,
+      "venueClub": "Wayside Athletic Club",
+      "venueLocation": "80 Broadmeadow Street, Marlborough, MA 01752, U.S.A."
     },
     {
       "name": "2026 CBA MIDWEST OLC",
@@ -155,7 +188,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/58FD9D91-2FE9-4613-9E59-6D56ADE8BF5B",
       "usabUrl": "https://usabadminton.org/2026-cba-midwest-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/12/2026-CBA-Midwest-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 113,
+      "venueClub": "Chicago Badminton Academy",
+      "venueLocation": "2600W 35th Street, Chicago, IL 60632, U.S.A."
     },
     {
       "name": "2026 YONEX ARENA SOCAL ORC",
@@ -168,7 +204,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/239635E4-C300-4F6A-A364-7062F0430F30",
       "usabUrl": "https://usabadminton.org/2026-yonex-arena-socal-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2025/12/2026-Yonex-Arena-SoCal-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 577,
+      "venueClub": "Arena Badminton & Sports Club",
+      "venueLocation": "2780 S Reservoir St, Pomona, CA 91766, U.S.A."
     },
     {
       "name": "2026 YONEX DFW BADMINTON SOUTH ORC",
@@ -181,7 +220,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/4C4A21C2-E62B-4448-8B0D-12AEE6263B99",
       "usabUrl": "https://usabadminton.org/2026-yonex-dfw-badminton-lewisville-south-orc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/01/2026-YONEX-DFW-BADMINTON-LEWISVILLE-SOUTH-ORC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 603,
+      "venueClub": "DFW Badminton Lewisville",
+      "venueLocation": "2801 Rockbrook Dr, Lewisville, TX 75067, U.S.A."
     },
     {
       "name": "2026 DAVE FREEMAN JR. SOCAL OLC",
@@ -194,7 +236,10 @@
       "tswUrl": "https://scba.tournamentsoftware.com/tournament/2BFD46B7-6318-465C-A6CB-E95F424718B9",
       "usabUrl": "https://usabadminton.org/2026-dave-freeman-open-and-junior-olc-prospectuses-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/01/2026-Dave-Freeman-Jr-SoCal-OLC-Prospectus.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 287,
+      "venueClub": "Balboa Park Activity Center",
+      "venueLocation": "2145 Park Blvd., San Diego, CA 92101"
     },
     {
       "name": "2026 SEATTLE NW CRC",
@@ -207,7 +252,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/EF556B64-3B34-438D-853D-8812143EC357",
       "usabUrl": "https://usabadminton.org/2026-seattle-nw-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/01/2026-NW-SEATTLE-BADMINTON-CLUB-CRC-PROSPECTUS.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 137,
+      "venueClub": "Seattle Badminton Club",
+      "venueLocation": "10858 117th PL NE, Kirkland, CA 98033, U.S.A."
     },
     {
       "name": "2026 Play N Thrive MW CRC",
@@ -220,7 +268,10 @@
       "tswUrl": "https://www.tournamentsoftware.com/tournament/AB29A304-A807-4A9B-8B2F-DD33BD545B91",
       "usabUrl": "https://usabadminton.org/2026-play-n-thrive-crc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/02/2026-Play-N-Thrive-MW-CRC.pdf",
-      "status": "completed"
+      "status": "completed",
+      "totalPlayers": 112,
+      "venueClub": "Play N Thrive Club",
+      "venueLocation": "808 S Route 59 , Suite 120, Naperville, IL 60540, U.S.A."
     },
     {
       "name": "2026 BINTANG NorCal OLC",
@@ -233,7 +284,10 @@
       "tswUrl": null,
       "usabUrl": "https://usabadminton.org/2026-bintang-norcal-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/02/2026-Bintang-NorCal-OLC.pdf",
-      "status": "upcoming"
+      "status": "in-progress",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2026 VISTARA SOUTH OLC",
@@ -246,7 +300,10 @@
       "tswUrl": null,
       "usabUrl": "https://usabadminton.org/2026-vistara-south-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/03/Updated_Vistara2026.pdf",
-      "status": "upcoming"
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2026 YONEX U.S SELECTION EVENT for Pan Am Junior Championships & World Junior Championships (PAJC & WJC)",
@@ -259,7 +316,10 @@
       "tswUrl": null,
       "usabUrl": "https://usabadminton.org/2026-yonex-u-s-junior-selection-event-prospectus-released-for-pan-am-junior-championships-bwf-world-junior-championships/",
       "prospectusUrl": "https://usabadminton.org/wp-content/uploads/2026/03/Junior-Selection-Selection-Prospectus.pdf",
-      "status": "upcoming"
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2026 OBA NW OLC",
@@ -272,7 +332,10 @@
       "tswUrl": null,
       "usabUrl": "https://usabadminton.org/2026-oregon-badminton-acadamy-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/03/2026OBANWOLC.pdf",
-      "status": "upcoming"
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2026 Schafer South OLC",
@@ -285,7 +348,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "upcoming"
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2026 EBC NORCAL CRC",
@@ -298,7 +364,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "upcoming"
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2026 YONEX SPBA MIDWEST ORC",
@@ -311,7 +380,10 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "upcoming"
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     },
     {
       "name": "2026 YONEX U.S. JUNIOR NATIONAL CHAMPIONSHIPS",
@@ -324,8 +396,11 @@
       "tswUrl": null,
       "usabUrl": null,
       "prospectusUrl": null,
-      "status": "upcoming"
+      "status": "upcoming",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
     }
   ],
-  "savedAt": "2026-03-12T16:11:59.460Z"
+  "savedAt": "2026-03-14T06:21:06.317Z"
 }
