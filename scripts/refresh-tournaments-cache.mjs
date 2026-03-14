@@ -180,7 +180,7 @@ function parseSeasonTable(html) {
       }
     }
 
-    const region = stripHtml(cells[2]);
+    const region = stripHtml(cells[2]) || 'National';
     const hostClub = stripHtml(cells[3]);
     const type = normalizeTournamentType(stripHtml(cells[4]));
 
