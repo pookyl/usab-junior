@@ -225,7 +225,7 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
       <div className="flex items-center gap-2 flex-wrap">
         {tournament.tswId && tournament.status === 'completed' && (
           <Link
-            to={`/tournaments/${tournament.tswId}`}
+            to={`/tournaments/${tournament.tswId}?tab=medals`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
           >
             <Medal className="w-3 h-3" />
