@@ -207,7 +207,7 @@ function parseSeasonTable(html) {
 // ── Fetch TSW IDs from USAB blog posts ───────────────────────────────────────
 
 async function enrichWithTswIds(tournaments) {
-  const toFetch = tournaments.filter(t => !t.tswId && t.usabUrl && t.status === 'completed');
+  const toFetch = tournaments.filter(t => !t.tswId && t.usabUrl);
   if (toFetch.length === 0) return;
 
   console.log(`[tsw-ids] fetching ${toFetch.length} USAB blog posts for TSW IDs…`);

@@ -280,14 +280,14 @@
       "region": "NorCal",
       "hostClub": "Bintang Badminton",
       "type": "OLC",
-      "tswId": null,
-      "tswUrl": null,
+      "tswId": "5779DD58-5F08-4D64-A092-B41478B07A0A",
+      "tswUrl": "https://www.tournamentsoftware.com/tournament/5779DD58-5F08-4D64-A092-B41478B07A0A",
       "usabUrl": "https://usabadminton.org/2026-bintang-norcal-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/02/2026-Bintang-NorCal-OLC.pdf",
       "status": "in-progress",
-      "totalPlayers": null,
-      "venueClub": null,
-      "venueLocation": null
+      "totalPlayers": 434,
+      "venueClub": "Bintang Badminton",
+      "venueLocation": "48900 Milmont Drive, Fremont, CA 94538, U.S.A."
     },
     {
       "name": "2026 VISTARA SOUTH OLC",
@@ -296,14 +296,14 @@
       "region": "South",
       "hostClub": "Vistara Sports",
       "type": "OLC",
-      "tswId": null,
-      "tswUrl": null,
+      "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+      "tswUrl": "https://www.tournamentsoftware.com/tournament/9BA4D091-5DA0-44B3-ADD7-511F99031852",
       "usabUrl": "https://usabadminton.org/2026-vistara-south-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/03/Updated_Vistara2026.pdf",
       "status": "upcoming",
       "totalPlayers": null,
-      "venueClub": null,
-      "venueLocation": null
+      "venueClub": "Vistara Sports",
+      "venueLocation": "400 W Vista Ridge Mall Dr, Lewsville, TX 75067, U.S.A."
     },
     {
       "name": "2026 YONEX U.S SELECTION EVENT for Pan Am Junior Championships & World Junior Championships (PAJC & WJC)",
@@ -312,14 +312,14 @@
       "region": "National",
       "hostClub": "Wayside Athletic Club",
       "type": "Selection",
-      "tswId": null,
-      "tswUrl": null,
+      "tswId": "0E3C129B-28CA-43FF-9C2C-96C92D3C7090",
+      "tswUrl": "https://www.tournamentsoftware.com/tournament/0e3c129b-28ca-43ff-9c2c-96c92d3c7090",
       "usabUrl": "https://usabadminton.org/2026-yonex-u-s-junior-selection-event-prospectus-released-for-pan-am-junior-championships-bwf-world-junior-championships/",
       "prospectusUrl": "https://usabadminton.org/wp-content/uploads/2026/03/Junior-Selection-Selection-Prospectus.pdf",
       "status": "upcoming",
       "totalPlayers": null,
-      "venueClub": null,
-      "venueLocation": null
+      "venueClub": "Wayside Athletic Club",
+      "venueLocation": "80 Broadmeadow Street, Marlborough, MA 01752, U.S.A."
     },
     {
       "name": "2026 OBA NW OLC",
@@ -328,14 +328,14 @@
       "region": "NW",
       "hostClub": "Oregon Badminton Academy",
       "type": "OLC",
-      "tswId": null,
-      "tswUrl": null,
+      "tswId": "1ED39347-2461-4BB8-945F-F694BE254915",
+      "tswUrl": "https://www.tournamentsoftware.com/tournament/1ED39347-2461-4BB8-945F-F694BE254915",
       "usabUrl": "https://usabadminton.org/2026-oregon-badminton-acadamy-olc-prospectus-released/",
       "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/03/2026OBANWOLC.pdf",
       "status": "upcoming",
       "totalPlayers": null,
-      "venueClub": null,
-      "venueLocation": null
+      "venueClub": "Oregon Badminton Academy",
+      "venueLocation": "11150 SW Allen Blvd, Suite 200, Beaverton, OR 97005, U.S.A."
     },
     {
       "name": "2026 Schafer South OLC",
@@ -402,5 +402,5 @@
       "venueLocation": null
     }
   ],
-  "savedAt": "2026-03-14T06:21:06.317Z"
+  "savedAt": "2026-03-15T05:21:42.074Z"
 }
