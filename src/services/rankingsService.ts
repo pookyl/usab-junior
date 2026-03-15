@@ -11,6 +11,12 @@ import type {
   TournamentsResponse,
   TournamentDetail,
   TournamentMedals,
+  TournamentEventsResponse,
+  TournamentPlayersResponse,
+  TournamentSeedingResponse,
+  TournamentWinnersResponse,
+  TournamentMatchDatesResponse,
+  TournamentMatchDayResponse,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -272,5 +278,102 @@ export async function fetchTournamentMedals(
 
   const data: TournamentMedals = await res.json();
   cappedSet(tournamentMedalsCache, tswId, data);
+  return data;
+}
+
+// ── Tournament Tab Fetchers ──────────────────────────────────────────────────
+
+const tournamentEventsCache = new Map<string, TournamentEventsResponse>();
+const tournamentPlayersCache = new Map<string, TournamentPlayersResponse>();
+const tournamentSeedingCache = new Map<string, TournamentSeedingResponse>();
+const tournamentWinnersCache = new Map<string, TournamentWinnersResponse>();
+const tournamentMatchDatesCache = new Map<string, TournamentMatchDatesResponse>();
+const tournamentMatchDayCache = new Map<string, TournamentMatchDayResponse>();
+
+export async function fetchTournamentEvents(
+  tswId: string,
+): Promise<TournamentEventsResponse> {
+  if (tournamentEventsCache.has(tswId)) return tournamentEventsCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/events`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament events API ${res.status}`);
+
+  const data: TournamentEventsResponse = await res.json();
+  cappedSet(tournamentEventsCache, tswId, data);
+  return data;
+}
+
+export async function fetchTournamentPlayers(
+  tswId: string,
+): Promise<TournamentPlayersResponse> {
+  if (tournamentPlayersCache.has(tswId)) return tournamentPlayersCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/players`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament players API ${res.status}`);
+
+  const data: TournamentPlayersResponse = await res.json();
+  cappedSet(tournamentPlayersCache, tswId, data);
+  return data;
+}
+
+export async function fetchTournamentSeeding(
+  tswId: string,
+): Promise<TournamentSeedingResponse> {
+  if (tournamentSeedingCache.has(tswId)) return tournamentSeedingCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/seeding`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament seeding API ${res.status}`);
+
+  const data: TournamentSeedingResponse = await res.json();
+  cappedSet(tournamentSeedingCache, tswId, data);
+  return data;
+}
+
+export async function fetchTournamentWinners(
+  tswId: string,
+): Promise<TournamentWinnersResponse> {
+  if (tournamentWinnersCache.has(tswId)) return tournamentWinnersCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/winners`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament winners API ${res.status}`);
+
+  const data: TournamentWinnersResponse = await res.json();
+  cappedSet(tournamentWinnersCache, tswId, data);
+  return data;
+}
+
+export async function fetchTournamentMatchDates(
+  tswId: string,
+): Promise<TournamentMatchDatesResponse> {
+  if (tournamentMatchDatesCache.has(tswId)) return tournamentMatchDatesCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/matches`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament match dates API ${res.status}`);
+
+  const data: TournamentMatchDatesResponse = await res.json();
+  cappedSet(tournamentMatchDatesCache, tswId, data);
+  return data;
+}
+
+export async function fetchTournamentMatchDay(
+  tswId: string,
+  dateParam: string,
+  refresh = false,
+): Promise<TournamentMatchDayResponse> {
+  const cacheKey = `${tswId}:${dateParam}`;
+  if (!refresh && tournamentMatchDayCache.has(cacheKey)) return tournamentMatchDayCache.get(cacheKey)!;
+
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/matches?d=${encodeURIComponent(dateParam)}`;
+  if (refresh) url += '&refresh=1';
+  const res = await fetchWithRetry(url, 60_000);
+  if (!res.ok) throw new Error(`Tournament matches API ${res.status}`);
+
+  const data: TournamentMatchDayResponse = await res.json();
+  cappedSet(tournamentMatchDayCache, cacheKey, data);
   return data;
 }

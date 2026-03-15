@@ -198,7 +198,17 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
       </div>
 
       <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-2 leading-snug">
-        {tournament.name}
+        {tournament.tswId ? (
+          <Link
+            to={`/tournaments/${tournament.tswId}`}
+            state={{ name: tournament.name, hostClub: tournament.hostClub, startDate: tournament.startDate, endDate: tournament.endDate }}
+            className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+          >
+            {tournament.name}
+          </Link>
+        ) : (
+          tournament.name
+        )}
       </h3>
 
       <div className="flex flex-col gap-1.5 text-sm text-slate-500 dark:text-slate-400 mb-4">

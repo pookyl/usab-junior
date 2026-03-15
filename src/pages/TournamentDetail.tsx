@@ -1,17 +1,101 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useParams, useSearchParams, useLocation, Link } from 'react-router-dom';
 import {
-  ArrowLeft, ExternalLink, Loader2,
-  Medal,
+  ArrowLeft, ExternalLink, Loader2, Medal, Search,
+  Calendar, MapPin, Users, List, Trophy, Hash, Swords,
+  ChevronDown, ChevronRight, Info, RefreshCw,
 } from 'lucide-react';
-import { fetchTournamentMedals } from '../services/rankingsService';
+import {
+  fetchTournaments,
+  fetchTournamentDetail,
+  fetchTournamentMedals,
+  fetchTournamentEvents,
+  fetchTournamentPlayers,
+  fetchTournamentSeeding,
+  fetchTournamentWinners,
+  fetchTournamentMatchDates,
+  fetchTournamentMatchDay,
+} from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import type {
   TournamentMedals,
   ClubMedalSummary,
   DrawMedals,
   MedalPlayer,
+  TournamentEventsResponse,
+  TournamentPlayersResponse,
+  TournamentSeedingResponse,
+  TournamentWinnersResponse,
+  MatchDateTab,
+  TournamentMatch,
 } from '../types/junior';
+
+// ── Tab definitions ─────────────────────────────────────────────────────────
+
+const TABS = [
+  { id: 'overview', label: 'Overview', icon: Info },
+  { id: 'matches', label: 'Matches', icon: Swords },
+  { id: 'draws', label: 'Draws', icon: List },
+  { id: 'events', label: 'Events', icon: Calendar },
+  { id: 'players', label: 'Players', icon: Users },
+  { id: 'seeding', label: 'Seeded Entries', icon: Hash },
+  { id: 'winners', label: 'Winners', icon: Trophy },
+  { id: 'medals', label: 'Medals', icon: Medal },
+] as const;
+
+type TabId = (typeof TABS)[number]['id'];
+
+// ── Shared helpers ──────────────────────────────────────────────────────────
+
+function TabLoading({ label }: { label: string }) {
+  return (
+    <div className="flex items-center justify-center gap-3 text-slate-400 dark:text-slate-500 py-16">
+      <Loader2 className="w-5 h-5 animate-spin" />
+      <span>Loading {label}…</span>
+    </div>
+  );
+}
+
+function TabError({ error }: { error: string }) {
+  return (
+    <div className="text-center text-red-500 dark:text-red-400 py-12">
+      <p className="font-medium">Failed to load data</p>
+      <p className="text-sm mt-1">{error}</p>
+    </div>
+  );
+}
+
+function TabEmpty({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
+  return (
+    <div className="text-center text-slate-400 dark:text-slate-500 py-16">
+      <Icon className="w-10 h-10 mx-auto mb-3 opacity-40" />
+      <p className="text-sm">{message}</p>
+    </div>
+  );
+}
+
+function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id: string) => Promise<T>) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fetched, setFetched] = useState(false);
+
+  useEffect(() => {
+    if (!tswId || !active || fetched) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetcher(tswId)
+      .then(d => { if (!cancelled) { setData(d); setFetched(true); } })
+      .catch(e => { if (!cancelled) setError(e.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [tswId, active, fetched, fetcher]);
+
+  return { data, loading, error };
+}
+
+// ── Medal helpers (preserved from original) ─────────────────────────────────
 
 const EVENT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   BS: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300' },
@@ -36,10 +120,7 @@ function PlayerName({ player, nameMap, playerIdSet }: { player: MedalPlayer; nam
   const usabId = idMatch ?? nameMap.get(player.name.toLowerCase())?.[0] ?? null;
   if (usabId) {
     return (
-      <Link
-        to={`/directory/${usabId}`}
-        className="text-violet-600 dark:text-violet-400 hover:underline"
-      >
+      <Link to={`/directory/${usabId}`} className="text-violet-600 dark:text-violet-400 hover:underline">
         {player.name}
       </Link>
     );
@@ -64,17 +145,10 @@ type DetailSortKey = 'event' | 'place' | 'player';
 const PLACE_ORDER: Record<string, number> = { gold: 1, silver: 2, bronze: 3, fourth: 4 };
 
 function ClubMedalRow({
-  club,
-  rank,
-  medals,
-  nameMap,
-  playerIdSet,
+  club, rank, medals, nameMap, playerIdSet,
 }: {
-  club: ClubMedalSummary;
-  rank: number;
-  medals: DrawMedals[];
-  nameMap: Map<string, string[]>;
-  playerIdSet: Set<string>;
+  club: ClubMedalSummary; rank: number; medals: DrawMedals[];
+  nameMap: Map<string, string[]>; playerIdSet: Set<string>;
 }) {
   const [expandMode, setExpandMode] = useState<ExpandMode>(null);
   const [detailSort, setDetailSort] = useState<DetailSortKey>('event');
@@ -83,7 +157,6 @@ function ClubMedalRow({
   function toggle(mode: Exclude<ExpandMode, null>) {
     setExpandMode(prev => prev === mode ? null : mode);
   }
-
   function handleDetailSort(key: DetailSortKey) {
     if (detailSort === key) setDetailAsc(!detailAsc);
     else { setDetailSort(key); setDetailAsc(true); }
@@ -91,40 +164,27 @@ function ClubMedalRow({
 
   const clubMedals = useMemo(() => {
     const results: Array<{
-      drawName: string;
-      ageGroup: string;
-      eventType: string;
-      place: 'gold' | 'silver' | 'bronze' | 'fourth';
-      players: MedalPlayer[];
+      drawName: string; ageGroup: string; eventType: string;
+      place: 'gold' | 'silver' | 'bronze' | 'fourth'; players: MedalPlayer[];
     }> = [];
-
     for (const m of medals) {
       for (const p of m.gold) {
-        if (p.club === club.club) {
-          results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'gold', players: m.gold });
-        }
+        if (p.club === club.club) results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'gold', players: m.gold });
       }
       for (const p of m.silver) {
-        if (p.club === club.club) {
-          results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'silver', players: m.silver });
-        }
+        if (p.club === club.club) results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'silver', players: m.silver });
       }
       for (const team of m.bronze) {
         for (const p of team) {
-          if (p.club === club.club) {
-            results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'bronze', players: team });
-          }
+          if (p.club === club.club) results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'bronze', players: team });
         }
       }
       for (const team of (m.fourth ?? [])) {
         for (const p of team) {
-          if (p.club === club.club) {
-            results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'fourth', players: team });
-          }
+          if (p.club === club.club) results.push({ drawName: m.drawName, ageGroup: m.ageGroup, eventType: m.eventType, place: 'fourth', players: team });
         }
       }
     }
-
     const seen = new Set<string>();
     return results.filter(r => {
       const key = `${r.drawName}:${r.place}:${r.players.map(p => p.name).join(',')}`;
@@ -143,9 +203,8 @@ function ClubMedalRow({
     }
     const sorted = [...list].sort((a, b) => {
       let cmp = 0;
-      if (detailSort === 'event') {
-        cmp = a.drawName.localeCompare(b.drawName);
-      } else if (detailSort === 'place') {
+      if (detailSort === 'event') cmp = a.drawName.localeCompare(b.drawName);
+      else if (detailSort === 'place') {
         cmp = (PLACE_ORDER[a.place] ?? 9) - (PLACE_ORDER[b.place] ?? 9);
         if (cmp === 0) cmp = a.drawName.localeCompare(b.drawName);
       } else {
@@ -166,46 +225,22 @@ function ClubMedalRow({
     <>
       <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
         <td className="px-3 py-2.5 text-sm text-slate-400 dark:text-slate-500 w-10 text-center">{rank}</td>
-        <td
-          className={`px-3 py-2.5 ${cellClickCls}`}
-          onClick={() => toggle('medals')}
-        >
+        <td className={`px-3 py-2.5 ${cellClickCls}`} onClick={() => toggle('medals')}>
           <span className={`font-semibold text-sm text-slate-800 dark:text-slate-100 ${activeRing('medals')}`}>{club.club}</span>
         </td>
-        <td
-          className={`px-3 py-2.5 text-center ${cellClickCls}`}
-          onClick={() => club.gold > 0 && toggle('gold')}
-        >
-          <span className={`inline-flex items-center gap-1 text-sm font-bold text-yellow-600 dark:text-yellow-400 px-1 ${club.gold > 0 ? 'hover:underline' : ''} ${activeRing('gold')}`}>
-            {club.gold}
-          </span>
+        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.gold > 0 && toggle('gold')}>
+          <span className={`inline-flex items-center gap-1 text-sm font-bold text-yellow-600 dark:text-yellow-400 px-1 ${club.gold > 0 ? 'hover:underline' : ''} ${activeRing('gold')}`}>{club.gold}</span>
         </td>
-        <td
-          className={`px-3 py-2.5 text-center ${cellClickCls}`}
-          onClick={() => club.silver > 0 && toggle('silver')}
-        >
-          <span className={`inline-flex items-center gap-1 text-sm font-bold text-slate-500 dark:text-slate-400 px-1 ${club.silver > 0 ? 'hover:underline' : ''} ${activeRing('silver')}`}>
-            {club.silver}
-          </span>
+        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.silver > 0 && toggle('silver')}>
+          <span className={`inline-flex items-center gap-1 text-sm font-bold text-slate-500 dark:text-slate-400 px-1 ${club.silver > 0 ? 'hover:underline' : ''} ${activeRing('silver')}`}>{club.silver}</span>
         </td>
-        <td
-          className={`px-3 py-2.5 text-center ${cellClickCls}`}
-          onClick={() => club.bronze > 0 && toggle('bronze')}
-        >
-          <span className={`inline-flex items-center gap-1 text-sm font-bold text-amber-700 dark:text-amber-500 px-1 ${club.bronze > 0 ? 'hover:underline' : ''} ${activeRing('bronze')}`}>
-            {club.bronze}
-          </span>
+        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.bronze > 0 && toggle('bronze')}>
+          <span className={`inline-flex items-center gap-1 text-sm font-bold text-amber-700 dark:text-amber-500 px-1 ${club.bronze > 0 ? 'hover:underline' : ''} ${activeRing('bronze')}`}>{club.bronze}</span>
         </td>
-        <td
-          className={`px-3 py-2.5 text-center ${cellClickCls}`}
-          onClick={() => club.total > 0 && toggle('medals')}
-        >
-          <span className={`font-extrabold text-sm text-slate-800 dark:text-slate-100 px-1 ${club.total > 0 ? 'hover:underline' : ''} ${activeRing('medals')}`}>
-            {club.total}
-          </span>
+        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.total > 0 && toggle('medals')}>
+          <span className={`font-extrabold text-sm text-slate-800 dark:text-slate-100 px-1 ${club.total > 0 ? 'hover:underline' : ''} ${activeRing('medals')}`}>{club.total}</span>
         </td>
       </tr>
-
       {expandMode !== null && filteredMedals.length > 0 && (
         <tr>
           <td colSpan={6} className="px-0 py-0">
@@ -214,11 +249,7 @@ function ClubMedalRow({
                 <thead>
                   <tr className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">
                     {([['event', 'Event'], ['place', 'Place'], ['player', 'Player(s)']] as const).map(([key, label]) => (
-                      <th
-                        key={key}
-                        className="text-left py-1 pr-3 font-medium cursor-pointer select-none hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
-                        onClick={() => handleDetailSort(key)}
-                      >
+                      <th key={key} className="text-left py-1 pr-3 font-medium cursor-pointer select-none hover:text-violet-600 dark:hover:text-violet-400 transition-colors" onClick={() => handleDetailSort(key)}>
                         {label}{detailSort === key ? (detailAsc ? ' ↑' : ' ↓') : ''}
                       </th>
                     ))}
@@ -230,9 +261,7 @@ function ClubMedalRow({
                     return (
                       <tr key={i} className="border-t border-slate-200/50 dark:border-slate-700/30">
                         <td className="py-1.5 pr-3">
-                          <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
-                            {cm.drawName}
-                          </span>
+                          <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>{cm.drawName}</span>
                         </td>
                         <td className="py-1.5 pr-3">
                           <div className="flex items-center gap-1">
@@ -265,35 +294,333 @@ function ClubMedalRow({
   );
 }
 
-export default function TournamentDetail() {
-  const { tswId } = useParams<{ tswId: string }>();
-  const [data, setData] = useState<TournamentMedals | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// ── Overview Tab ─────────────────────────────────────────────────────────────
+
+function OverviewTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentDetail(id), []);
+  const { data, loading, error } = useTabData(tswId, active, fetcher);
+
+  if (loading) return <TabLoading label="overview" />;
+  if (error) return <TabError error={error} />;
+  if (!data) return <TabEmpty icon={Info} message="No overview data available." />;
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 p-6">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">{data.name}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {data.dates && (
+            <div className="flex items-start gap-3">
+              <Calendar className="w-5 h-5 text-violet-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dates</p>
+                <p className="text-sm text-slate-700 dark:text-slate-200">{data.dates}</p>
+              </div>
+            </div>
+          )}
+          {data.location && (
+            <div className="flex items-start gap-3">
+              <MapPin className="w-5 h-5 text-violet-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Location</p>
+                <p className="text-sm text-slate-700 dark:text-slate-200">{data.location}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {data.draws.length > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 p-6">
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3">
+            Draws ({data.draws.length})
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {data.draws.map(d => {
+              const color = getEventColor(d.name);
+              return (
+                <span key={d.drawId} className={`inline-block px-2.5 py-1 rounded-lg text-xs font-medium ${color.bg} ${color.text}`}>
+                  {d.name}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Draws Tab ───────────────────────────────────────────────────────────────
+
+function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentDetail(id), []);
+  const { data, loading, error } = useTabData(tswId, active, fetcher);
+  const [expandedDraw, setExpandedDraw] = useState<number | null>(null);
+
+  if (loading) return <TabLoading label="draws" />;
+  if (error) return <TabError error={error} />;
+  if (!data || data.draws.length === 0) return <TabEmpty icon={List} message="No draws available for this tournament." />;
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        {data.draws.map(draw => {
+          const color = getEventColor(draw.name);
+          const expanded = expandedDraw === draw.drawId;
+          const tswDrawUrl = `https://www.tournamentsoftware.com/sport/draw.aspx?id=${tswId}&draw=${draw.drawId}`;
+          return (
+            <div key={draw.drawId}>
+              <button
+                onClick={() => setExpandedDraw(expanded ? null : draw.drawId)}
+                className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
+              >
+                {expanded ? <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />}
+                <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
+                  {draw.name}
+                </span>
+              </button>
+              {expanded && (
+                <div className="px-5 pb-4 pl-12">
+                  <a
+                    href={tswDrawUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    View bracket on TournamentSoftware
+                  </a>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Events Tab ──────────────────────────────────────────────────────────────
+
+function EventsTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentEvents(id), []);
+  const { data, loading, error } = useTabData<TournamentEventsResponse>(tswId, active, fetcher);
+
+  if (loading) return <TabLoading label="events" />;
+  if (error) return <TabError error={error} />;
+  if (!data || data.events.length === 0) return <TabEmpty icon={Calendar} message="No events available for this tournament." />;
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
+              <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">#</th>
+              <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">Event</th>
+              <th className="px-5 py-3 text-right text-xs uppercase tracking-wider font-medium">Entries</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+            {data.events.map((ev, i) => {
+              const color = getEventColor(ev.name);
+              return (
+                <tr key={ev.eventId} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                  <td className="px-5 py-3 text-sm text-slate-400 dark:text-slate-500">{i + 1}</td>
+                  <td className="px-5 py-3">
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
+                      {ev.name}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-right text-sm text-slate-600 dark:text-slate-300">
+                    {ev.entries > 0 ? ev.entries : '—'}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ── Players Tab ─────────────────────────────────────────────────────────────
+
+function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentPlayers(id), []);
+  const { data, loading, error } = useTabData<TournamentPlayersResponse>(tswId, active, fetcher);
+  const [search, setSearch] = useState('');
+
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    if (!search.trim()) return data.players;
+    const q = search.toLowerCase();
+    return data.players.filter(p =>
+      p.name.toLowerCase().includes(q) || p.club.toLowerCase().includes(q),
+    );
+  }, [data, search]);
+
+  if (loading) return <TabLoading label="players" />;
+  if (error) return <TabError error={error} />;
+  if (!data || data.players.length === 0) return <TabEmpty icon={Users} message="No player data available for this tournament." />;
+
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder={`Search ${data.players.length} players…`}
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-500"
+        />
+      </div>
+
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
+                <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">#</th>
+                <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">Player</th>
+                <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">Club</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+              {filtered.map((p, i) => (
+                <tr key={p.playerId} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                  <td className="px-5 py-2.5 text-sm text-slate-400 dark:text-slate-500">{i + 1}</td>
+                  <td className="px-5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-100">{p.name}</td>
+                  <td className="px-5 py-2.5 text-sm text-slate-500 dark:text-slate-400">{p.club || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {filtered.length === 0 && search && (
+          <div className="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">
+            No players match "{search}"
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Seeding Tab ─────────────────────────────────────────────────────────────
+
+function SeedingTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentSeeding(id), []);
+  const { data, loading, error } = useTabData<TournamentSeedingResponse>(tswId, active, fetcher);
+
+  if (loading) return <TabLoading label="seeded entries" />;
+  if (error) return <TabError error={error} />;
+  if (!data || data.events.length === 0) return <TabEmpty icon={Hash} message="No seeding data available for this tournament." />;
+
+  return (
+    <div className="space-y-4">
+      {data.events.map(ev => {
+        const color = getEventColor(ev.eventName);
+        return (
+          <div key={ev.eventName} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
+              <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
+                {ev.eventName}
+              </span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
+                    <th className="px-5 py-2 text-left text-xs uppercase tracking-wider font-medium w-16">Seed</th>
+                    <th className="px-5 py-2 text-left text-xs uppercase tracking-wider font-medium">Player(s)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                  {ev.seeds.map(s => (
+                    <tr key={s.seed} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                      <td className="px-5 py-2 text-sm font-bold text-violet-600 dark:text-violet-400">{s.seed}</td>
+                      <td className="px-5 py-2 text-sm text-slate-700 dark:text-slate-200">
+                        {s.players.map(p => p.name).join(' / ')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Winners Tab ─────────────────────────────────────────────────────────────
+
+function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentWinners(id), []);
+  const { data, loading, error } = useTabData<TournamentWinnersResponse>(tswId, active, fetcher);
+
+  if (loading) return <TabLoading label="winners" />;
+  if (error) return <TabError error={error} />;
+  if (!data || data.events.length === 0) return <TabEmpty icon={Trophy} message="No winners data available for this tournament." />;
+
+  const placeLabel = (p: string) => {
+    if (p === '1') return 'Winner';
+    if (p === '2' || p === '1/2') return 'Runner-up';
+    if (p === '3' || p === '3/4') return 'Semi-finalist';
+    return p;
+  };
+
+  return (
+    <div className="space-y-4">
+      {data.events.map(ev => {
+        const color = getEventColor(ev.eventName);
+        return (
+          <div key={ev.eventName} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
+              <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
+                {ev.eventName}
+              </span>
+            </div>
+            <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
+              {ev.results.map((r, i) => (
+                <div key={i} className="flex items-center gap-4 px-5 py-2.5">
+                  <span className="text-xs font-medium text-slate-400 dark:text-slate-500 w-24 shrink-0">
+                    {placeLabel(r.place)}
+                  </span>
+                  <span className="text-sm text-slate-700 dark:text-slate-200">
+                    {r.players.map(p => p.name).join(' / ')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Medals Tab ──────────────────────────────────────────────────────────────
+
+function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentMedals(id), []);
+  const { data, loading, error } = useTabData<TournamentMedals>(tswId, active, fetcher);
   const [sortKey, setSortKey] = useState<SortKey>('total');
   const [sortAsc, setSortAsc] = useState(false);
   const { playerNameMap, playerIdSet } = usePlayers();
-
-  useEffect(() => {
-    if (!tswId) return;
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    fetchTournamentMedals(tswId)
-      .then(d => { if (!cancelled) setData(d); })
-      .catch(e => { if (!cancelled) setError(e.message); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [tswId]);
 
   const sortedClubs = useMemo(() => {
     if (!data) return [];
     const clubs = [...data.clubs];
     clubs.sort((a, b) => {
       let cmp = 0;
-      if (sortKey === 'club') {
-        cmp = a.club.localeCompare(b.club);
-      } else {
+      if (sortKey === 'club') cmp = a.club.localeCompare(b.club);
+      else {
         cmp = (b[sortKey] as number) - (a[sortKey] as number);
         if (cmp === 0) cmp = b.total - a.total;
         if (cmp === 0) cmp = b.gold - a.gold;
@@ -308,57 +635,443 @@ export default function TournamentDetail() {
     else { setSortKey(key); setSortAsc(false); }
   }
 
-  if (loading) {
-    return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center justify-center gap-3 text-slate-400 dark:text-slate-500">
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>Loading medal results…</span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <TabLoading label="medals" />;
+  if (error) return <TabError error={error} />;
+  if (!data) return <TabEmpty icon={Medal} message="No medal data available for this tournament." />;
 
-  if (error || !data) {
-    return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-4">
-        <Link to="/tournaments" className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Tournaments
-        </Link>
-        <div className="text-center text-red-500 dark:text-red-400 py-8">
-          <p className="font-medium">Failed to load medals</p>
-          <p className="text-sm mt-1">{error || 'Unknown error'}</p>
-        </div>
-      </div>
-    );
-  }
-
-  const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
   const medalClubs = sortedClubs.filter(c => c.total > 0);
   const headerCls = 'px-3 py-2 text-xs uppercase tracking-wider font-medium cursor-pointer select-none hover:text-violet-600 dark:hover:text-violet-400 transition-colors';
-  const sortArrow = (key: SortKey) =>
-    sortKey === key ? (sortAsc ? ' ↑' : ' ↓') : '';
+  const sortArrow = (key: SortKey) => sortKey === key ? (sortAsc ? ' ↑' : ' ↓') : '';
+
+  if (medalClubs.length === 0) {
+    return <TabEmpty icon={Medal} message="No medal data available for this tournament." />;
+  }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          {medalClubs.length} clubs with medals &middot; {data.medals.length} events &middot; Click a medal count to filter by type
+        </p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
+              <th className="px-3 py-2 w-10 text-xs">#</th>
+              <th className={`${headerCls} text-left`} onClick={() => handleSort('club')}>Club{sortArrow('club')}</th>
+              <th className={`${headerCls} text-center`} onClick={() => handleSort('gold')}>
+                <span className="inline-flex items-center gap-1"><MedalIcon type="gold" size={14} />Gold{sortArrow('gold')}</span>
+              </th>
+              <th className={`${headerCls} text-center`} onClick={() => handleSort('silver')}>
+                <span className="inline-flex items-center gap-1"><MedalIcon type="silver" size={14} />Silver{sortArrow('silver')}</span>
+              </th>
+              <th className={`${headerCls} text-center`} onClick={() => handleSort('bronze')}>
+                <span className="inline-flex items-center gap-1"><MedalIcon type="bronze" size={14} />Bronze{sortArrow('bronze')}</span>
+              </th>
+              <th className={`${headerCls} text-center`} onClick={() => handleSort('total')}>Total{sortArrow('total')}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+            {medalClubs.map((club, idx) => (
+              <ClubMedalRow
+                key={club.club}
+                club={club}
+                rank={idx + 1}
+                medals={data.medals}
+                nameMap={playerNameMap}
+                playerIdSet={playerIdSet}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ── Matches Tab ─────────────────────────────────────────────────────────────
+
+function TeamRow({ names, won, ongoing, scores, otherScores, showRetired, showWalkover }: {
+  names: string[];
+  won: boolean;
+  ongoing?: boolean;
+  scores: number[];
+  otherScores: number[];
+  showRetired?: boolean;
+  showWalkover?: boolean;
+}) {
+  const nameClass = won
+    ? 'font-semibold text-slate-800 dark:text-slate-100'
+    : 'text-slate-800 dark:text-slate-100';
+  const badgeClass = won
+    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+    : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500';
+
+  return (
+    <div className="flex items-start gap-2 py-1.5">
+      {ongoing ? (
+        <span className="w-5 shrink-0" />
+      ) : (
+        <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5 ${badgeClass}`}>
+          {won ? 'W' : 'L'}
+        </span>
+      )}
+      <div className={`text-sm min-w-0 flex-1 ${nameClass}`}>
+        {names.map((n, i) => (
+          <div key={i} className="truncate">{n}</div>
+        ))}
+      </div>
+      <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
+        {showWalkover && (
+          <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold">Walkover</span>
+        )}
+        {showRetired && (
+          <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold mr-1">Retired</span>
+        )}
+        {won && scores.length > 0 && (
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+        )}
+        {scores.map((s, i) => {
+          const isWinningGame = s > otherScores[i];
+          return (
+            <span key={i} className={`w-5 text-right text-slate-800 dark:text-slate-100 ${isWinningGame ? 'font-bold' : ''}`}>{s}</span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MatchCard({ match, date }: { match: TournamentMatch; date?: string }) {
+  const t1Scores = match.scores.map(g => g[0]);
+  const t2Scores = match.scores.map(g => g[1]);
+  const ongoing = !match.team1Won && !match.team2Won && !match.walkover;
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
+      {/* Header */}
+      <div className="px-4 pt-3 pb-1">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          {match.header || [match.round, match.event].filter(Boolean).join(' \u00b7 ')}
+        </p>
+      </div>
+
+      {/* Team rows */}
+      <div className="px-4 divide-y divide-slate-100 dark:divide-slate-800">
+        <TeamRow
+          names={match.team1}
+          won={match.team1Won}
+          ongoing={ongoing}
+          scores={t1Scores}
+          otherScores={t2Scores}
+          showWalkover={match.walkover && !match.team1Won}
+          showRetired={match.retired && !match.team1Won}
+        />
+        <TeamRow
+          names={match.team2}
+          won={match.team2Won}
+          ongoing={ongoing}
+          scores={t2Scores}
+          otherScores={t1Scores}
+          showWalkover={match.walkover && !match.team2Won}
+          showRetired={match.retired && !match.team2Won}
+        />
+      </div>
+
+      {/* Footer: date + time + location */}
+      <div className="px-4 py-2 flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800">
+        {(date || match.time) && (
+          <span className="flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            {[date, match.time].filter(Boolean).join(' ')}
+          </span>
+        )}
+        {match.location && (
+          <span className="flex items-center gap-1">
+            <MapPin className="w-3 h-3" />
+            {match.location}
+          </span>
+        )}
+        {match.duration && (
+          <span className="ml-auto">{match.duration}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function todayYYYYMMDD(): string {
+  const now = new Date();
+  return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+}
+
+function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const [dates, setDates] = useState<MatchDateTab[]>([]);
+  const [datesLoading, setDatesLoading] = useState(false);
+  const [datesError, setDatesError] = useState<string | null>(null);
+  const [datesFetched, setDatesFetched] = useState(false);
+
+  const [matches, setMatches] = useState<TournamentMatch[]>([]);
+  const [matchDate, setMatchDate] = useState('');
+  const [matchesLoading, setMatchesLoading] = useState(false);
+  const [matchesError, setMatchesError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState('');
+
+  const [eventFilter, setEventFilter] = useState('');
+
+  const isToday = selectedDate === todayYYYYMMDD();
+
+  useEffect(() => {
+    if (!active || !tswId || datesFetched) return;
+    let cancelled = false;
+    setDatesLoading(true);
+    setDatesError(null);
+    fetchTournamentMatchDates(tswId)
+      .then(d => {
+        if (cancelled) return;
+        setDates(d.dates);
+        setDatesFetched(true);
+      })
+      .catch(e => { if (!cancelled) setDatesError(e.message); })
+      .finally(() => { if (!cancelled) setDatesLoading(false); });
+    return () => { cancelled = true; };
+  }, [tswId, active, datesFetched]);
+
+  function loadMatches(dateParam: string, refresh = false) {
+    setSelectedDate(dateParam);
+    setMatches([]);
+    setMatchesLoading(true);
+    setMatchesError(null);
+    setEventFilter('');
+    fetchTournamentMatchDay(tswId, dateParam, refresh)
+      .then(d => { setMatches(d.matches); setMatchDate(d.date); })
+      .catch(e => setMatchesError(e.message))
+      .finally(() => setMatchesLoading(false));
+  }
+
+  function handleDateChange(dateParam: string) {
+    if (dateParam === selectedDate && matches.length > 0) return;
+    loadMatches(dateParam);
+  }
+
+  function handleRefresh() {
+    if (!selectedDate) return;
+    loadMatches(selectedDate, true);
+  }
+
+  const events = useMemo(() => {
+    const set = new Set(matches.map(m => m.event).filter(Boolean));
+    return [...set].sort();
+  }, [matches]);
+
+  const filtered = useMemo(() => {
+    if (!eventFilter) return matches;
+    return matches.filter(m => m.event === eventFilter);
+  }, [matches, eventFilter]);
+
+  const timeGroups = useMemo(() => {
+    const groups: { time: string; matches: typeof filtered }[] = [];
+    for (const m of filtered) {
+      const t = m.time || '';
+      const last = groups[groups.length - 1];
+      if (last && last.time === t) {
+        last.matches.push(m);
+      } else {
+        groups.push({ time: t, matches: [m] });
+      }
+    }
+    return groups;
+  }, [filtered]);
+
+  if (datesLoading) return <TabLoading label="matches" />;
+  if (datesError) return <TabError error={datesError} />;
+  if (datesFetched && dates.length === 0) {
+    return <TabEmpty icon={Swords} message="No match data available for this tournament." />;
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Date tabs */}
+      {dates.length > 0 && (
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1">
+          {dates.map(d => (
+            <button
+              key={d.param}
+              onClick={() => handleDateChange(d.param)}
+              disabled={matchesLoading}
+              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                d.param === selectedDate
+                  ? 'bg-violet-600 text-white shadow-sm'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+              } ${matchesLoading ? 'opacity-60' : ''}`}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Refresh button for today's matches */}
+      {isToday && selectedDate && !matchesLoading && (
+        <button
+          onClick={handleRefresh}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors cursor-pointer"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          Refresh live results
+        </button>
+      )}
+
+      {/* Prompt to select a date */}
+      {!selectedDate && (
+        <div className="text-center py-12 text-slate-400 dark:text-slate-500">
+          <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">Select a date above to view matches</p>
+        </div>
+      )}
+
+      {/* Loading state for matches */}
+      {selectedDate && matchesLoading && <TabLoading label="matches" />}
+      {selectedDate && matchesError && <TabError error={matchesError} />}
+
+      {/* Match content */}
+      {selectedDate && !matchesLoading && !matchesError && (
+        <>
+          {/* Event filter */}
+          {events.length > 1 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">Event:</span>
+              {['All', ...events].map(ev => (
+                <button
+                  key={ev}
+                  onClick={() => setEventFilter(ev === 'All' ? '' : ev)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                    (ev === 'All' && !eventFilter) || ev === eventFilter
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {ev}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Match count */}
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            {filtered.length} match{filtered.length !== 1 ? 'es' : ''}
+            {eventFilter && ` in ${eventFilter}`}
+          </p>
+
+          {/* Match results */}
+          {filtered.length === 0 ? (
+            <TabEmpty icon={Swords} message={matches.length > 0 ? `No matches for "${eventFilter}"` : 'No matches for this day.'} />
+          ) : (
+            <div>
+              {timeGroups.flatMap((group, gi) => {
+                const items: React.ReactNode[] = [];
+                if (group.time) {
+                  items.push(
+                    <div key={`t-${gi}`} className="sticky top-[3.5rem] md:top-16 z-10 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm py-2">
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{group.time}</span>
+                    </div>
+                  );
+                }
+                items.push(
+                  <div key={`g-${gi}`} className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4">
+                    {group.matches.map((m, i) => (
+                      <MatchCard key={i} match={m} date={matchDate} />
+                    ))}
+                  </div>
+                );
+                return items;
+              })}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Main Page ───────────────────────────────────────────────────────────────
+
+export default function TournamentDetail() {
+  const { tswId } = useParams<{ tswId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const activeTab = (searchParams.get('tab') as TabId) || 'overview';
+
+  const routeState = location.state as { name?: string; hostClub?: string; startDate?: string; endDate?: string } | null;
+
+  const [tournamentName, setTournamentName] = useState(routeState?.name || '');
+  const [tournamentMeta, setTournamentMeta] = useState({
+    hostClub: routeState?.hostClub || '',
+    startDate: routeState?.startDate || '',
+    endDate: routeState?.endDate || '',
+  });
+
+  useEffect(() => {
+    if (tournamentName || !tswId) return;
+    let cancelled = false;
+    fetchTournaments()
+      .then(data => {
+        if (cancelled) return;
+        const allTournaments = data.tournaments
+          ?? Object.values(data.seasons ?? {}).flatMap(s => s.tournaments);
+        const match = allTournaments.find(t => t.tswId?.toUpperCase() === tswId.toUpperCase());
+        if (match) {
+          setTournamentName(match.name);
+          setTournamentMeta({ hostClub: match.hostClub, startDate: match.startDate ?? '', endDate: match.endDate ?? '' });
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [tswId, tournamentName]);
+
+  function setTab(tab: TabId) {
+    setSearchParams({ tab }, { replace: true });
+  }
+
+  if (!tswId) return null;
+
+  const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
+
+  function formatDateRange(start: string, end: string) {
+    if (!start) return '';
+    const s = new Date(start + 'T00:00:00');
+    const e = end ? new Date(end + 'T00:00:00') : s;
+    const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    if (start === end || !end) return s.toLocaleDateString('en-US', opts);
+    return `${s.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${e.toLocaleDateString('en-US', opts)}`;
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <Link to="/tournaments" className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline">
         <ArrowLeft className="w-4 h-4" />
         Back to Tournaments
       </Link>
 
+      {/* Header */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight mb-4">
-          {data.tournamentName || 'Tournament'}
+        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight mb-2">
+          {tournamentName || 'Tournament'}
         </h1>
-
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-            <Medal className="w-4 h-4 text-yellow-500" />
-            <span className="font-medium">
-              {medalClubs.length} clubs with medals &middot; {data.medals.length} events
+        <div className="flex items-center gap-4 flex-wrap mt-2 text-sm text-slate-500 dark:text-slate-400">
+          {tournamentMeta.startDate && (
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-4 h-4" />
+              {formatDateRange(tournamentMeta.startDate, tournamentMeta.endDate)}
             </span>
-          </div>
+          )}
+          {tournamentMeta.hostClub && (
+            <span className="flex items-center gap-1.5">
+              <MapPin className="w-4 h-4" />
+              {tournamentMeta.hostClub}
+            </span>
+          )}
           <a
             href={tswUrl}
             target="_blank"
@@ -366,61 +1079,46 @@ export default function TournamentDetail() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
           >
             <ExternalLink className="w-3 h-3" />
-            View on TournamentSoftware
+            TournamentSoftware
           </a>
         </div>
       </div>
 
-      {data.clubs.length === 0 ? (
-        <div className="text-center text-slate-400 dark:text-slate-500 py-8">
-          <Medal className="w-8 h-8 mx-auto mb-2 opacity-50" />
-          <p>No medal data available for this tournament.</p>
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-            <p className="text-xs text-slate-400 dark:text-slate-500">
-              Click a medal count to filter by type &middot; Click Players to see full roster
-            </p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
-                  <th className="px-3 py-2 w-10 text-xs">#</th>
-                  <th className={`${headerCls} text-left`} onClick={() => handleSort('club')}>
-                    Club{sortArrow('club')}
-                  </th>
-                  <th className={`${headerCls} text-center`} onClick={() => handleSort('gold')}>
-                    <span className="inline-flex items-center gap-1"><MedalIcon type="gold" size={14} />Gold{sortArrow('gold')}</span>
-                  </th>
-                  <th className={`${headerCls} text-center`} onClick={() => handleSort('silver')}>
-                    <span className="inline-flex items-center gap-1"><MedalIcon type="silver" size={14} />Silver{sortArrow('silver')}</span>
-                  </th>
-                  <th className={`${headerCls} text-center`} onClick={() => handleSort('bronze')}>
-                    <span className="inline-flex items-center gap-1"><MedalIcon type="bronze" size={14} />Bronze{sortArrow('bronze')}</span>
-                  </th>
-                  <th className={`${headerCls} text-center`} onClick={() => handleSort('total')}>
-                    Total{sortArrow('total')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                {medalClubs.map((club, idx) => (
-                  <ClubMedalRow
-                    key={club.club}
-                    club={club}
-                    rank={idx + 1}
-                    medals={data.medals}
-                    nameMap={playerNameMap}
-                    playerIdSet={playerIdSet}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {/* Tabs */}
+      <div className="border-b border-slate-200 dark:border-slate-700 overflow-x-auto scrollbar-hide">
+        <nav className="flex gap-1 min-w-max" aria-label="Tabs">
+          {TABS.map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setTab(tab.id)}
+                className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? 'border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Tab content */}
+      <div>
+        {activeTab === 'overview' && <OverviewTab tswId={tswId} active={activeTab === 'overview'} />}
+        {activeTab === 'draws' && <DrawsTab tswId={tswId} active={activeTab === 'draws'} />}
+        {activeTab === 'events' && <EventsTab tswId={tswId} active={activeTab === 'events'} />}
+        {activeTab === 'players' && <PlayersTab tswId={tswId} active={activeTab === 'players'} />}
+        {activeTab === 'seeding' && <SeedingTab tswId={tswId} active={activeTab === 'seeding'} />}
+        {activeTab === 'winners' && <WinnersTab tswId={tswId} active={activeTab === 'winners'} />}
+        {activeTab === 'medals' && <MedalsTab tswId={tswId} active={activeTab === 'medals'} />}
+        {activeTab === 'matches' && <MatchesTab tswId={tswId} active={activeTab === 'matches'} />}
+      </div>
     </div>
   );
 }

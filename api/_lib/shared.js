@@ -487,9 +487,22 @@ export function parseTswDrawsList(html) {
 }
 
 export function parseTswTournamentInfo(html) {
-  const nameMatch = html.match(/<h3[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h3>/i)
+  const titleBlock = html.match(/<h3[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h3>/i)
     || html.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
-  const name = nameMatch ? nameMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+  let name = '';
+  if (titleBlock) {
+    const spanVal = titleBlock[1].match(/<span[^>]*class="[^"]*nav-link__value[^"]*"[^>]*>([^<]+)<\/span>/i);
+    if (spanVal) {
+      name = spanVal[1].trim();
+    } else {
+      name = titleBlock[1]
+        .replace(/<a[^>]*class="[^"]*favorite[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '')
+        .replace(/<button[^>]*>[\s\S]*?<\/button>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        .trim();
+    }
+    name = name.replace(/\bFavorite\b/gi, '').replace(/^[""\u201C\u201D]+|[""\u201C\u201D]+$/g, '').replace(/\s{2,}/g, ' ').trim();
+  }
 
   const dateMatch = html.match(/<time[^>]*>([^<]+)<\/time>\s*(?:to|-)\s*<time[^>]*>([^<]+)<\/time>/i)
     || html.match(/<time[^>]*>([^<]+)<\/time>/i);
@@ -707,6 +720,396 @@ export function parseTswTournamentPlayers(html) {
     if (!players.has(playerId)) {
       players.set(playerId, { name, club });
     }
+  }
+  return players;
+}
+
+// ── TSW Events page parser ──────────────────────────────────────────────────
+// Parses /sport/events.aspx?id=<tswId>
+// Returns array of { eventId, name, entries, status }
+
+export function parseTswEvents(html) {
+  const events = [];
+  const linkRegex = /<a[^>]*href="[^"]*draw(?:\.aspx)?\?[^"]*draw=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = linkRegex.exec(html)) !== null) {
+    const eventId = parseInt(m[1], 10);
+    const name = m[2].replace(/<[^>]*>/g, '').trim();
+    if (name && !events.some(e => e.eventId === eventId)) {
+      events.push({ eventId, name, entries: 0 });
+    }
+  }
+
+  const tableRegex = /<table[^>]*class="ruler"[^>]*>([\s\S]*?)<\/table>/gi;
+  let tableMatch;
+  while ((tableMatch = tableRegex.exec(html)) !== null) {
+    const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let rowMatch;
+    while ((rowMatch = rowRegex.exec(tableMatch[1])) !== null) {
+      const rowHtml = rowMatch[1];
+      const drawIdMatch = rowHtml.match(/draw=(\d+)/);
+      if (!drawIdMatch) continue;
+      const drawId = parseInt(drawIdMatch[1], 10);
+
+      const cells = [];
+      const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+      let cellMatch;
+      while ((cellMatch = cellRegex.exec(rowHtml)) !== null) {
+        cells.push(cellMatch[1].replace(/<[^>]*>/g, '').trim());
+      }
+
+      const existing = events.find(e => e.eventId === drawId);
+      if (existing && cells.length >= 2) {
+        const numMatch = cells.find(c => /^\d+$/.test(c));
+        if (numMatch) existing.entries = parseInt(numMatch, 10);
+      }
+    }
+  }
+
+  return events;
+}
+
+// ── TSW Seeding overview parser ─────────────────────────────────────────────
+// Parses /sport/seedingoverview.aspx?id=<tswId>
+// Returns array of { eventName, seeds: [{ seed, players: [{ name, playerId }] }] }
+
+export function parseTswSeeding(html) {
+  const events = [];
+  const tableRegex = /<table[^>]*class="ruler seeding"[^>]*>([\s\S]*?)<\/table>/gi;
+  let tableMatch;
+
+  while ((tableMatch = tableRegex.exec(html)) !== null) {
+    const tableHtml = tableMatch[1];
+    let currentEvent = null;
+
+    const rowRegex = /<tr>([\s\S]*?)<\/tr>/gi;
+    let rowMatch;
+    while ((rowMatch = rowRegex.exec(tableHtml)) !== null) {
+      const rowHtml = rowMatch[1];
+
+      const headerMatch = rowHtml.match(/<th[^>]*colspan[^>]*>[\s\S]*?<a[^>]*>([^<]+)<\/a>/i)
+        || rowHtml.match(/<th[^>]*colspan[^>]*>\s*([^<]+)/i);
+      if (headerMatch) {
+        const name = headerMatch[1].replace(/<[^>]*>/g, '').trim();
+        if (name) {
+          currentEvent = { eventName: name, seeds: [] };
+          events.push(currentEvent);
+        }
+        continue;
+      }
+
+      if (!currentEvent) continue;
+
+      const seedMatch = rowHtml.match(/<td[^>]*>\s*(\d+)\s*<\/td>/);
+      if (!seedMatch) continue;
+      const seed = parseInt(seedMatch[1], 10);
+
+      const players = [];
+      const playerRegex = /<a\s+href="[^"]*player=(\d+)[^"]*">([^<]+)<\/a>/gi;
+      let pm;
+      while ((pm = playerRegex.exec(rowHtml)) !== null) {
+        const rawName = pm[2].replace(/\s*\[[\d/]+\]\s*$/, '').trim();
+        const commaIdx = rawName.indexOf(',');
+        const name = commaIdx > -1
+          ? `${rawName.slice(commaIdx + 1).trim()} ${rawName.slice(0, commaIdx).trim()}`
+          : rawName;
+        players.push({ name, playerId: parseInt(pm[1], 10) });
+      }
+
+      if (players.length > 0) {
+        currentEvent.seeds.push({ seed, players });
+      }
+    }
+  }
+
+  return events;
+}
+
+// ── TSW Matches page parser ─────────────────────────────────────────────────
+// The matches page at /sport/matches.aspx loads match content via AJAX:
+//   /tournament/{tswId}/Matches/MatchesInDay?date=YYYYMMDD
+// The parent page contains date tabs as data-href attributes.
+
+export function parseTswMatchDates(html) {
+  const dates = [];
+  const tabRegex = /data-href="[^"]*MatchesInDay\?date=(\d+)"[^>]*>([\s\S]*?)<\/(?:a|button)/gi;
+  let m;
+  while ((m = tabRegex.exec(html)) !== null) {
+    const param = m[1];
+    let label = m[2].replace(/<[^>]*>/g, '').trim();
+    // TSW labels like "Sat17Jan" → "Sat 17 Jan"
+    label = label.replace(/^(\w{3})(\d{1,2})(\w{3})$/, '$1 $2 $3');
+    if (param && !dates.some(d => d.param === param)) {
+      dates.push({ param, label });
+    }
+  }
+  // Fallback: look in init JSON for current date
+  if (dates.length === 0) {
+    const initMatch = html.match(/"date"\s*:\s*"(\d{8})"/);
+    if (initMatch) {
+      const d = initMatch[1];
+      const formatted = formatDateLabel(d);
+      dates.push({ param: d, label: formatted });
+    }
+  }
+  return dates;
+}
+
+function formatDateLabel(yyyymmdd) {
+  const y = yyyymmdd.slice(0, 4);
+  const m = parseInt(yyyymmdd.slice(4, 6), 10);
+  const d = parseInt(yyyymmdd.slice(6, 8), 10);
+  const dt = new Date(+y, m - 1, d);
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${days[dt.getDay()]} ${d} ${months[m - 1]}`;
+}
+
+export function formatMatchDate(yyyymmdd) {
+  if (!yyyymmdd || yyyymmdd.length !== 8) return '';
+  const y = yyyymmdd.slice(0, 4);
+  const m = parseInt(yyyymmdd.slice(4, 6), 10);
+  const d = parseInt(yyyymmdd.slice(6, 8), 10);
+  const dt = new Date(+y, m - 1, d);
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${days[dt.getDay()]} ${m}/${d}/${y}`;
+}
+
+export function parseTswMatches(html) {
+  const matches = [];
+
+  // Matches are grouped by time under sticky headers, then individual match blocks.
+  // Header pattern: <h5 class="sticky is-sticky match-group__header">TIME</h5>
+  // Match pattern: <div class="match match--list">...</div>
+
+  const sections = html.split(/<(?:h[1-6]|div)[^>]*class="[^"]*match-group__header[^"]*"[^>]*>/g);
+  let currentTime = '';
+
+  for (let i = 0; i < sections.length; i++) {
+    const section = sections[i];
+
+    // Extract the time from the start of this section (text before first tag)
+    if (i > 0) {
+      const timeText = section.match(/^\s*([^<]+)/);
+      if (timeText) {
+        const t = timeText[1].trim();
+        if (/\d{1,2}:\d{2}/.test(t)) currentTime = t;
+      }
+    }
+
+    // Find all match blocks in this section
+    const matchBlocks = section.split(/<div class="match[^"]*match--list[^"]*">/g).slice(1);
+
+    for (const block of matchBlocks) {
+      const headerItems = [];
+      const headerRegex =
+        /<li class="match__header-title-item">[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/g;
+      let hm;
+      while ((hm = headerRegex.exec(block)) !== null) {
+        headerItems.push(decodeHtmlEntities(hm[1].trim()));
+      }
+      const event = headerItems[0] ?? '';
+      const round = headerItems[1] ?? '';
+
+      // Extract status tags from header-aside (e.g. "Now Playing", "Upcoming")
+      const asideMatch = block.match(/<div class="match__header-aside">([\s\S]*?)<\/div>/);
+      let headerStatus = '';
+      if (asideMatch) {
+        const tagRegex = /<span[^>]*class="[^"]*tag[^"]*"[^>]*>([^<]+)<\/span>/g;
+        let tm;
+        while ((tm = tagRegex.exec(asideMatch[1])) !== null) {
+          const txt = tm[1].trim();
+          if (txt) headerStatus = txt;
+        }
+        if (!headerStatus) {
+          const valMatch = asideMatch[1].match(/nav-link__value">([^<]+)<\/span>/);
+          if (valMatch && valMatch[1].trim()) headerStatus = valMatch[1].trim();
+        }
+      }
+
+      if (block.includes('>Bye<')) continue;
+
+      const rowBlocks = block.split(/<div class="match__row[\s"]/g).slice(1);
+      if (rowBlocks.length < 2) continue;
+
+      function extractTeam(rowHtml) {
+        const names = [];
+        const pRegex = /<a[^>]*class="nav-link"[^>]*><span class="nav-link__value">([^<]+)<\/span>/g;
+        let pm;
+        while ((pm = pRegex.exec(rowHtml)) !== null) names.push(pm[1].trim());
+        if (names.length === 0) {
+          const altRegex = /match__row-title-value-content[\s\S]*?nav-link__value">([^<]+)<\/span>/g;
+          let am;
+          while ((am = altRegex.exec(rowHtml)) !== null) {
+            const n = am[1].trim();
+            if (n && n !== 'Bye') names.push(n);
+          }
+        }
+        const won = rowHtml.includes('has-won');
+        return { names, won };
+      }
+
+      const team1 = extractTeam(rowBlocks[0] ?? '');
+      const team2 = extractTeam(rowBlocks[1] ?? '');
+
+      const isWalkover = block.includes('>Walkover<');
+      const isRetired = /match__message">\s*Retired?\s*</i.test(block)
+        || />\s*Retired?\s*</i.test(block)
+        || />\s*Ret\.?\s*</i.test(block);
+
+      const scores = [];
+      const setRegex = /<ul class="points">([\s\S]*?)<\/ul>/g;
+      let sm;
+      while ((sm = setRegex.exec(block)) !== null) {
+        const pts = [];
+        const ptRegex = /<li class="points__cell[^"]*">\s*(\d+)/g;
+        let ptm;
+        while ((ptm = ptRegex.exec(sm[1])) !== null) pts.push(parseInt(ptm[1], 10));
+        if (pts.length === 2) scores.push(pts);
+      }
+
+      // Duration and court from the tooltip: title="Duration: 12m | Main Location - 04"
+      let court = '';
+      let duration = '';
+      const tooltipMatch = block.match(/title="Duration:\s*([^|"]+)\s*\|\s*([^"]+)"/i)
+        || block.match(/title="([^|"]+)\s*\|\s*([^"]+)"/i);
+      if (tooltipMatch) {
+        duration = tooltipMatch[1].replace(/^Duration:\s*/i, '').trim();
+        court = tooltipMatch[2].trim();
+      }
+
+      // Location from footer: <span class="nav-link__value">Main Location - 21</span>
+      let location = '';
+      const footerMatch = block.match(/icon-marker[\s\S]*?nav-link__value">([^<]+)<\/span>/);
+      if (footerMatch) location = footerMatch[1].trim();
+      if (!location && court) location = court;
+
+      const headerParts = headerItems.join(' \u00b7 ');
+      const header = headerStatus
+        ? `${headerParts} \u00b7 ${headerStatus}`
+        : headerParts;
+
+      matches.push({
+        event,
+        round,
+        header,
+        team1: team1.names,
+        team2: team2.names,
+        team1Won: team1.won,
+        team2Won: team2.won,
+        scores,
+        walkover: isWalkover || undefined,
+        retired: isRetired || undefined,
+        time: currentTime,
+        court,
+        duration,
+        location,
+      });
+    }
+  }
+
+  return matches;
+}
+
+// ── TSW Draw bracket parser ─────────────────────────────────────────────────
+// Parses /sport/draw.aspx?id=<tswId>&draw=<drawId>
+// Returns { drawName, rounds: [{ name, matches }] }
+
+export function parseTswDrawBracket(html) {
+  const nameMatch = html.match(/<h3[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h3>/i)
+    || html.match(/<select[^>]*id="draws"[^>]*>[\s\S]*?<option[^>]*selected[^>]*>([^<]+)/i);
+  const drawName = nameMatch ? nameMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+
+  const rounds = [];
+  const matchBlocks = html.split(/<div class="match">/g).slice(1);
+
+  for (const block of matchBlocks) {
+    const headerItems = [];
+    const headerRegex =
+      /<li class="match__header-title-item">[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/g;
+    let hm;
+    while ((hm = headerRegex.exec(block)) !== null) {
+      headerItems.push(decodeHtmlEntities(hm[1].trim()));
+    }
+    const roundName = headerItems[0] ?? '';
+
+    if (block.includes('>Bye<')) continue;
+
+    const rowBlocks = block.split(/<div class="match__row[\s"]/g).slice(1);
+    if (rowBlocks.length < 2) continue;
+
+    function extractTeam(rowHtml) {
+      const names = [];
+      const seedMatch = rowHtml.match(/\[(\d+(?:\/\d+)?)\]/);
+      const seed = seedMatch ? seedMatch[1] : '';
+      const pRegex = /nav-link__value">([^<]+)<\/span><\/a>\s*<\/span>/g;
+      let pm;
+      while ((pm = pRegex.exec(rowHtml)) !== null) {
+        names.push(pm[1].replace(/\s*\[[\d/]+\]/, '').trim());
+      }
+      if (names.length === 0) {
+        const altRegex = /match__row-title-value-content[\s\S]*?<span[^>]*>([^<]+)<\/span>/g;
+        let am;
+        while ((am = altRegex.exec(rowHtml)) !== null) {
+          const n = am[1].replace(/\s*\[[\d/]+\]/, '').trim();
+          if (n && n !== 'Bye') names.push(n);
+        }
+      }
+      return { names, seed, won: rowHtml.includes('has-won') };
+    }
+
+    const team1 = extractTeam(rowBlocks[0] ?? '');
+    const team2 = extractTeam(rowBlocks[1] ?? '');
+
+    const scores = [];
+    const setRegex = /<ul class="points">([\s\S]*?)<\/ul>/g;
+    let sm;
+    while ((sm = setRegex.exec(block)) !== null) {
+      const pts = [];
+      const ptRegex = /<li class="points__cell[^"]*">\s*(\d+)/g;
+      let ptm;
+      while ((ptm = ptRegex.exec(sm[1])) !== null) pts.push(parseInt(ptm[1], 10));
+      if (pts.length === 2) scores.push(pts);
+    }
+
+    const isWalkover = block.includes('>Walkover<');
+    const isRetired = /match__message">\s*Retired?\s*</i.test(block)
+      || />\s*Retired?\s*</i.test(block)
+      || />\s*Ret\.?\s*</i.test(block);
+
+    rounds.push({
+      round: roundName,
+      team1: { names: team1.names, seed: team1.seed, won: team1.won },
+      team2: { names: team2.names, seed: team2.seed, won: team2.won },
+      scores,
+      walkover: isWalkover || undefined,
+      retired: isRetired || undefined,
+    });
+  }
+
+  return { drawName, matches: rounds };
+}
+
+// ── TSW Tournament Players page parser (array version) ──────────────────────
+// Same source as parseTswTournamentPlayers but returns an array instead of Map
+
+export function parseTswTournamentPlayersArray(html) {
+  const players = [];
+  const seen = new Set();
+  const blockRegex = /player=(\d+)[^"]*"[^>]*class="nav-link media__link"[^>]*><span[^>]*>([^<]+)<\/span><\/a>[\s\S]*?<small class="media__subheading">\s*\n?\s*<span[^>]*><span[^>]*>([^<]*)<\/span>/gi;
+  let m;
+  while ((m = blockRegex.exec(html)) !== null) {
+    const playerId = parseInt(m[1], 10);
+    if (seen.has(playerId)) continue;
+    seen.add(playerId);
+    const rawName = m[2].trim();
+    const club = m[3].trim();
+    const commaIdx = rawName.indexOf(',');
+    const name = commaIdx > -1
+      ? `${rawName.slice(commaIdx + 1).trim()} ${rawName.slice(0, commaIdx).trim()}`
+      : rawName;
+    players.push({ playerId, name, club });
   }
   return players;
 }

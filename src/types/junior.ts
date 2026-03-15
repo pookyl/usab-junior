@@ -231,3 +231,111 @@ export interface TournamentMedals {
   clubs: ClubMedalSummary[];
   medals: DrawMedals[];
 }
+
+// ── Tournament tab data types ────────────────────────────────────────────────
+
+export interface TournamentEvent {
+  eventId: number;
+  name: string;
+  entries: number;
+}
+
+export interface TournamentEventsResponse {
+  tswId: string;
+  events: TournamentEvent[];
+}
+
+export interface TournamentPlayer {
+  playerId: number;
+  name: string;
+  club: string;
+}
+
+export interface TournamentPlayersResponse {
+  tswId: string;
+  players: TournamentPlayer[];
+}
+
+export interface SeedEntry {
+  seed: number;
+  players: { name: string; playerId: number }[];
+}
+
+export interface TournamentSeedingEvent {
+  eventName: string;
+  seeds: SeedEntry[];
+}
+
+export interface TournamentSeedingResponse {
+  tswId: string;
+  events: TournamentSeedingEvent[];
+}
+
+export interface WinnerResult {
+  place: string;
+  players: { name: string; playerId: number }[];
+}
+
+export interface TournamentWinnerEvent {
+  eventName: string;
+  results: WinnerResult[];
+}
+
+export interface TournamentWinnersResponse {
+  tswId: string;
+  tournamentName: string;
+  events: TournamentWinnerEvent[];
+}
+
+export interface TournamentMatch {
+  event: string;
+  round: string;
+  header: string;
+  team1: string[];
+  team2: string[];
+  team1Won: boolean;
+  team2Won: boolean;
+  scores: number[][];
+  walkover?: boolean;
+  retired?: boolean;
+  time: string;
+  court: string;
+  duration: string;
+  location: string;
+}
+
+export interface MatchDateTab {
+  param: string;
+  label: string;
+}
+
+export interface TournamentMatchDatesResponse {
+  tswId: string;
+  dates: MatchDateTab[];
+}
+
+export interface TournamentMatchDayResponse {
+  tswId: string;
+  date: string;
+  matches: TournamentMatch[];
+}
+
+export interface DrawBracketTeam {
+  names: string[];
+  seed: string;
+  won: boolean;
+}
+
+export interface DrawBracketMatch {
+  round: string;
+  team1: DrawBracketTeam;
+  team2: DrawBracketTeam;
+  scores: number[][];
+  walkover?: boolean;
+  retired?: boolean;
+}
+
+export interface DrawBracketResponse {
+  drawName: string;
+  matches: DrawBracketMatch[];
+}

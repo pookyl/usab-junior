@@ -363,6 +363,51 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // GET /api/tournaments/:tswId/events
+  const tournamentEventsMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/events$/);
+  if (tournamentEventsMatch) {
+    const { default: eventsHandler } = await import('./api/tournaments/[tswId]/events.js');
+    req.query = { tswId: tournamentEventsMatch[1] };
+    await eventsHandler(req, res);
+    return;
+  }
+
+  // GET /api/tournaments/:tswId/players
+  const tournamentPlayersMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/players$/);
+  if (tournamentPlayersMatch) {
+    const { default: playersHandler } = await import('./api/tournaments/[tswId]/players.js');
+    req.query = { tswId: tournamentPlayersMatch[1] };
+    await playersHandler(req, res);
+    return;
+  }
+
+  // GET /api/tournaments/:tswId/seeding
+  const tournamentSeedingMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/seeding$/);
+  if (tournamentSeedingMatch) {
+    const { default: seedingHandler } = await import('./api/tournaments/[tswId]/seeding.js');
+    req.query = { tswId: tournamentSeedingMatch[1] };
+    await seedingHandler(req, res);
+    return;
+  }
+
+  // GET /api/tournaments/:tswId/winners
+  const tournamentWinnersMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/winners$/);
+  if (tournamentWinnersMatch) {
+    const { default: winnersHandler } = await import('./api/tournaments/[tswId]/winners.js');
+    req.query = { tswId: tournamentWinnersMatch[1] };
+    await winnersHandler(req, res);
+    return;
+  }
+
+  // GET /api/tournaments/:tswId/matches
+  const tournamentMatchesMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/matches$/);
+  if (tournamentMatchesMatch) {
+    const { default: matchesHandler } = await import('./api/tournaments/[tswId]/matches.js');
+    req.query = { tswId: tournamentMatchesMatch[1], d: reqUrl.searchParams.get('d') || '' };
+    await matchesHandler(req, res);
+    return;
+  }
+
   // GET /api/tournaments/:tswId — on-demand tournament detail from TSW
   const tournamentDetailMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)$/);
   if (tournamentDetailMatch) {
