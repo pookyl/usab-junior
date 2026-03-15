@@ -1,16 +1,25 @@
 import {
   TSW_BASE, TSW_ORG_CODE,
-  getCached, setCache,
+  getCached, setCache, listCachedDates, loadDiskCacheForDate,
   tswFetch, tswUsabProfilePath, tswUsabTournamentsPath, tswUsabOverviewPath,
   emptyCat, parseTswOverviewStats, parseTswTournaments,
-  setCors,
+  setCors, isValidUsabId,
 } from '../../_lib/shared.js';
 
 export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const { id: usabId, name: playerName = '' } = req.query;
+  const { id: usabId, action } = req.query;
+
+  if (action === 'tsw-stats') return handleTswStats(req, res, usabId);
+  if (action === 'ranking-trend') return handleRankingTrend(req, res, usabId);
+
+  return res.status(404).json({ error: `Unknown action: ${action}` });
+}
+
+async function handleTswStats(req, res, usabId) {
+  const playerName = req.query.name ?? '';
   const cacheKey = `tsw-stats:${usabId}`;
 
   const cached = getCached(cacheKey);
@@ -120,5 +129,35 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error('[tsw-stats] error:', err.message);
     return res.status(200).json(fallback);
+  }
+}
+
+async function handleRankingTrend(req, res, usabId) {
+  if (!usabId || !isValidUsabId(usabId)) return res.status(400).json({ error: 'Invalid player ID' });
+
+  const cacheKey = `trend:${usabId}`;
+
+  const cached = getCached(cacheKey);
+  if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
+
+  try {
+    const dates = (await listCachedDates()).sort();
+    const trend = [];
+    let playerName = '';
+
+    for (const date of dates) {
+      const disk = await loadDiskCacheForDate(date);
+      if (!disk || !disk.allPlayers) continue;
+      const player = disk.allPlayers.find((p) => p.usabId === usabId);
+      if (!player) continue;
+      if (!playerName && player.name) playerName = player.name;
+      trend.push({ date, entries: player.entries });
+    }
+
+    const result = { usabId, name: playerName, trend };
+    setCache(cacheKey, result);
+    return res.setHeader('X-Cache', 'MISS').status(200).json(result);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 }

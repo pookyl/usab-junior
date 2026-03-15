@@ -1,18 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useSearchParams, useLocation, Link } from 'react-router-dom';
 import {
-  ArrowLeft, ExternalLink, Loader2, Medal, Search,
-  Calendar, MapPin, Users, List, Trophy, Hash, Swords,
-  ChevronDown, ChevronRight, Info, RefreshCw,
+  ArrowLeft, ExternalLink, Loader2, Medal,
+  Calendar, MapPin, List, Swords,
+  ChevronDown, ChevronRight, RefreshCw,
 } from 'lucide-react';
 import {
   fetchTournaments,
   fetchTournamentDetail,
   fetchTournamentMedals,
-  fetchTournamentEvents,
-  fetchTournamentPlayers,
-  fetchTournamentSeeding,
-  fetchTournamentWinners,
   fetchTournamentMatchDates,
   fetchTournamentMatchDay,
 } from '../services/rankingsService';
@@ -22,10 +18,6 @@ import type {
   ClubMedalSummary,
   DrawMedals,
   MedalPlayer,
-  TournamentEventsResponse,
-  TournamentPlayersResponse,
-  TournamentSeedingResponse,
-  TournamentWinnersResponse,
   MatchDateTab,
   TournamentMatch,
 } from '../types/junior';
@@ -33,13 +25,8 @@ import type {
 // ── Tab definitions ─────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'overview', label: 'Overview', icon: Info },
   { id: 'matches', label: 'Matches', icon: Swords },
   { id: 'draws', label: 'Draws', icon: List },
-  { id: 'events', label: 'Events', icon: Calendar },
-  { id: 'players', label: 'Players', icon: Users },
-  { id: 'seeding', label: 'Seeded Entries', icon: Hash },
-  { id: 'winners', label: 'Winners', icon: Trophy },
   { id: 'medals', label: 'Medals', icon: Medal },
 ] as const;
 
@@ -294,63 +281,6 @@ function ClubMedalRow({
   );
 }
 
-// ── Overview Tab ─────────────────────────────────────────────────────────────
-
-function OverviewTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentDetail(id), []);
-  const { data, loading, error } = useTabData(tswId, active, fetcher);
-
-  if (loading) return <TabLoading label="overview" />;
-  if (error) return <TabError error={error} />;
-  if (!data) return <TabEmpty icon={Info} message="No overview data available." />;
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 p-6">
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">{data.name}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {data.dates && (
-            <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-violet-500 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dates</p>
-                <p className="text-sm text-slate-700 dark:text-slate-200">{data.dates}</p>
-              </div>
-            </div>
-          )}
-          {data.location && (
-            <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 text-violet-500 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Location</p>
-                <p className="text-sm text-slate-700 dark:text-slate-200">{data.location}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {data.draws.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 p-6">
-          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3">
-            Draws ({data.draws.length})
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {data.draws.map(d => {
-              const color = getEventColor(d.name);
-              return (
-                <span key={d.drawId} className={`inline-block px-2.5 py-1 rounded-lg text-xs font-medium ${color.bg} ${color.text}`}>
-                  {d.name}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Draws Tab ───────────────────────────────────────────────────────────────
 
 function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
@@ -397,210 +327,6 @@ function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
           );
         })}
       </div>
-    </div>
-  );
-}
-
-// ── Events Tab ──────────────────────────────────────────────────────────────
-
-function EventsTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentEvents(id), []);
-  const { data, loading, error } = useTabData<TournamentEventsResponse>(tswId, active, fetcher);
-
-  if (loading) return <TabLoading label="events" />;
-  if (error) return <TabError error={error} />;
-  if (!data || data.events.length === 0) return <TabEmpty icon={Calendar} message="No events available for this tournament." />;
-
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
-              <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">#</th>
-              <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">Event</th>
-              <th className="px-5 py-3 text-right text-xs uppercase tracking-wider font-medium">Entries</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-            {data.events.map((ev, i) => {
-              const color = getEventColor(ev.name);
-              return (
-                <tr key={ev.eventId} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
-                  <td className="px-5 py-3 text-sm text-slate-400 dark:text-slate-500">{i + 1}</td>
-                  <td className="px-5 py-3">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
-                      {ev.name}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-right text-sm text-slate-600 dark:text-slate-300">
-                    {ev.entries > 0 ? ev.entries : '—'}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// ── Players Tab ─────────────────────────────────────────────────────────────
-
-function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentPlayers(id), []);
-  const { data, loading, error } = useTabData<TournamentPlayersResponse>(tswId, active, fetcher);
-  const [search, setSearch] = useState('');
-
-  const filtered = useMemo(() => {
-    if (!data) return [];
-    if (!search.trim()) return data.players;
-    const q = search.toLowerCase();
-    return data.players.filter(p =>
-      p.name.toLowerCase().includes(q) || p.club.toLowerCase().includes(q),
-    );
-  }, [data, search]);
-
-  if (loading) return <TabLoading label="players" />;
-  if (error) return <TabError error={error} />;
-  if (!data || data.players.length === 0) return <TabEmpty icon={Users} message="No player data available for this tournament." />;
-
-  return (
-    <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder={`Search ${data.players.length} players…`}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-500"
-        />
-      </div>
-
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
-                <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">#</th>
-                <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">Player</th>
-                <th className="px-5 py-3 text-left text-xs uppercase tracking-wider font-medium">Club</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-              {filtered.map((p, i) => (
-                <tr key={p.playerId} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
-                  <td className="px-5 py-2.5 text-sm text-slate-400 dark:text-slate-500">{i + 1}</td>
-                  <td className="px-5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-100">{p.name}</td>
-                  <td className="px-5 py-2.5 text-sm text-slate-500 dark:text-slate-400">{p.club || '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {filtered.length === 0 && search && (
-          <div className="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">
-            No players match "{search}"
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── Seeding Tab ─────────────────────────────────────────────────────────────
-
-function SeedingTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentSeeding(id), []);
-  const { data, loading, error } = useTabData<TournamentSeedingResponse>(tswId, active, fetcher);
-
-  if (loading) return <TabLoading label="seeded entries" />;
-  if (error) return <TabError error={error} />;
-  if (!data || data.events.length === 0) return <TabEmpty icon={Hash} message="No seeding data available for this tournament." />;
-
-  return (
-    <div className="space-y-4">
-      {data.events.map(ev => {
-        const color = getEventColor(ev.eventName);
-        return (
-          <div key={ev.eventName} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
-              <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
-                {ev.eventName}
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
-                    <th className="px-5 py-2 text-left text-xs uppercase tracking-wider font-medium w-16">Seed</th>
-                    <th className="px-5 py-2 text-left text-xs uppercase tracking-wider font-medium">Player(s)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                  {ev.seeds.map(s => (
-                    <tr key={s.seed} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
-                      <td className="px-5 py-2 text-sm font-bold text-violet-600 dark:text-violet-400">{s.seed}</td>
-                      <td className="px-5 py-2 text-sm text-slate-700 dark:text-slate-200">
-                        {s.players.map(p => p.name).join(' / ')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ── Winners Tab ─────────────────────────────────────────────────────────────
-
-function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentWinners(id), []);
-  const { data, loading, error } = useTabData<TournamentWinnersResponse>(tswId, active, fetcher);
-
-  if (loading) return <TabLoading label="winners" />;
-  if (error) return <TabError error={error} />;
-  if (!data || data.events.length === 0) return <TabEmpty icon={Trophy} message="No winners data available for this tournament." />;
-
-  const placeLabel = (p: string) => {
-    if (p === '1') return 'Winner';
-    if (p === '2' || p === '1/2') return 'Runner-up';
-    if (p === '3' || p === '3/4') return 'Semi-finalist';
-    return p;
-  };
-
-  return (
-    <div className="space-y-4">
-      {data.events.map(ev => {
-        const color = getEventColor(ev.eventName);
-        return (
-          <div key={ev.eventName} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
-              <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
-                {ev.eventName}
-              </span>
-            </div>
-            <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
-              {ev.results.map((r, i) => (
-                <div key={i} className="flex items-center gap-4 px-5 py-2.5">
-                  <span className="text-xs font-medium text-slate-400 dark:text-slate-500 w-24 shrink-0">
-                    {placeLabel(r.place)}
-                  </span>
-                  <span className="text-sm text-slate-700 dark:text-slate-200">
-                    {r.players.map(p => p.name).join(' / ')}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -1001,7 +727,7 @@ export default function TournamentDetail() {
   const { tswId } = useParams<{ tswId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const activeTab = (searchParams.get('tab') as TabId) || 'overview';
+  const activeTab = (searchParams.get('tab') as TabId) || 'matches';
 
   const routeState = location.state as { name?: string; hostClub?: string; startDate?: string; endDate?: string } | null;
 
@@ -1110,12 +836,7 @@ export default function TournamentDetail() {
 
       {/* Tab content */}
       <div>
-        {activeTab === 'overview' && <OverviewTab tswId={tswId} active={activeTab === 'overview'} />}
         {activeTab === 'draws' && <DrawsTab tswId={tswId} active={activeTab === 'draws'} />}
-        {activeTab === 'events' && <EventsTab tswId={tswId} active={activeTab === 'events'} />}
-        {activeTab === 'players' && <PlayersTab tswId={tswId} active={activeTab === 'players'} />}
-        {activeTab === 'seeding' && <SeedingTab tswId={tswId} active={activeTab === 'seeding'} />}
-        {activeTab === 'winners' && <WinnersTab tswId={tswId} active={activeTab === 'winners'} />}
         {activeTab === 'medals' && <MedalsTab tswId={tswId} active={activeTab === 'medals'} />}
         {activeTab === 'matches' && <MatchesTab tswId={tswId} active={activeTab === 'matches'} />}
       </div>
