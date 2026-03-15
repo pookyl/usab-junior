@@ -120,6 +120,17 @@ function normalizeTournamentType(raw) {
   return raw.trim();
 }
 
+// ── Normalize region names ───────────────────────────────────────────────────
+
+const REGION_ALIASES = {
+  midwest: 'MW',
+};
+
+function normalizeRegion(raw) {
+  const trimmed = raw.trim();
+  return REGION_ALIASES[trimmed.toLowerCase()] || trimmed;
+}
+
 // ── Parse the USAB schedule page ─────────────────────────────────────────────
 
 function parseSchedulePage(html) {
@@ -180,7 +191,7 @@ function parseSeasonTable(html) {
       }
     }
 
-    const region = stripHtml(cells[2]) || 'National';
+    const region = normalizeRegion(stripHtml(cells[2]) || 'National');
     const hostClub = stripHtml(cells[3]);
     const type = normalizeTournamentType(stripHtml(cells[4]));
 
