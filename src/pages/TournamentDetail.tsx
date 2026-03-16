@@ -624,7 +624,7 @@ function TeamRow({ names, won, ongoing, scores, otherScores, showRetired, showWa
 function MatchCard({ match, date }: { match: TournamentMatch; date?: string }) {
   const t1Scores = match.scores.map(g => g[0]);
   const t2Scores = match.scores.map(g => g[1]);
-  const ongoing = !match.team1Won && !match.team2Won && !match.walkover;
+  const ongoing = !match.team1Won && !match.team2Won && !match.walkover && !match.bye;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
@@ -646,15 +646,24 @@ function MatchCard({ match, date }: { match: TournamentMatch; date?: string }) {
           showWalkover={match.walkover && !match.team1Won}
           showRetired={match.retired && !match.team1Won}
         />
-        <TeamRow
-          names={match.team2}
-          won={match.team2Won}
-          ongoing={ongoing}
-          scores={t2Scores}
-          otherScores={t1Scores}
-          showWalkover={match.walkover && !match.team2Won}
-          showRetired={match.retired && !match.team2Won}
-        />
+        {match.bye ? (
+          <div className="flex items-center gap-2 py-1.5">
+            <span className="w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500">
+              &mdash;
+            </span>
+            <span className="text-sm italic text-slate-400 dark:text-slate-500">Bye</span>
+          </div>
+        ) : (
+          <TeamRow
+            names={match.team2}
+            won={match.team2Won}
+            ongoing={ongoing}
+            scores={t2Scores}
+            otherScores={t1Scores}
+            showWalkover={match.walkover && !match.team2Won}
+            showRetired={match.retired && !match.team2Won}
+          />
+        )}
       </div>
 
       {/* Footer: date + time + location */}

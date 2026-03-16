@@ -1035,7 +1035,7 @@ export function parseTswPlayerMatches(html) {
     const statusMatch = block.match(/<span[^>]*class="[^"]*match__status[^"]*"[^>]*>([^<]+)<\/span>/);
     const status = statusMatch ? statusMatch[1].trim() : '';
 
-    if (block.includes('>Bye<')) continue;
+    const isBye = block.includes('>Bye<');
 
     // Split on match__row divs — take only first two (team1, team2), ignore status/footer
     const rowBlocks = block.split(/<div class="match__row[\s"]/g).slice(1);
@@ -1056,8 +1056,8 @@ export function parseTswPlayerMatches(html) {
     const team1 = extractTeam(rowBlocks[0]);
     const team2 = extractTeam(rowBlocks[1]);
 
-    const isWalkover = block.includes('>Walkover<');
-    const isRetired = />\s*Retired?\s*</i.test(block) || />\s*Ret\.?\s*</i.test(block);
+    const isWalkover = !isBye && block.includes('>Walkover<');
+    const isRetired = !isBye && (/>\s*Retired?\s*</i.test(block) || />\s*Ret\.?\s*</i.test(block));
 
     const scores = [];
     const setRegex = /<ul class="points">([\s\S]*?)<\/ul>/g;
@@ -1099,6 +1099,7 @@ export function parseTswPlayerMatches(html) {
       team1Won: team1.won,
       team2Won: team2.won,
       scores,
+      bye: isBye || undefined,
       walkover: isWalkover || undefined,
       retired: isRetired || undefined,
       time,

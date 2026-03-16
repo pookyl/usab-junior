@@ -304,12 +304,14 @@ export interface TournamentMatch {
   team1Won: boolean;
   team2Won: boolean;
   scores: number[][];
+  bye?: boolean;
   walkover?: boolean;
   retired?: boolean;
   time: string;
   court: string;
   duration: string;
   location: string;
+  status?: string;
 }
 
 export interface MatchDateTab {
