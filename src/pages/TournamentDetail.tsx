@@ -570,8 +570,10 @@ function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
 
 // ── Matches Tab ─────────────────────────────────────────────────────────────
 
-function TeamRow({ names, won, ongoing, scores, otherScores, showRetired, showWalkover }: {
+function TeamRow({ names, playerIds, tswId, won, ongoing, scores, otherScores, showRetired, showWalkover }: {
   names: string[];
+  playerIds?: (number | null)[];
+  tswId?: string;
   won: boolean;
   ongoing?: boolean;
   scores: number[];
@@ -596,9 +598,19 @@ function TeamRow({ names, won, ongoing, scores, otherScores, showRetired, showWa
         </span>
       )}
       <div className={`text-sm min-w-0 flex-1 ${nameClass}`}>
-        {names.map((n, i) => (
-          <div key={i} className="truncate">{n}</div>
-        ))}
+        {names.map((n, i) => {
+          const pid = playerIds?.[i];
+          if (pid && tswId) {
+            return (
+              <div key={i} className="truncate">
+                <Link to={`/tournaments/${tswId}/player/${pid}`} className="hover:text-violet-600 dark:hover:text-violet-400 hover:underline">
+                  {n}
+                </Link>
+              </div>
+            );
+          }
+          return <div key={i} className="truncate">{n}</div>;
+        })}
       </div>
       <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
         {showWalkover && (
@@ -621,7 +633,7 @@ function TeamRow({ names, won, ongoing, scores, otherScores, showRetired, showWa
   );
 }
 
-function MatchCard({ match, date }: { match: TournamentMatch; date?: string }) {
+function MatchCard({ match, date, tswId }: { match: TournamentMatch; date?: string; tswId?: string }) {
   const t1Scores = match.scores.map(g => g[0]);
   const t2Scores = match.scores.map(g => g[1]);
   const ongoing = !match.team1Won && !match.team2Won && !match.walkover && !match.bye;
@@ -639,6 +651,8 @@ function MatchCard({ match, date }: { match: TournamentMatch; date?: string }) {
       <div className="px-4 divide-y divide-slate-100 dark:divide-slate-800">
         <TeamRow
           names={match.team1}
+          playerIds={match.team1Ids}
+          tswId={tswId}
           won={match.team1Won}
           ongoing={ongoing}
           scores={t1Scores}
@@ -656,6 +670,8 @@ function MatchCard({ match, date }: { match: TournamentMatch; date?: string }) {
         ) : (
           <TeamRow
             names={match.team2}
+            playerIds={match.team2Ids}
+            tswId={tswId}
             won={match.team2Won}
             ongoing={ongoing}
             scores={t2Scores}
@@ -1120,7 +1136,7 @@ export function TournamentPlayerDetail() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {filtered.map((m, i) => (
-                <MatchCard key={i} match={m} />
+                <MatchCard key={i} match={m} tswId={tswId} />
               ))}
             </div>
           )}

@@ -1043,14 +1043,20 @@ export function parseTswPlayerMatches(html) {
 
     function extractTeam(rowHtml) {
       const names = [];
-      const pRegex = /match__row-title-value-content[\s\S]*?nav-link__value">([^<]+)<\/span>/g;
-      let pm;
-      while ((pm = pRegex.exec(rowHtml)) !== null) {
-        const n = pm[1].trim();
-        if (n && n !== 'Bye') names.push(n);
+      const playerIds = [];
+      // Each player is inside a match__row-title-value-content span
+      const contentBlocks = rowHtml.split(/match__row-title-value-content/).slice(1);
+      for (const cb of contentBlocks) {
+        const nameMatch = cb.match(/nav-link__value">([^<]+)<\/span>/);
+        if (!nameMatch) continue;
+        const n = nameMatch[1].trim();
+        if (!n || n === 'Bye') continue;
+        names.push(n);
+        const idMatch = cb.match(/data-player-id="(\d+)"/);
+        playerIds.push(idMatch ? parseInt(idMatch[1], 10) : null);
       }
       const won = rowHtml.includes('has-won');
-      return { names, won };
+      return { names, playerIds, won };
     }
 
     const team1 = extractTeam(rowBlocks[0]);
@@ -1096,6 +1102,8 @@ export function parseTswPlayerMatches(html) {
       header,
       team1: team1.names,
       team2: team2.names,
+      team1Ids: team1.playerIds.some(Boolean) ? team1.playerIds : undefined,
+      team2Ids: team2.playerIds.some(Boolean) ? team2.playerIds : undefined,
       team1Won: team1.won,
       team2Won: team2.won,
       scores,

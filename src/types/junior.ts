@@ -301,6 +301,8 @@ export interface TournamentMatch {
   header: string;
   team1: string[];
   team2: string[];
+  team1Ids?: (number | null)[];
+  team2Ids?: (number | null)[];
   team1Won: boolean;
   team2Won: boolean;
   scores: number[][];
