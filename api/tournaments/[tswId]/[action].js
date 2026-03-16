@@ -2,7 +2,7 @@ import {
   setCors, getCached, setCache,
   tswFetch, parseTswDrawsList, parseTswTournamentInfo,
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
-  parseTswMatches, parseTswMatchDates, formatMatchDate,
+  parseTswMatches, parseTswPlayerMatches, parseTswMatchDates, formatMatchDate,
   isValidTswId, loadMedalsDiskCache,
   TSW_BASE,
 } from '../../_lib/shared.js';
@@ -381,23 +381,19 @@ async function handlePlayerDetail(tswId, req, res) {
     if (!resp.ok) throw new Error(`TSW player page HTTP ${resp.status}`);
     const html = await resp.text();
 
-    // Parse player name from the page header
-    const nameMatch = html.match(/<h3[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h3>/i);
+    // Player name is in <h4 class="media__title ..."><a ...><span>Name</span></a></h4>
+    const nameMatch = html.match(/<h4[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h4>/i);
     let playerName = '';
     if (nameMatch) {
-      playerName = nameMatch[1].replace(/<[^>]*>/g, '').trim();
-      const commaIdx = playerName.indexOf(',');
-      if (commaIdx > -1) {
-        playerName = `${playerName.slice(commaIdx + 1).trim()} ${playerName.slice(0, commaIdx).trim()}`;
-      }
+      const valMatch = nameMatch[1].match(/nav-link__value">([^<]+)<\/span>/);
+      if (valMatch) playerName = valMatch[1].trim();
     }
 
-    // Parse club from subheading
+    // Club/location from first media__subheading, strip HTML tags and embedded images
     const clubMatch = html.match(/<small[^>]*class="[^"]*media__subheading[^"]*"[^>]*>([\s\S]*?)<\/small>/i);
-    const club = clubMatch ? clubMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+    const club = clubMatch ? clubMatch[1].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() : '';
 
-    // Parse matches using the existing match parser
-    const matches = parseTswMatches(html);
+    const matches = parseTswPlayerMatches(html);
 
     const result = {
       tswId,

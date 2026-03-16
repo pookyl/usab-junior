@@ -1012,6 +1012,106 @@ export function parseTswMatches(html) {
   return matches;
 }
 
+// ── TSW Player-page match parser ────────────────────────────────────────────
+// Parses the /tournament/{id}/player/{pid} page where matches use <div class="match">
+// inside <li class="match-group__item"> elements (no match--list class, no time grouping).
+
+export function parseTswPlayerMatches(html) {
+  const matches = [];
+  const blocks = html.split(/<div class="match">/g).slice(1);
+
+  for (const block of blocks) {
+    const headerItems = [];
+    const headerRegex =
+      /<li class="match__header-title-item">[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/g;
+    let hm;
+    while ((hm = headerRegex.exec(block)) !== null) {
+      headerItems.push(decodeHtmlEntities(hm[1].trim()));
+    }
+    const round = headerItems[0] ?? '';
+    const event = headerItems[1] ?? '';
+
+    // Win/Loss status tag
+    const statusMatch = block.match(/<span[^>]*class="[^"]*match__status[^"]*"[^>]*>([^<]+)<\/span>/);
+    const status = statusMatch ? statusMatch[1].trim() : '';
+
+    if (block.includes('>Bye<')) continue;
+
+    // Split on match__row divs — take only first two (team1, team2), ignore status/footer
+    const rowBlocks = block.split(/<div class="match__row[\s"]/g).slice(1);
+    if (rowBlocks.length < 2) continue;
+
+    function extractTeam(rowHtml) {
+      const names = [];
+      const pRegex = /match__row-title-value-content[\s\S]*?nav-link__value">([^<]+)<\/span>/g;
+      let pm;
+      while ((pm = pRegex.exec(rowHtml)) !== null) {
+        const n = pm[1].trim();
+        if (n && n !== 'Bye') names.push(n);
+      }
+      const won = rowHtml.includes('has-won');
+      return { names, won };
+    }
+
+    const team1 = extractTeam(rowBlocks[0]);
+    const team2 = extractTeam(rowBlocks[1]);
+
+    const isWalkover = block.includes('>Walkover<');
+    const isRetired = />\s*Retired?\s*</i.test(block) || />\s*Ret\.?\s*</i.test(block);
+
+    const scores = [];
+    const setRegex = /<ul class="points">([\s\S]*?)<\/ul>/g;
+    let sm;
+    while ((sm = setRegex.exec(block)) !== null) {
+      const pts = [];
+      const ptRegex = /<li class="points__cell[^"]*">\s*(\d+)/g;
+      let ptm;
+      while ((ptm = ptRegex.exec(sm[1])) !== null) pts.push(parseInt(ptm[1], 10));
+      if (pts.length === 2) scores.push(pts);
+    }
+
+    let court = '';
+    let duration = '';
+    const tooltipMatch = block.match(/title="Duration:\s*([^|"]+)\s*\|\s*([^"]+)"/i)
+      || block.match(/title="([^|"]+)\s*\|\s*([^"]+)"/i);
+    if (tooltipMatch) {
+      duration = tooltipMatch[1].replace(/^Duration:\s*/i, '').trim();
+      court = tooltipMatch[2].trim();
+    }
+
+    let location = '';
+    const footerMatch = block.match(/icon-marker[\s\S]*?nav-link__value">([^<]+)<\/span>/);
+    if (footerMatch) location = footerMatch[1].trim();
+    if (!location && court) location = court;
+
+    let time = '';
+    const timeMatch = block.match(/icon-clock[\s\S]*?nav-link__value">([^<]+)<\/span>/);
+    if (timeMatch) time = timeMatch[1].trim();
+
+    const header = [round, event, status].filter(Boolean).join(' · ');
+
+    matches.push({
+      event,
+      round,
+      header,
+      team1: team1.names,
+      team2: team2.names,
+      team1Won: team1.won,
+      team2Won: team2.won,
+      scores,
+      walkover: isWalkover || undefined,
+      retired: isRetired || undefined,
+      time,
+      court,
+      duration,
+      location,
+      status,
+    });
+  }
+
+  return matches;
+}
+
 // ── TSW Draw bracket parser ─────────────────────────────────────────────────
 // Parses /sport/draw.aspx?id=<tswId>&draw=<drawId>
 // Returns { drawName, rounds: [{ name, matches }] }
