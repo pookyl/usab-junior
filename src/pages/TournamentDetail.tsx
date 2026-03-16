@@ -607,7 +607,7 @@ function TeamRow({ names, won, ongoing, scores, otherScores, showRetired, showWa
         {showRetired && (
           <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold mr-1">Retired</span>
         )}
-        {won && scores.length > 0 && (
+        {won && (
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
         )}
         {scores.map((s, i) => {
@@ -649,9 +649,9 @@ function MatchCard({ match, date }: { match: TournamentMatch; date?: string }) {
         {match.bye ? (
           <div className="flex items-center gap-2 py-1.5">
             <span className="w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500">
-              &mdash;
+              L
             </span>
-            <span className="text-sm italic text-slate-400 dark:text-slate-500">Bye</span>
+            <span className="text-sm text-slate-800 dark:text-slate-100">Bye</span>
           </div>
         ) : (
           <TeamRow
