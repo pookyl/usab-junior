@@ -250,7 +250,7 @@ export async function fetchTournamentDetail(
 ): Promise<TournamentDetail> {
   if (tournamentDetailCache.has(tswId)) return tournamentDetailCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}`;
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/detail`;
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) throw new Error(`Tournament detail API ${res.status}`);
 

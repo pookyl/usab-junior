@@ -16,7 +16,6 @@ import {
   getCached, setCache,
   parseRankings, parsePlayerGender, parsePlayerDetail,
   parseH2HContent, parseTswOverviewStats, parseTswTournaments,
-  parseTswDrawsList, parseTswTournamentInfo,
   tswFetch, tswUsabProfilePath, tswUsabTournamentsPath, tswUsabOverviewPath,
   emptyCat,
 } from './api/_lib/shared.js';
@@ -354,64 +353,17 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  // GET /api/tournaments/:tswId/medals — tournament medal results
-  const tournamentMedalsMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/medals$/);
-  if (tournamentMedalsMatch) {
-    const { default: medalsHandler } = await import('./api/tournaments/[tswId]/medals.js');
-    req.query = { tswId: tournamentMedalsMatch[1] };
-    await medalsHandler(req, res);
-    return;
-  }
-
-  // GET /api/tournaments/:tswId/matches
-  const tournamentMatchesMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/matches$/);
-  if (tournamentMatchesMatch) {
-    const { default: matchesHandler } = await import('./api/tournaments/[tswId]/matches.js');
-    req.query = { tswId: tournamentMatchesMatch[1], d: reqUrl.searchParams.get('d') || '' };
-    await matchesHandler(req, res);
-    return;
-  }
-
-  // GET /api/tournaments/:tswId — on-demand tournament detail from TSW
-  const tournamentDetailMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)$/);
-  if (tournamentDetailMatch) {
-    const tswId = tournamentDetailMatch[1];
-    const cacheKey = `tournament-detail:${tswId}`;
-    const cached = getCached(cacheKey);
-    if (cached) {
-      res.writeHead(200, { 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
-      return;
-    }
-
-    try {
-      const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
-      console.log(`[tournament-detail] fetching ${TSW_BASE}${drawsPath}`);
-      const resp = await tswFetch(drawsPath);
-      if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
-      const html = await resp.text();
-
-      const info = parseTswTournamentInfo(html);
-      const draws = parseTswDrawsList(html);
-
-      const result = {
-        tswId,
-        name: info.name,
-        dates: info.dates,
-        location: info.location,
-        draws,
-        tswUrl: `https://www.tournamentsoftware.com/tournament/${tswId}`,
-      };
-
-      console.log(`[tournament-detail] ${tswId}: "${info.name}", ${draws.length} draws`);
-      setCache(cacheKey, result);
-      res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(result));
-    } catch (err) {
-      console.error('[tournament-detail] error:', err.message);
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: err.message }));
-    }
+  // GET /api/tournaments/:tswId/:action — unified tournament action dispatcher
+  const tournamentActionMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/([a-z]+)$/);
+  if (tournamentActionMatch) {
+    const { default: actionHandler } = await import('./api/tournaments/[tswId]/[action].js');
+    req.query = {
+      tswId: tournamentActionMatch[1],
+      action: tournamentActionMatch[2],
+      d: reqUrl.searchParams.get('d') || '',
+      refresh: reqUrl.searchParams.get('refresh') || '',
+    };
+    await actionHandler(req, res);
     return;
   }
 
@@ -421,52 +373,6 @@ const server = createServer(async (req, res) => {
     console.log(`[cached-dates] found ${dates.length} cached date files`);
     res.writeHead(200);
     res.end(JSON.stringify({ dates }));
-    return;
-  }
-
-  // GET /api/latest-date  – scrapes the USAB homepage for the most recent "As Of" date
-  if (reqUrl.pathname === '/api/latest-date') {
-    const cacheKey = 'latest-date';
-    const cached = getCached(cacheKey);
-    if (cached) {
-      res.writeHead(200, { 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
-      return;
-    }
-
-    try {
-      console.log('[latest-date] fetching USAB homepage…');
-      const response = await fetch(USAB_BASE, { headers: BROWSER_HEADERS });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const html = await response.text();
-
-      const dates = [];
-      const optionRegex = /<option[^>]*value="([^"]+)"[^>]*>/gi;
-      let om;
-      while ((om = optionRegex.exec(html)) !== null) {
-        const val = om[1].trim();
-        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) dates.push(val);
-      }
-
-      const latestDate = dates.length > 0 ? dates[0] : null;
-      console.log(`[latest-date] found ${dates.length} dates, latest: ${latestDate}`);
-      const result = { latestDate, availableDates: dates };
-      setCache(cacheKey, result);
-      res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(result));
-    } catch (err) {
-      console.error('[latest-date] error:', err.message);
-      const diskDate = await getDiskCachedDate();
-      if (diskDate) {
-        console.log(`[latest-date] website unreachable, using disk-cached date: ${diskDate}`);
-        const result = { latestDate: diskDate, availableDates: [diskDate] };
-        res.writeHead(200, { 'X-Cache': 'DISK' });
-        res.end(JSON.stringify(result));
-      } else {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: err.message }));
-      }
-    }
     return;
   }
 
