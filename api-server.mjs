@@ -169,7 +169,7 @@ const server = createServer(async (req, res) => {
     }
 
     const diskKey = `${ageGroup}-${eventType}`;
-    const perDateDisk = getDiskCachedRankings(diskKey, date);
+    const perDateDisk = await getDiskCachedRankings(diskKey, date);
     if (perDateDisk) {
       console.log(`[rankings] serving from per-date disk cache for ${diskKey} date=${date}`);
       setCache(cacheKey, perDateDisk);
@@ -191,7 +191,7 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(players));
     } catch (err) {
       console.error(`[rankings] error:`, err.message);
-      const diskData = getDiskCachedRankings(diskKey);
+      const diskData = await getDiskCachedRankings(diskKey);
       if (diskData) {
         console.log(`[rankings] serving from disk cache for ${diskKey}`);
         res.writeHead(200, { 'X-Cache': 'DISK' });
@@ -456,7 +456,7 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(result));
     } catch (err) {
       console.error('[latest-date] error:', err.message);
-      const diskDate = getDiskCachedDate();
+      const diskDate = await getDiskCachedDate();
       if (diskDate) {
         console.log(`[latest-date] website unreachable, using disk-cached date: ${diskDate}`);
         const result = { latestDate: diskDate, availableDates: [diskDate] };
@@ -536,7 +536,7 @@ const server = createServer(async (req, res) => {
       return;
     }
 
-    const perDateDisk = getDiskCachedAllPlayers(date);
+    const perDateDisk = await getDiskCachedAllPlayers(date);
     if (perDateDisk) {
       console.log(`[all-players] serving from per-date disk cache for ${date}`);
       setCache(cacheKey, perDateDisk.players);
@@ -618,7 +618,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(200, { 'X-Cache': 'MISS' });
       res.end(JSON.stringify(uniquePlayers));
     } else {
-      const diskData = getDiskCachedAllPlayers();
+      const diskData = await getDiskCachedAllPlayers();
       if (diskData) {
         console.log(`[all-players] website returned no data, serving from disk cache (date ${diskData.date})`);
         res.writeHead(200, { 'X-Cache': 'DISK' });
