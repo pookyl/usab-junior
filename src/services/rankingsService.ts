@@ -13,6 +13,8 @@ import type {
   TournamentMedals,
   TournamentMatchDatesResponse,
   TournamentMatchDayResponse,
+  TournamentPlayersResponse,
+  TournamentPlayerDetailResponse,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -274,6 +276,44 @@ export async function fetchTournamentMedals(
 
   const data: TournamentMedals = await res.json();
   cappedSet(tournamentMedalsCache, tswId, data);
+  return data;
+}
+
+// ── Tournament Players ───────────────────────────────────────────────────────
+
+const tournamentPlayersCache = new Map<string, TournamentPlayersResponse>();
+
+export async function fetchTournamentPlayers(
+  tswId: string,
+): Promise<TournamentPlayersResponse> {
+  if (tournamentPlayersCache.has(tswId)) return tournamentPlayersCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/players`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament players API ${res.status}`);
+
+  const data: TournamentPlayersResponse = await res.json();
+  cappedSet(tournamentPlayersCache, tswId, data);
+  return data;
+}
+
+// ── Tournament Player Detail ─────────────────────────────────────────────────
+
+const tournamentPlayerDetailCache = new Map<string, TournamentPlayerDetailResponse>();
+
+export async function fetchTournamentPlayerDetail(
+  tswId: string,
+  playerId: number | string,
+): Promise<TournamentPlayerDetailResponse> {
+  const key = `${tswId}:${playerId}`;
+  if (tournamentPlayerDetailCache.has(key)) return tournamentPlayerDetailCache.get(key)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/player-detail?playerId=${encodeURIComponent(playerId)}`;
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) throw new Error(`Tournament player detail API ${res.status}`);
+
+  const data: TournamentPlayerDetailResponse = await res.json();
+  cappedSet(tournamentPlayerDetailCache, key, data);
   return data;
 }
 

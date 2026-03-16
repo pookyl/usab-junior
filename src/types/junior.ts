@@ -256,6 +256,14 @@ export interface TournamentPlayersResponse {
   players: TournamentPlayer[];
 }
 
+export interface TournamentPlayerDetailResponse {
+  tswId: string;
+  playerId: number;
+  playerName: string;
+  club: string;
+  matches: TournamentMatch[];
+}
+
 export interface SeedEntry {
   seed: number;
   players: { name: string; playerId: number }[];

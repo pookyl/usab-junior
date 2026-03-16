@@ -354,7 +354,7 @@ const server = createServer(async (req, res) => {
   }
 
   // GET /api/tournaments/:tswId/:action — unified tournament action dispatcher
-  const tournamentActionMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/([a-z]+)$/);
+  const tournamentActionMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/([a-z][-a-z]*)$/);
   if (tournamentActionMatch) {
     const { default: actionHandler } = await import('./api/tournaments/[tswId]/[action].js');
     req.query = {
@@ -362,6 +362,7 @@ const server = createServer(async (req, res) => {
       action: tournamentActionMatch[2],
       d: reqUrl.searchParams.get('d') || '',
       refresh: reqUrl.searchParams.get('refresh') || '',
+      playerId: reqUrl.searchParams.get('playerId') || '',
     };
     await actionHandler(req, res);
     return;

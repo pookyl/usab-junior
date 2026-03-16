@@ -1,7 +1,7 @@
 import {
   setCors, getCached, setCache,
   tswFetch, parseTswDrawsList, parseTswTournamentInfo,
-  parseTswWinners, parseTswTournamentPlayers,
+  parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
   parseTswMatches, parseTswMatchDates, formatMatchDate,
   isValidTswId, loadMedalsDiskCache,
   TSW_BASE,
@@ -273,8 +273,18 @@ async function handlePlayers(tswId, _req, res) {
       return;
     }
 
-    const playersMap = await fetchTournamentPlayers(tswId);
-    const players = [...playersMap.values()];
+    const playersUrl = `/tournament/${tswId.toLowerCase()}/Players/GetPlayersContent`;
+    const resp = await tswFetch(playersUrl, {
+      method: 'POST',
+      extraHeaders: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Referer: `${TSW_BASE}/tournament/${tswId}/players`,
+      },
+      body: '',
+    });
+    if (!resp.ok) throw new Error(`Players content HTTP ${resp.status}`);
+    const html = await resp.text();
+    const players = parseTswTournamentPlayersArray(html);
     const result = { tswId, playerCount: players.length, players };
 
     setCache(cacheKey, result);
@@ -348,6 +358,65 @@ async function handleEvents(tswId, _req, res) {
   }
 }
 
+async function handlePlayerDetail(tswId, req, res) {
+  const urlObj = new URL(req.url, 'http://localhost');
+  const playerId = req.query?.playerId || urlObj.searchParams.get('playerId');
+  if (!playerId || !/^\d+$/.test(playerId)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'playerId query parameter required (numeric)' }));
+    return;
+  }
+
+  const cacheKey = `tournament-player-detail:${tswId}:${playerId}`;
+  const cached = getCached(cacheKey);
+  if (cached) {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+    res.end(JSON.stringify(cached));
+    return;
+  }
+
+  try {
+    const playerPath = `/tournament/${tswId.toLowerCase()}/player/${playerId}`;
+    const resp = await tswFetch(playerPath);
+    if (!resp.ok) throw new Error(`TSW player page HTTP ${resp.status}`);
+    const html = await resp.text();
+
+    // Parse player name from the page header
+    const nameMatch = html.match(/<h3[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h3>/i);
+    let playerName = '';
+    if (nameMatch) {
+      playerName = nameMatch[1].replace(/<[^>]*>/g, '').trim();
+      const commaIdx = playerName.indexOf(',');
+      if (commaIdx > -1) {
+        playerName = `${playerName.slice(commaIdx + 1).trim()} ${playerName.slice(0, commaIdx).trim()}`;
+      }
+    }
+
+    // Parse club from subheading
+    const clubMatch = html.match(/<small[^>]*class="[^"]*media__subheading[^"]*"[^>]*>([\s\S]*?)<\/small>/i);
+    const club = clubMatch ? clubMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+
+    // Parse matches using the existing match parser
+    const matches = parseTswMatches(html);
+
+    const result = {
+      tswId,
+      playerId: parseInt(playerId, 10),
+      playerName,
+      club,
+      matches,
+    };
+
+    setCache(cacheKey, result);
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
+    res.end(JSON.stringify(result));
+  } catch (err) {
+    console.error('[tournament-player-detail] error:', err.message);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message }));
+  }
+}
+
 // ── Main handler ────────────────────────────────────────────────────────────
 
 const ACTIONS = {
@@ -357,6 +426,7 @@ const ACTIONS = {
   players: handlePlayers,
   draws: handleDraws,
   events: handleEvents,
+  'player-detail': handlePlayerDetail,
 };
 
 export default async function handler(req, res) {

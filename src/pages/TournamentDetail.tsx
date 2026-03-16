@@ -1,20 +1,24 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useSearchParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, ExternalLink, Loader2, Medal,
-  Calendar, MapPin, List, Swords,
+  Calendar, MapPin, List, Swords, Users, Search,
   ChevronDown, ChevronRight, RefreshCw,
 } from 'lucide-react';
 import {
   fetchTournaments,
   fetchTournamentDetail,
   fetchTournamentMedals,
+  fetchTournamentPlayers,
+  fetchTournamentPlayerDetail,
   fetchTournamentMatchDates,
   fetchTournamentMatchDay,
 } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import type {
   TournamentMedals,
+  TournamentPlayersResponse,
+  TournamentPlayerDetailResponse,
   ClubMedalSummary,
   DrawMedals,
   MedalPlayer,
@@ -26,6 +30,7 @@ import type {
 
 const TABS = [
   { id: 'matches', label: 'Matches', icon: Swords },
+  { id: 'players', label: 'Players', icon: Users },
   { id: 'draws', label: 'Draws', icon: List },
   { id: 'medals', label: 'Medals', icon: Medal },
 ] as const;
@@ -332,6 +337,153 @@ function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
 }
 
 // ── Medals Tab ──────────────────────────────────────────────────────────────
+
+type PlayerSortKey = 'name' | 'club';
+
+function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentPlayers(id), []);
+  const { data, loading, error } = useTabData<TournamentPlayersResponse>(tswId, active, fetcher);
+  const [search, setSearch] = useState('');
+  const [clubFilter, setClubFilter] = useState('');
+  const [playerSortKey, setPlayerSortKey] = useState<PlayerSortKey>('name');
+  const [playerSortAsc, setPlayerSortAsc] = useState(true);
+
+  const clubs = useMemo(() => {
+    if (!data) return [];
+    const counts = new Map<string, number>();
+    for (const p of data.players) {
+      const c = p.club || 'N/A';
+      counts.set(c, (counts.get(c) || 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count }));
+  }, [data]);
+
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    let list = data.players;
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(p => p.name.toLowerCase().includes(q) || p.club.toLowerCase().includes(q));
+    }
+    if (clubFilter) {
+      list = list.filter(p => (p.club || 'N/A') === clubFilter);
+    }
+    const sorted = [...list].sort((a, b) => {
+      const cmp = playerSortKey === 'name'
+        ? a.name.localeCompare(b.name)
+        : (a.club || 'N/A').localeCompare(b.club || 'N/A') || a.name.localeCompare(b.name);
+      return playerSortAsc ? cmp : -cmp;
+    });
+    return sorted;
+  }, [data, search, clubFilter, playerSortKey, playerSortAsc]);
+
+  function handlePlayerSort(key: PlayerSortKey) {
+    if (playerSortKey === key) setPlayerSortAsc(!playerSortAsc);
+    else { setPlayerSortKey(key); setPlayerSortAsc(true); }
+  }
+
+  if (loading) return <TabLoading label="players" />;
+  if (error) return <TabError error={error} />;
+  if (!data || data.players.length === 0) return <TabEmpty icon={Users} message="No player data available for this tournament." />;
+
+  const phCls = 'px-3 py-2 text-xs uppercase tracking-wider font-medium cursor-pointer select-none hover:text-violet-600 dark:hover:text-violet-400 transition-colors';
+  const pSortArrow = (key: PlayerSortKey) => playerSortKey === key ? (playerSortAsc ? ' ↑' : ' ↓') : '';
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 space-y-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search players or clubs…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-500"
+            />
+          </div>
+          <p className="text-xs text-slate-400 dark:text-slate-500 shrink-0">
+            {filtered.length} of {data.players.length} players
+            {clubs.length > 0 && <> &middot; {clubs.length} clubs</>}
+          </p>
+        </div>
+
+        {clubs.length > 1 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">Club:</span>
+            <button
+              onClick={() => setClubFilter('')}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                !clubFilter
+                  ? 'bg-violet-600 text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              All
+            </button>
+            {clubs.map(c => (
+              <button
+                key={c.name}
+                onClick={() => setClubFilter(c.name === clubFilter ? '' : c.name)}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                  c.name === clubFilter
+                    ? 'bg-violet-600 text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                {c.name} ({c.count})
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
+              <th className="px-3 py-2 w-10 text-xs">#</th>
+              <th className={`${phCls} text-left`} onClick={() => handlePlayerSort('name')}>
+                Player{pSortArrow('name')}
+              </th>
+              <th className={`${phCls} text-left`} onClick={() => handlePlayerSort('club')}>
+                Club{pSortArrow('club')}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+            {filtered.map((player, idx) => (
+              <tr key={player.playerId} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                <td className="px-3 py-2.5 text-sm text-slate-400 dark:text-slate-500 w-10 text-center">{idx + 1}</td>
+                <td className="px-3 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-100">
+                  <Link
+                    to={`/tournaments/${tswId}/player/${player.playerId}`}
+                    className="text-violet-600 dark:text-violet-400 hover:underline"
+                  >
+                    {player.name}
+                  </Link>
+                </td>
+                <td className="px-3 py-2.5 text-sm text-slate-600 dark:text-slate-300">
+                  {player.club || <span className="text-slate-300 dark:text-slate-600">&mdash;</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="text-center text-slate-400 dark:text-slate-500 py-12">
+          <Search className="w-8 h-8 mx-auto mb-2 opacity-40" />
+          <p className="text-sm">No players match your search</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
   const fetcher = useCallback((id: string) => fetchTournamentMedals(id), []);
@@ -837,9 +989,134 @@ export default function TournamentDetail() {
       {/* Tab content */}
       <div>
         {activeTab === 'draws' && <DrawsTab tswId={tswId} active={activeTab === 'draws'} />}
+        {activeTab === 'players' && <PlayersTab tswId={tswId} active={activeTab === 'players'} />}
         {activeTab === 'medals' && <MedalsTab tswId={tswId} active={activeTab === 'medals'} />}
         {activeTab === 'matches' && <MatchesTab tswId={tswId} active={activeTab === 'matches'} />}
       </div>
+    </div>
+  );
+}
+
+// ── Tournament Player Detail Page ───────────────────────────────────────────
+
+export function TournamentPlayerDetail() {
+  const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
+  const navigate = useNavigate();
+
+  const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [eventFilter, setEventFilter] = useState('');
+
+  useEffect(() => {
+    if (!tswId || !playerId) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetchTournamentPlayerDetail(tswId, playerId)
+      .then(d => { if (!cancelled) setData(d); })
+      .catch(e => { if (!cancelled) setError(e.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [tswId, playerId]);
+
+  const events = useMemo(() => {
+    if (!data) return [];
+    const set = new Set(data.matches.map(m => m.event).filter(Boolean));
+    return [...set].sort();
+  }, [data]);
+
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    if (!eventFilter) return data.matches;
+    return data.matches.filter(m => m.event === eventFilter);
+  }, [data, eventFilter]);
+
+  if (!tswId || !playerId) return null;
+
+  const tswPlayerUrl = `https://www.tournamentsoftware.com/tournament/${tswId}/player/${playerId}`;
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
+      <button
+        onClick={() => navigate(`/tournaments/${tswId}?tab=players`)}
+        className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Players
+      </button>
+
+      {/* Header */}
+      {loading ? (
+        <TabLoading label="player" />
+      ) : error ? (
+        <TabError error={error} />
+      ) : data ? (
+        <>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+              {data.playerName || 'Player'}
+            </h1>
+            <div className="flex items-center gap-4 flex-wrap mt-3 text-sm text-slate-500 dark:text-slate-400">
+              {data.club && (
+                <span className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4" />
+                  {data.club}
+                </span>
+              )}
+              <span className="text-slate-400 dark:text-slate-500">
+                {data.matches.length} match{data.matches.length !== 1 ? 'es' : ''}
+              </span>
+              <a
+                href={tswPlayerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
+              >
+                <ExternalLink className="w-3 h-3" />
+                View on TournamentSoftware
+              </a>
+            </div>
+          </div>
+
+          {/* Event filter */}
+          {events.length > 1 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">Event:</span>
+              {['All', ...events].map(ev => (
+                <button
+                  key={ev}
+                  onClick={() => setEventFilter(ev === 'All' ? '' : ev)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                    (ev === 'All' && !eventFilter) || ev === eventFilter
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {ev}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Match count */}
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            {filtered.length} match{filtered.length !== 1 ? 'es' : ''}
+            {eventFilter && ` in ${eventFilter}`}
+          </p>
+
+          {/* Match cards */}
+          {filtered.length === 0 ? (
+            <TabEmpty icon={Swords} message={data.matches.length > 0 ? `No matches for "${eventFilter}"` : 'No matches found for this player.'} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {filtered.map((m, i) => (
+                <MatchCard key={i} match={m} />
+              ))}
+            </div>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }
