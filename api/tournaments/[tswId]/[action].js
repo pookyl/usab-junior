@@ -399,17 +399,42 @@ async function handlePlayerDetail(tswId, req, res) {
     if (!resp.ok) throw new Error(`TSW player page HTTP ${resp.status}`);
     const html = await resp.text();
 
-    // Player name is in <h4 class="media__title ..."><a ...><span>Name</span></a></h4>
+    // Player name from <h4 class="media__title ..."><a ...><span>Name</span></a></h4>
     const nameMatch = html.match(/<h4[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h4>/i);
     let playerName = '';
+    let memberId = '';
     if (nameMatch) {
       const valMatch = nameMatch[1].match(/nav-link__value">([^<]+)<\/span>/);
       if (valMatch) playerName = valMatch[1].trim();
+      const asideMatch = nameMatch[1].match(/media__title-aside[^>]*>\s*\((\d+)\)/);
+      if (asideMatch) memberId = asideMatch[1];
     }
 
-    // Club/location from first media__subheading, strip HTML tags and embedded images
-    const clubMatch = html.match(/<small[^>]*class="[^"]*media__subheading[^"]*"[^>]*>([\s\S]*?)<\/small>/i);
-    const club = clubMatch ? clubMatch[1].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() : '';
+    const club = '';
+
+    // Events + partners from media__subheading-wrapper (player-level)
+    const events = [];
+    const wrapperMatch = html.match(/<div class="media__subheading-wrapper">([\s\S]*?)<\/div>/i);
+    if (wrapperMatch) {
+      const evRegex = /nav-link__value">([^<]+)<\/span>/g;
+      let em;
+      while ((em = evRegex.exec(wrapperMatch[1])) !== null) {
+        events.push(em[1].trim());
+      }
+    }
+
+    // Win-loss from progress-bar-container
+    let winLoss = null;
+    const wlMatch = html.match(/<span class="flex-item">(\d+)-(\d+)\s*\((\d+)\)<\/span>/);
+    const pctMatch = html.match(/aria-valuenow="(\d+)"/);
+    if (wlMatch) {
+      winLoss = {
+        wins: parseInt(wlMatch[1], 10),
+        losses: parseInt(wlMatch[2], 10),
+        total: parseInt(wlMatch[3], 10),
+        winPct: pctMatch ? parseInt(pctMatch[1], 10) : 0,
+      };
+    }
 
     const matches = parseTswPlayerMatches(html);
 
@@ -417,7 +442,10 @@ async function handlePlayerDetail(tswId, req, res) {
       tswId,
       playerId: parseInt(playerId, 10),
       playerName,
+      memberId: memberId || undefined,
       club,
+      events,
+      winLoss,
       matches,
     };
 

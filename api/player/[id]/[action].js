@@ -6,16 +6,21 @@ import {
   setCors, isValidUsabId,
 } from '../../_lib/shared.js';
 
+function sendJson(res, status, data, extraHeaders) {
+  res.writeHead(status, { 'Content-Type': 'application/json', ...extraHeaders });
+  res.end(JSON.stringify(data));
+}
+
 export default async function handler(req, res) {
   setCors(res);
-  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
   const { id: usabId, action } = req.query;
 
   if (action === 'tsw-stats') return handleTswStats(req, res, usabId);
   if (action === 'ranking-trend') return handleRankingTrend(req, res, usabId);
 
-  return res.status(404).json({ error: `Unknown action: ${action}` });
+  sendJson(res, 404, { error: `Unknown action: ${action}` });
 }
 
 async function handleTswStats(req, res, usabId) {
@@ -23,7 +28,7 @@ async function handleTswStats(req, res, usabId) {
   const cacheKey = `tsw-stats:${usabId}`;
 
   const cached = getCached(cacheKey);
-  if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
+  if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }
 
   const profilePath = tswUsabProfilePath(usabId);
   const tswProfileUrl = `${TSW_BASE}${profilePath}`;
@@ -125,20 +130,20 @@ async function handleTswStats(req, res, usabId) {
     };
 
     setCache(cacheKey, stats);
-    return res.setHeader('X-Cache', 'MISS').status(200).json(stats);
+    sendJson(res, 200, stats, { 'X-Cache': 'MISS' });
   } catch (err) {
     console.error('[tsw-stats] error:', err.message);
-    return res.status(200).json(fallback);
+    sendJson(res, 200, fallback);
   }
 }
 
 async function handleRankingTrend(req, res, usabId) {
-  if (!usabId || !isValidUsabId(usabId)) return res.status(400).json({ error: 'Invalid player ID' });
+  if (!usabId || !isValidUsabId(usabId)) { sendJson(res, 400, { error: 'Invalid player ID' }); return; }
 
   const cacheKey = `trend:${usabId}`;
 
   const cached = getCached(cacheKey);
-  if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
+  if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }
 
   try {
     const dates = (await listCachedDates()).sort();
@@ -156,8 +161,9 @@ async function handleRankingTrend(req, res, usabId) {
 
     const result = { usabId, name: playerName, trend };
     setCache(cacheKey, result);
-    return res.setHeader('X-Cache', 'MISS').status(200).json(result);
+    sendJson(res, 200, result, { 'X-Cache': 'MISS' });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.error('[ranking-trend] error:', err.message);
+    sendJson(res, 500, { error: err.message });
   }
 }

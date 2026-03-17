@@ -256,11 +256,21 @@ export interface TournamentPlayersResponse {
   players: TournamentPlayer[];
 }
 
+export interface TournamentPlayerWinLoss {
+  wins: number;
+  losses: number;
+  total: number;
+  winPct: number;
+}
+
 export interface TournamentPlayerDetailResponse {
   tswId: string;
   playerId: number;
   playerName: string;
+  memberId?: string;
   club: string;
+  events: string[];
+  winLoss: TournamentPlayerWinLoss | null;
   matches: TournamentMatch[];
 }
 

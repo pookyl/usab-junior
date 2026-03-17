@@ -15,6 +15,7 @@ import {
   fetchTournamentMatchDates,
   fetchTournamentMatchDay,
 } from '../services/rankingsService';
+import { usePlayers } from '../contexts/PlayersContext';
 import type {
   TournamentMedals,
   TournamentWinnersResponse,
@@ -1144,6 +1145,7 @@ export default function TournamentDetail() {
 export function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
   const navigate = useNavigate();
+  const { playerNameMap } = usePlayers();
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1161,6 +1163,15 @@ export function TournamentPlayerDetail() {
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [tswId, playerId]);
+
+  const { playerIdSet } = usePlayers();
+
+  const resolvedUsabId = useMemo(() => {
+    if (data?.memberId && playerIdSet.has(data.memberId)) return data.memberId;
+    if (!data?.playerName) return null;
+    const ids = playerNameMap.get(data.playerName.toLowerCase());
+    return ids?.length === 1 ? ids[0] : null;
+  }, [data?.memberId, data?.playerName, playerNameMap, playerIdSet]);
 
   const events = useMemo(() => {
     if (!data) return [];
@@ -1195,20 +1206,58 @@ export function TournamentPlayerDetail() {
         <TabError error={error} />
       ) : data ? (
         <>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
-              {data.playerName || 'Player'}
-            </h1>
-            <div className="flex items-center gap-4 flex-wrap mt-3 text-sm text-slate-500 dark:text-slate-400">
-              {data.club && (
-                <span className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4" />
-                  {data.club}
-                </span>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 space-y-5">
+            {/* Name + win-loss row */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+                    {data.playerName || 'Player'}
+                  </h1>
+                  {data.memberId && (
+                    <span className="text-sm text-slate-400 dark:text-slate-500 font-mono">({data.memberId})</span>
+                  )}
+                </div>
+                {resolvedUsabId && (
+                  <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                    USAB <span className="font-mono font-semibold text-slate-600 dark:text-slate-300">{resolvedUsabId}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Win-Loss badge */}
+              {data.winLoss && (
+                <div className="shrink-0 sm:text-right">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Win-Loss</p>
+                  <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                    {data.winLoss.wins}-{data.winLoss.losses}
+                    <span className="text-sm font-semibold ml-1">({data.winLoss.total})</span>
+                  </p>
+                  <div className="w-32 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mt-1.5">
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+                      style={{ width: `${data.winLoss.winPct}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{data.winLoss.winPct}% won</p>
+                </div>
               )}
-              <span className="text-slate-400 dark:text-slate-500">
-                {data.matches.length} match{data.matches.length !== 1 ? 'es' : ''}
-              </span>
+            </div>
+
+            {/* Events & partners */}
+            {data.events.length > 0 && (
+              <div className="flex flex-wrap gap-x-1 gap-y-1 text-sm text-slate-600 dark:text-slate-300">
+                {data.events.map((ev, i) => (
+                  <span key={i} className="inline-flex items-center">
+                    {i > 0 && <span className="text-slate-300 dark:text-slate-600 mr-1">,&nbsp;</span>}
+                    {ev}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Action links */}
+            <div className="flex items-center gap-2 flex-wrap">
               <a
                 href={tswPlayerUrl}
                 target="_blank"
@@ -1216,8 +1265,17 @@ export function TournamentPlayerDetail() {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
               >
                 <ExternalLink className="w-3 h-3" />
-                View on TournamentSoftware
+                TournamentSoftware
               </a>
+              {resolvedUsabId && (
+                <Link
+                  to={`/directory/${resolvedUsabId}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
+                >
+                  <Users className="w-3 h-3" />
+                  Player Profile
+                </Link>
+              )}
             </div>
           </div>
 
