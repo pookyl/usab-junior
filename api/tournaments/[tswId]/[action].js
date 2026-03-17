@@ -3,7 +3,7 @@ import {
   tswFetch, parseTswDrawsList, parseTswTournamentInfo,
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
   parseTswMatches, parseTswPlayerMatches, parseTswMatchDates, formatMatchDate,
-  isValidTswId, loadMedalsDiskCache,
+  isValidTswId,
   TSW_BASE,
 } from '../../_lib/shared.js';
 
@@ -116,8 +116,8 @@ async function handleDetail(tswId, _req, res) {
   }
 }
 
-async function handleMedals(tswId, _req, res) {
-  const cacheKey = `tournament-medals:${tswId}`;
+async function handleWinners(tswId, _req, res) {
+  const cacheKey = `tournament-winners:${tswId}`;
   const cached = getCached(cacheKey);
   if (cached) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
@@ -125,17 +125,35 @@ async function handleMedals(tswId, _req, res) {
     return;
   }
 
-  const diskCached = await loadMedalsDiskCache(tswId);
-  if (diskCached) {
-    const medals = diskCached.medals.map(m => ({
-      ...m,
-      ageGroup: m.ageGroup || getAgeGroup(m.drawName),
-      eventType: m.eventType || getEventType(m.drawName),
-    }));
-    const result = { ...diskCached, medals, clubs: buildClubStats(medals) };
+  try {
+    const winnersResp = await tswFetch(`/sport/winners.aspx?id=${encodeURIComponent(tswId)}`);
+    if (!winnersResp.ok) throw new Error(`Winners page HTTP ${winnersResp.status}`);
+    const winnersHtml = await winnersResp.text();
+
+    const titleMatch = winnersHtml.match(/<title>\s*([\s\S]*?)\s*<\/title>/i);
+    const tournamentName = titleMatch
+      ? titleMatch[1].replace(/^Tournamentsoftware\.com\s*-\s*/i, '').replace(/\s*-\s*Winners$/i, '').trim()
+      : '';
+
+    const events = parseTswWinners(winnersHtml);
+    const result = { tswId, tournamentName, events };
+
     setCache(cacheKey, result);
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'DISK' });
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
+  } catch (err) {
+    console.error('[tournament-winners] error:', err.message);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message }));
+  }
+}
+
+async function handleMedals(tswId, _req, res) {
+  const cacheKey = `tournament-medals:${tswId}`;
+  const cached = getCached(cacheKey);
+  if (cached) {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+    res.end(JSON.stringify(cached));
     return;
   }
 
@@ -160,7 +178,7 @@ async function handleMedals(tswId, _req, res) {
       return resultEntries.flatMap(r =>
         r.players.map(p => {
           const entry = pMap.get(p.playerId);
-          return { name: p.name, club: entry?.club || '', usabId: '' };
+          return { name: p.name, club: entry?.club || '', playerId: p.playerId };
         }),
       );
     }
@@ -169,7 +187,7 @@ async function handleMedals(tswId, _req, res) {
       return resultEntries.map(r =>
         r.players.map(p => {
           const entry = pMap.get(p.playerId);
-          return { name: p.name, club: entry?.club || '', usabId: '' };
+          return { name: p.name, club: entry?.club || '', playerId: p.playerId };
         }),
       );
     }
@@ -417,6 +435,7 @@ async function handlePlayerDetail(tswId, req, res) {
 
 const ACTIONS = {
   detail: handleDetail,
+  winners: handleWinners,
   medals: handleMedals,
   matches: handleMatches,
   players: handlePlayers,

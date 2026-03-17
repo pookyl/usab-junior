@@ -15,6 +15,7 @@ import type {
   TournamentMatchDayResponse,
   TournamentPlayersResponse,
   TournamentPlayerDetailResponse,
+  TournamentWinnersResponse,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -258,6 +259,24 @@ export async function fetchTournamentDetail(
 
   const data: TournamentDetail = await res.json();
   cappedSet(tournamentDetailCache, tswId, data);
+  return data;
+}
+
+// ── Tournament Winners ────────────────────────────────────────────────────────
+
+const tournamentWinnersCache = new Map<string, TournamentWinnersResponse>();
+
+export async function fetchTournamentWinners(
+  tswId: string,
+): Promise<TournamentWinnersResponse> {
+  if (tournamentWinnersCache.has(tswId)) return tournamentWinnersCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/winners`;
+  const res = await fetchWithRetry(url, 60_000);
+  if (!res.ok) throw new Error(`Tournament winners API ${res.status}`);
+
+  const data: TournamentWinnersResponse = await res.json();
+  cappedSet(tournamentWinnersCache, tswId, data);
   return data;
 }
 

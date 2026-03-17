@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useSearchParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import {
-  ArrowLeft, ExternalLink, Loader2, Medal,
+  ArrowLeft, ExternalLink, Loader2, Medal, Trophy,
   Calendar, MapPin, List, Swords, Users, Search,
   ChevronDown, ChevronRight, RefreshCw,
 } from 'lucide-react';
@@ -9,14 +9,15 @@ import {
   fetchTournaments,
   fetchTournamentDetail,
   fetchTournamentMedals,
+  fetchTournamentWinners,
   fetchTournamentPlayers,
   fetchTournamentPlayerDetail,
   fetchTournamentMatchDates,
   fetchTournamentMatchDay,
 } from '../services/rankingsService';
-import { usePlayers } from '../contexts/PlayersContext';
 import type {
   TournamentMedals,
+  TournamentWinnersResponse,
   TournamentPlayersResponse,
   TournamentPlayerDetailResponse,
   ClubMedalSummary,
@@ -32,6 +33,7 @@ const TABS = [
   { id: 'matches', label: 'Matches', icon: Swords },
   { id: 'players', label: 'Players', icon: Users },
   { id: 'draws', label: 'Draws', icon: List },
+  { id: 'winners', label: 'Winners', icon: Trophy },
   { id: 'medals', label: 'Medals', icon: Medal },
 ] as const;
 
@@ -66,11 +68,16 @@ function TabEmpty({ icon: Icon, message }: { icon: React.ElementType; message: s
   );
 }
 
-function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id: string) => Promise<T>) {
-  const [data, setData] = useState<T | null>(null);
+const tabDataCache = new Map<string, unknown>();
+
+function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id: string) => Promise<T>, cacheKey?: string) {
+  const fullKey = cacheKey && tswId ? `${tswId}:${cacheKey}` : '';
+  const cached = fullKey ? tabDataCache.get(fullKey) as T | undefined : undefined;
+
+  const [data, setData] = useState<T | null>(cached ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fetched, setFetched] = useState(false);
+  const [fetched, setFetched] = useState(!!cached);
 
   useEffect(() => {
     if (!tswId || !active || fetched) return;
@@ -78,11 +85,16 @@ function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id:
     setLoading(true);
     setError(null);
     fetcher(tswId)
-      .then(d => { if (!cancelled) { setData(d); setFetched(true); } })
+      .then(d => {
+        if (cancelled) return;
+        setData(d);
+        setFetched(true);
+        if (fullKey) tabDataCache.set(fullKey, d);
+      })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [tswId, active, fetched, fetcher]);
+  }, [tswId, active, fetched, fetcher, fullKey]);
 
   return { data, loading, error };
 }
@@ -107,12 +119,10 @@ function getEventColor(name: string) {
 
 type SortKey = 'gold' | 'silver' | 'bronze' | 'total' | 'club';
 
-function PlayerName({ player, nameMap, playerIdSet }: { player: MedalPlayer; nameMap: Map<string, string[]>; playerIdSet: Set<string> }) {
-  const idMatch = player.usabId && playerIdSet.has(player.usabId) ? player.usabId : null;
-  const usabId = idMatch ?? nameMap.get(player.name.toLowerCase())?.[0] ?? null;
-  if (usabId) {
+function PlayerName({ player, tswId }: { player: MedalPlayer; tswId: string }) {
+  if (player.playerId) {
     return (
-      <Link to={`/directory/${usabId}`} className="text-violet-600 dark:text-violet-400 hover:underline">
+      <Link to={`/tournaments/${tswId}/player/${player.playerId}`} className="text-violet-600 dark:text-violet-400 hover:underline">
         {player.name}
       </Link>
     );
@@ -137,10 +147,10 @@ type DetailSortKey = 'event' | 'place' | 'player';
 const PLACE_ORDER: Record<string, number> = { gold: 1, silver: 2, bronze: 3, fourth: 4 };
 
 function ClubMedalRow({
-  club, rank, medals, nameMap, playerIdSet,
+  club, rank, medals, tswId,
 }: {
   club: ClubMedalSummary; rank: number; medals: DrawMedals[];
-  nameMap: Map<string, string[]>; playerIdSet: Set<string>;
+  tswId: string;
 }) {
   const [expandMode, setExpandMode] = useState<ExpandMode>(null);
   const [detailSort, setDetailSort] = useState<DetailSortKey>('event');
@@ -268,7 +278,7 @@ function ClubMedalRow({
                             return show.map((p, j) => (
                               <span key={j}>
                                 {j > 0 && <span className="text-slate-400 dark:text-slate-500"> / </span>}
-                                <PlayerName player={p} nameMap={nameMap} playerIdSet={playerIdSet} />
+                                <PlayerName player={p} tswId={tswId} />
                               </span>
                             ));
                           })()}
@@ -286,11 +296,105 @@ function ClubMedalRow({
   );
 }
 
+// ── Winners Tab ─────────────────────────────────────────────────────────────
+
+const PLACE_ICONS: Record<string, { label: string; color: string }> = {
+  '1': { label: '1st', color: 'text-yellow-500' },
+  '2': { label: '2nd', color: 'text-slate-400' },
+  '3': { label: '3rd', color: 'text-amber-700 dark:text-amber-600' },
+  '3/4': { label: '3rd/4th', color: 'text-amber-700 dark:text-amber-600' },
+  '4': { label: '4th', color: 'text-amber-700 dark:text-amber-600' },
+};
+
+function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const fetcher = useCallback((id: string) => fetchTournamentWinners(id), []);
+  const { data, loading, error } = useTabData<TournamentWinnersResponse>(tswId, active, fetcher, 'winners');
+  const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
+
+  if (loading) return <TabLoading label="winners" />;
+  if (error) return <TabError error={error} />;
+  if (!data || data.events.length === 0) return <TabEmpty icon={Trophy} message="No winners data available for this tournament." />;
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          {data.events.length} events
+        </p>
+      </div>
+      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        {data.events.map((event, idx) => {
+          const color = getEventColor(event.eventName);
+          const expanded = expandedEvent === idx;
+          return (
+            <div key={idx}>
+              <button
+                onClick={() => setExpandedEvent(expanded ? null : idx)}
+                className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
+              >
+                {expanded
+                  ? <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                  : <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />}
+                <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
+                  {event.eventName}
+                </span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">
+                  {event.results.length} result{event.results.length !== 1 ? 's' : ''}
+                </span>
+              </button>
+              {expanded && (
+                <div className="px-5 pb-4 pl-12">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                        <th className="text-left py-1.5 pr-3 font-medium w-20">Place</th>
+                        <th className="text-left py-1.5 font-medium">Player(s)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {event.results.map((result, ri) => {
+                        const placeInfo = PLACE_ICONS[result.place.replace(/\s/g, '')] ?? { label: result.place, color: 'text-slate-500' };
+                        return (
+                          <tr key={ri} className="border-t border-slate-200/50 dark:border-slate-700/30">
+                            <td className="py-1.5 pr-3">
+                              <div className="flex items-center gap-1.5">
+                                <Medal className={`w-4 h-4 shrink-0 ${placeInfo.color}`} />
+                                <span className={`text-xs font-semibold ${placeInfo.color}`}>{placeInfo.label}</span>
+                              </div>
+                            </td>
+                            <td className="py-1.5 text-slate-700 dark:text-slate-200">
+                              {result.players.map((p, pi) => (
+                                <span key={pi}>
+                                  {pi > 0 && <span className="text-slate-400 dark:text-slate-500"> / </span>}
+                                  <Link
+                                    to={`/tournaments/${tswId}/player/${p.playerId}`}
+                                    className="text-violet-600 dark:text-violet-400 hover:underline"
+                                  >
+                                    {p.name}
+                                  </Link>
+                                </span>
+                              ))}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Draws Tab ───────────────────────────────────────────────────────────────
 
 function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
   const fetcher = useCallback((id: string) => fetchTournamentDetail(id), []);
-  const { data, loading, error } = useTabData(tswId, active, fetcher);
+  const { data, loading, error } = useTabData(tswId, active, fetcher, 'draws');
   const [expandedDraw, setExpandedDraw] = useState<number | null>(null);
 
   if (loading) return <TabLoading label="draws" />;
@@ -342,7 +446,7 @@ type PlayerSortKey = 'name' | 'club';
 
 function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
   const fetcher = useCallback((id: string) => fetchTournamentPlayers(id), []);
-  const { data, loading, error } = useTabData<TournamentPlayersResponse>(tswId, active, fetcher);
+  const { data, loading, error } = useTabData<TournamentPlayersResponse>(tswId, active, fetcher, 'players');
   const [search, setSearch] = useState('');
   const [clubFilter, setClubFilter] = useState('');
   const [playerSortKey, setPlayerSortKey] = useState<PlayerSortKey>('name');
@@ -487,10 +591,9 @@ function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
 
 function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
   const fetcher = useCallback((id: string) => fetchTournamentMedals(id), []);
-  const { data, loading, error } = useTabData<TournamentMedals>(tswId, active, fetcher);
+  const { data, loading, error } = useTabData<TournamentMedals>(tswId, active, fetcher, 'medals');
   const [sortKey, setSortKey] = useState<SortKey>('total');
   const [sortAsc, setSortAsc] = useState(false);
-  const { playerNameMap, playerIdSet } = usePlayers();
 
   const sortedClubs = useMemo(() => {
     if (!data) return [];
@@ -557,8 +660,7 @@ function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
                 club={club}
                 rank={idx + 1}
                 medals={data.medals}
-                nameMap={playerNameMap}
-                playerIdSet={playerIdSet}
+                tswId={tswId}
               />
             ))}
           </tbody>
@@ -709,21 +811,35 @@ function todayYYYYMMDD(): string {
   return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
 }
 
+interface MatchesTabSnapshot {
+  dates: MatchDateTab[];
+  selectedDate: string;
+  matchDate: string;
+  matches: TournamentMatch[];
+}
+const matchesTabCache = new Map<string, MatchesTabSnapshot>();
+
 function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const [dates, setDates] = useState<MatchDateTab[]>([]);
+  const snap = matchesTabCache.get(tswId);
+
+  const [dates, setDates] = useState<MatchDateTab[]>(snap?.dates ?? []);
   const [datesLoading, setDatesLoading] = useState(false);
   const [datesError, setDatesError] = useState<string | null>(null);
-  const [datesFetched, setDatesFetched] = useState(false);
+  const [datesFetched, setDatesFetched] = useState(!!snap?.dates.length);
 
-  const [matches, setMatches] = useState<TournamentMatch[]>([]);
-  const [matchDate, setMatchDate] = useState('');
+  const [matches, setMatches] = useState<TournamentMatch[]>(snap?.matches ?? []);
+  const [matchDate, setMatchDate] = useState(snap?.matchDate ?? '');
   const [matchesLoading, setMatchesLoading] = useState(false);
   const [matchesError, setMatchesError] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(snap?.selectedDate ?? '');
 
   const [eventFilter, setEventFilter] = useState('');
 
   const isToday = selectedDate === todayYYYYMMDD();
+
+  useEffect(() => {
+    matchesTabCache.set(tswId, { dates, selectedDate, matchDate, matches });
+  }, [tswId, dates, selectedDate, matchDate, matches]);
 
   useEffect(() => {
     if (!active || !tswId || datesFetched) return;
@@ -1015,6 +1131,7 @@ export default function TournamentDetail() {
       <div>
         {activeTab === 'draws' && <DrawsTab tswId={tswId} active={activeTab === 'draws'} />}
         {activeTab === 'players' && <PlayersTab tswId={tswId} active={activeTab === 'players'} />}
+        {activeTab === 'winners' && <WinnersTab tswId={tswId} active={activeTab === 'winners'} />}
         {activeTab === 'medals' && <MedalsTab tswId={tswId} active={activeTab === 'medals'} />}
         {activeTab === 'matches' && <MatchesTab tswId={tswId} active={activeTab === 'matches'} />}
       </div>
@@ -1064,11 +1181,11 @@ export function TournamentPlayerDetail() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <button
-        onClick={() => navigate(`/tournaments/${tswId}?tab=players`)}
+        onClick={() => navigate(-1)}
         className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Players
+        Back to Tournament
       </button>
 
       {/* Header */}
