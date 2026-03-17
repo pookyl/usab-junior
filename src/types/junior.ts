@@ -369,6 +369,8 @@ export interface BracketPlayer {
   seed: string;
   club: string;
   playerId: number | null;
+  partner?: string;
+  partnerPlayerId?: number | null;
 }
 
 export interface BracketEntry extends BracketPlayer {

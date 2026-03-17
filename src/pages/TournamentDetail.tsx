@@ -427,9 +427,20 @@ function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
 
 // ── Draws Tab ───────────────────────────────────────────────────────────────
 
+interface DisplayPlayer {
+  name: string;
+  seed: string;
+  playerId: number | null;
+  won: boolean;
+  bye: boolean;
+  position?: number;
+  partner?: string;
+  partnerPlayerId?: number | null;
+}
+
 interface DisplayMatch {
-  player1: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean; position?: number } | null;
-  player2: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean; position?: number } | null;
+  player1: DisplayPlayer | null;
+  player2: DisplayPlayer | null;
   score: string[];
   retired: boolean;
   walkover: boolean;
@@ -450,6 +461,10 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
   for (const ms of matchesByLevel.values()) ms.sort((a, b) => a.matchNum - b.matchNum);
 
   const levels = [...matchesByLevel.keys()].sort((a, b) => b - a);
+
+  // TSW headers include "Winner" as a column name, but we generate the winner
+  // column automatically from the finals result. Strip it to avoid duplication.
+  const roundNames = section.rounds.filter(r => r.toLowerCase() !== 'winner');
   if (levels.length === 0) return [];
 
   let sortedEntries = [...section.entries].sort((a, b) => a.position - b.position);
@@ -467,6 +482,8 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
       club: m.winner?.club || '',
       playerId: m.winner?.playerId || null,
       bye: false,
+      partner: m.winner?.partner || '',
+      partnerPlayerId: m.winner?.partnerPlayerId || null,
     }));
 
     // The parser may associate scores/retired with the promoted level rather than
@@ -497,8 +514,8 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
   for (let li = 0; li < levels.length; li++) {
     const level = levels[li];
     const levelMatches = matchesByLevel.get(level) || [];
-    const roundIdx = li;
-    const roundName = section.rounds[roundIdx] || `Round ${roundIdx + 1}`;
+    const nameOffset = levels.length - roundNames.length;
+    const roundName = roundNames[li - nameOffset] || `Round ${li + 1}`;
     const displayMatches: DisplayMatch[] = [];
 
     for (let i = 0; i < levelMatches.length; i++) {
@@ -509,15 +526,15 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
       if (level === entryLevel - 1) {
         const e1 = sortedEntries[i * 2];
         const e2 = sortedEntries[i * 2 + 1];
-        if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye, position: e1.position };
-        if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye, position: e2.position };
+        if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye, position: e1.position, partner: e1.partner, partnerPlayerId: e1.partnerPlayerId };
+        if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye, position: e2.position, partner: e2.partner, partnerPlayerId: e2.partnerPlayerId };
       } else {
         const prevLevel = levels[li - 1];
         const prevMatches = matchesByLevel.get(prevLevel) || [];
         const prev1 = prevMatches[i * 2];
         const prev2 = prevMatches[i * 2 + 1];
-        if (prev1?.winner) p1 = { name: prev1.winner.name, seed: prev1.winner.seed, playerId: prev1.winner.playerId, won: false, bye: false };
-        if (prev2?.winner) p2 = { name: prev2.winner.name, seed: prev2.winner.seed, playerId: prev2.winner.playerId, won: false, bye: false };
+        if (prev1?.winner) p1 = { name: prev1.winner.name, seed: prev1.winner.seed, playerId: prev1.winner.playerId, won: false, bye: false, partner: prev1.winner.partner, partnerPlayerId: prev1.winner.partnerPlayerId };
+        if (prev2?.winner) p2 = { name: prev2.winner.name, seed: prev2.winner.seed, playerId: prev2.winner.playerId, won: false, bye: false, partner: prev2.winner.partner, partnerPlayerId: prev2.winner.partnerPlayerId };
       }
 
       if (m.winner && p1) p1.won = m.winner.playerId === p1.playerId;
@@ -541,7 +558,7 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
     const finalMatch = finalRound.matches[0];
     const winner = finalMatch?.player1?.won ? finalMatch.player1 : finalMatch?.player2?.won ? finalMatch.player2 : null;
     if (winner) {
-      const winnerRoundName = section.rounds[rounds.length] || 'Winner';
+      const winnerRoundName = 'Winner';
       rounds.push({
         name: winnerRoundName,
         matches: [{
@@ -598,24 +615,34 @@ function BracketPlayerRow({
       ? 'text-slate-400 dark:text-slate-500'
       : 'text-slate-800 dark:text-slate-100';
 
+  const renderName = (name: string, pid: number | null) =>
+    pid ? (
+      <Link
+        to={`/tournaments/${tswId}/player/${pid}`}
+        className={`text-[11px] truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline ${nameClass}`}
+      >
+        {name}
+      </Link>
+    ) : (
+      <span className={`text-[11px] truncate ${nameClass}`}>{name || 'TBD'}</span>
+    );
+
   return (
     <div className={`flex items-center justify-between gap-1 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
-      <div className="flex items-center gap-1 min-w-0 flex-1">
-        {player.playerId ? (
-          <Link
-            to={`/tournaments/${tswId}/player/${player.playerId}`}
-            className={`text-[11px] truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline ${nameClass}`}
-          >
-            {player.name}
-          </Link>
-        ) : (
-          <span className={`text-[11px] truncate ${nameClass}`}>{player.name || 'TBD'}</span>
-        )}
-        {player.seed && (
-          <span className={`text-[10px] font-semibold shrink-0 ${lost ? 'text-violet-400/50 dark:text-violet-500/50' : 'text-violet-500 dark:text-violet-400'}`}>({player.seed})</span>
-        )}
-        {statusLabel && (
-          <span className="text-[9px] font-medium text-amber-500 dark:text-amber-400 shrink-0">{statusLabel}</span>
+      <div className="flex flex-col min-w-0 flex-1">
+        <div className="flex items-center gap-1 min-w-0">
+          {renderName(player.name, player.playerId)}
+          {player.seed && (
+            <span className={`text-[10px] font-semibold shrink-0 ${lost ? 'text-violet-400/50 dark:text-violet-500/50' : 'text-violet-500 dark:text-violet-400'}`}>({player.seed})</span>
+          )}
+          {statusLabel && (
+            <span className="text-[9px] font-medium text-amber-500 dark:text-amber-400 shrink-0">{statusLabel}</span>
+          )}
+        </div>
+        {player.partner && (
+          <div className="flex items-center gap-1 min-w-0">
+            {renderName(player.partner, player.partnerPlayerId ?? null)}
+          </div>
         )}
       </div>
       <div className="flex items-center gap-0.5 shrink-0 ml-1">
@@ -727,19 +754,35 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
                         <div className="w-48 ml-1 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10 rounded-md border-2 border-yellow-300 dark:border-yellow-600 shadow-sm overflow-hidden text-left">
                           <div className="flex items-center gap-1.5 px-2.5 py-2 min-w-0">
                             <Trophy className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
-                            {match.player1?.playerId ? (
-                              <Link
-                                to={`/tournaments/${tswId}/player/${match.player1.playerId}`}
-                                className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
-                              >
-                                {match.player1?.name}
-                                {match.player1?.seed && <span className="text-violet-500 dark:text-violet-400 ml-1">({match.player1.seed})</span>}
-                              </Link>
-                            ) : (
-                              <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                                {match.player1?.name || 'TBD'}
-                              </span>
-                            )}
+                            <div className="flex flex-col min-w-0">
+                              {match.player1?.playerId ? (
+                                <Link
+                                  to={`/tournaments/${tswId}/player/${match.player1.playerId}`}
+                                  className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
+                                >
+                                  {match.player1?.name}
+                                  {match.player1?.seed && <span className="text-violet-500 dark:text-violet-400 ml-1">({match.player1.seed})</span>}
+                                </Link>
+                              ) : (
+                                <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                  {match.player1?.name || 'TBD'}
+                                </span>
+                              )}
+                              {match.player1?.partner && (
+                                match.player1.partnerPlayerId ? (
+                                  <Link
+                                    to={`/tournaments/${tswId}/player/${match.player1.partnerPlayerId}`}
+                                    className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
+                                  >
+                                    {match.player1.partner}
+                                  </Link>
+                                ) : (
+                                  <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                    {match.player1.partner}
+                                  </span>
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
                       ) : (

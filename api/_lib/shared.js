@@ -1246,16 +1246,20 @@ export function parseTswEliminationDraw(html) {
       rows.push(parseTdCells(rm[1]));
     }
 
-    function parsePlayerFromCell(cell) {
-      const pLink = cell.match(/player=(\d+)[^"]*">([^<]+)<\/a>/);
-      if (!pLink) return null;
-      const raw = decodeHtmlEntities(pLink[2].trim());
-      const seedM = raw.match(/\[(\d+(?:\/\d+)?)\]$/);
-      return {
-        name: raw.replace(/\s*\[[\d/]+\]$/, '').trim(),
-        playerId: parseInt(pLink[1], 10),
-        seed: seedM ? seedM[1] : '',
-      };
+    function parsePlayersFromCell(cell) {
+      const results = [];
+      const re = /player=(\d+)[^"]*">([^<]+)<\/a>/g;
+      let pLink;
+      while ((pLink = re.exec(cell)) !== null) {
+        const raw = decodeHtmlEntities(pLink[2].trim());
+        const seedM = raw.match(/\[(\d+(?:\/\d+)?)\]$/);
+        results.push({
+          name: raw.replace(/\s*\[[\d/]+\]$/, '').trim(),
+          playerId: parseInt(pLink[1], 10),
+          seed: seedM ? seedM[1] : '',
+        });
+      }
+      return results.length > 0 ? results : null;
     }
 
     const entries = [];
@@ -1274,15 +1278,19 @@ export function parseTswEliminationDraw(html) {
         if (!cell.match(/class="entry"/)) continue;
 
         const isBye = /\bBye\b/i.test(cell.replace(/<[^>]*>/g, ''));
-        const player = parsePlayerFromCell(cell);
+        const players = parsePlayersFromCell(cell);
+        const p1 = players?.[0];
+        const p2 = players?.[1];
 
         entries.push({
           position: posNum,
-          name: isBye ? 'Bye' : (player?.name || ''),
-          seed: player?.seed || '',
+          name: isBye ? 'Bye' : (p1?.name || ''),
+          seed: p1?.seed || '',
           club,
-          playerId: player?.playerId || null,
+          playerId: p1?.playerId || null,
           bye: isBye,
+          partner: p2?.name || '',
+          partnerPlayerId: p2?.playerId || null,
         });
         break;
       }
@@ -1298,11 +1306,14 @@ export function parseTswEliminationDraw(html) {
 
         const mSpan = cell.match(/id="(\d+)"\s*class="match"/);
         if (mSpan) {
-          const player = parsePlayerFromCell(cell);
+          const players = parsePlayersFromCell(cell);
+          const p1 = players?.[0];
+          const p2 = players?.[1];
           matchSpans.push({
             row: r, col: c, matchId: mSpan[1],
-            name: player?.name || '', playerId: player?.playerId || null,
-            seed: player?.seed || '',
+            name: p1?.name || '', playerId: p1?.playerId || null,
+            seed: p1?.seed || '',
+            partner: p2?.name || '', partnerPlayerId: p2?.playerId || null,
           });
         }
 
@@ -1349,6 +1360,7 @@ export function parseTswEliminationDraw(html) {
         winner: ms.name ? {
           name: ms.name, playerId: ms.playerId,
           seed: ms.seed, club: '',
+          partner: ms.partner || '', partnerPlayerId: ms.partnerPlayerId || null,
         } : null,
         score: bestScore?.data.games || [],
         retired: bestScore?.data.retired || false,
