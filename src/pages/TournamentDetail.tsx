@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useLocation, useNavigate, Link } from 'reac
 import {
   ArrowLeft, ExternalLink, Loader2, Medal, Trophy,
   Calendar, MapPin, List, Swords, Users, Search,
-  ChevronDown, ChevronRight, RefreshCw,
+  ChevronRight, RefreshCw,
 } from 'lucide-react';
 import {
   fetchTournaments,
@@ -14,6 +14,7 @@ import {
   fetchTournamentPlayerDetail,
   fetchTournamentMatchDates,
   fetchTournamentMatchDay,
+  fetchDrawBracket,
 } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import type {
@@ -26,6 +27,9 @@ import type {
   MedalPlayer,
   MatchDateTab,
   TournamentMatch,
+  EliminationDrawResponse,
+  BracketMatch as BracketMatchData,
+  BracketSection,
 } from '../types/junior';
 
 // ── Tab definitions ─────────────────────────────────────────────────────────
@@ -423,49 +427,285 @@ function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
 
 // ── Draws Tab ───────────────────────────────────────────────────────────────
 
+interface DisplayMatch {
+  player1: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean } | null;
+  player2: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean } | null;
+  score: string[];
+  retired: boolean;
+  walkover: boolean;
+  bye: boolean;
+}
+
+interface DisplayRound {
+  name: string;
+  matches: DisplayMatch[];
+}
+
+function buildDisplayRounds(section: BracketSection): DisplayRound[] {
+  const matchesByLevel = new Map<number, BracketMatchData[]>();
+  for (const m of section.matches) {
+    if (!matchesByLevel.has(m.roundLevel)) matchesByLevel.set(m.roundLevel, []);
+    matchesByLevel.get(m.roundLevel)!.push(m);
+  }
+  for (const ms of matchesByLevel.values()) ms.sort((a, b) => a.matchNum - b.matchNum);
+
+  const levels = [...matchesByLevel.keys()].sort((a, b) => b - a);
+  if (levels.length === 0) return [];
+
+  const entryLevel = levels[0] + 1;
+  const sortedEntries = [...section.entries].sort((a, b) => a.position - b.position);
+
+  const rounds: DisplayRound[] = [];
+
+  for (let li = 0; li < levels.length; li++) {
+    const level = levels[li];
+    const levelMatches = matchesByLevel.get(level) || [];
+    const roundIdx = li;
+    const roundName = section.rounds[roundIdx] || `Round ${roundIdx + 1}`;
+    const displayMatches: DisplayMatch[] = [];
+
+    for (let i = 0; i < levelMatches.length; i++) {
+      const m = levelMatches[i];
+      let p1: DisplayMatch['player1'] = null;
+      let p2: DisplayMatch['player2'] = null;
+
+      if (level === entryLevel - 1) {
+        const e1 = sortedEntries[i * 2];
+        const e2 = sortedEntries[i * 2 + 1];
+        if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye };
+        if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye };
+      } else {
+        const prevLevel = levels[li - 1];
+        const prevMatches = matchesByLevel.get(prevLevel) || [];
+        const prev1 = prevMatches[i * 2];
+        const prev2 = prevMatches[i * 2 + 1];
+        if (prev1?.winner) p1 = { name: prev1.winner.name, seed: prev1.winner.seed, playerId: prev1.winner.playerId, won: false, bye: false };
+        if (prev2?.winner) p2 = { name: prev2.winner.name, seed: prev2.winner.seed, playerId: prev2.winner.playerId, won: false, bye: false };
+      }
+
+      if (m.winner && p1) p1.won = m.winner.playerId === p1.playerId;
+      if (m.winner && p2) p2.won = m.winner.playerId === p2.playerId;
+
+      displayMatches.push({
+        player1: p1,
+        player2: p2,
+        score: m.score,
+        retired: m.retired,
+        walkover: m.walkover,
+        bye: (p1?.bye || p2?.bye) ?? false,
+      });
+    }
+
+    rounds.push({ name: roundName, matches: displayMatches });
+  }
+
+  if (rounds.length > 0) {
+    const finalRound = rounds[rounds.length - 1];
+    const finalMatch = finalRound.matches[0];
+    const winner = finalMatch?.player1?.won ? finalMatch.player1 : finalMatch?.player2?.won ? finalMatch.player2 : null;
+    if (winner) {
+      const winnerRoundName = section.rounds[rounds.length] || 'Winner';
+      rounds.push({
+        name: winnerRoundName,
+        matches: [{
+          player1: { ...winner, won: true },
+          player2: null,
+          score: [],
+          retired: false,
+          walkover: false,
+          bye: false,
+        }],
+      });
+    }
+  }
+
+  return rounds;
+}
+
+function BracketPlayerRow({
+  player,
+  tswId,
+  gameScores,
+  otherScores,
+  isTop,
+}: {
+  player: DisplayMatch['player1'];
+  tswId: string;
+  gameScores: number[];
+  otherScores: number[];
+  isTop: boolean;
+}) {
+  if (!player || player.bye) {
+    return (
+      <div className={`flex items-center justify-between gap-2 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
+        <span className="text-[11px] text-slate-400 dark:text-slate-500 italic truncate">Bye</span>
+      </div>
+    );
+  }
+
+  const nameClass = player.won
+    ? 'font-semibold text-slate-800 dark:text-slate-100'
+    : 'text-slate-800 dark:text-slate-100';
+
+  return (
+    <div className={`flex items-center justify-between gap-1 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
+      <div className="flex items-center gap-1 min-w-0 flex-1">
+        {player.seed && (
+          <span className="text-[10px] font-semibold text-violet-500 dark:text-violet-400 shrink-0">[{player.seed}]</span>
+        )}
+        {player.playerId ? (
+          <Link
+            to={`/tournaments/${tswId}/player/${player.playerId}`}
+            className={`text-[11px] truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline ${nameClass}`}
+          >
+            {player.name}
+          </Link>
+        ) : (
+          <span className={`text-[11px] truncate ${nameClass}`}>{player.name || 'TBD'}</span>
+        )}
+      </div>
+      <div className="flex items-center gap-0.5 shrink-0 ml-1 font-mono text-[11px]">
+        {player.won && (
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+        )}
+        {gameScores.map((s, i) => {
+          const isWinningGame = s > otherScores[i];
+          return (
+            <span key={i} className={`w-4 text-right tabular-nums ${isWinningGame ? 'font-bold text-slate-800 dark:text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{s}</span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string }) {
+  const p1Scores: number[] = [];
+  const p2Scores: number[] = [];
+  for (const s of match.score) {
+    const [a, b] = s.split('-').map(Number);
+    p1Scores.push(a);
+    p2Scores.push(b);
+  }
+
+  return (
+    <div className="w-48 bg-white dark:bg-slate-900 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden text-left shrink-0">
+      <BracketPlayerRow player={match.player1} tswId={tswId} gameScores={p1Scores} otherScores={p2Scores} isTop />
+      <BracketPlayerRow player={match.player2} tswId={tswId} gameScores={p2Scores} otherScores={p1Scores} isTop={false} />
+      {(match.retired || match.walkover) && (
+        <div className="px-2 py-0.5 bg-amber-50 dark:bg-amber-900/10 text-center border-t border-slate-100 dark:border-slate-700/50">
+          <span className="text-[9px] font-medium text-amber-600 dark:text-amber-400">
+            {match.retired ? 'Retired' : 'Walkover'}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BracketConnectors({ matchCount }: { matchCount: number }) {
+  if (matchCount <= 0) return null;
+  const pairs = matchCount / 2;
+  return (
+    <div className="flex flex-col justify-around flex-1 shrink-0" style={{ width: 16 }}>
+      {Array.from({ length: pairs }, (_, i) => (
+        <div key={i} className="flex flex-col items-stretch" style={{ flex: 1 }}>
+          <div className="flex-1 border-r-2 border-t-2 border-slate-200 dark:border-slate-600 rounded-tr" />
+          <div className="flex-1 border-r-2 border-b-2 border-slate-200 dark:border-slate-600 rounded-br" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BracketView({ section, tswId }: { section: BracketSection; tswId: string }) {
+  const rounds = useMemo(() => buildDisplayRounds(section), [section]);
+
+  if (rounds.length === 0) return null;
+
+  const lastRoundName = rounds[rounds.length - 1]?.name?.toLowerCase() ?? '';
+  const hasWinnerColumn = lastRoundName === 'winner';
+
+  return (
+    <div className="overflow-x-auto overflow-y-auto max-h-[80vh] -mx-4 px-4 md:mx-0 md:px-0 pb-4">
+      <div className="flex min-w-max items-stretch">
+        {rounds.map((round, ri) => {
+          const isWinner = ri === rounds.length - 1 && hasWinnerColumn;
+          return (
+            <div key={ri} className="flex items-stretch shrink-0">
+              <div className="flex flex-col shrink-0">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 text-center whitespace-nowrap px-1">
+                  {round.name}
+                </div>
+                <div className="flex-1 flex flex-col justify-around">
+                  {round.matches.map((match, mi) => (
+                    isWinner ? (
+                      <div key={mi} className="flex items-center px-2">
+                        <div className="w-48 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10 rounded-md border-2 border-yellow-300 dark:border-yellow-600 shadow-sm overflow-hidden text-left">
+                          <div className="flex items-center gap-1.5 px-2.5 py-2 min-w-0">
+                            <Trophy className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
+                            {match.player1?.playerId ? (
+                              <Link
+                                to={`/tournaments/${tswId}/player/${match.player1.playerId}`}
+                                className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
+                              >
+                                {match.player1?.seed && <span className="text-violet-500 dark:text-violet-400 mr-1">[{match.player1.seed}]</span>}
+                                {match.player1?.name}
+                              </Link>
+                            ) : (
+                              <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                {match.player1?.name || 'TBD'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <BracketMatchCard key={mi} match={match} tswId={tswId} />
+                    )
+                  ))}
+                </div>
+              </div>
+              {ri < rounds.length - 1 && !isWinner && round.matches.length > 1 && (
+                <BracketConnectors matchCount={round.matches.length} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
 function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
   const fetcher = useCallback((id: string) => fetchTournamentDetail(id), []);
   const { data, loading, error } = useTabData(tswId, active, fetcher, 'draws');
-  const [expandedDraw, setExpandedDraw] = useState<number | null>(null);
 
   if (loading) return <TabLoading label="draws" />;
   if (error) return <TabError error={error} />;
   if (!data || data.draws.length === 0) return <TabEmpty icon={List} message="No draws available for this tournament." />;
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-      <div className="divide-y divide-slate-100 dark:divide-slate-800">
-        {data.draws.map(draw => {
-          const color = getEventColor(draw.name);
-          const expanded = expandedDraw === draw.drawId;
-          const tswDrawUrl = `https://www.tournamentsoftware.com/sport/draw.aspx?id=${tswId}&draw=${draw.drawId}`;
-          return (
-            <div key={draw.drawId}>
-              <button
-                onClick={() => setExpandedDraw(expanded ? null : draw.drawId)}
-                className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
+    <div className="space-y-3">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+          {data.draws.map(draw => {
+            const color = getEventColor(draw.name);
+            return (
+              <Link
+                key={draw.drawId}
+                to={`/tournaments/${tswId}/draw/${draw.drawId}`}
+                className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
               >
-                {expanded ? <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />}
                 <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
                   {draw.name}
                 </span>
-              </button>
-              {expanded && (
-                <div className="px-5 pb-4 pl-12">
-                  <a
-                    href={tswDrawUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    View bracket on TournamentSoftware
-                  </a>
-                </div>
-              )}
-            </div>
-          );
-        })}
+                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 ml-auto" />
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -1402,6 +1642,104 @@ export function TournamentPlayerDetail() {
                 <MatchCard key={i} match={m} tswId={tswId} />
               ))}
             </div>
+          )}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+// ── Tournament Draw Detail Page ─────────────────────────────────────────────
+
+export function TournamentDrawDetail() {
+  const { tswId, drawId } = useParams<{ tswId: string; drawId: string }>();
+  const navigate = useNavigate();
+
+  const [drawName, setDrawName] = useState<string | null>(null);
+  const [bracketData, setBracketData] = useState<EliminationDrawResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!tswId || !drawId) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    const numericDrawId = Number(drawId);
+
+    Promise.all([
+      fetchTournamentDetail(tswId),
+      fetchDrawBracket(tswId, numericDrawId),
+    ])
+      .then(([detail, bracket]) => {
+        if (cancelled) return;
+        const draw = detail.draws.find(d => d.drawId === numericDrawId);
+        setDrawName(draw?.name ?? `Draw ${drawId}`);
+        setBracketData(bracket);
+      })
+      .catch(e => { if (!cancelled) setError(e.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [tswId, drawId]);
+
+  if (!tswId || !drawId) return null;
+
+  const tswDrawUrl = `https://www.tournamentsoftware.com/sport/draw.aspx?id=${tswId}&draw=${drawId}`;
+  const color = drawName ? getEventColor(drawName) : null;
+
+  return (
+    <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
+      <button
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Tournament
+      </button>
+
+      {loading ? (
+        <TabLoading label="draw" />
+      ) : error ? (
+        <TabError error={error} />
+      ) : bracketData ? (
+        <>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {color && (
+                  <span className={`inline-block px-2.5 py-1 rounded text-sm font-bold ${color.bg} ${color.text}`}>
+                    {drawName}
+                  </span>
+                )}
+                <h1 className="text-xl md:text-2xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+                  Elimination Draw
+                </h1>
+              </div>
+              <a
+                href={tswDrawUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors shrink-0"
+              >
+                <ExternalLink className="w-3 h-3" />
+                View on TournamentSoftware
+              </a>
+            </div>
+          </div>
+
+          {bracketData.sections.length === 0 ? (
+            <TabEmpty icon={List} message="No bracket data available for this draw." />
+          ) : (
+            bracketData.sections.map((section, si) => (
+              <div key={si} className="space-y-3">
+                {bracketData.sections.length > 1 && (
+                  <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">{section.name}</h3>
+                )}
+                <BracketView section={section} tswId={tswId} />
+              </div>
+            ))
           )}
         </>
       ) : null}

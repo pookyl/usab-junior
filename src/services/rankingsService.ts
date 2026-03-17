@@ -16,6 +16,7 @@ import type {
   TournamentPlayersResponse,
   TournamentPlayerDetailResponse,
   TournamentWinnersResponse,
+  EliminationDrawResponse,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -352,6 +353,26 @@ export async function fetchTournamentMatchDates(
 
   const data: TournamentMatchDatesResponse = await res.json();
   cappedSet(tournamentMatchDatesCache, tswId, data);
+  return data;
+}
+
+// ── Draw Bracket ──────────────────────────────────────────────────────────────
+
+const drawBracketCache = new Map<string, EliminationDrawResponse>();
+
+export async function fetchDrawBracket(
+  tswId: string,
+  drawId: number,
+): Promise<EliminationDrawResponse> {
+  const key = `${tswId}:${drawId}`;
+  if (drawBracketCache.has(key)) return drawBracketCache.get(key)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/draw-bracket?drawId=${drawId}`;
+  const res = await fetchWithRetry(url, 60_000);
+  if (!res.ok) throw new Error(`Draw bracket API ${res.status}`);
+
+  const data: EliminationDrawResponse = await res.json();
+  cappedSet(drawBracketCache, key, data);
   return data;
 }
 

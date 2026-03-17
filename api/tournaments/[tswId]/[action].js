@@ -3,6 +3,7 @@ import {
   tswFetch, parseTswDrawsList, parseTswTournamentInfo,
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
   parseTswMatches, parseTswPlayerMatches, parseTswMatchDates, formatMatchDate,
+  parseTswEliminationDraw, parseTswDrawType,
   isValidTswId,
   TSW_BASE,
 } from '../../_lib/shared.js';
@@ -459,6 +460,44 @@ async function handlePlayerDetail(tswId, req, res) {
   }
 }
 
+async function handleDrawBracket(tswId, req, res) {
+  const urlObj = new URL(req.url, 'http://localhost');
+  const drawId = req.query?.drawId || urlObj.searchParams.get('drawId');
+  if (!drawId || !/^\d+$/.test(drawId)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'drawId query parameter required (numeric)' }));
+    return;
+  }
+
+  const cacheKey = `tournament-draw-bracket:${tswId}:${drawId}`;
+  const cached = getCached(cacheKey);
+  if (cached) {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+    res.end(JSON.stringify(cached));
+    return;
+  }
+
+  try {
+    const drawPath = `/tournament/${tswId.toLowerCase()}/draw/${drawId}`;
+    const resp = await tswFetch(drawPath);
+    if (!resp.ok) throw new Error(`TSW draw page HTTP ${resp.status}`);
+    const html = await resp.text();
+
+    const drawType = parseTswDrawType(html);
+    const sections = parseTswEliminationDraw(html);
+
+    const result = { tswId, drawId: parseInt(drawId, 10), drawType, sections };
+
+    setCache(cacheKey, result);
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
+    res.end(JSON.stringify(result));
+  } catch (err) {
+    console.error('[tournament-draw-bracket] error:', err.message);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message }));
+  }
+}
+
 // ── Main handler ────────────────────────────────────────────────────────────
 
 const ACTIONS = {
@@ -470,6 +509,7 @@ const ACTIONS = {
   draws: handleDraws,
   events: handleEvents,
   'player-detail': handlePlayerDetail,
+  'draw-bracket': handleDrawBracket,
 };
 
 export default async function handler(req, res) {

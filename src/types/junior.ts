@@ -361,3 +361,41 @@ export interface DrawBracketResponse {
   drawName: string;
   matches: DrawBracketMatch[];
 }
+
+// ── Elimination bracket types ─────────────────────────────────────────────────
+
+export interface BracketPlayer {
+  name: string;
+  seed: string;
+  club: string;
+  playerId: number | null;
+}
+
+export interface BracketEntry extends BracketPlayer {
+  position: number;
+  bye: boolean;
+}
+
+export interface BracketMatch {
+  matchId: string;
+  roundLevel: number;
+  matchNum: number;
+  winner: BracketPlayer | null;
+  score: string[];
+  retired: boolean;
+  walkover: boolean;
+}
+
+export interface BracketSection {
+  name: string;
+  rounds: string[];
+  entries: BracketEntry[];
+  matches: BracketMatch[];
+}
+
+export interface EliminationDrawResponse {
+  tswId: string;
+  drawId: number;
+  drawType: string;
+  sections: BracketSection[];
+}

@@ -1200,6 +1200,177 @@ export function parseTswDrawBracket(html) {
   return { drawName, matches: rounds };
 }
 
+// ── TSW Elimination draw table parser ────────────────────────────────────────
+// Parses /tournament/{tswId}/draw/{drawId} which uses table-based bracket layout.
+// Each <div class="draw"><table> section represents a bracket (main + optional playoff).
+// Returns array of { name, rounds, entries, matches }.
+
+function parseTdCells(rowHtml) {
+  const cells = [];
+  const re = /<td([^>]*?)(?:\/>|>([\s\S]*?)<\/td>)/g;
+  let m;
+  while ((m = re.exec(rowHtml)) !== null) {
+    cells.push(m[2] ?? '');
+  }
+  return cells;
+}
+
+export function parseTswEliminationDraw(html) {
+  const sections = [];
+
+  const drawDivRegex = /<div class="draw"><table>([\s\S]*?)<\/table><\/div>/g;
+  let dMatch;
+
+  while ((dMatch = drawDivRegex.exec(html)) !== null) {
+    const tableHtml = dMatch[1];
+
+    const capMatch = tableHtml.match(/<caption>([^<]+)<\/caption>/);
+    const name = capMatch ? decodeHtmlEntities(capMatch[1].trim()) : '';
+
+    const theadMatch = tableHtml.match(/<thead><tr>([\s\S]*?)<\/tr><\/thead>/);
+    const roundNames = [];
+    if (theadMatch) {
+      const hdrCells = parseTdCells(theadMatch[1]);
+      for (let i = 2; i < hdrCells.length; i++) {
+        roundNames.push(hdrCells[i].replace(/<[^>]*>/g, '').trim());
+      }
+    }
+
+    const tbodyMatch = tableHtml.match(/<tbody>([\s\S]*?)<\/tbody>/);
+    if (!tbodyMatch) continue;
+
+    const rows = [];
+    const rowRe = /<tr>([\s\S]*?)<\/tr>/g;
+    let rm;
+    while ((rm = rowRe.exec(tbodyMatch[1])) !== null) {
+      rows.push(parseTdCells(rm[1]));
+    }
+
+    function parsePlayerFromCell(cell) {
+      const pLink = cell.match(/player=(\d+)[^"]*">([^<]+)<\/a>/);
+      if (!pLink) return null;
+      const raw = decodeHtmlEntities(pLink[2].trim());
+      const seedM = raw.match(/\[(\d+(?:\/\d+)?)\]$/);
+      return {
+        name: raw.replace(/\s*\[[\d/]+\]$/, '').trim(),
+        playerId: parseInt(pLink[1], 10),
+        seed: seedM ? seedM[1] : '',
+      };
+    }
+
+    const entries = [];
+    for (let r = 0; r < rows.length; r++) {
+      const cells = rows[r];
+      if (cells.length < 3) continue;
+
+      const posText = cells[0].replace(/<[^>]*>/g, '').trim();
+      const posNum = parseInt(posText, 10);
+      if (!posNum) continue;
+
+      const club = cells[1].replace(/<[^>]*>/g, '').trim();
+
+      for (let c = 2; c < cells.length; c++) {
+        const cell = cells[c];
+        if (!cell.match(/class="entry"/)) continue;
+
+        const isBye = /\bBye\b/i.test(cell.replace(/<[^>]*>/g, ''));
+        const player = parsePlayerFromCell(cell);
+
+        entries.push({
+          position: posNum,
+          name: isBye ? 'Bye' : (player?.name || ''),
+          seed: player?.seed || '',
+          club,
+          playerId: player?.playerId || null,
+          bye: isBye,
+        });
+        break;
+      }
+    }
+
+    const matchSpans = [];
+    const scoreSpans = [];
+
+    for (let r = 0; r < rows.length; r++) {
+      const cells = rows[r];
+      for (let c = 2; c < cells.length; c++) {
+        const cell = cells[c];
+
+        const mSpan = cell.match(/id="(\d+)"\s*class="match"/);
+        if (mSpan) {
+          const player = parsePlayerFromCell(cell);
+          matchSpans.push({
+            row: r, col: c, matchId: mSpan[1],
+            name: player?.name || '', playerId: player?.playerId || null,
+            seed: player?.seed || '',
+          });
+        }
+
+        if (/<span class="score">/.test(cell)) {
+          const games = [];
+          const gameRe = /<span>(\d+-\d+)<\/span>/g;
+          let gm;
+          while ((gm = gameRe.exec(cell)) !== null) {
+            games.push(gm[1]);
+          }
+          const retired = /Retired/i.test(cell);
+          const walkover = /Walkover/i.test(cell);
+          if (games.length > 0 || retired || walkover) {
+            scoreSpans.push({ row: r, col: c, games, retired, walkover });
+          }
+        }
+      }
+    }
+
+    const matches = [];
+    const usedScores = new Set();
+
+    for (const ms of matchSpans) {
+      let bestScore = null;
+      let bestDist = Infinity;
+
+      for (let si = 0; si < scoreSpans.length; si++) {
+        if (usedScores.has(si)) continue;
+        const ss = scoreSpans[si];
+        if (ss.col !== ms.col && ss.col !== ms.col + 1) continue;
+        const dist = Math.abs(ss.row - ms.row) + (ss.col !== ms.col ? 0.5 : 0);
+        if (dist < bestDist && dist <= 3) {
+          bestDist = dist;
+          bestScore = { idx: si, data: ss };
+        }
+      }
+
+      if (bestScore) usedScores.add(bestScore.idx);
+
+      matches.push({
+        matchId: ms.matchId,
+        roundLevel: parseInt(ms.matchId.charAt(0), 10),
+        matchNum: parseInt(ms.matchId.slice(1), 10),
+        winner: ms.name ? {
+          name: ms.name, playerId: ms.playerId,
+          seed: ms.seed, club: '',
+        } : null,
+        score: bestScore?.data.games || [],
+        retired: bestScore?.data.retired || false,
+        walkover: bestScore?.data.walkover || false,
+      });
+    }
+
+    sections.push({ name, rounds: roundNames, entries, matches });
+  }
+
+  return sections;
+}
+
+// ── TSW Draw type detector ──────────────────────────────────────────────────
+export function parseTswDrawType(html) {
+  if (/>\s*Elimination\s*</.test(html)) return 'elimination';
+  if (/>\s*Round Robin\s*</.test(html)) return 'round-robin';
+  if (/>\s*Group\s*</.test(html)) return 'group';
+  if (/<div class="draw"><table>/.test(html)) return 'elimination';
+  return 'unknown';
+}
+
 // ── TSW Tournament Players page parser (array version) ──────────────────────
 // Same source as parseTswTournamentPlayers but returns an array instead of Map
 

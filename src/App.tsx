@@ -10,7 +10,7 @@ import AllPlayers from './pages/AllPlayers';
 import PlayerProfile from './pages/PlayerProfile';
 import HeadToHead from './pages/HeadToHead';
 import Tournaments from './pages/Tournaments';
-import TournamentDetail, { TournamentPlayerDetail } from './pages/TournamentDetail';
+import TournamentDetail, { TournamentPlayerDetail, TournamentDrawDetail } from './pages/TournamentDetail';
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -83,6 +83,7 @@ export default function App() {
                   <Route path="/head-to-head" element={<HeadToHead />} />
                   <Route path="/tournaments" element={<Tournaments />} />
                   <Route path="/tournaments/:tswId" element={<TournamentDetail />} />
+                  <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
                   <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
