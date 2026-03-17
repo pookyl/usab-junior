@@ -428,8 +428,8 @@ function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
 // ── Draws Tab ───────────────────────────────────────────────────────────────
 
 interface DisplayMatch {
-  player1: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean } | null;
-  player2: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean } | null;
+  player1: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean; position?: number } | null;
+  player2: { name: string; seed: string; playerId: number | null; won: boolean; bye: boolean; position?: number } | null;
   score: string[];
   retired: boolean;
   walkover: boolean;
@@ -452,8 +452,45 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
   const levels = [...matchesByLevel.keys()].sort((a, b) => b - a);
   if (levels.length === 0) return [];
 
+  let sortedEntries = [...section.entries].sort((a, b) => a.position - b.position);
+
+  // Play-off sections (e.g., 3/4 playoff) use class="match" instead of
+  // class="entry" for players, so the parser finds no entries. The highest-level
+  // match spans actually represent the entering players — promote them to entries.
+  if (sortedEntries.length === 0 && levels.length > 1) {
+    const topLevel = levels[0];
+    const topMatches = matchesByLevel.get(topLevel) || [];
+    sortedEntries = topMatches.map((m, i) => ({
+      position: i + 1,
+      name: m.winner?.name || '',
+      seed: m.winner?.seed || '',
+      club: m.winner?.club || '',
+      playerId: m.winner?.playerId || null,
+      bye: false,
+    }));
+
+    // The parser may associate scores/retired with the promoted level rather than
+    // the actual match level. Transfer any result data to the remaining match.
+    const promotedWithScore = topMatches.find(m => m.score.length > 0 || m.retired || m.walkover);
+    if (promotedWithScore) {
+      const nextLevel = levels[1];
+      const nextMatches = matchesByLevel.get(nextLevel);
+      if (nextMatches) {
+        for (const nm of nextMatches) {
+          if (nm.score.length === 0 && !nm.retired && !nm.walkover) {
+            nm.score = promotedWithScore.score;
+            nm.retired = promotedWithScore.retired;
+            nm.walkover = promotedWithScore.walkover;
+          }
+        }
+      }
+    }
+
+    matchesByLevel.delete(topLevel);
+    levels.shift();
+  }
+
   const entryLevel = levels[0] + 1;
-  const sortedEntries = [...section.entries].sort((a, b) => a.position - b.position);
 
   const rounds: DisplayRound[] = [];
 
@@ -472,8 +509,8 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
       if (level === entryLevel - 1) {
         const e1 = sortedEntries[i * 2];
         const e2 = sortedEntries[i * 2 + 1];
-        if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye };
-        if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye };
+        if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye, position: e1.position };
+        if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye, position: e2.position };
       } else {
         const prevLevel = levels[li - 1];
         const prevMatches = matchesByLevel.get(prevLevel) || [];
@@ -528,14 +565,26 @@ function BracketPlayerRow({
   gameScores,
   otherScores,
   isTop,
+  lost,
+  statusLabel,
 }: {
   player: DisplayMatch['player1'];
   tswId: string;
   gameScores: number[];
   otherScores: number[];
   isTop: boolean;
+  lost: boolean;
+  statusLabel?: string;
 }) {
-  if (!player || player.bye) {
+  if (!player) {
+    return (
+      <div className={`flex items-center justify-between gap-2 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
+        <span className="text-[11px] text-slate-400 dark:text-slate-500 italic truncate">TBD</span>
+      </div>
+    );
+  }
+
+  if (player.bye) {
     return (
       <div className={`flex items-center justify-between gap-2 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
         <span className="text-[11px] text-slate-400 dark:text-slate-500 italic truncate">Bye</span>
@@ -545,14 +594,13 @@ function BracketPlayerRow({
 
   const nameClass = player.won
     ? 'font-semibold text-slate-800 dark:text-slate-100'
-    : 'text-slate-800 dark:text-slate-100';
+    : lost
+      ? 'text-slate-400 dark:text-slate-500'
+      : 'text-slate-800 dark:text-slate-100';
 
   return (
     <div className={`flex items-center justify-between gap-1 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
       <div className="flex items-center gap-1 min-w-0 flex-1">
-        {player.seed && (
-          <span className="text-[10px] font-semibold text-violet-500 dark:text-violet-400 shrink-0">[{player.seed}]</span>
-        )}
         {player.playerId ? (
           <Link
             to={`/tournaments/${tswId}/player/${player.playerId}`}
@@ -563,15 +611,24 @@ function BracketPlayerRow({
         ) : (
           <span className={`text-[11px] truncate ${nameClass}`}>{player.name || 'TBD'}</span>
         )}
+        {player.seed && (
+          <span className={`text-[10px] font-semibold shrink-0 ${lost ? 'text-violet-400/50 dark:text-violet-500/50' : 'text-violet-500 dark:text-violet-400'}`}>({player.seed})</span>
+        )}
+        {statusLabel && (
+          <span className="text-[9px] font-medium text-amber-500 dark:text-amber-400 shrink-0">{statusLabel}</span>
+        )}
       </div>
-      <div className="flex items-center gap-0.5 shrink-0 ml-1 font-mono text-[11px]">
+      <div className="flex items-center gap-0.5 shrink-0 ml-1">
         {player.won && (
-          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mr-0.5" />
         )}
         {gameScores.map((s, i) => {
           const isWinningGame = s > otherScores[i];
           return (
-            <span key={i} className={`w-4 text-right tabular-nums ${isWinningGame ? 'font-bold text-slate-800 dark:text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{s}</span>
+            <span key={i} className={`font-mono text-[11px] w-5 text-right tabular-nums ${
+              lost ? 'text-slate-400 dark:text-slate-500' :
+              isWinningGame ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
+            }`}>{s}</span>
           );
         })}
       </div>
@@ -582,23 +639,26 @@ function BracketPlayerRow({
 function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string }) {
   const p1Scores: number[] = [];
   const p2Scores: number[] = [];
+  const p1IsWinner = match.player1?.won ?? false;
   for (const s of match.score) {
-    const [a, b] = s.split('-').map(Number);
-    p1Scores.push(a);
-    p2Scores.push(b);
+    const [winnerScore, loserScore] = s.split('-').map(Number);
+    p1Scores.push(p1IsWinner ? winnerScore : loserScore);
+    p2Scores.push(p1IsWinner ? loserScore : winnerScore);
   }
+
+  const p1Won = match.player1?.won ?? false;
+  const p2Won = match.player2?.won ?? false;
+  const p1Lost = !p1Won && p2Won;
+  const p2Lost = !p2Won && p1Won;
+
+  const statusText = match.retired ? 'Retired' : match.walkover ? 'Walkover' : '';
+  const p1Status = p1Lost ? statusText : '';
+  const p2Status = p2Lost ? statusText : '';
 
   return (
     <div className="w-48 bg-white dark:bg-slate-900 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden text-left shrink-0">
-      <BracketPlayerRow player={match.player1} tswId={tswId} gameScores={p1Scores} otherScores={p2Scores} isTop />
-      <BracketPlayerRow player={match.player2} tswId={tswId} gameScores={p2Scores} otherScores={p1Scores} isTop={false} />
-      {(match.retired || match.walkover) && (
-        <div className="px-2 py-0.5 bg-amber-50 dark:bg-amber-900/10 text-center border-t border-slate-100 dark:border-slate-700/50">
-          <span className="text-[9px] font-medium text-amber-600 dark:text-amber-400">
-            {match.retired ? 'Retired' : 'Walkover'}
-          </span>
-        </div>
-      )}
+      <BracketPlayerRow player={match.player1} tswId={tswId} gameScores={p1Scores} otherScores={p2Scores} isTop lost={p1Lost} statusLabel={p1Status || undefined} />
+      <BracketPlayerRow player={match.player2} tswId={tswId} gameScores={p2Scores} otherScores={p1Scores} isTop={false} lost={p2Lost} statusLabel={p2Status || undefined} />
     </div>
   );
 }
@@ -607,13 +667,24 @@ function BracketConnectors({ matchCount }: { matchCount: number }) {
   if (matchCount <= 0) return null;
   const pairs = matchCount / 2;
   return (
-    <div className="flex flex-col justify-around flex-1 shrink-0" style={{ width: 16 }}>
-      {Array.from({ length: pairs }, (_, i) => (
-        <div key={i} className="flex flex-col items-stretch" style={{ flex: 1 }}>
-          <div className="flex-1 border-r-2 border-t-2 border-slate-200 dark:border-slate-600 rounded-tr" />
-          <div className="flex-1 border-r-2 border-b-2 border-slate-200 dark:border-slate-600 rounded-br" />
-        </div>
-      ))}
+    <div className="flex shrink-0" style={{ width: 32 }}>
+      <div className="flex flex-col" style={{ width: 16 }}>
+        {Array.from({ length: pairs }, (_, i) => (
+          <div key={i} className="flex-1 flex flex-col">
+            <div className="flex-1" />
+            <div className="flex-1 border-r-2 border-t-2 border-slate-300 dark:border-slate-600" />
+            <div className="flex-1 border-r-2 border-b-2 border-slate-300 dark:border-slate-600" />
+            <div className="flex-1" />
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col" style={{ width: 16 }}>
+        {Array.from({ length: pairs }, (_, i) => (
+          <div key={i} className="flex-1 flex flex-col justify-center">
+            <div className="border-t-2 border-slate-300 dark:border-slate-600" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -631,17 +702,29 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
       <div className="flex min-w-max items-stretch">
         {rounds.map((round, ri) => {
           const isWinner = ri === rounds.length - 1 && hasWinnerColumn;
+          const isFirstRound = ri === 0;
+          const showConnector = ri < rounds.length - 1 && !isWinner && round.matches.length > 1;
           return (
-            <div key={ri} className="flex items-stretch shrink-0">
-              <div className="flex flex-col shrink-0">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 text-center whitespace-nowrap px-1">
-                  {round.name}
-                </div>
-                <div className="flex-1 flex flex-col justify-around">
+            <div key={ri} className="flex flex-col shrink-0">
+              <div className={`sticky top-0 z-10 bg-white dark:bg-slate-950 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 pb-2 text-center whitespace-nowrap px-1 ${isFirstRound ? 'pl-7' : ''}`}>
+                {round.name}
+              </div>
+              <div className="flex-1 flex items-stretch">
+                <div className="flex flex-col flex-1">
                   {round.matches.map((match, mi) => (
-                    isWinner ? (
-                      <div key={mi} className="flex items-center px-2">
-                        <div className="w-48 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10 rounded-md border-2 border-yellow-300 dark:border-yellow-600 shadow-sm overflow-hidden text-left">
+                    <div key={mi} className="flex-1 flex items-center">
+                      {isFirstRound && (
+                        <div className="flex flex-col shrink-0 mr-1.5 w-5">
+                          <div className="py-1 text-[11px] text-slate-400 dark:text-slate-500 text-right tabular-nums leading-tight">
+                            {match.player1?.position ?? ''}
+                          </div>
+                          <div className="py-1 text-[11px] text-slate-400 dark:text-slate-500 text-right tabular-nums leading-tight">
+                            {match.player2?.position ?? ''}
+                          </div>
+                        </div>
+                      )}
+                      {isWinner ? (
+                        <div className="w-48 ml-1 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10 rounded-md border-2 border-yellow-300 dark:border-yellow-600 shadow-sm overflow-hidden text-left">
                           <div className="flex items-center gap-1.5 px-2.5 py-2 min-w-0">
                             <Trophy className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
                             {match.player1?.playerId ? (
@@ -649,8 +732,8 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
                                 to={`/tournaments/${tswId}/player/${match.player1.playerId}`}
                                 className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
                               >
-                                {match.player1?.seed && <span className="text-violet-500 dark:text-violet-400 mr-1">[{match.player1.seed}]</span>}
                                 {match.player1?.name}
+                                {match.player1?.seed && <span className="text-violet-500 dark:text-violet-400 ml-1">({match.player1.seed})</span>}
                               </Link>
                             ) : (
                               <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
@@ -659,16 +742,14 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
                             )}
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      <BracketMatchCard key={mi} match={match} tswId={tswId} />
-                    )
+                      ) : (
+                        <BracketMatchCard match={match} tswId={tswId} />
+                      )}
+                    </div>
                   ))}
                 </div>
+                {showConnector && <BracketConnectors matchCount={round.matches.length} />}
               </div>
-              {ri < rounds.length - 1 && !isWinner && round.matches.length > 1 && (
-                <BracketConnectors matchCount={round.matches.length} />
-              )}
             </div>
           );
         })}
