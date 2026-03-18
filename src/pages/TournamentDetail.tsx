@@ -456,7 +456,7 @@ interface DisplayRound {
   matches: DisplayMatch[];
 }
 
-function buildDisplayRounds(section: BracketSection): DisplayRound[] {
+function buildDisplayRounds(section: BracketSection): { rounds: DisplayRound[]; hasFeedIn: boolean } {
   const matchesByLevel = new Map<number, BracketMatchData[]>();
   for (const m of section.matches) {
     if (!matchesByLevel.has(m.roundLevel)) matchesByLevel.set(m.roundLevel, []);
@@ -469,7 +469,7 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
   // TSW headers include "Winner" as a column name, but we generate the winner
   // column automatically from the finals result. Strip it to avoid duplication.
   const roundNames = section.rounds.filter(r => r.toLowerCase() !== 'winner');
-  if (levels.length === 0) return [];
+  if (levels.length === 0) return { rounds: [], hasFeedIn: false };
 
   let sortedEntries = [...section.entries].sort((a, b) => a.position - b.position);
 
@@ -514,12 +514,28 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
   // When the top level has 1:1 pairing with all-unscored matches (e.g. two-column
   // Round 1 in consolation brackets), merge it into entries so the display starts
   // one round later — matching the TSW visual where these two columns are combined.
+  // For feed-in levels (count > expected), only merge if subsequent levels still
+  // have feed-in patterns (large brackets like 128-player). Skip the merge for
+  // small brackets where this is the only feed-in level.
   if (levels.length > 1 && sortedEntries.length > 0) {
     const topLevel = levels[0];
     const topMatches = matchesByLevel.get(topLevel) || [];
     const allUnscored = topMatches.length > 0 && topMatches.every(m => m.score.length === 0 && !m.retired && !m.walkover);
+    const expectedNormal = Math.ceil(sortedEntries.length / 2);
+    const isFeedInLevel = topMatches.length > expectedNormal;
 
-    if (allUnscored && topMatches.length === sortedEntries.length) {
+    let canMergeFeedIn = false;
+    if (isFeedInLevel) {
+      let prevCount = topMatches.length;
+      for (let i = 1; i < levels.length; i++) {
+        const lm = matchesByLevel.get(levels[i]) || [];
+        const exp = Math.ceil(prevCount / 2);
+        if (lm.length > exp) { canMergeFeedIn = true; break; }
+        prevCount = lm.length;
+      }
+    }
+
+    if (allUnscored && topMatches.length === sortedEntries.length && (!isFeedInLevel || canMergeFeedIn)) {
       sortedEntries = topMatches.map((m, i) => ({
         position: sortedEntries[i]?.position ?? (i + 1),
         name: m.winner?.name || 'Bye',
@@ -563,9 +579,6 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
     const levelMatches = matchesByLevel.get(level) || [];
     actualByLevel.set(level, levelMatches);
 
-    const scored = levelMatches.filter(m => m.score.length > 0 || m.retired || m.walkover);
-    const unscored = levelMatches.filter(m => m.score.length === 0 && !m.retired && !m.walkover);
-
     let expectedCount: number;
     if (li === 0) {
       expectedCount = Math.ceil(sortedEntries.length / 2);
@@ -574,7 +587,7 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
       expectedCount = Math.ceil(prevActual.length / 2);
     }
 
-    if (scored.length > 0 && unscored.length > 0 && levelMatches.length > expectedCount) {
+    if (levelMatches.length > expectedCount) {
       feedInLevels.add(level);
     }
   }
@@ -594,11 +607,11 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
 
     if (isFeedInLevel) {
       const isEntryLevel = level === entryLevel - 1;
-      const scoredMatches = actualMatches.filter(m => m.score.length > 0 || m.retired || m.walkover);
-      const feedInEntries = actualMatches.filter(m => m.score.length === 0 && !m.retired && !m.walkover);
+      const continuationMatches = actualMatches.filter(m => m.matchNum % 2 === 1);
+      const feedInEntries = actualMatches.filter(m => m.matchNum % 2 === 0);
 
-      for (let i = 0; i < scoredMatches.length; i++) {
-        const m = scoredMatches[i];
+      for (let i = 0; i < continuationMatches.length; i++) {
+        const m = continuationMatches[i];
         let p1: DisplayMatch['player1'] = null;
         let p2: DisplayMatch['player2'] = null;
 
@@ -667,6 +680,12 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
     rounds.push({ name: roundName, matches: displayMatches });
   }
 
+  for (const r of rounds) {
+    if (/^Round \d+$/i.test(r.name)) {
+      r.name = `Round of ${r.matches.length * 2}`;
+    }
+  }
+
   if (rounds.length > 0) {
     const finalRound = rounds[rounds.length - 1];
     const finalMatch = finalRound.matches[0];
@@ -687,7 +706,7 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
     }
   }
 
-  return rounds;
+  return { rounds, hasFeedIn: feedInLevels.size > 0 };
 }
 
 function BracketPlayerRow({
@@ -749,9 +768,6 @@ function BracketPlayerRow({
           {player.seed && (
             <span className={`text-[10px] font-semibold shrink-0 ${lost ? 'text-violet-400/50 dark:text-violet-500/50' : 'text-violet-500 dark:text-violet-400'}`}>({player.seed})</span>
           )}
-          {statusLabel && (
-            <span className="text-[9px] font-medium text-amber-500 dark:text-amber-400 shrink-0">{statusLabel}</span>
-          )}
         </div>
         {player.partner && (
           <div className="flex items-center gap-1 min-w-0">
@@ -760,6 +776,9 @@ function BracketPlayerRow({
         )}
       </div>
       <div className="flex items-center gap-0.5 shrink-0 ml-1">
+        {statusLabel && (
+          <span className="text-amber-500 dark:text-amber-400 text-[9px] font-semibold shrink-0">{statusLabel}</span>
+        )}
         {player.won && (
           <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mr-0.5" />
         )}
@@ -876,8 +895,15 @@ function BracketStraightConnectors({ matchCount }: { matchCount: number }) {
   );
 }
 
-function BracketView({ section, tswId }: { section: BracketSection; tswId: string }) {
-  const rounds = useMemo(() => buildDisplayRounds(section), [section]);
+function BracketView({ section, tswId, showTitle }: { section: BracketSection; tswId: string; showTitle?: boolean }) {
+  const { rounds, hasFeedIn } = useMemo(() => buildDisplayRounds(section), [section]);
+
+  const displayName = useMemo(() => {
+    if (hasFeedIn && /consolation/i.test(section.name) && !/feed.in/i.test(section.name)) {
+      return section.name.replace(/consolation/i, 'Feed-in Consolation');
+    }
+    return section.name;
+  }, [section.name, hasFeedIn]);
 
   if (rounds.length === 0) return null;
 
@@ -885,9 +911,11 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
   const hasWinnerColumn = lastRoundName === 'winner';
 
   return (
-    <div className="overflow-x-auto overflow-y-auto max-h-[80vh] -mx-4 px-4 md:mx-0 md:px-0 pb-4">
-      <div className="flex min-w-max items-stretch">
-        {rounds.map((round, ri) => {
+    <div>
+      {showTitle && <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200 mb-3">{displayName}</h3>}
+      <div className="overflow-x-auto overflow-y-auto max-h-[80vh] -mx-4 px-4 md:mx-0 md:px-0 pb-4">
+        <div className="flex min-w-max items-stretch">
+          {rounds.map((round, ri) => {
           const isWinner = ri === rounds.length - 1 && hasWinnerColumn;
           const isFirstRound = ri === 0;
           const nextRound = ri < rounds.length - 1 ? rounds[ri + 1] : null;
@@ -900,7 +928,7 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
                 {round.name}
               </div>
               <div className="flex-1 flex items-stretch">
-                <div className="flex flex-col flex-1">
+                <div className={`flex flex-col flex-1 ${isFirstRound ? 'gap-1 py-1' : ''}`}>
                   {round.matches.map((match, mi) => (
                     <div key={mi} className="flex-1 flex items-center">
                       {isFirstRound && (
@@ -949,12 +977,15 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
                           </div>
                         </div>
                       ) : (
-                        <div className="relative">
-                          <BracketMatchCard match={match} tswId={tswId} />
+                        <div>
                           {match.feedInPlayer && (
-                            <div className="absolute left-0 top-full">
+                            <div className="invisible pointer-events-none" aria-hidden="true">
                               <BracketFeedInEntry player={match.feedInPlayer} tswId={tswId} />
                             </div>
+                          )}
+                          <BracketMatchCard match={match} tswId={tswId} />
+                          {match.feedInPlayer && (
+                            <BracketFeedInEntry player={match.feedInPlayer} tswId={tswId} />
                           )}
                         </div>
                       )}
@@ -969,6 +1000,7 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );
@@ -2257,10 +2289,7 @@ export function TournamentDrawDetail() {
               ) : (
                 elim.sections.map((section, si) => (
                   <div key={si} className="space-y-3">
-                    {elim.sections.length > 1 && (
-                      <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">{section.name}</h3>
-                    )}
-                    <BracketView section={section} tswId={tswId} />
+                    <BracketView section={section} tswId={tswId} showTitle={elim.sections.length > 1} />
                   </div>
                 ))
               );
