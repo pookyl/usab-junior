@@ -15,6 +15,7 @@ import {
   fetchTournamentMatchDates,
   fetchTournamentMatchDay,
   fetchDrawBracket,
+  type DrawResponse,
 } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import type {
@@ -28,6 +29,8 @@ import type {
   MatchDateTab,
   TournamentMatch,
   EliminationDrawResponse,
+  RoundRobinDrawResponse,
+  RoundRobinPlayer,
   BracketMatch as BracketMatchData,
   BracketSection,
 } from '../types/junior';
@@ -1966,14 +1969,210 @@ export function TournamentPlayerDetail() {
   );
 }
 
+// ── Round Robin View ────────────────────────────────────────────────────────
+
+function RoundRobinPlayerName({ player, tswId }: { player: RoundRobinPlayer; tswId: string }) {
+  if (player.playerId) {
+    return (
+      <Link
+        to={`/tournaments/${tswId}/player/${player.playerId}`}
+        className="hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
+      >
+        {player.name}
+      </Link>
+    );
+  }
+  return <span>{player.name}</span>;
+}
+
+function RoundRobinMatchCard({ match, tswId }: { match: RoundRobinDrawResponse['matches'][number]; tswId: string }) {
+  const t1Scores = match.scores.map(g => g[0]);
+  const t2Scores = match.scores.map(g => g[1]);
+  const ongoing = match.winner === null && !match.walkover;
+
+  const renderTeam = (players: RoundRobinPlayer[], won: boolean, scores: number[], otherScores: number[]) => {
+    const nameClass = won ? 'font-semibold text-slate-800 dark:text-slate-100' : 'text-slate-800 dark:text-slate-100';
+    const badgeClass = won
+      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+      : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500';
+
+    return (
+      <div className="flex items-start gap-2 py-1.5">
+        {ongoing ? (
+          <span className="w-5 shrink-0" />
+        ) : (
+          <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5 ${badgeClass}`}>
+            {won ? 'W' : 'L'}
+          </span>
+        )}
+        <div className={`text-sm min-w-0 flex-1 ${nameClass}`}>
+          {players.map((p, i) => (
+            <div key={i} className="truncate">
+              <RoundRobinPlayerName player={p} tswId={tswId} />
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
+          {won && <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />}
+          {scores.map((s, i) => {
+            const isWinning = s > otherScores[i];
+            return (
+              <span key={i} className={`w-5 text-right text-slate-800 dark:text-slate-100 ${isWinning ? 'font-bold' : ''}`}>{s}</span>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
+      <div className="px-4 pt-3 pb-1">
+        <p className="text-xs text-slate-400 dark:text-slate-500">{match.round}</p>
+      </div>
+      <div className="px-4 divide-y divide-slate-100 dark:divide-slate-800">
+        {renderTeam(match.team1, match.winner === 1, t1Scores, t2Scores)}
+        {renderTeam(match.team2, match.winner === 2, t2Scores, t1Scores)}
+      </div>
+      {match.dateTime && (
+        <div className="px-4 py-2 flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800">
+          <span className="flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            {match.dateTime}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RoundRobinView({ data, tswId }: { data: RoundRobinDrawResponse; tswId: string }) {
+  const navigate = useNavigate();
+
+  return (
+    <div className="space-y-6">
+      {/* Group tabs */}
+      {data.groups.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {data.groups.map(g => (
+            <button
+              key={g.drawId || g.name}
+              onClick={() => !g.active && navigate(`/tournaments/${tswId}/draw/${g.drawId}`)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                g.active
+                  ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {g.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Standings table */}
+      {data.standings.length > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Standings</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-center w-10 sticky left-0 bg-white dark:bg-slate-900 z-10">#</th>
+                  <th className="px-3 py-2 text-left sticky left-10 bg-white dark:bg-slate-900 z-10 min-w-[140px]">Player(s)</th>
+                  <th className="px-2 py-2 text-center" title="Played">Pl</th>
+                  <th className="px-2 py-2 text-center" title="Won">W</th>
+                  <th className="px-2 py-2 text-center" title="Draw">D</th>
+                  <th className="px-2 py-2 text-center" title="Lost">L</th>
+                  <th className="px-2 py-2 text-center" title="Matches">M</th>
+                  <th className="px-2 py-2 text-center" title="Games">Gm</th>
+                  <th className="px-2 py-2 text-center" title="Points">Points</th>
+                  <th className="px-2 py-2 text-center font-bold" title="Total Points">Pts</th>
+                  <th className="px-2 py-2 text-center" title="History">History</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {data.standings.map((s) => (
+                  <tr
+                    key={s.position}
+                    className={s.position === 1 ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''}
+                  >
+                    <td className="px-3 py-2 text-center sticky left-0 bg-inherit z-10">
+                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                        s.position === 1
+                          ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                      }`}>
+                        {s.position}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 sticky left-10 bg-inherit z-10">
+                      <div className="space-y-0.5">
+                        {s.players.map((p, i) => (
+                          <div key={i} className="text-sm truncate text-slate-800 dark:text-slate-100">
+                            <RoundRobinPlayerName player={p} tswId={tswId} />
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-2 py-2 text-center tabular-nums text-slate-600 dark:text-slate-300">{s.played}</td>
+                    <td className="px-2 py-2 text-center tabular-nums font-medium text-emerald-600 dark:text-emerald-400">{s.won}</td>
+                    <td className="px-2 py-2 text-center tabular-nums text-slate-500 dark:text-slate-400">{s.drawn}</td>
+                    <td className="px-2 py-2 text-center tabular-nums text-red-500 dark:text-red-400">{s.lost}</td>
+                    <td className="px-2 py-2 text-center tabular-nums text-slate-600 dark:text-slate-300">{s.matchRecord}</td>
+                    <td className="px-2 py-2 text-center tabular-nums text-slate-600 dark:text-slate-300">{s.gameRecord}</td>
+                    <td className="px-2 py-2 text-center tabular-nums text-slate-600 dark:text-slate-300">{s.pointRecord}</td>
+                    <td className="px-2 py-2 text-center tabular-nums text-lg font-bold text-slate-800 dark:text-slate-100">{s.points}</td>
+                    <td className="px-2 py-2">
+                      <div className="flex items-center justify-center gap-1">
+                        {s.history.map((h, i) => (
+                          <span
+                            key={i}
+                            className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                              h === 'W'
+                                ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+                                : h === 'L'
+                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                            }`}
+                          >
+                            {h}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Matches */}
+      {data.matches.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Matches</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {data.matches.map((m) => (
+              <RoundRobinMatchCard key={m.matchId} match={m} tswId={tswId} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Tournament Draw Detail Page ─────────────────────────────────────────────
 
 export function TournamentDrawDetail() {
   const { tswId, drawId } = useParams<{ tswId: string; drawId: string }>();
-  const navigate = useNavigate();
 
   const [drawName, setDrawName] = useState<string | null>(null);
-  const [bracketData, setBracketData] = useState<EliminationDrawResponse | null>(null);
+  const [drawData, setDrawData] = useState<DrawResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -1989,11 +2188,11 @@ export function TournamentDrawDetail() {
       fetchTournamentDetail(tswId),
       fetchDrawBracket(tswId, numericDrawId),
     ])
-      .then(([detail, bracket]) => {
+      .then(([detail, data]) => {
         if (cancelled) return;
         const draw = detail.draws.find(d => d.drawId === numericDrawId);
         setDrawName(draw?.name ?? `Draw ${drawId}`);
-        setBracketData(bracket);
+        setDrawData(data);
       })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -2005,22 +2204,24 @@ export function TournamentDrawDetail() {
 
   const tswDrawUrl = `https://www.tournamentsoftware.com/sport/draw.aspx?id=${tswId}&draw=${drawId}`;
   const color = drawName ? getEventColor(drawName) : null;
+  const isRoundRobin = drawData?.drawType === 'round-robin';
+  const headingLabel = isRoundRobin ? 'Round Robin' : 'Elimination Draw';
 
   return (
     <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
-      <button
-        onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
+      <Link
+        to={`/tournaments/${tswId}?tab=draws`}
+        className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Tournament
-      </button>
+        Back to Draws
+      </Link>
 
       {loading ? (
         <TabLoading label="draw" />
       ) : error ? (
         <TabError error={error} />
-      ) : bracketData ? (
+      ) : drawData ? (
         <>
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -2031,7 +2232,7 @@ export function TournamentDrawDetail() {
                   </span>
                 )}
                 <h1 className="text-xl md:text-2xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
-                  Elimination Draw
+                  {headingLabel}
                 </h1>
               </div>
               <a
@@ -2046,17 +2247,24 @@ export function TournamentDrawDetail() {
             </div>
           </div>
 
-          {bracketData.sections.length === 0 ? (
-            <TabEmpty icon={List} message="No bracket data available for this draw." />
+          {isRoundRobin ? (
+            <RoundRobinView data={drawData as RoundRobinDrawResponse} tswId={tswId} />
           ) : (
-            bracketData.sections.map((section, si) => (
-              <div key={si} className="space-y-3">
-                {bracketData.sections.length > 1 && (
-                  <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">{section.name}</h3>
-                )}
-                <BracketView section={section} tswId={tswId} />
-              </div>
-            ))
+            (() => {
+              const elim = drawData as EliminationDrawResponse;
+              return elim.sections.length === 0 ? (
+                <TabEmpty icon={List} message="No bracket data available for this draw." />
+              ) : (
+                elim.sections.map((section, si) => (
+                  <div key={si} className="space-y-3">
+                    {elim.sections.length > 1 && (
+                      <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">{section.name}</h3>
+                    )}
+                    <BracketView section={section} tswId={tswId} />
+                  </div>
+                ))
+              );
+            })()
           )}
         </>
       ) : null}

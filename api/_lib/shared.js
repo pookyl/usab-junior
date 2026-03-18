@@ -1404,6 +1404,183 @@ export function parseTswDrawType(html) {
   return 'unknown';
 }
 
+// ── TSW Round Robin group navigation parser ─────────────────────────────────
+export function parseTswRoundRobinGroups(html) {
+  const groups = [];
+  const wrapperMatch = html.match(/<div class="media__subheading-wrapper">([\s\S]*?)<\/div>/);
+  if (!wrapperMatch) return groups;
+  const wrapper = wrapperMatch[1];
+
+  const itemRe = /<small class="media__subheading">\s*([\s\S]*?)<\/small>/gi;
+  let m;
+  while ((m = itemRe.exec(wrapper)) !== null) {
+    const block = m[1];
+    const linkMatch = block.match(/\/Draw\/(\d+)"/i);
+    const nameMatch = block.match(/nav-link__value">([^<]+)<\/span>/);
+    if (!nameMatch) continue;
+    const name = nameMatch[1].trim();
+    const drawId = linkMatch ? parseInt(linkMatch[1], 10) : 0;
+    const active = !linkMatch;
+    groups.push({ name, drawId, active });
+  }
+  return groups;
+}
+
+// ── TSW Round Robin group name parser ───────────────────────────────────────
+export function parseTswRoundRobinGroupName(html) {
+  const m = html.match(/<h4 class="media__title[^"]*">\s*[\s\S]*?nav-link__value">([^<]+)<\/span>/);
+  return m ? m[1].trim() : '';
+}
+
+// ── TSW Round Robin standings parser ────────────────────────────────────────
+export function parseTswRoundRobinStandings(html) {
+  const standings = [];
+  const rowRe = /<tr\s*>\s*\n?\s*\n?\s*<td\s*>([\s\S]*?)<\/tr>/gi;
+  let rm;
+  while ((rm = rowRe.exec(html)) !== null) {
+    const row = rm[0];
+
+    const posMatch = row.match(/standing-status">(\d+)<\/span>/);
+    if (!posMatch) continue;
+    const position = parseInt(posMatch[1], 10);
+
+    const players = [];
+    const playerRe = /\/Player\/(\d+)"[^>]*class="nav-link"><span[^>]*>([^<]+)<\/span>/gi;
+    let pm;
+    while ((pm = playerRe.exec(row)) !== null) {
+      const playerId = parseInt(pm[1], 10);
+      const name = pm[2].trim();
+      players.push({ name, playerId, club: '' });
+    }
+
+    const clubRe = /entrant-info-club"[^>]*>([^<]+)</gi;
+    let ci = 0;
+    let cm;
+    while ((cm = clubRe.exec(row)) !== null) {
+      if (ci < players.length) {
+        players[ci].club = cm[1].trim();
+      }
+      ci++;
+    }
+
+    const cells = [];
+    const cellRe = /<td class="cell-points[^"]*">\s*\n?\s*([^<\n]*)/gi;
+    let cc;
+    while ((cc = cellRe.exec(row)) !== null) {
+      cells.push(cc[1].trim());
+    }
+
+    const historyItems = [];
+    const histRe = /tag--(success|danger|warning)[^>]*>([WLD])<\/span>/gi;
+    let hm;
+    while ((hm = histRe.exec(row)) !== null) {
+      historyItems.push(hm[2]);
+    }
+
+    standings.push({
+      position,
+      players,
+      played: parseInt(cells[0], 10) || 0,
+      won: parseInt(cells[1], 10) || 0,
+      drawn: parseInt(cells[2], 10) || 0,
+      lost: parseInt(cells[3], 10) || 0,
+      matchRecord: cells[4] || '0-0',
+      gameRecord: cells[5] || '0-0',
+      pointRecord: cells[6] || '0-0',
+      points: parseInt(cells[7], 10) || 0,
+      history: historyItems,
+    });
+  }
+  return standings;
+}
+
+// ── TSW Round Robin matches parser ──────────────────────────────────────────
+export function parseTswRoundRobinMatches(html) {
+  const matches = [];
+
+  const idRe = /id="match_(\d+)"/gi;
+  const idPositions = [];
+  let im;
+  while ((im = idRe.exec(html)) !== null) {
+    idPositions.push({ matchId: im[1], index: im.index });
+  }
+
+  for (let i = 0; i < idPositions.length; i++) {
+    const start = idPositions[i].index;
+    const end = i + 1 < idPositions.length ? idPositions[i + 1].index : html.length;
+    const block = html.substring(start, end);
+    const matchId = idPositions[i].matchId;
+
+    const roundMatch = block.match(/nav-link__value">([^<]*Round[^<]*)<\/span>/i);
+    const round = roundMatch ? roundMatch[1].trim() : '';
+
+    const teams = [];
+    const rowStartRe = /<div class="match__row(?![-\w])([^"]*)">/gi;
+    const rowPositions = [];
+    let rs;
+    while ((rs = rowStartRe.exec(block)) !== null) {
+      rowPositions.push({ index: rs.index, hasWon: rs[1].includes('has-won') });
+    }
+
+    for (let ti = 0; ti < rowPositions.length; ti++) {
+      const rStart = rowPositions[ti].index;
+      const resultIdx = block.indexOf('match__result', rStart);
+      const nextRowIdx = ti + 1 < rowPositions.length ? rowPositions[ti + 1].index : block.length;
+      const rEnd = resultIdx > rStart && resultIdx < nextRowIdx ? resultIdx : nextRowIdx;
+      const chunk = block.substring(rStart, rEnd);
+
+      const playerItems = [];
+      const plRe = /data-player-id="(\d+)"[^>]*class="nav-link"><span[^>]*>([^<]+)<\/span>/gi;
+      let pl;
+      while ((pl = plRe.exec(chunk)) !== null) {
+        let rawName = pl[2].trim();
+        const seedMatch = rawName.match(/^(.*?)\s*\[[\d/]+\]$/);
+        if (seedMatch) rawName = seedMatch[1].trim();
+        playerItems.push({ name: rawName, playerId: parseInt(pl[1], 10), club: '' });
+      }
+      teams.push({ players: playerItems, won: rowPositions[ti].hasWon });
+    }
+
+    const scores = [];
+    const gameRe = /<ul class="points">([\s\S]*?)<\/ul>/gi;
+    let gm;
+    while ((gm = gameRe.exec(block)) !== null) {
+      const pts = [];
+      const ptRe = /points__cell[^"]*">\s*(\d+)/gi;
+      let pt;
+      while ((pt = ptRe.exec(gm[1])) !== null) {
+        pts.push(parseInt(pt[1], 10));
+      }
+      if (pts.length >= 2) scores.push(pts);
+    }
+
+    const timeMatch = block.match(/icon-clock[\s\S]*?nav-link__value">([^<]+)/);
+    const dateTime = timeMatch ? timeMatch[1].trim() : '';
+
+    const retired = /retired/i.test(block);
+    const walkover = /walkover/i.test(block) || /\bwo\b/i.test(block);
+
+    let winner = null;
+    if (teams.length >= 2) {
+      if (teams[0].won) winner = 1;
+      else if (teams[1].won) winner = 2;
+    }
+
+    matches.push({
+      matchId,
+      round,
+      team1: teams[0]?.players || [],
+      team2: teams[1]?.players || [],
+      winner,
+      scores,
+      dateTime,
+      retired,
+      walkover,
+    });
+  }
+  return matches;
+}
+
 // ── TSW Tournament Players page parser (array version) ──────────────────────
 // Same source as parseTswTournamentPlayers but returns an array instead of Map
 

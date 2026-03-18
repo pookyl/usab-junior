@@ -405,3 +405,53 @@ export interface EliminationDrawResponse {
   drawType: string;
   sections: BracketSection[];
 }
+
+// ── Round Robin draw types ────────────────────────────────────────────────────
+
+export interface RoundRobinPlayer {
+  name: string;
+  playerId: number | null;
+  club: string;
+}
+
+export interface RoundRobinStanding {
+  position: number;
+  players: RoundRobinPlayer[];
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  matchRecord: string;
+  gameRecord: string;
+  pointRecord: string;
+  points: number;
+  history: ('W' | 'L' | 'D')[];
+}
+
+export interface RoundRobinMatch {
+  matchId: string;
+  round: string;
+  team1: RoundRobinPlayer[];
+  team2: RoundRobinPlayer[];
+  winner: 1 | 2 | null;
+  scores: number[][];
+  dateTime: string;
+  retired: boolean;
+  walkover: boolean;
+}
+
+export interface RoundRobinGroup {
+  name: string;
+  drawId: number;
+  active: boolean;
+}
+
+export interface RoundRobinDrawResponse {
+  tswId: string;
+  drawId: number;
+  drawType: 'round-robin';
+  groupName: string;
+  groups: RoundRobinGroup[];
+  standings: RoundRobinStanding[];
+  matches: RoundRobinMatch[];
+}

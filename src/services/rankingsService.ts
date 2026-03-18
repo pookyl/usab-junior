@@ -17,6 +17,7 @@ import type {
   TournamentPlayerDetailResponse,
   TournamentWinnersResponse,
   EliminationDrawResponse,
+  RoundRobinDrawResponse,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -358,12 +359,14 @@ export async function fetchTournamentMatchDates(
 
 // ── Draw Bracket ──────────────────────────────────────────────────────────────
 
-const drawBracketCache = new Map<string, EliminationDrawResponse>();
+export type DrawResponse = EliminationDrawResponse | RoundRobinDrawResponse;
+
+const drawBracketCache = new Map<string, DrawResponse>();
 
 export async function fetchDrawBracket(
   tswId: string,
   drawId: number,
-): Promise<EliminationDrawResponse> {
+): Promise<DrawResponse> {
   const key = `${tswId}:${drawId}`;
   if (drawBracketCache.has(key)) return drawBracketCache.get(key)!;
 
@@ -371,7 +374,7 @@ export async function fetchDrawBracket(
   const res = await fetchWithRetry(url, 60_000);
   if (!res.ok) throw new Error(`Draw bracket API ${res.status}`);
 
-  const data: EliminationDrawResponse = await res.json();
+  const data: DrawResponse = await res.json();
   cappedSet(drawBracketCache, key, data);
   return data;
 }

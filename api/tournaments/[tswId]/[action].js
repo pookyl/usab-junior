@@ -4,6 +4,8 @@ import {
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
   parseTswMatches, parseTswPlayerMatches, parseTswMatchDates, formatMatchDate,
   parseTswEliminationDraw, parseTswDrawType,
+  parseTswRoundRobinGroups, parseTswRoundRobinGroupName,
+  parseTswRoundRobinStandings, parseTswRoundRobinMatches,
   isValidTswId,
   TSW_BASE,
 } from '../../_lib/shared.js';
@@ -478,15 +480,41 @@ async function handleDrawBracket(tswId, req, res) {
   }
 
   try {
-    const drawPath = `/tournament/${tswId.toLowerCase()}/draw/${drawId}`;
+    const tswIdLower = tswId.toLowerCase();
+    const drawPath = `/tournament/${tswIdLower}/draw/${drawId}`;
     const resp = await tswFetch(drawPath);
     if (!resp.ok) throw new Error(`TSW draw page HTTP ${resp.status}`);
     const html = await resp.text();
 
     const drawType = parseTswDrawType(html);
-    const sections = parseTswEliminationDraw(html);
 
-    const result = { tswId, drawId: parseInt(drawId, 10), drawType, sections };
+    let result;
+    if (drawType === 'round-robin') {
+      const groups = parseTswRoundRobinGroups(html);
+      for (const g of groups) {
+        if (g.active && !g.drawId) g.drawId = parseInt(drawId, 10);
+      }
+      const groupName = parseTswRoundRobinGroupName(html);
+
+      const [standingsResp, matchesResp] = await Promise.all([
+        tswFetch(`/tournament/${tswIdLower}/Draw/${drawId}/GetStandings`),
+        tswFetch(`/tournament/${tswIdLower}/Draw/${drawId}/GetMatchesContent?tabindex=1`),
+      ]);
+
+      const standingsHtml = standingsResp.ok ? await standingsResp.text() : '';
+      const matchesHtml = matchesResp.ok ? await matchesResp.text() : '';
+
+      const standings = parseTswRoundRobinStandings(standingsHtml);
+      const matches = parseTswRoundRobinMatches(matchesHtml);
+
+      result = {
+        tswId, drawId: parseInt(drawId, 10), drawType,
+        groupName, groups, standings, matches,
+      };
+    } else {
+      const sections = parseTswEliminationDraw(html);
+      result = { tswId, drawId: parseInt(drawId, 10), drawType, sections };
+    }
 
     setCache(cacheKey, result);
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
