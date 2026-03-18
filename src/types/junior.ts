@@ -188,6 +188,10 @@ export interface TournamentsResponse {
 export interface TournamentDraw {
   drawId: number;
   name: string;
+  size: number | null;
+  type: string | null;
+  stage: string | null;
+  consolation: string | null;
 }
 
 export interface TournamentDetail {

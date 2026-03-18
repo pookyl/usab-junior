@@ -445,6 +445,7 @@ interface DisplayMatch {
   retired: boolean;
   walkover: boolean;
   bye: boolean;
+  feedInPlayer?: DisplayPlayer | null;
 }
 
 interface DisplayRound {
@@ -477,11 +478,11 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
     const topMatches = matchesByLevel.get(topLevel) || [];
     sortedEntries = topMatches.map((m, i) => ({
       position: i + 1,
-      name: m.winner?.name || '',
+      name: m.winner?.name || 'Bye',
       seed: m.winner?.seed || '',
       club: m.winner?.club || '',
       playerId: m.winner?.playerId || null,
-      bye: false,
+      bye: !m.winner?.name,
       partner: m.winner?.partner || '',
       partnerPlayerId: m.winner?.partnerPlayerId || null,
     }));
@@ -507,47 +508,157 @@ function buildDisplayRounds(section: BracketSection): DisplayRound[] {
     levels.shift();
   }
 
+  // When the top level has 1:1 pairing with all-unscored matches (e.g. two-column
+  // Round 1 in consolation brackets), merge it into entries so the display starts
+  // one round later — matching the TSW visual where these two columns are combined.
+  if (levels.length > 1 && sortedEntries.length > 0) {
+    const topLevel = levels[0];
+    const topMatches = matchesByLevel.get(topLevel) || [];
+    const allUnscored = topMatches.length > 0 && topMatches.every(m => m.score.length === 0 && !m.retired && !m.walkover);
+
+    if (allUnscored && topMatches.length === sortedEntries.length) {
+      sortedEntries = topMatches.map((m, i) => ({
+        position: sortedEntries[i]?.position ?? (i + 1),
+        name: m.winner?.name || 'Bye',
+        seed: m.winner?.seed || '',
+        club: '',
+        playerId: m.winner?.playerId || null,
+        bye: !m.winner?.name,
+        partner: m.winner?.partner || '',
+        partnerPlayerId: m.winner?.partnerPlayerId || null,
+      }));
+
+      matchesByLevel.delete(topLevel);
+      levels.shift();
+
+      // Renumber round names: "Round 1" is now absorbed into entries
+      if (roundNames.length > levels.length) {
+        roundNames.shift();
+        let idx = 1;
+        for (let i = 0; i < roundNames.length; i++) {
+          if (/^Round \d+$/i.test(roundNames[i])) {
+            roundNames[i] = `Round ${idx++}`;
+          } else {
+            break;
+          }
+        }
+      }
+    }
+  }
+
   const entryLevel = levels[0] + 1;
+
+  // Detect feed-in levels: levels with interleaved scored match results and
+  // unscored feed-in entries (more matches than expected from halving).
+  // We keep all matches together and track which levels are feed-in so the
+  // display can interleave scored match cards with feed-in entry labels.
+  const actualByLevel = new Map<number, BracketMatchData[]>();
+  const feedInLevels = new Set<number>();
+
+  for (let li = 0; li < levels.length; li++) {
+    const level = levels[li];
+    const levelMatches = matchesByLevel.get(level) || [];
+    actualByLevel.set(level, levelMatches);
+
+    const scored = levelMatches.filter(m => m.score.length > 0 || m.retired || m.walkover);
+    const unscored = levelMatches.filter(m => m.score.length === 0 && !m.retired && !m.walkover);
+
+    let expectedCount: number;
+    if (li === 0) {
+      expectedCount = Math.ceil(sortedEntries.length / 2);
+    } else {
+      const prevActual = actualByLevel.get(levels[li - 1]) || [];
+      expectedCount = Math.ceil(prevActual.length / 2);
+    }
+
+    if (scored.length > 0 && unscored.length > 0 && levelMatches.length > expectedCount) {
+      feedInLevels.add(level);
+    }
+  }
 
   const rounds: DisplayRound[] = [];
 
   for (let li = 0; li < levels.length; li++) {
     const level = levels[li];
-    const levelMatches = matchesByLevel.get(level) || [];
+    const actualMatches = actualByLevel.get(level) || [];
     const nameOffset = levels.length - roundNames.length;
     const roundName = roundNames[li - nameOffset] || `Round ${li + 1}`;
     const displayMatches: DisplayMatch[] = [];
+    const isFeedInLevel = feedInLevels.has(level);
 
-    for (let i = 0; i < levelMatches.length; i++) {
-      const m = levelMatches[i];
-      let p1: DisplayMatch['player1'] = null;
-      let p2: DisplayMatch['player2'] = null;
+    const makePlayer = (w: BracketMatchData['winner']): DisplayPlayer | null =>
+      w ? { name: w.name, seed: w.seed, playerId: w.playerId, won: false, bye: false, partner: w.partner, partnerPlayerId: w.partnerPlayerId } : null;
 
-      if (level === entryLevel - 1) {
-        const e1 = sortedEntries[i * 2];
-        const e2 = sortedEntries[i * 2 + 1];
-        if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye, position: e1.position, partner: e1.partner, partnerPlayerId: e1.partnerPlayerId };
-        if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye, position: e2.position, partner: e2.partner, partnerPlayerId: e2.partnerPlayerId };
-      } else {
-        const prevLevel = levels[li - 1];
-        const prevMatches = matchesByLevel.get(prevLevel) || [];
-        const prev1 = prevMatches[i * 2];
-        const prev2 = prevMatches[i * 2 + 1];
-        if (prev1?.winner) p1 = { name: prev1.winner.name, seed: prev1.winner.seed, playerId: prev1.winner.playerId, won: false, bye: false, partner: prev1.winner.partner, partnerPlayerId: prev1.winner.partnerPlayerId };
-        if (prev2?.winner) p2 = { name: prev2.winner.name, seed: prev2.winner.seed, playerId: prev2.winner.playerId, won: false, bye: false, partner: prev2.winner.partner, partnerPlayerId: prev2.winner.partnerPlayerId };
+    if (isFeedInLevel) {
+      const isEntryLevel = level === entryLevel - 1;
+      const scoredMatches = actualMatches.filter(m => m.score.length > 0 || m.retired || m.walkover);
+      const feedInEntries = actualMatches.filter(m => m.score.length === 0 && !m.retired && !m.walkover);
+
+      for (let i = 0; i < scoredMatches.length; i++) {
+        const m = scoredMatches[i];
+        let p1: DisplayMatch['player1'] = null;
+        let p2: DisplayMatch['player2'] = null;
+
+        if (isEntryLevel) {
+          const e1 = sortedEntries[i * 2];
+          const e2 = sortedEntries[i * 2 + 1];
+          if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye, position: e1.position, partner: e1.partner, partnerPlayerId: e1.partnerPlayerId };
+          if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye, position: e2.position, partner: e2.partner, partnerPlayerId: e2.partnerPlayerId };
+        } else {
+          const prevLevel = levels[li - 1];
+          const prevMatches = actualByLevel.get(prevLevel) || [];
+          const prev1 = prevMatches[i * 2];
+          const prev2 = prevMatches[i * 2 + 1];
+          if (prev1?.winner) p1 = makePlayer(prev1.winner);
+          if (prev2?.winner) p2 = makePlayer(prev2.winner);
+        }
+
+        if (m.winner && p1) p1.won = m.winner.playerId === p1.playerId;
+        if (m.winner && p2) p2.won = m.winner.playerId === p2.playerId;
+
+        const feedIn = feedInEntries[i];
+        displayMatches.push({
+          player1: p1, player2: p2,
+          score: m.score, retired: m.retired, walkover: m.walkover,
+          bye: (p1?.bye || p2?.bye) ?? false,
+          feedInPlayer: feedIn ? makePlayer(feedIn.winner) : null,
+        });
       }
+    } else {
+      for (let i = 0; i < actualMatches.length; i++) {
+        const m = actualMatches[i];
+        let p1: DisplayMatch['player1'] = null;
+        let p2: DisplayMatch['player2'] = null;
 
-      if (m.winner && p1) p1.won = m.winner.playerId === p1.playerId;
-      if (m.winner && p2) p2.won = m.winner.playerId === p2.playerId;
+        if (level === entryLevel - 1) {
+          if (actualMatches.length === sortedEntries.length) {
+            const e1 = sortedEntries[i];
+            if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye, position: e1.position, partner: e1.partner, partnerPlayerId: e1.partnerPlayerId };
+            if (m.winner) p2 = { name: m.winner.name, seed: m.winner.seed, playerId: m.winner.playerId, won: false, bye: false, partner: m.winner.partner, partnerPlayerId: m.winner.partnerPlayerId };
+          } else {
+            const e1 = sortedEntries[i * 2];
+            const e2 = sortedEntries[i * 2 + 1];
+            if (e1) p1 = { name: e1.name, seed: e1.seed, playerId: e1.playerId, won: false, bye: e1.bye, position: e1.position, partner: e1.partner, partnerPlayerId: e1.partnerPlayerId };
+            if (e2) p2 = { name: e2.name, seed: e2.seed, playerId: e2.playerId, won: false, bye: e2.bye, position: e2.position, partner: e2.partner, partnerPlayerId: e2.partnerPlayerId };
+          }
+        } else {
+          const prevLevel = levels[li - 1];
+          const prevMatches = actualByLevel.get(prevLevel) || [];
+          const prev1 = prevMatches[i * 2];
+          const prev2 = prevMatches[i * 2 + 1];
+          if (prev1?.winner) p1 = makePlayer(prev1.winner);
+          if (prev2?.winner) p2 = makePlayer(prev2.winner);
+        }
 
-      displayMatches.push({
-        player1: p1,
-        player2: p2,
-        score: m.score,
-        retired: m.retired,
-        walkover: m.walkover,
-        bye: (p1?.bye || p2?.bye) ?? false,
-      });
+        if (m.winner && p1) p1.won = m.winner.playerId === p1.playerId;
+        if (m.winner && p2) p2.won = m.winner.playerId === p2.playerId;
+
+        displayMatches.push({
+          player1: p1, player2: p2,
+          score: m.score, retired: m.retired, walkover: m.walkover,
+          bye: (p1?.bye || p2?.bye) ?? false,
+        });
+      }
     }
 
     rounds.push({ name: roundName, matches: displayMatches });
@@ -663,6 +774,39 @@ function BracketPlayerRow({
   );
 }
 
+
+function BracketFeedInEntry({ player, tswId }: { player: DisplayPlayer | null; tswId: string }) {
+  if (!player || !player.name) {
+    return <div className="w-48 h-6" />;
+  }
+
+  const renderName = (name: string, pid: number | null | undefined) =>
+    pid ? (
+      <Link
+        to={`/tournaments/${tswId}/player/${pid}`}
+        className="text-[11px] text-sky-600 dark:text-sky-400 truncate hover:underline"
+      >
+        {name}
+      </Link>
+    ) : (
+      <span className="text-[11px] text-slate-600 dark:text-slate-400 truncate">{name}</span>
+    );
+
+  return (
+    <div className="w-48 flex flex-col px-2 py-0.5 min-w-0">
+      <div className="flex items-center gap-1 min-w-0">
+        {renderName(player.name, player.playerId)}
+        {player.seed && <span className="text-[10px] text-violet-500 dark:text-violet-400 shrink-0">({player.seed})</span>}
+      </div>
+      {player.partner && (
+        <div className="flex items-center min-w-0">
+          {renderName(player.partner, player.partnerPlayerId ?? null)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string }) {
   const p1Scores: number[] = [];
   const p2Scores: number[] = [];
@@ -716,6 +860,19 @@ function BracketConnectors({ matchCount }: { matchCount: number }) {
   );
 }
 
+function BracketStraightConnectors({ matchCount }: { matchCount: number }) {
+  if (matchCount <= 0) return null;
+  return (
+    <div className="flex shrink-0 flex-col" style={{ width: 32 }}>
+      {Array.from({ length: matchCount }, (_, i) => (
+        <div key={i} className="flex-1 flex flex-col justify-center">
+          <div className="border-t-2 border-slate-300 dark:border-slate-600" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function BracketView({ section, tswId }: { section: BracketSection; tswId: string }) {
   const rounds = useMemo(() => buildDisplayRounds(section), [section]);
 
@@ -730,7 +887,10 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
         {rounds.map((round, ri) => {
           const isWinner = ri === rounds.length - 1 && hasWinnerColumn;
           const isFirstRound = ri === 0;
-          const showConnector = ri < rounds.length - 1 && !isWinner && round.matches.length > 1;
+          const nextRound = ri < rounds.length - 1 ? rounds[ri + 1] : null;
+          const nextIsWinner = ri === rounds.length - 2 && hasWinnerColumn;
+          const showConnector = ri < rounds.length - 1 && !isWinner && !nextIsWinner && round.matches.length > 1;
+          const isStraightConnector = showConnector && nextRound && round.matches.length === nextRound.matches.length;
           return (
             <div key={ri} className="flex flex-col shrink-0">
               <div className={`sticky top-0 z-10 bg-white dark:bg-slate-950 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 pb-2 text-center whitespace-nowrap px-1 ${isFirstRound ? 'pl-7' : ''}`}>
@@ -786,12 +946,22 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
                           </div>
                         </div>
                       ) : (
-                        <BracketMatchCard match={match} tswId={tswId} />
+                        <div className="relative">
+                          <BracketMatchCard match={match} tswId={tswId} />
+                          {match.feedInPlayer && (
+                            <div className="absolute left-0 top-full">
+                              <BracketFeedInEntry player={match.feedInPlayer} tswId={tswId} />
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   ))}
                 </div>
-                {showConnector && <BracketConnectors matchCount={round.matches.length} />}
+                {showConnector && (isStraightConnector
+                  ? <BracketStraightConnectors matchCount={round.matches.length} />
+                  : <BracketConnectors matchCount={round.matches.length} />
+                )}
               </div>
             </div>
           );
@@ -803,6 +973,7 @@ function BracketView({ section, tswId }: { section: BracketSection; tswId: strin
 
 
 function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
+  const navigate = useNavigate();
   const fetcher = useCallback((id: string) => fetchTournamentDetail(id), []);
   const { data, loading, error } = useTabData(tswId, active, fetcher, 'draws');
 
@@ -811,26 +982,48 @@ function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
   if (!data || data.draws.length === 0) return <TabEmpty icon={List} message="No draws available for this tournament." />;
 
   return (
-    <div className="space-y-3">
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 dark:border-slate-700 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <th className="px-4 py-3">Draw</th>
+            <th className="px-4 py-3 text-right">Size</th>
+            <th className="px-4 py-3">Type</th>
+            <th className="px-4 py-3">Stage</th>
+            <th className="px-4 py-3 hidden sm:table-cell">Consolation</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {data.draws.map(draw => {
             const color = getEventColor(draw.name);
             return (
-              <Link
+              <tr
                 key={draw.drawId}
-                to={`/tournaments/${tswId}/draw/${draw.drawId}`}
-                className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+                onClick={() => navigate(`/tournaments/${tswId}/draw/${draw.drawId}`)}
+                className="hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors"
               >
-                <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
-                  {draw.name}
-                </span>
-                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 ml-auto" />
-              </Link>
+                <td className="px-4 py-3">
+                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
+                    {draw.name}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-300 tabular-nums">
+                  {draw.size ?? '–'}
+                </td>
+                <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                  {draw.type ?? '–'}
+                </td>
+                <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                  {draw.stage ?? '–'}
+                </td>
+                <td className="px-4 py-3 hidden sm:table-cell text-slate-400 dark:text-slate-500">
+                  {draw.consolation || '–'}
+                </td>
+              </tr>
             );
           })}
-        </div>
-      </div>
+        </tbody>
+      </table>
     </div>
   );
 }

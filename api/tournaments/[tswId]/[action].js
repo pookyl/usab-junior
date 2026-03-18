@@ -469,7 +469,7 @@ async function handleDrawBracket(tswId, req, res) {
     return;
   }
 
-  const cacheKey = `tournament-draw-bracket:${tswId}:${drawId}`;
+  const cacheKey = `tournament-draw-bracket:v6:${tswId}:${drawId}`;
   const cached = getCached(cacheKey);
   if (cached) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });

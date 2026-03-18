@@ -475,15 +475,32 @@ export function parseTswOverviewStats(html) {
 
 export function parseTswDrawsList(html) {
   const draws = [];
-  const re = /draw=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    const name = m[2].replace(/<[^>]*>/g, '').trim();
-    if (name) draws.push({ drawId: parseInt(m[1], 10), name });
+  const rowRe = /<tr>\s*<td class="drawname\s*">([\s\S]*?)<\/td>([\s\S]*?)<\/tr>/gi;
+  let row;
+  while ((row = rowRe.exec(html)) !== null) {
+    const linkMatch = row[1].match(/draw=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/i);
+    if (!linkMatch) continue;
+    const drawId = parseInt(linkMatch[1], 10);
+    const name = linkMatch[2].replace(/<[^>]*>/g, '').trim();
+    if (!name) continue;
+
+    const cells = [];
+    const tdRe = /<td>([\s\S]*?)<\/td>/gi;
+    let td;
+    while ((td = tdRe.exec(row[2])) !== null) {
+      cells.push(td[1].replace(/<[^>]*>/g, '').trim());
+    }
+
+    draws.push({
+      drawId,
+      name,
+      size: cells[0] ? parseInt(cells[0], 10) || null : null,
+      type: cells[1] || null,
+      stage: cells[2] || null,
+      consolation: cells[3] || null,
+    });
   }
-  // Deduplicate: keep only main draws (no "Group A/B" variants unless that's all there is)
-  const mainDraws = draws.filter(d => !/ - Group [A-Z]$/i.test(d.name));
-  return mainDraws.length > 0 ? mainDraws : draws;
+  return draws;
 }
 
 export function parseTswTournamentInfo(html) {
@@ -1229,12 +1246,16 @@ export function parseTswEliminationDraw(html) {
 
     const theadMatch = tableHtml.match(/<thead><tr>([\s\S]*?)<\/tr><\/thead>/);
     const roundNames = [];
+    let hasStateCol = false;
     if (theadMatch) {
       const hdrCells = parseTdCells(theadMatch[1]);
-      for (let i = 2; i < hdrCells.length; i++) {
+      hasStateCol = hdrCells.some(c => c.replace(/<[^>]*>/g, '').trim() === 'State');
+      const hdrStart = hasStateCol ? 2 : 0;
+      for (let i = hdrStart; i < hdrCells.length; i++) {
         roundNames.push(hdrCells[i].replace(/<[^>]*>/g, '').trim());
       }
     }
+    const dataColStart = hasStateCol ? 2 : 1;
 
     const tbodyMatch = tableHtml.match(/<tbody>([\s\S]*?)<\/tbody>/);
     if (!tbodyMatch) continue;
@@ -1265,15 +1286,15 @@ export function parseTswEliminationDraw(html) {
     const entries = [];
     for (let r = 0; r < rows.length; r++) {
       const cells = rows[r];
-      if (cells.length < 3) continue;
+      if (cells.length < dataColStart + 1) continue;
 
       const posText = cells[0].replace(/<[^>]*>/g, '').trim();
       const posNum = parseInt(posText, 10);
       if (!posNum) continue;
 
-      const club = cells[1].replace(/<[^>]*>/g, '').trim();
+      const club = hasStateCol ? cells[1].replace(/<[^>]*>/g, '').trim() : '';
 
-      for (let c = 2; c < cells.length; c++) {
+      for (let c = dataColStart; c < cells.length; c++) {
         const cell = cells[c];
         if (!cell.match(/class="entry"/)) continue;
 
@@ -1301,7 +1322,7 @@ export function parseTswEliminationDraw(html) {
 
     for (let r = 0; r < rows.length; r++) {
       const cells = rows[r];
-      for (let c = 2; c < cells.length; c++) {
+      for (let c = dataColStart; c < cells.length; c++) {
         const cell = cells[c];
 
         const mSpan = cell.match(/id="(\d+)"\s*class="match"/);
@@ -1355,8 +1376,8 @@ export function parseTswEliminationDraw(html) {
 
       matches.push({
         matchId: ms.matchId,
-        roundLevel: parseInt(ms.matchId.charAt(0), 10),
-        matchNum: parseInt(ms.matchId.slice(1), 10),
+        roundLevel: parseInt(ms.matchId.slice(0, -3), 10),
+        matchNum: parseInt(ms.matchId.slice(-3), 10),
         winner: ms.name ? {
           name: ms.name, playerId: ms.playerId,
           seed: ms.seed, club: '',
