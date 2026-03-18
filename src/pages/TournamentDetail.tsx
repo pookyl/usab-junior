@@ -430,7 +430,7 @@ function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
 
 // ── Draws Tab ───────────────────────────────────────────────────────────────
 
-interface DisplayPlayer {
+export interface DisplayPlayer {
   name: string;
   seed: string;
   playerId: number | null;
@@ -441,7 +441,7 @@ interface DisplayPlayer {
   partnerPlayerId?: number | null;
 }
 
-interface DisplayMatch {
+export interface DisplayMatch {
   player1: DisplayPlayer | null;
   player2: DisplayPlayer | null;
   score: string[];
@@ -451,12 +451,12 @@ interface DisplayMatch {
   feedInPlayer?: DisplayPlayer | null;
 }
 
-interface DisplayRound {
+export interface DisplayRound {
   name: string;
   matches: DisplayMatch[];
 }
 
-function buildDisplayRounds(section: BracketSection): { rounds: DisplayRound[]; hasFeedIn: boolean } {
+export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRound[]; hasFeedIn: boolean } {
   const matchesByLevel = new Map<number, BracketMatchData[]>();
   for (const m of section.matches) {
     if (!matchesByLevel.has(m.roundLevel)) matchesByLevel.set(m.roundLevel, []);
