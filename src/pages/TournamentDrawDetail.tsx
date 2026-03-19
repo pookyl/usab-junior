@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, List } from 'lucide-react';
 import { fetchTournamentDetail, fetchDrawBracket, type DrawResponse } from '../services/rankingsService';
 import { TabLoading, TabError, TabEmpty, getEventColor, RefreshButton } from '../components/tournament/shared';
@@ -9,6 +9,7 @@ import type { EliminationDrawResponse, RoundRobinDrawResponse } from '../types/j
 
 export default function TournamentDrawDetail() {
   const { tswId, drawId } = useParams<{ tswId: string; drawId: string }>();
+  const navigate = useNavigate();
   const location = useLocation();
   const routeState = location.state as { drawName?: string } | null;
 
@@ -76,13 +77,13 @@ export default function TournamentDrawDetail() {
   return (
     <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <div className="flex items-center justify-between">
-        <Link
-          to={`/tournaments/${tswId}/draws`}
-          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Draws
-        </Link>
+          Back
+        </button>
         <RefreshButton onClick={handleRefresh} loading={loading} />
       </div>
 

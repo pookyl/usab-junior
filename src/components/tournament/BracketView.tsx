@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
 import type {
@@ -493,9 +493,49 @@ function BracketStraightConnectors({ matchCount }: { matchCount: number }) {
   );
 }
 
+// ── Scroll position cache (survives unmount/remount) ────────────────────────
+
+const _bracketScroll = new Map<string, { scrollLeft: number; scrollTop: number }>();
+
 // ── Main BracketView component ──────────────────────────────────────────────
 
 export default function BracketView({ section, tswId, showTitle }: { section: BracketSection; tswId: string; showTitle?: boolean }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cacheKey = `${tswId}:${section.name}`;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let restoring = false;
+    const saved = _bracketScroll.get(cacheKey);
+    if (saved) {
+      restoring = true;
+      let attempts = 0;
+      const tryRestore = () => {
+        el.scrollLeft = saved.scrollLeft;
+        el.scrollTop = saved.scrollTop;
+        const closeEnough =
+          Math.abs(el.scrollLeft - saved.scrollLeft) <= 1 &&
+          Math.abs(el.scrollTop - saved.scrollTop) <= 1;
+        if (!closeEnough && attempts++ < 15) {
+          requestAnimationFrame(tryRestore);
+        } else {
+          restoring = false;
+        }
+      };
+      requestAnimationFrame(tryRestore);
+    }
+    const onScroll = () => {
+      if (restoring) return;
+      _bracketScroll.set(cacheKey, {
+        scrollLeft: el.scrollLeft,
+        scrollTop: el.scrollTop,
+      });
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [cacheKey]);
+
   const { rounds, hasFeedIn } = useMemo(() => buildDisplayRounds(section), [section]);
 
   const displayName = useMemo(() => {
@@ -513,7 +553,7 @@ export default function BracketView({ section, tswId, showTitle }: { section: Br
   return (
     <div>
       {showTitle && <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200 mb-3">{displayName}</h3>}
-      <div className="overflow-x-auto overflow-y-auto max-h-[80vh] -mx-4 px-4 md:mx-0 md:px-0 pb-4">
+      <div ref={scrollRef} className="overflow-x-auto overflow-y-auto max-h-[80vh] -mx-4 px-4 md:mx-0 md:px-0 pb-4">
         <div className="flex min-w-max items-stretch">
           {rounds.map((round, ri) => {
           const isWinner = ri === rounds.length - 1 && hasWinnerColumn;

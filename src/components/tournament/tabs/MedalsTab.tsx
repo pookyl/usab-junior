@@ -55,18 +55,24 @@ type ExpandMode = 'medals' | 'gold' | 'silver' | 'bronze' | null;
 type DetailSortKey = 'event' | 'place' | 'player';
 const PLACE_ORDER: Record<string, number> = { gold: 1, silver: 2, bronze: 3, fourth: 4 };
 
+let _medalsSnap: {
+  tswId: string;
+  sortKey: SortKey;
+  sortAsc: boolean;
+  expandedClubs: Record<string, ExpandMode>;
+} | null = null;
+
 function ClubMedalRow({
-  club, rank, medals, tswId,
+  club, rank, medals, tswId, expandMode, onExpandChange,
 }: {
   club: ClubMedalSummary; rank: number; medals: DrawMedals[];
-  tswId: string;
+  tswId: string; expandMode: ExpandMode; onExpandChange: (mode: ExpandMode) => void;
 }) {
-  const [expandMode, setExpandMode] = useState<ExpandMode>(null);
   const [detailSort, setDetailSort] = useState<DetailSortKey>('event');
   const [detailAsc, setDetailAsc] = useState(true);
 
   function toggle(mode: Exclude<ExpandMode, null>) {
-    setExpandMode(prev => prev === mode ? null : mode);
+    onExpandChange(expandMode === mode ? null : mode);
   }
   function handleDetailSort(key: DetailSortKey) {
     if (detailSort === key) setDetailAsc(!detailAsc);
@@ -208,8 +214,17 @@ function ClubMedalRow({
 export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
   const { data, loading, error, retry, refresh } = useTabData<TournamentMedals>(tswId, active, fetchTournamentMedals, 'medals');
   useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [sortKey, setSortKey] = useState<SortKey>('total');
-  const [sortAsc, setSortAsc] = useState(false);
+
+  const snap = _medalsSnap?.tswId === tswId ? _medalsSnap : null;
+  const [sortKey, setSortKey] = useState<SortKey>(snap?.sortKey ?? 'total');
+  const [sortAsc, setSortAsc] = useState(snap?.sortAsc ?? false);
+  const [expandedClubs, setExpandedClubs] = useState<Record<string, ExpandMode>>(snap?.expandedClubs ?? {});
+
+  useEffect(() => {
+    return () => {
+      _medalsSnap = { tswId, sortKey, sortAsc, expandedClubs };
+    };
+  });
 
   const sortedClubs = useMemo(() => {
     if (!data) return [];
@@ -271,7 +286,15 @@ export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: st
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
             {medalClubs.map((club, idx) => (
-              <ClubMedalRow key={club.club} club={club} rank={idx + 1} medals={data.medals} tswId={tswId} />
+              <ClubMedalRow
+                key={club.club}
+                club={club}
+                rank={idx + 1}
+                medals={data.medals}
+                tswId={tswId}
+                expandMode={expandedClubs[club.club] ?? null}
+                onExpandChange={(mode) => setExpandedClubs(prev => ({ ...prev, [club.club]: mode }))}
+              />
             ))}
           </tbody>
         </table>

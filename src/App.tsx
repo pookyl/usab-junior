@@ -1,6 +1,7 @@
-import { Component, useEffect } from 'react';
+import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import useScrollRestore from './hooks/useScrollRestore';
 import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -57,9 +58,8 @@ class ErrorBoundary extends Component<
   }
 }
 
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+function ScrollManager() {
+  useScrollRestore();
   return null;
 }
 
@@ -75,7 +75,7 @@ export default function App() {
         <BrowserRouter>
           <PlayersProvider>
             <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-              <ScrollToTop />
+              <ScrollManager />
               <Navbar />
               <main className="pb-20 md:pb-0">
                 <Routes>

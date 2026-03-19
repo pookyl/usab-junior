@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
@@ -9,6 +9,7 @@ import type { TournamentPlayerDetailResponse } from '../types/junior';
 
 export default function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
+  const navigate = useNavigate();
   const { playerNameMap, playerIdSet } = usePlayers();
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
@@ -65,13 +66,13 @@ export default function TournamentPlayerDetail() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <div className="flex items-center justify-between">
-        <Link
-          to={`/tournaments/${tswId}/players`}
-          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Players
-        </Link>
+          Back
+        </button>
         <RefreshButton onClick={handleRefresh} loading={loading} />
       </div>
 
