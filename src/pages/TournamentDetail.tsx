@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, useSearchParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, ExternalLink, Loader2, Medal, Trophy,
@@ -58,11 +58,20 @@ function TabLoading({ label }: { label: string }) {
   );
 }
 
-function TabError({ error }: { error: string }) {
+function TabError({ error, onRetry }: { error: string; onRetry?: () => void }) {
   return (
     <div className="text-center text-red-500 dark:text-red-400 py-12">
       <p className="font-medium">Failed to load data</p>
       <p className="text-sm mt-1">{error}</p>
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors cursor-pointer"
+        >
+          <RefreshCw className="w-3 h-3" />
+          Retry
+        </button>
+      )}
     </div>
   );
 }
@@ -76,7 +85,17 @@ function TabEmpty({ icon: Icon, message }: { icon: React.ElementType; message: s
   );
 }
 
+const UI_CACHE_MAX = 50;
 const tabDataCache = new Map<string, unknown>();
+const matchesTabCache = new Map<string, MatchesTabSnapshot>();
+
+function cappedMapSet<K, V>(map: Map<K, V>, key: K, value: V) {
+  if (map.size >= UI_CACHE_MAX) {
+    const oldest = map.keys().next().value;
+    if (oldest !== undefined) map.delete(oldest);
+  }
+  map.set(key, value);
+}
 
 function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id: string) => Promise<T>, cacheKey?: string) {
   const fullKey = cacheKey && tswId ? `${tswId}:${cacheKey}` : '';
@@ -97,14 +116,19 @@ function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id:
         if (cancelled) return;
         setData(d);
         setFetched(true);
-        if (fullKey) tabDataCache.set(fullKey, d);
+        if (fullKey) cappedMapSet(tabDataCache, fullKey, d);
       })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [tswId, active, fetched, fetcher, fullKey]);
 
-  return { data, loading, error };
+  const retry = useCallback(() => {
+    setError(null);
+    setFetched(false);
+  }, []);
+
+  return { data, loading, error, retry };
 }
 
 // ── Medal helpers (preserved from original) ─────────────────────────────────
@@ -315,8 +339,7 @@ const PLACE_STYLES: Record<string, { label: string; color: string; ring: string 
 };
 
 function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentWinners(id), []);
-  const { data, loading, error } = useTabData<TournamentWinnersResponse>(tswId, active, fetcher, 'winners');
+  const { data, loading, error, retry } = useTabData<TournamentWinnersResponse>(tswId, active, fetchTournamentWinners, 'winners');
   const [filter, setFilter] = useState<string>('all');
 
   const filteredEvents = useMemo(() => {
@@ -326,7 +349,7 @@ function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
   }, [data, filter]);
 
   if (loading) return <TabLoading label="winners" />;
-  if (error) return <TabError error={error} />;
+  if (error) return <TabError error={error} onRetry={retry} />;
   if (!data || data.events.length === 0) return <TabEmpty icon={Trophy} message="No winners data available for this tournament." />;
 
   return (
@@ -399,12 +422,16 @@ function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
                           {result.players.map((p, pi) => (
                             <span key={pi}>
                               {pi > 0 && <span className="text-slate-400 dark:text-slate-500"> &amp; </span>}
-                              <Link
-                                to={`/tournaments/${tswId}/player/${p.playerId}`}
-                                className="text-violet-600 dark:text-violet-400 hover:underline font-medium"
-                              >
-                                {p.name}
-                              </Link>
+                              {p.playerId ? (
+                                <Link
+                                  to={`/tournaments/${tswId}/player/${p.playerId}`}
+                                  className="text-violet-600 dark:text-violet-400 hover:underline font-medium"
+                                >
+                                  {p.name}
+                                </Link>
+                              ) : (
+                                <span className="font-medium">{p.name}</span>
+                              )}
                             </span>
                           ))}
                         </div>
@@ -834,7 +861,9 @@ function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string
   const p2Scores: number[] = [];
   const p1IsWinner = match.player1?.won ?? false;
   for (const s of match.score) {
-    const [winnerScore, loserScore] = s.split('-').map(Number);
+    const parts = s.split('-').map(Number);
+    const winnerScore = Number.isFinite(parts[0]) ? parts[0] : 0;
+    const loserScore = Number.isFinite(parts[1]) ? parts[1] : 0;
     p1Scores.push(p1IsWinner ? winnerScore : loserScore);
     p2Scores.push(p1IsWinner ? loserScore : winnerScore);
   }
@@ -1009,11 +1038,10 @@ function BracketView({ section, tswId, showTitle }: { section: BracketSection; t
 
 function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
   const navigate = useNavigate();
-  const fetcher = useCallback((id: string) => fetchTournamentDetail(id), []);
-  const { data, loading, error } = useTabData(tswId, active, fetcher, 'draws');
+  const { data, loading, error, retry } = useTabData(tswId, active, fetchTournamentDetail, 'draws');
 
   if (loading) return <TabLoading label="draws" />;
-  if (error) return <TabError error={error} />;
+  if (error) return <TabError error={error} onRetry={retry} />;
   if (!data || data.draws.length === 0) return <TabEmpty icon={List} message="No draws available for this tournament." />;
 
   return (
@@ -1068,8 +1096,7 @@ function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
 const PLAYERS_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentPlayers(id), []);
-  const { data, loading, error } = useTabData<TournamentPlayersResponse>(tswId, active, fetcher, 'players');
+  const { data, loading, error, retry } = useTabData<TournamentPlayersResponse>(tswId, active, fetchTournamentPlayers, 'players');
   const [search, setSearch] = useState('');
   const [clubFilter, setClubFilter] = useState('');
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
@@ -1127,7 +1154,7 @@ function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
   }, [filtered]);
 
   if (loading) return <TabLoading label="players" />;
-  if (error) return <TabError error={error} />;
+  if (error) return <TabError error={error} onRetry={retry} />;
   if (!data || data.players.length === 0) return <TabEmpty icon={Users} message="No player data available for this tournament." />;
 
   return (
@@ -1276,8 +1303,7 @@ function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
 }
 
 function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const fetcher = useCallback((id: string) => fetchTournamentMedals(id), []);
-  const { data, loading, error } = useTabData<TournamentMedals>(tswId, active, fetcher, 'medals');
+  const { data, loading, error, retry } = useTabData<TournamentMedals>(tswId, active, fetchTournamentMedals, 'medals');
   const [sortKey, setSortKey] = useState<SortKey>('total');
   const [sortAsc, setSortAsc] = useState(false);
 
@@ -1303,7 +1329,7 @@ function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
   }
 
   if (loading) return <TabLoading label="medals" />;
-  if (error) return <TabError error={error} />;
+  if (error) return <TabError error={error} onRetry={retry} />;
   if (!data) return <TabEmpty icon={Medal} message="No medal data available for this tournament." />;
 
   const medalClubs = sortedClubs.filter(c => c.total > 0);
@@ -1503,7 +1529,6 @@ interface MatchesTabSnapshot {
   matchDate: string;
   matches: TournamentMatch[];
 }
-const matchesTabCache = new Map<string, MatchesTabSnapshot>();
 
 function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
   const snap = matchesTabCache.get(tswId);
@@ -1521,10 +1546,17 @@ function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
 
   const [eventFilter, setEventFilter] = useState('');
 
+  const matchRequestId = useRef(0);
+  const unmountedRef = useRef(false);
+  useEffect(() => {
+    unmountedRef.current = false;
+    return () => { unmountedRef.current = true; };
+  }, []);
+
   const isToday = selectedDate === todayYYYYMMDD();
 
   useEffect(() => {
-    matchesTabCache.set(tswId, { dates, selectedDate, matchDate, matches });
+    cappedMapSet(matchesTabCache, tswId, { dates, selectedDate, matchDate, matches });
   }, [tswId, dates, selectedDate, matchDate, matches]);
 
   useEffect(() => {
@@ -1544,15 +1576,25 @@ function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
   }, [tswId, active, datesFetched]);
 
   function loadMatches(dateParam: string, refresh = false) {
+    const reqId = ++matchRequestId.current;
     setSelectedDate(dateParam);
     setMatches([]);
     setMatchesLoading(true);
     setMatchesError(null);
     setEventFilter('');
     fetchTournamentMatchDay(tswId, dateParam, refresh)
-      .then(d => { setMatches(d.matches); setMatchDate(d.date); })
-      .catch(e => setMatchesError(e.message))
-      .finally(() => setMatchesLoading(false));
+      .then(d => {
+        if (unmountedRef.current || reqId !== matchRequestId.current) return;
+        setMatches(d.matches);
+        setMatchDate(d.date);
+      })
+      .catch(e => {
+        if (unmountedRef.current || reqId !== matchRequestId.current) return;
+        setMatchesError(e.message);
+      })
+      .finally(() => {
+        if (!unmountedRef.current && reqId === matchRequestId.current) setMatchesLoading(false);
+      });
   }
 
   function handleDateChange(dateParam: string) {
@@ -1589,8 +1631,10 @@ function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
     return groups;
   }, [filtered]);
 
+  const retryDates = useCallback(() => { setDatesError(null); setDatesFetched(false); }, []);
+
   if (datesLoading) return <TabLoading label="matches" />;
-  if (datesError) return <TabError error={datesError} />;
+  if (datesError) return <TabError error={datesError} onRetry={retryDates} />;
   if (datesFetched && dates.length === 0) {
     return <TabEmpty icon={Swords} message="No match data available for this tournament." />;
   }
@@ -1706,7 +1750,9 @@ export default function TournamentDetail() {
   const { tswId } = useParams<{ tswId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const activeTab = (searchParams.get('tab') as TabId) || 'matches';
+  const TAB_IDS = TABS.map(t => t.id) as readonly TabId[];
+  const rawTab = searchParams.get('tab');
+  const activeTab: TabId = TAB_IDS.includes(rawTab as TabId) ? (rawTab as TabId) : 'matches';
 
   const routeState = location.state as { name?: string; hostClub?: string; startDate?: string; endDate?: string } | null;
 
@@ -1830,7 +1876,7 @@ export default function TournamentDetail() {
 export function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
   const navigate = useNavigate();
-  const { playerNameMap } = usePlayers();
+  const { playerNameMap, playerIdSet } = usePlayers();
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1840,16 +1886,16 @@ export function TournamentPlayerDetail() {
   useEffect(() => {
     if (!tswId || !playerId) return;
     let cancelled = false;
-    setLoading(true);
+    setData(null);
     setError(null);
+    setEventFilter('');
+    setLoading(true);
     fetchTournamentPlayerDetail(tswId, playerId)
       .then(d => { if (!cancelled) setData(d); })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [tswId, playerId]);
-
-  const { playerIdSet } = usePlayers();
 
   const resolvedUsabId = useMemo(() => {
     if (data?.memberId && playerIdSet.has(data.memberId)) return data.memberId;
@@ -2213,20 +2259,31 @@ export function TournamentDrawDetail() {
     let cancelled = false;
     setLoading(true);
     setError(null);
+    setDrawName(null);
+    setDrawData(null);
 
     const numericDrawId = Number(drawId);
 
-    Promise.all([
+    Promise.allSettled([
       fetchTournamentDetail(tswId),
       fetchDrawBracket(tswId, numericDrawId),
     ])
-      .then(([detail, data]) => {
+      .then(([detailResult, bracketResult]) => {
         if (cancelled) return;
-        const draw = detail.draws.find(d => d.drawId === numericDrawId);
-        setDrawName(draw?.name ?? `Draw ${drawId}`);
-        setDrawData(data);
+
+        if (detailResult.status === 'fulfilled') {
+          const draw = detailResult.value.draws.find(d => d.drawId === numericDrawId);
+          setDrawName(draw?.name ?? `Draw ${drawId}`);
+        } else {
+          setDrawName(`Draw ${drawId}`);
+        }
+
+        if (bracketResult.status === 'fulfilled') {
+          setDrawData(bracketResult.value);
+        } else {
+          setError(bracketResult.reason?.message ?? 'Failed to load bracket data');
+        }
       })
-      .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
