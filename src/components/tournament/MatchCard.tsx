@@ -4,18 +4,20 @@ import type { TournamentMatch, RoundRobinPlayer } from '../../types/junior';
 
 // ── TeamRow (shared between MatchCard and RoundRobinMatchCard) ──────────────
 
-export function TeamRow({ names, playerIds, tswId, won, ongoing, scores, otherScores, showRetired, showWalkover }: {
+export function TeamRow({ names, playerIds, tswId, won, ongoing, lost, boldName, scores, otherScores, showRetired, showWalkover }: {
   names: string[];
   playerIds?: (number | null)[];
   tswId?: string;
   won: boolean;
   ongoing?: boolean;
+  lost?: boolean;
+  boldName?: boolean;
   scores: number[];
   otherScores: number[];
   showRetired?: boolean;
   showWalkover?: boolean;
 }) {
-  const nameClass = won
+  const nameClass = (won || boldName)
     ? 'font-semibold text-slate-800 dark:text-slate-100'
     : 'text-slate-800 dark:text-slate-100';
   const badgeClass = won
@@ -59,7 +61,10 @@ export function TeamRow({ names, playerIds, tswId, won, ongoing, scores, otherSc
         {scores.map((s, i) => {
           const isWinningGame = s > otherScores[i];
           return (
-            <span key={i} className={`w-5 text-right text-slate-800 dark:text-slate-100 ${isWinningGame ? 'font-bold' : ''}`}>{s}</span>
+            <span key={i} className={`w-5 text-right tabular-nums ${
+              lost ? 'text-slate-400 dark:text-slate-500' :
+              isWinningGame ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
+            }`}>{s}</span>
           );
         })}
       </div>
@@ -85,8 +90,8 @@ export default function MatchCard({ match, date, tswId }: { match: TournamentMat
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
-      <div className="px-4 pt-3 pb-1">
-        <p className="text-xs text-slate-400 dark:text-slate-500">
+      <div className="px-4 py-2 bg-slate-200/70 dark:bg-slate-800/60 rounded-t-xl">
+        <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
           {match.header || [match.round, match.event].filter(Boolean).join(' \u00b7 ')}
         </p>
       </div>
@@ -98,6 +103,8 @@ export default function MatchCard({ match, date, tswId }: { match: TournamentMat
           tswId={tswId}
           won={match.team1Won}
           ongoing={ongoing}
+          lost={!match.team1Won && match.team2Won}
+          boldName
           scores={t1Scores}
           otherScores={t2Scores}
           showWalkover={match.walkover && !match.team1Won}
@@ -117,6 +124,7 @@ export default function MatchCard({ match, date, tswId }: { match: TournamentMat
             tswId={tswId}
             won={match.team2Won}
             ongoing={ongoing}
+            lost={!match.team2Won && match.team1Won}
             scores={t2Scores}
             otherScores={t1Scores}
             showWalkover={match.walkover && !match.team2Won}

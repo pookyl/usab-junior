@@ -391,6 +391,7 @@ export interface BracketMatch {
   score: string[];
   retired: boolean;
   walkover: boolean;
+  scheduledTime?: string;
 }
 
 export interface BracketSection {

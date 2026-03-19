@@ -27,6 +27,7 @@ export interface DisplayMatch {
   walkover: boolean;
   bye: boolean;
   feedInPlayer?: DisplayPlayer | null;
+  scheduledTime?: string;
 }
 
 export interface DisplayRound {
@@ -115,7 +116,8 @@ export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRo
       }
     }
 
-    if (allUnscored && topMatches.length === sortedEntries.length && (!isFeedInLevel || canMergeFeedIn)) {
+    const allWinnersNull = topMatches.every(m => m.winner === null);
+    if (allUnscored && topMatches.length === sortedEntries.length && (!isFeedInLevel || canMergeFeedIn || allWinnersNull)) {
       sortedEntries = topMatches.map((m, i) => ({
         position: sortedEntries[i]?.position ?? (i + 1),
         name: m.winner?.name || 'Bye',
@@ -215,6 +217,7 @@ export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRo
           score: m.score, retired: m.retired, walkover: m.walkover,
           bye: (p1?.bye || p2?.bye) ?? false,
           feedInPlayer: feedIn ? makePlayer(feedIn.winner) : null,
+          scheduledTime: m.scheduledTime,
         });
       }
     } else {
@@ -250,6 +253,7 @@ export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRo
           player1: p1, player2: p2,
           score: m.score, retired: m.retired, walkover: m.walkover,
           bye: (p1?.bye || p2?.bye) ?? false,
+          scheduledTime: m.scheduledTime,
         });
       }
     }
@@ -288,7 +292,7 @@ export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRo
 // ── Bracket sub-components ──────────────────────────────────────────────────
 
 function BracketPlayerRow({
-  player, tswId, gameScores, otherScores, isTop, lost, statusLabel,
+  player, tswId, gameScores, otherScores, isTop, lost, statusLabel, timeLabel,
 }: {
   player: DisplayMatch['player1'];
   tswId: string;
@@ -297,11 +301,13 @@ function BracketPlayerRow({
   isTop: boolean;
   lost: boolean;
   statusLabel?: string;
+  timeLabel?: string;
 }) {
   if (!player) {
     return (
       <div className={`flex items-center justify-between gap-2 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
         <span className="text-[11px] text-slate-400 dark:text-slate-500 italic truncate">TBD</span>
+        {timeLabel && <span className="text-[9px] text-sky-600 dark:text-sky-400 whitespace-nowrap shrink-0">{timeLabel}</span>}
       </div>
     );
   }
@@ -310,6 +316,7 @@ function BracketPlayerRow({
     return (
       <div className={`flex items-center justify-between gap-2 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
         <span className="text-[11px] text-slate-400 dark:text-slate-500 italic truncate">Bye</span>
+        {timeLabel && <span className="text-[9px] text-sky-600 dark:text-sky-400 whitespace-nowrap shrink-0">{timeLabel}</span>}
       </div>
     );
   }
@@ -363,6 +370,9 @@ function BracketPlayerRow({
             }`}>{s}</span>
           );
         })}
+        {timeLabel && gameScores.length === 0 && (
+          <span className="text-[9px] text-sky-600 dark:text-sky-400 whitespace-nowrap">{timeLabel}</span>
+        )}
       </div>
     </div>
   );
@@ -397,6 +407,20 @@ function BracketFeedInEntry({ player, tswId }: { player: DisplayPlayer | null; t
   );
 }
 
+export function formatScheduledTime(raw: string): { date: string; time: string } {
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return { date: raw, time: '' };
+  const day = d.toLocaleDateString('en-US', { weekday: 'short' });
+  const month = d.getMonth() + 1;
+  const date = d.getDate();
+  const hours = d.getHours();
+  const minutes = d.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const h = hours % 12 || 12;
+  const mm = minutes === 0 ? '' : `:${String(minutes).padStart(2, '0')}`;
+  return { date: `${day} ${month}/${date}`, time: `${h}${mm} ${ampm}` };
+}
+
 function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string }) {
   const p1Scores: number[] = [];
   const p2Scores: number[] = [];
@@ -418,10 +442,14 @@ function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string
   const p1Status = p1Lost ? statusText : '';
   const p2Status = p2Lost ? statusText : '';
 
+  const hasResult = match.score.length > 0 || p1Won || p2Won;
+
+  const timeParts = match.scheduledTime && !hasResult ? formatScheduledTime(match.scheduledTime) : null;
+
   return (
     <div className="w-48 bg-white dark:bg-slate-900 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden text-left shrink-0">
-      <BracketPlayerRow player={match.player1} tswId={tswId} gameScores={p1Scores} otherScores={p2Scores} isTop lost={p1Lost} statusLabel={p1Status || undefined} />
-      <BracketPlayerRow player={match.player2} tswId={tswId} gameScores={p2Scores} otherScores={p1Scores} isTop={false} lost={p2Lost} statusLabel={p2Status || undefined} />
+      <BracketPlayerRow player={match.player1} tswId={tswId} gameScores={p1Scores} otherScores={p2Scores} isTop lost={p1Lost} statusLabel={p1Status || undefined} timeLabel={timeParts?.date} />
+      <BracketPlayerRow player={match.player2} tswId={tswId} gameScores={p2Scores} otherScores={p1Scores} isTop={false} lost={p2Lost} statusLabel={p2Status || undefined} timeLabel={timeParts?.time} />
     </div>
   );
 }

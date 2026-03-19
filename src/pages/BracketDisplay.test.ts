@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildDisplayRounds } from './TournamentDetail';
+import { buildDisplayRounds, formatScheduledTime } from '../components/tournament/BracketView';
 import type { BracketSection, BracketMatch, BracketEntry } from '../types/junior';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -11,8 +11,9 @@ function M(
   score: string[] = [],
   walkover = false,
   retired = false,
+  scheduledTime?: string,
 ): BracketMatch {
-  return {
+  const m: BracketMatch = {
     matchId: `${roundLevel}${String(matchNum).padStart(3, '0')}`,
     roundLevel,
     matchNum,
@@ -21,6 +22,8 @@ function M(
     retired,
     walkover,
   };
+  if (scheduledTime) m.scheduledTime = scheduledTime;
+  return m;
 }
 
 function E(position: number, name: string, seed = '', playerId: number | null = null, bye = false): BracketEntry {
@@ -711,6 +714,52 @@ describe('buildDisplayRounds — medium feed-in consolation (32-player, draw/4)'
   });
 });
 
+// ── Two-column Round 1 Consolation (not feed-in) ─────────────────────────────
+
+describe('buildDisplayRounds — two-column consolation (not feed-in)', () => {
+  function buildTwoColumnConsolation(): BracketSection {
+    const matches: BracketMatch[] = [];
+    // L7: 32 entry positions (all null — tournament not started)
+    for (let i = 1; i <= 32; i++) matches.push(M(7, i, null));
+    // L6: 32 second-column matches (all null — two-column Round 1)
+    for (let i = 1; i <= 32; i++) matches.push(M(6, i, null));
+    // L5: 16 normal matches
+    for (let i = 1; i <= 16; i++) matches.push(M(5, i, null));
+    // L4: 8
+    for (let i = 1; i <= 8; i++) matches.push(M(4, i, null));
+    // L3: 4
+    for (let i = 1; i <= 4; i++) matches.push(M(3, i, null));
+    // L2: 2
+    matches.push(M(2, 1, null)); matches.push(M(2, 2, null));
+    // L1: 1
+    matches.push(M(1, 1, null));
+
+    return section(
+      'BS U11 - Consolation',
+      ['Round 1', 'Round 2', 'Round 3', 'Quarter Finals', 'Semi Finals', 'Finals', 'Winner'],
+      [],
+      matches,
+    );
+  }
+
+  it('should NOT detect feed-in', () => {
+    expect(buildDisplayRounds(buildTwoColumnConsolation()).hasFeedIn).toBe(false);
+  });
+
+  it('should merge both entry columns into entries', () => {
+    const result = buildDisplayRounds(buildTwoColumnConsolation());
+    // After merging L7 (entries) and L6 (second column), first display round is L5 with 16 matches
+    expect(result.rounds[0].matches.length).toBe(16);
+  });
+
+  it('should have correct round progression', () => {
+    const result = buildDisplayRounds(buildTwoColumnConsolation());
+    const counts = roundMatchCounts(result);
+    // 16, 8, 4, 2, 1 (no Winner column since no results)
+    expect(counts).toEqual([16, 8, 4, 2, 1]);
+  });
+});
+
 // ── Feed-in Detection: matchNum Parity ───────────────────────────────────────
 
 describe('buildDisplayRounds — feed-in parity detection', () => {
@@ -853,5 +902,147 @@ describe('display name logic', () => {
       M(1, 1, W('D', 4), ['21-18', '21-16']),
     ]);
     expect(getDisplayName(s)).toBe('Main Draw');
+  });
+});
+
+// ── Scheduled Time — formatScheduledTime ─────────────────────────────────────
+
+describe('formatScheduledTime', () => {
+  it('should split a valid datetime into date and time parts', () => {
+    const result = formatScheduledTime('3/20/2026 7:15 PM');
+    expect(result.date).toMatch(/3\/20/);
+    expect(result.time).toBe('7:15 PM');
+  });
+
+  it('should handle AM times', () => {
+    const result = formatScheduledTime('3/21/2026 9:30 AM');
+    expect(result.time).toBe('9:30 AM');
+  });
+
+  it('should omit minutes when on the hour', () => {
+    const result = formatScheduledTime('3/20/2026 6:00 PM');
+    expect(result.time).toBe('6 PM');
+  });
+
+  it('should handle noon (12 PM)', () => {
+    const result = formatScheduledTime('3/20/2026 12:00 PM');
+    expect(result.time).toBe('12 PM');
+  });
+
+  it('should handle midnight-adjacent times', () => {
+    const result = formatScheduledTime('3/20/2026 12:30 AM');
+    expect(result.time).toBe('12:30 AM');
+  });
+
+  it('should include weekday abbreviation in date', () => {
+    // 3/20/2026 is a Friday
+    const result = formatScheduledTime('3/20/2026 6:00 PM');
+    expect(result.date).toBe('Fri 3/20');
+  });
+
+  it('should return raw string as date for unparseable input', () => {
+    const result = formatScheduledTime('not-a-date');
+    expect(result.date).toBe('not-a-date');
+    expect(result.time).toBe('');
+  });
+});
+
+// ── Scheduled Time — propagation through buildDisplayRounds ──────────────────
+
+describe('buildDisplayRounds — scheduledTime propagation', () => {
+  function buildDrawWithTimes(): BracketSection {
+    return section(
+      'BS U13',
+      ['Round 1', 'Semi Finals', 'Finals', 'Winner'],
+      [
+        E(1, 'Alice', '', 1), E(2, 'Bob', '', 2),
+        E(3, 'Carol', '', 3), E(4, 'Bye', '', null, true),
+      ],
+      [
+        M(3, 1, null, [], false, false, '3/20/2026 6:00 PM'),
+        M(3, 2, W('Carol', 3), []),
+        M(2, 1, null, [], false, false, '3/20/2026 7:15 PM'),
+        M(1, 1, null),
+      ],
+    );
+  }
+
+  it('should pass scheduledTime through to DisplayMatch for unplayed matches', () => {
+    const result = buildDisplayRounds(buildDrawWithTimes());
+    const r1 = result.rounds[0];
+    expect(r1.matches[0].scheduledTime).toBe('3/20/2026 6:00 PM');
+  });
+
+  it('should pass scheduledTime to later rounds', () => {
+    const result = buildDisplayRounds(buildDrawWithTimes());
+    const sf = result.rounds[1];
+    expect(sf.matches[0].scheduledTime).toBe('3/20/2026 7:15 PM');
+  });
+
+  it('should leave scheduledTime undefined when not set on source match', () => {
+    const result = buildDisplayRounds(buildDrawWithTimes());
+    const r1 = result.rounds[0];
+    expect(r1.matches[1].scheduledTime).toBeUndefined();
+  });
+
+  it('should preserve scheduledTime even on matches with a bye opponent', () => {
+    const s = section('Test', ['Semi Finals', 'Finals', 'Winner'],
+      [E(1, 'Alice', '', 1), E(2, 'Bye', '', null, true), E(3, 'Carol', '', 3), E(4, 'Dave', '', 4)],
+      [
+        M(2, 1, W('Alice', 1), [], false, false, '3/20/2026 5:00 PM'),
+        M(2, 2, W('Carol', 3), ['21-10', '21-8'], false, false, '3/20/2026 5:00 PM'),
+        M(1, 1, null, [], false, false, '3/21/2026 10:00 AM'),
+      ],
+    );
+    const result = buildDisplayRounds(s);
+    const r1 = result.rounds[0];
+    expect(r1.matches[0].scheduledTime).toBe('3/20/2026 5:00 PM');
+    expect(r1.matches[0].player2?.bye).toBe(true);
+  });
+
+  it('should preserve scheduledTime on match with TBD (null) players', () => {
+    const s = section('Test', ['Semi Finals', 'Finals', 'Winner'],
+      [E(1, 'Alice', '', 1), E(2, 'Bob', '', 2), E(3, '', '', null), E(4, '', '', null)],
+      [
+        M(2, 1, null, [], false, false, '3/20/2026 6:00 PM'),
+        M(2, 2, null, [], false, false, '3/20/2026 7:00 PM'),
+        M(1, 1, null),
+      ],
+    );
+    const result = buildDisplayRounds(s);
+    expect(result.rounds[0].matches[0].scheduledTime).toBe('3/20/2026 6:00 PM');
+    expect(result.rounds[0].matches[1].scheduledTime).toBe('3/20/2026 7:00 PM');
+  });
+
+  it('should preserve scheduledTime on scored matches (filtering is UI concern)', () => {
+    const s = section('Test', ['Semi Finals', 'Finals', 'Winner'],
+      [E(1, 'Alice', '', 1), E(2, 'Bob', '', 2), E(3, 'Carol', '', 3), E(4, 'Dave', '', 4)],
+      [
+        M(2, 1, W('Alice', 1), ['21-10', '21-8'], false, false, '3/20/2026 6:00 PM'),
+        M(2, 2, W('Carol', 3), ['21-15', '21-12'], false, false, '3/20/2026 6:00 PM'),
+        M(1, 1, W('Alice', 1), ['21-18', '21-16']),
+      ],
+    );
+    const result = buildDisplayRounds(s);
+    expect(result.rounds[0].matches[0].scheduledTime).toBe('3/20/2026 6:00 PM');
+    expect(result.rounds[0].matches[1].scheduledTime).toBe('3/20/2026 6:00 PM');
+  });
+
+  it('should propagate scheduledTime through feed-in consolation rounds', () => {
+    const s = section('Consolation', ['Round 1', 'Semi Finals', 'Finals', 'Winner'], [], [
+      M(4, 1, null), M(4, 2, W('A', 1)), M(4, 3, W('B', 2)), M(4, 4, null),
+      M(3, 1, W('A', 1), [], false, false, '3/20/2026 6:00 PM'),
+      M(3, 2, W('C', 3)),
+      M(3, 3, W('B', 2), [], false, false, '3/20/2026 6:30 PM'),
+      M(3, 4, W('D', 4)),
+      M(2, 1, null, [], false, false, '3/20/2026 8:00 PM'),
+      M(2, 2, null),
+      M(1, 1, null),
+    ]);
+    const result = buildDisplayRounds(s);
+    expect(result.hasFeedIn).toBe(true);
+    expect(result.rounds[0].matches[0].scheduledTime).toBe('3/20/2026 6:00 PM');
+    expect(result.rounds[0].matches[1].scheduledTime).toBe('3/20/2026 6:30 PM');
+    expect(result.rounds[1].matches[0].scheduledTime).toBe('3/20/2026 8:00 PM');
   });
 });

@@ -3,7 +3,27 @@ import { Calendar, Swords, RefreshCw } from 'lucide-react';
 import { TabLoading, TabError, TabEmpty, cappedMapSet, todayYYYYMMDD } from '../shared';
 import MatchCard from '../MatchCard';
 import { fetchTournamentMatchDates, fetchTournamentMatchDay } from '../../../services/rankingsService';
+import { useTournamentMeta } from '../../../hooks/useTournamentMeta';
 import type { MatchDateTab, TournamentMatch } from '../../../types/junior';
+
+function generateDateTabs(startDate: string, endDate: string): MatchDateTab[] {
+  if (!startDate) return [];
+  const tabs: MatchDateTab[] = [];
+  const start = new Date(startDate + 'T00:00:00');
+  const end = endDate ? new Date(endDate + 'T00:00:00') : start;
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return [];
+  const current = new Date(start);
+  while (current <= end) {
+    const y = current.getFullYear();
+    const m = String(current.getMonth() + 1).padStart(2, '0');
+    const d = String(current.getDate()).padStart(2, '0');
+    const param = `${y}${m}${d}`;
+    const label = current.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+    tabs.push({ param, label });
+    current.setDate(current.getDate() + 1);
+  }
+  return tabs;
+}
 
 interface MatchesTabSnapshot {
   dates: MatchDateTab[];
@@ -16,6 +36,11 @@ const matchesTabCache = new Map<string, MatchesTabSnapshot>();
 
 export default function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
   const snap = matchesTabCache.get(tswId);
+  const meta = useTournamentMeta(tswId);
+  const metaDates = useMemo(
+    () => generateDateTabs(meta.startDate, meta.endDate),
+    [meta.startDate, meta.endDate],
+  );
 
   const [dates, setDates] = useState<MatchDateTab[]>(snap?.dates ?? []);
   const [datesLoading, setDatesLoading] = useState(false);
@@ -75,12 +100,6 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
         if (cancelled) return;
         setDates(d.dates);
         setDatesFetched(true);
-        if (d.dates.length > 0 && !selectedDate) {
-          const today = todayYYYYMMDD();
-          const todayDate = d.dates.find(dt => dt.param === today);
-          const initial = todayDate ? todayDate.param : d.dates[d.dates.length - 1].param;
-          loadMatches(initial);
-        }
       })
       .catch(e => { if (!cancelled) setDatesError(e.message); })
       .finally(() => { if (!cancelled) setDatesLoading(false); });
@@ -124,7 +143,9 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
 
   const retryDates = useCallback(() => { setDatesError(null); setDatesFetched(false); }, []);
 
-  if (datesLoading) return <TabLoading label="matches" />;
+  const displayDates = datesFetched ? dates : metaDates;
+
+  if (datesLoading && displayDates.length === 0) return <TabLoading label="matches" />;
   if (datesError) return <TabError error={datesError} onRetry={retryDates} />;
   if (datesFetched && dates.length === 0) {
     return <TabEmpty icon={Swords} message="No match data available for this tournament." />;
@@ -132,9 +153,9 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
 
   return (
     <div className="space-y-4">
-      {dates.length > 0 && (
+      {displayDates.length > 0 && (
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1">
-          {dates.map(d => (
+          {displayDates.map(d => (
             <button
               key={d.param}
               onClick={() => handleDateChange(d.param)}
@@ -213,7 +234,7 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
                 items.push(
                   <div key={`g-${gi}`} className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4">
                     {group.matches.map((m, i) => (
-                      <MatchCard key={i} match={m} date={matchDate} />
+                      <MatchCard key={i} match={m} date={matchDate} tswId={tswId} />
                     ))}
                   </div>
                 );

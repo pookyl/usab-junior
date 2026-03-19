@@ -952,19 +952,24 @@ export function parseTswMatches(html) {
 
       function extractTeam(rowHtml) {
         const names = [];
-        const pRegex = /<a[^>]*class="nav-link"[^>]*><span class="nav-link__value">([^<]+)<\/span>/g;
-        let pm;
-        while ((pm = pRegex.exec(rowHtml)) !== null) names.push(pm[1].trim());
+        const playerIds = [];
+        const contentBlocks = rowHtml.split(/match__row-title-value-content/).slice(1);
+        for (const cb of contentBlocks) {
+          const nameMatch = cb.match(/nav-link__value">([^<]+)<\/span>/);
+          if (!nameMatch) continue;
+          const n = nameMatch[1].trim();
+          if (!n || n === 'Bye') continue;
+          names.push(n);
+          const idMatch = cb.match(/data-player-id="(\d+)"/);
+          playerIds.push(idMatch ? parseInt(idMatch[1], 10) : null);
+        }
         if (names.length === 0) {
-          const altRegex = /match__row-title-value-content[\s\S]*?nav-link__value">([^<]+)<\/span>/g;
-          let am;
-          while ((am = altRegex.exec(rowHtml)) !== null) {
-            const n = am[1].trim();
-            if (n && n !== 'Bye') names.push(n);
-          }
+          const pRegex = /<a[^>]*class="nav-link"[^>]*><span class="nav-link__value">([^<]+)<\/span>/g;
+          let pm;
+          while ((pm = pRegex.exec(rowHtml)) !== null) names.push(pm[1].trim());
         }
         const won = rowHtml.includes('has-won');
-        return { names, won };
+        return { names, playerIds, won };
       }
 
       const team1 = extractTeam(rowBlocks[0] ?? '');
@@ -1013,6 +1018,8 @@ export function parseTswMatches(html) {
         header,
         team1: team1.names,
         team2: team2.names,
+        team1Ids: team1.playerIds.some(Boolean) ? team1.playerIds : undefined,
+        team2Ids: team2.playerIds.some(Boolean) ? team2.playerIds : undefined,
         team1Won: team1.won,
         team2Won: team2.won,
         scores,
@@ -1149,7 +1156,18 @@ export function parseTswPlayerMatches(html) {
 
     let time = '';
     const timeMatch = block.match(/icon-clock[\s\S]*?nav-link__value">([^<]+)<\/span>/);
-    if (timeMatch) time = timeMatch[1].trim();
+    if (timeMatch) {
+      time = timeMatch[1].trim();
+    } else {
+      const footerItems = block.match(/match__footer-list-item[\s\S]*?nav-link__value">([^<]*)<\/span>/g) || [];
+      for (const fi of footerItems) {
+        const val = (fi.match(/nav-link__value">([^<]+)<\/span>/) || [])[1]?.trim();
+        if (val && /\d{1,2}\/\d{1,2}\/\d{4}.*\d{1,2}:\d{2}\s*(AM|PM)/i.test(val)) {
+          time = val;
+          break;
+        }
+      }
+    }
 
     const header = [round, event, status].filter(Boolean).join(' · ');
 
@@ -1359,6 +1377,7 @@ export function parseTswEliminationDraw(html) {
 
     const matchSpans = [];
     const scoreSpans = [];
+    const timeSpans = [];
 
     for (let r = 0; r < rows.length; r++) {
       const cells = rows[r];
@@ -1391,13 +1410,44 @@ export function parseTswEliminationDraw(html) {
             scoreSpans.push({ row: r, col: c, games, retired, walkover });
           }
         }
+
+        const plainText = cell.replace(/<[^>]*>/g, '').trim();
+        const timeMatch = plainText.match(/\w+ (\d+\/\d+\/\d+ \d+:\d+ [AP]M)/);
+        if (timeMatch && !mSpan) {
+          timeSpans.push({ row: r, col: c, dateTime: timeMatch[1] });
+        }
+      }
+    }
+
+    // Build time→match assignment: for each time, find its closest match.
+    // This avoids earlier matches greedily stealing times from closer later matches.
+    const timeToMatch = new Map();
+    for (let ti = 0; ti < timeSpans.length; ti++) {
+      const ts = timeSpans[ti];
+      let bestIdx = -1;
+      let bestDist = Infinity;
+      for (let mi = 0; mi < matchSpans.length; mi++) {
+        const ms = matchSpans[mi];
+        if (ms.col !== ts.col && ms.col + 1 !== ts.col) continue;
+        const dist = Math.abs(ts.row - ms.row) + (ts.col !== ms.col ? 0.5 : 0);
+        if (dist < bestDist && dist <= 6) {
+          bestDist = dist;
+          bestIdx = mi;
+        }
+      }
+      if (bestIdx >= 0) {
+        const prev = timeToMatch.get(bestIdx);
+        if (!prev || bestDist < prev.dist) {
+          timeToMatch.set(bestIdx, { ti, dist: bestDist, data: ts });
+        }
       }
     }
 
     const matches = [];
     const usedScores = new Set();
 
-    for (const ms of matchSpans) {
+    for (let mi = 0; mi < matchSpans.length; mi++) {
+      const ms = matchSpans[mi];
       let bestScore = null;
       let bestDist = Infinity;
 
@@ -1414,7 +1464,7 @@ export function parseTswEliminationDraw(html) {
 
       if (bestScore) usedScores.add(bestScore.idx);
 
-      matches.push({
+      const m = {
         matchId: ms.matchId,
         roundLevel: parseInt(ms.matchId.slice(0, -3), 10),
         matchNum: parseInt(ms.matchId.slice(-3), 10),
@@ -1426,7 +1476,10 @@ export function parseTswEliminationDraw(html) {
         score: bestScore?.data.games || [],
         retired: bestScore?.data.retired || false,
         walkover: bestScore?.data.walkover || false,
-      });
+      };
+      const timeEntry = timeToMatch.get(mi);
+      if (timeEntry) m.scheduledTime = timeEntry.data.dateTime;
+      matches.push(m);
     }
 
     sections.push({ name, rounds: roundNames, entries, matches });
