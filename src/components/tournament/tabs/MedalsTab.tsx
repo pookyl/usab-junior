@@ -18,14 +18,35 @@ function PlayerName({ player, tswId }: { player: MedalPlayer; tswId: string }) {
   return <span>{player.name}</span>;
 }
 
-function MedalIcon({ type, size = 16 }: { type: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number }) {
-  const colors = {
-    gold: 'text-yellow-500',
-    silver: 'text-slate-400',
-    bronze: 'text-amber-700 dark:text-amber-600',
-    fourth: 'text-amber-700 dark:text-amber-600',
-  };
-  return <Medal className={`${colors[type]} shrink-0`} style={{ width: size, height: size }} />;
+function CustomMedal({ size = 22, label, ribbon }: { size?: number; label: string; ribbon: [string, string] }) {
+  return (
+    <svg className="shrink-0" width={size} height={size} viewBox="0 0 36 36">
+      <path d="M14.5 1h-2.8L16 12.5 18 6z" fill={ribbon[0]} />
+      <path d="M21.5 1h2.8L20 12.5 18 6z" fill={ribbon[1]} />
+      <circle cx="18" cy="22.5" r="12" fill="#8B5E3C" />
+      <circle cx="18" cy="22.5" r="10.5" fill="#CD853F" />
+      <circle cx="18" cy="22.5" r="8" fill="none" stroke="#8B4513" strokeWidth="0.7" opacity="0.35" />
+      <text x="18" y="27" textAnchor="middle" fontSize={label.length > 1 ? 9 : 12} fontWeight="bold" fill="#5C2E0E" fontFamily="system-ui, -apple-system, sans-serif">{label}</text>
+    </svg>
+  );
+}
+
+const MEDAL_RIBBONS: Record<string, [string, string]> = {
+  fourth: ['#5A8BA8', '#487A96'],
+  'bronze-fourth': ['#8B5A5A', '#6E4747'],
+};
+
+function MedalIcon({ place, size = 22, label }: { place: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number; label?: string }) {
+  if (label === '3/4') {
+    return <CustomMedal size={size} label="3/4" ribbon={MEDAL_RIBBONS['bronze-fourth']} />;
+  }
+
+  if (place === 'fourth') {
+    return <CustomMedal size={size} label="4" ribbon={MEDAL_RIBBONS.fourth} />;
+  }
+
+  const emoji: Record<string, string> = { gold: '🥇', silver: '🥈', bronze: '🥉' };
+  return <span className="shrink-0 leading-none" style={{ fontSize: size }}>{emoji[place]}</span>;
 }
 
 const PLACE_LABEL: Record<string, string> = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze', fourth: '4th' };
@@ -118,16 +139,16 @@ function ClubMedalRow({
         <td className={`px-3 py-2.5 ${cellClickCls}`} onClick={() => toggle('medals')}>
           <span className={`font-semibold text-sm text-slate-800 dark:text-slate-100 ${activeRing('medals')}`}>{club.club}</span>
         </td>
-        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.gold > 0 && toggle('gold')}>
+        <td className={`px-3 py-2.5 text-center whitespace-nowrap ${cellClickCls}`} onClick={() => club.gold > 0 && toggle('gold')}>
           <span className={`inline-flex items-center gap-1 text-sm font-bold text-yellow-600 dark:text-yellow-400 px-1 ${club.gold > 0 ? 'hover:underline' : ''} ${activeRing('gold')}`}>{club.gold}</span>
         </td>
-        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.silver > 0 && toggle('silver')}>
+        <td className={`px-3 py-2.5 text-center whitespace-nowrap ${cellClickCls}`} onClick={() => club.silver > 0 && toggle('silver')}>
           <span className={`inline-flex items-center gap-1 text-sm font-bold text-slate-500 dark:text-slate-400 px-1 ${club.silver > 0 ? 'hover:underline' : ''} ${activeRing('silver')}`}>{club.silver}</span>
         </td>
-        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.bronze > 0 && toggle('bronze')}>
+        <td className={`px-3 py-2.5 text-center whitespace-nowrap ${cellClickCls}`} onClick={() => club.bronze > 0 && toggle('bronze')}>
           <span className={`inline-flex items-center gap-1 text-sm font-bold text-amber-700 dark:text-amber-500 px-1 ${club.bronze > 0 ? 'hover:underline' : ''} ${activeRing('bronze')}`}>{club.bronze}</span>
         </td>
-        <td className={`px-3 py-2.5 text-center ${cellClickCls}`} onClick={() => club.total > 0 && toggle('medals')}>
+        <td className={`px-3 py-2.5 text-center whitespace-nowrap ${cellClickCls}`} onClick={() => club.total > 0 && toggle('medals')}>
           <span className={`font-extrabold text-sm text-slate-800 dark:text-slate-100 px-1 ${club.total > 0 ? 'hover:underline' : ''} ${activeRing('medals')}`}>{club.total}</span>
         </td>
       </tr>
@@ -135,7 +156,7 @@ function ClubMedalRow({
         <tr>
           <td colSpan={6} className="px-0 py-0">
             <div className="bg-slate-50 dark:bg-slate-800/40 px-6 py-3 border-y border-slate-100 dark:border-slate-700/50">
-              <table className="w-full text-sm">
+              <table className="min-w-full table-auto text-sm">
                 <thead>
                   <tr className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">
                     {([['event', 'Event'], ['place', 'Place'], ['player', 'Player(s)']] as const).map(([key, label]) => (
@@ -150,16 +171,16 @@ function ClubMedalRow({
                     const color = getEventColor(cm.drawName);
                     return (
                       <tr key={i} className="border-t border-slate-200/50 dark:border-slate-700/30">
-                        <td className="py-1.5 pr-3">
+                        <td className="py-1.5 pr-3 whitespace-nowrap">
                           <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>{cm.drawName}</span>
                         </td>
-                        <td className="py-1.5 pr-3">
-                          <div className="flex items-center gap-1">
-                            <MedalIcon type={cm.place} size={14} />
+                        <td className="py-1.5 pr-3 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5">
+                            <MedalIcon place={cm.place} size={18} />
                             <span className="text-xs text-slate-600 dark:text-slate-300">{PLACE_LABEL[cm.place] ?? cm.place}</span>
                           </div>
                         </td>
-                        <td className="py-1.5 text-slate-700 dark:text-slate-200">
+                        <td className="py-1.5 text-slate-700 dark:text-slate-200 whitespace-nowrap">
                           {(() => {
                             const clubOnly = cm.players.filter(p => p.club === club.club);
                             const show = clubOnly.length === cm.players.length ? cm.players : clubOnly;
@@ -216,7 +237,7 @@ export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: st
   if (!data) return <TabEmpty icon={Medal} message="No medal data available for this tournament." />;
 
   const medalClubs = sortedClubs.filter(c => c.total > 0);
-  const headerCls = 'px-3 py-2 text-xs uppercase tracking-wider font-medium cursor-pointer select-none hover:text-violet-600 dark:hover:text-violet-400 transition-colors';
+  const headerCls = 'px-3 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer select-none hover:text-violet-600 dark:hover:text-violet-400 transition-colors';
   const sortArrow = (key: SortKey) => sortKey === key ? (sortAsc ? ' ↑' : ' ↓') : '';
 
   if (medalClubs.length === 0) {
@@ -231,21 +252,21 @@ export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: st
         </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="min-w-full table-auto">
           <thead>
-            <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500">
-              <th className="px-3 py-2 w-10 text-xs">#</th>
-              <th className={`${headerCls} text-left`} onClick={() => handleSort('club')}>Club{sortArrow('club')}</th>
-              <th className={`${headerCls} text-center`} onClick={() => handleSort('gold')}>
-                <span className="inline-flex items-center gap-1"><MedalIcon type="gold" size={14} />Gold{sortArrow('gold')}</span>
+            <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">
+              <th className="px-3 py-2 w-10 text-xs whitespace-nowrap">#</th>
+              <th className={`${headerCls} text-left whitespace-nowrap`} onClick={() => handleSort('club')}>Club{sortArrow('club')}</th>
+              <th className={`${headerCls} text-center whitespace-nowrap`} onClick={() => handleSort('gold')}>
+                <span className="inline-flex items-center gap-0.5"><MedalIcon place="gold" size={20} />{sortArrow('gold')}</span>
               </th>
-              <th className={`${headerCls} text-center`} onClick={() => handleSort('silver')}>
-                <span className="inline-flex items-center gap-1"><MedalIcon type="silver" size={14} />Silver{sortArrow('silver')}</span>
+              <th className={`${headerCls} text-center whitespace-nowrap`} onClick={() => handleSort('silver')}>
+                <span className="inline-flex items-center gap-0.5"><MedalIcon place="silver" size={20} />{sortArrow('silver')}</span>
               </th>
-              <th className={`${headerCls} text-center`} onClick={() => handleSort('bronze')}>
-                <span className="inline-flex items-center gap-1"><MedalIcon type="bronze" size={14} />Bronze{sortArrow('bronze')}</span>
+              <th className={`${headerCls} text-center whitespace-nowrap`} onClick={() => handleSort('bronze')}>
+                <span className="inline-flex items-center gap-0.5"><MedalIcon place="bronze" size={20} label="3/4" />{sortArrow('bronze')}</span>
               </th>
-              <th className={`${headerCls} text-center`} onClick={() => handleSort('total')}>Total{sortArrow('total')}</th>
+              <th className={`${headerCls} text-center whitespace-nowrap`} onClick={() => handleSort('total')}>Total{sortArrow('total')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
