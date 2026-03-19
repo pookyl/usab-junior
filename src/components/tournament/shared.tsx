@@ -66,7 +66,7 @@ export function TabEmpty({ icon: Icon, message }: { icon: React.ElementType; mes
 
 // ── useTabData hook ─────────────────────────────────────────────────────────
 
-export function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id: string) => Promise<T>, cacheKey?: string) {
+export function useTabData<T>(tswId: string | undefined, active: boolean, fetcher: (id: string, refresh?: boolean) => Promise<T>, cacheKey?: string) {
   const fullKey = cacheKey && tswId ? `${tswId}:${cacheKey}` : '';
   const cached = fullKey ? tabDataCache.get(fullKey) as T | undefined : undefined;
 
@@ -75,13 +75,16 @@ export function useTabData<T>(tswId: string | undefined, active: boolean, fetche
   const [error, setError] = useState<string | null>(null);
   const [fetched, setFetched] = useState(!!cached);
   const reqId = useRef(0);
+  const refreshFlag = useRef(false);
 
   useEffect(() => {
     if (!tswId || !active || fetched) return;
     const currentReq = ++reqId.current;
+    const isRefresh = refreshFlag.current;
+    refreshFlag.current = false;
     setLoading(true);
     setError(null);
-    fetcher(tswId)
+    fetcher(tswId, isRefresh)
       .then(d => {
         if (currentReq !== reqId.current) return;
         setData(d);
@@ -97,7 +100,29 @@ export function useTabData<T>(tswId: string | undefined, active: boolean, fetche
     setFetched(false);
   }, []);
 
-  return { data, loading, error, retry };
+  const refresh = useCallback(() => {
+    if (fullKey) tabDataCache.delete(fullKey);
+    refreshFlag.current = true;
+    setError(null);
+    setFetched(false);
+  }, [fullKey]);
+
+  return { data, loading, error, retry, refresh };
+}
+
+// ── Refresh button ──────────────────────────────────────────────────────────
+
+export function RefreshButton({ onClick, loading }: { onClick: () => void; loading: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={loading}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+      {loading ? 'Refreshing…' : 'Refresh'}
+    </button>
+  );
 }
 
 // ── Color helpers ───────────────────────────────────────────────────────────

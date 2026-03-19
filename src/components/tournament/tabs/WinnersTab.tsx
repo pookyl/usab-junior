@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Medal } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
@@ -13,8 +13,9 @@ const PLACE_STYLES: Record<string, { label: string; color: string; ring: string 
   '4': { label: '4th', color: 'text-amber-700 dark:text-amber-600', ring: 'ring-amber-400/20' },
 };
 
-export default function WinnersTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const { data, loading, error, retry } = useTabData<TournamentWinnersResponse>(tswId, active, fetchTournamentWinners, 'winners');
+export default function WinnersTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+  const { data, loading, error, retry, refresh } = useTabData<TournamentWinnersResponse>(tswId, active, fetchTournamentWinners, 'winners');
+  useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
   const [filter, setFilter] = useState<string>('all');
 
   const filteredEvents = useMemo(() => {

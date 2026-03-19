@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Calendar, Swords, RefreshCw } from 'lucide-react';
-import { TabLoading, TabError, TabEmpty, cappedMapSet, todayYYYYMMDD } from '../shared';
+import { Calendar, Swords } from 'lucide-react';
+import { TabLoading, TabError, TabEmpty, cappedMapSet } from '../shared';
 import MatchCard from '../MatchCard';
 import { fetchTournamentMatchDates, fetchTournamentMatchDay } from '../../../services/rankingsService';
 import { useTournamentMeta } from '../../../hooks/useTournamentMeta';
@@ -34,7 +34,7 @@ interface MatchesTabSnapshot {
 
 const matchesTabCache = new Map<string, MatchesTabSnapshot>();
 
-export default function MatchesTab({ tswId, active }: { tswId: string; active: boolean }) {
+export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
   const snap = matchesTabCache.get(tswId);
   const meta = useTournamentMeta(tswId);
   const metaDates = useMemo(
@@ -61,8 +61,6 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
     unmountedRef.current = false;
     return () => { unmountedRef.current = true; };
   }, []);
-
-  const isToday = selectedDate === todayYYYYMMDD();
 
   useEffect(() => {
     cappedMapSet(matchesTabCache, tswId, { dates, selectedDate, matchDate, matches });
@@ -112,10 +110,7 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
     loadMatches(dateParam);
   }
 
-  function handleRefresh() {
-    if (!selectedDate) return;
-    loadMatches(selectedDate, true);
-  }
+  useEffect(() => { if (refreshTrigger && selectedDate) loadMatches(selectedDate, true); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const events = useMemo(() => {
     const set = new Set(matches.map(m => m.event).filter(Boolean));
@@ -172,16 +167,6 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
         </div>
       )}
 
-      {isToday && selectedDate && !matchesLoading && (
-        <button
-          onClick={handleRefresh}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors cursor-pointer"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Refresh live results
-        </button>
-      )}
-
       {!selectedDate && (
         <div className="text-center py-12 text-slate-400 dark:text-slate-500">
           <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -227,7 +212,7 @@ export default function MatchesTab({ tswId, active }: { tswId: string; active: b
                 if (group.time) {
                   items.push(
                     <div key={`t-${gi}`} className="sticky top-[3.5rem] md:top-16 z-10 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm py-2">
-                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{group.time}</span>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{group.time}</span>
                     </div>
                   );
                 }

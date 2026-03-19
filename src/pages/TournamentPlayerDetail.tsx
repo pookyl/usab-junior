@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
-import { TabLoading, TabError, TabEmpty } from '../components/tournament/shared';
+import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
 import MatchCard from '../components/tournament/MatchCard';
 import type { TournamentPlayerDetailResponse } from '../types/junior';
 
@@ -15,20 +15,29 @@ export default function TournamentPlayerDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [eventFilter, setEventFilter] = useState('');
+  const refreshFlag = useRef(false);
+  const [fetchTrigger, setFetchTrigger] = useState(0);
 
   useEffect(() => {
     if (!tswId || !playerId) return;
     let cancelled = false;
-    setData(null);
+    const isRefresh = refreshFlag.current;
+    refreshFlag.current = false;
+    if (!isRefresh) setData(null);
     setError(null);
-    setEventFilter('');
+    if (!isRefresh) setEventFilter('');
     setLoading(true);
-    fetchTournamentPlayerDetail(tswId, playerId)
+    fetchTournamentPlayerDetail(tswId, playerId, isRefresh)
       .then(d => { if (!cancelled) setData(d); })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [tswId, playerId]);
+  }, [tswId, playerId, fetchTrigger]);
+
+  const handleRefresh = useCallback(() => {
+    refreshFlag.current = true;
+    setFetchTrigger(n => n + 1);
+  }, []);
 
   const resolvedUsabId = useMemo(() => {
     if (data?.memberId && playerIdSet.has(data.memberId)) return data.memberId;
@@ -55,13 +64,16 @@ export default function TournamentPlayerDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
-      <Link
-        to={`/tournaments/${tswId}/players`}
-        className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Players
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          to={`/tournaments/${tswId}/players`}
+          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Players
+        </Link>
+        <RefreshButton onClick={handleRefresh} loading={loading} />
+      </div>
 
       {loading ? (
         <TabLoading label="player" />

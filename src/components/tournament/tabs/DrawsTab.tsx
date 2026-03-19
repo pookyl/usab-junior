@@ -1,11 +1,13 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { List } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
 import { fetchTournamentDetail } from '../../../services/rankingsService';
 
-export default function DrawsTab({ tswId, active }: { tswId: string; active: boolean }) {
+export default function DrawsTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
   const navigate = useNavigate();
-  const { data, loading, error, retry } = useTabData(tswId, active, fetchTournamentDetail, 'draws');
+  const { data, loading, error, retry, refresh } = useTabData(tswId, active, fetchTournamentDetail, 'draws');
+  useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <TabLoading label="draws" />;
   if (error) return <TabError error={error} onRetry={retry} />;

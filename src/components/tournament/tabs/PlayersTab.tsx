@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Search, ChevronRight } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty } from '../shared';
@@ -7,8 +7,9 @@ import type { TournamentPlayersResponse } from '../../../types/junior';
 
 const PLAYERS_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-export default function PlayersTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const { data, loading, error, retry } = useTabData<TournamentPlayersResponse>(tswId, active, fetchTournamentPlayers, 'players');
+export default function PlayersTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+  const { data, loading, error, retry, refresh } = useTabData<TournamentPlayersResponse>(tswId, active, fetchTournamentPlayers, 'players');
+  useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
   const [search, setSearch] = useState('');
   const [clubFilter, setClubFilter] = useState('');
   const [activeLetter, setActiveLetter] = useState<string | null>(null);

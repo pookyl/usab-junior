@@ -257,8 +257,9 @@ const tournamentDetailCache = new Map<string, TournamentDetail>();
 
 export async function fetchTournamentDetail(
   tswId: string,
+  refresh = false,
 ): Promise<TournamentDetail> {
-  if (tournamentDetailCache.has(tswId)) return tournamentDetailCache.get(tswId)!;
+  if (!refresh && tournamentDetailCache.has(tswId)) return tournamentDetailCache.get(tswId)!;
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/detail`;
   const res = await fetchWithRetry(url, 30_000);
@@ -275,8 +276,9 @@ const tournamentWinnersCache = new Map<string, TournamentWinnersResponse>();
 
 export async function fetchTournamentWinners(
   tswId: string,
+  refresh = false,
 ): Promise<TournamentWinnersResponse> {
-  if (tournamentWinnersCache.has(tswId)) return tournamentWinnersCache.get(tswId)!;
+  if (!refresh && tournamentWinnersCache.has(tswId)) return tournamentWinnersCache.get(tswId)!;
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/winners`;
   const res = await fetchWithRetry(url, 60_000);
@@ -293,8 +295,9 @@ const tournamentMedalsCache = new Map<string, TournamentMedals>();
 
 export async function fetchTournamentMedals(
   tswId: string,
+  refresh = false,
 ): Promise<TournamentMedals> {
-  if (tournamentMedalsCache.has(tswId)) return tournamentMedalsCache.get(tswId)!;
+  if (!refresh && tournamentMedalsCache.has(tswId)) return tournamentMedalsCache.get(tswId)!;
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/medals`;
   const res = await fetchWithRetry(url, 120_000);
@@ -311,8 +314,9 @@ const tournamentPlayersCache = new Map<string, TournamentPlayersResponse>();
 
 export async function fetchTournamentPlayers(
   tswId: string,
+  refresh = false,
 ): Promise<TournamentPlayersResponse> {
-  if (tournamentPlayersCache.has(tswId)) return tournamentPlayersCache.get(tswId)!;
+  if (!refresh && tournamentPlayersCache.has(tswId)) return tournamentPlayersCache.get(tswId)!;
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/players`;
   const res = await fetchWithRetry(url, 30_000);
@@ -330,9 +334,10 @@ const tournamentPlayerDetailCache = new Map<string, TournamentPlayerDetailRespon
 export async function fetchTournamentPlayerDetail(
   tswId: string,
   playerId: number | string,
+  refresh = false,
 ): Promise<TournamentPlayerDetailResponse> {
   const key = `${tswId}:${playerId}`;
-  if (tournamentPlayerDetailCache.has(key)) return tournamentPlayerDetailCache.get(key)!;
+  if (!refresh && tournamentPlayerDetailCache.has(key)) return tournamentPlayerDetailCache.get(key)!;
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/player-detail?playerId=${encodeURIComponent(playerId)}`;
   const res = await fetchWithRetry(url, 30_000);
@@ -350,8 +355,9 @@ const tournamentMatchDayCache = new Map<string, TournamentMatchDayResponse>();
 
 export async function fetchTournamentMatchDates(
   tswId: string,
+  refresh = false,
 ): Promise<TournamentMatchDatesResponse> {
-  if (tournamentMatchDatesCache.has(tswId)) return tournamentMatchDatesCache.get(tswId)!;
+  if (!refresh && tournamentMatchDatesCache.has(tswId)) return tournamentMatchDatesCache.get(tswId)!;
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/matches`;
   const res = await fetchWithRetry(url, 30_000);
@@ -371,9 +377,10 @@ const drawBracketCache = new Map<string, DrawResponse>();
 export async function fetchDrawBracket(
   tswId: string,
   drawId: number,
+  refresh = false,
 ): Promise<DrawResponse> {
   const key = `${tswId}:${drawId}`;
-  if (drawBracketCache.has(key)) return drawBracketCache.get(key)!;
+  if (!refresh && drawBracketCache.has(key)) return drawBracketCache.get(key)!;
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/draw-bracket?drawId=${drawId}`;
   const res = await fetchWithRetry(url, 60_000);

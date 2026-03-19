@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, List } from 'lucide-react';
 import { fetchTournamentDetail, fetchDrawBracket, type DrawResponse } from '../services/rankingsService';
-import { TabLoading, TabError, TabEmpty, getEventColor } from '../components/tournament/shared';
+import { TabLoading, TabError, TabEmpty, getEventColor, RefreshButton } from '../components/tournament/shared';
 import BracketView from '../components/tournament/BracketView';
 import RoundRobinView from '../components/tournament/RoundRobinView';
 import type { EliminationDrawResponse, RoundRobinDrawResponse } from '../types/junior';
@@ -16,20 +16,24 @@ export default function TournamentDrawDetail() {
   const [drawData, setDrawData] = useState<DrawResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const refreshFlag = useRef(false);
+  const [fetchTrigger, setFetchTrigger] = useState(0);
 
   useEffect(() => {
     if (!tswId || !drawId) return;
     let cancelled = false;
+    const isRefresh = refreshFlag.current;
+    refreshFlag.current = false;
     setLoading(true);
     setError(null);
-    setDrawData(null);
+    if (!isRefresh) setDrawData(null);
 
     const numericDrawId = Number(drawId);
-    const needsName = !routeState?.drawName;
+    const needsName = !routeState?.drawName && !drawName;
 
     const fetches: [Promise<unknown>, Promise<DrawResponse>] = [
       needsName ? fetchTournamentDetail(tswId) : Promise.resolve(null),
-      fetchDrawBracket(tswId, numericDrawId),
+      fetchDrawBracket(tswId, numericDrawId, isRefresh),
     ];
 
     Promise.allSettled(fetches)
@@ -55,7 +59,12 @@ export default function TournamentDrawDetail() {
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
-  }, [tswId, drawId, routeState?.drawName]);
+  }, [tswId, drawId, routeState?.drawName, drawName, fetchTrigger]);
+
+  const handleRefresh = useCallback(() => {
+    refreshFlag.current = true;
+    setFetchTrigger(n => n + 1);
+  }, []);
 
   if (!tswId || !drawId) return null;
 
@@ -66,13 +75,16 @@ export default function TournamentDrawDetail() {
 
   return (
     <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
-      <Link
-        to={`/tournaments/${tswId}/draws`}
-        className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Draws
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          to={`/tournaments/${tswId}/draws`}
+          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Draws
+        </Link>
+        <RefreshButton onClick={handleRefresh} loading={loading} />
+      </div>
 
       {loading ? (
         <TabLoading label="draw" />

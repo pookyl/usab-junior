@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Medal } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
@@ -184,8 +184,9 @@ function ClubMedalRow({
   );
 }
 
-export default function MedalsTab({ tswId, active }: { tswId: string; active: boolean }) {
-  const { data, loading, error, retry } = useTabData<TournamentMedals>(tswId, active, fetchTournamentMedals, 'medals');
+export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+  const { data, loading, error, retry, refresh } = useTabData<TournamentMedals>(tswId, active, fetchTournamentMedals, 'medals');
+  useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
   const [sortKey, setSortKey] = useState<SortKey>('total');
   const [sortAsc, setSortAsc] = useState(false);
 
