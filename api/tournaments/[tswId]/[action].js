@@ -25,12 +25,14 @@ function getEventType(eventName) {
 
 function normalizePlaces(results) {
   const gold = [], silver = [], bronze = [], fourth = [];
+  const hasExplicit3 = results.some(r => r.place.replace(/\s/g, '') === '3');
   for (const r of results) {
     const p = r.place.replace(/\s/g, '');
     if (p === '1') gold.push(r);
     else if (p === '1/2') { (gold.length === 0 ? gold : silver).push(r); }
     else if (p === '2') silver.push(r);
-    else if (p === '3' || p === '3/4') bronze.push(r);
+    else if (p === '3') bronze.push(r);
+    else if (p === '3/4') (hasExplicit3 ? fourth : bronze).push(r);
     else if (p === '4') fourth.push(r);
   }
   if (gold.length === 0 && results.length > 0) gold.push(results[0]);

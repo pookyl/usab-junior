@@ -1123,8 +1123,12 @@ export function parseTswPlayerMatches(html) {
       return { names, playerIds, won };
     }
 
-    const team1 = extractTeam(rowBlocks[0]);
-    const team2 = extractTeam(rowBlocks[1]);
+    let team1 = extractTeam(rowBlocks[0]);
+    let team2 = extractTeam(rowBlocks[1]);
+
+    if (isBye && team1.names.length === 0 && team2.names.length > 0) {
+      [team1, team2] = [team2, team1];
+    }
 
     const isWalkover = !isBye && block.includes('>Walkover<');
     const isRetired = !isBye && (/>\s*Retired?\s*</i.test(block) || />\s*Ret\.?\s*</i.test(block));
