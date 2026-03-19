@@ -6,6 +6,7 @@ import {
   parseTswEliminationDraw, parseTswDrawType,
   parseTswRoundRobinGroups, parseTswRoundRobinGroupName,
   parseTswRoundRobinStandings, parseTswRoundRobinMatches,
+  parseTswPlayerInfo, parseTswPlayerEvents, parseTswPlayerWinLoss,
   isValidTswId,
   TSW_BASE,
 } from '../../_lib/shared.js';
@@ -75,9 +76,28 @@ async function fetchTournamentPlayers(tswId) {
     },
     body: '',
   });
-  if (!resp.ok) throw new Error(`Players content HTTP ${resp.status}`);
+  tswOk(resp, 'Players content');
   const html = await resp.text();
   return parseTswTournamentPlayers(html);
+}
+
+class UpstreamError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'UpstreamError';
+  }
+}
+
+function tswOk(resp, label) {
+  if (!resp.ok) throw new UpstreamError(`${label} HTTP ${resp.status}`);
+  return resp;
+}
+
+function sendError(res, err, label) {
+  const status = err instanceof UpstreamError ? 502 : 500;
+  console.error(`[${label}] error:`, err.message);
+  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: err.message }));
 }
 
 // ── Action handlers ─────────────────────────────────────────────────────────
@@ -93,8 +113,7 @@ async function handleDetail(tswId, _req, res) {
 
   try {
     const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
-    const resp = await tswFetch(drawsPath);
-    if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
+    const resp = tswOk(await tswFetch(drawsPath), 'TSW draws page');
     const html = await resp.text();
 
     const info = parseTswTournamentInfo(html);
@@ -113,9 +132,7 @@ async function handleDetail(tswId, _req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-detail] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-detail');
   }
 }
 
@@ -129,8 +146,7 @@ async function handleWinners(tswId, _req, res) {
   }
 
   try {
-    const winnersResp = await tswFetch(`/sport/winners.aspx?id=${encodeURIComponent(tswId)}`);
-    if (!winnersResp.ok) throw new Error(`Winners page HTTP ${winnersResp.status}`);
+    const winnersResp = tswOk(await tswFetch(`/sport/winners.aspx?id=${encodeURIComponent(tswId)}`), 'Winners page');
     const winnersHtml = await winnersResp.text();
 
     const titleMatch = winnersHtml.match(/<title>\s*([\s\S]*?)\s*<\/title>/i);
@@ -145,9 +161,7 @@ async function handleWinners(tswId, _req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-winners] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-winners');
   }
 }
 
@@ -166,7 +180,7 @@ async function handleMedals(tswId, _req, res) {
       fetchTournamentPlayers(tswId),
     ]);
 
-    if (!winnersResp.ok) throw new Error(`Winners page HTTP ${winnersResp.status}`);
+    tswOk(winnersResp, 'Winners page');
     const winnersHtml = await winnersResp.text();
 
     const titleMatch = winnersHtml.match(/<title>\s*([\s\S]*?)\s*<\/title>/i);
@@ -217,9 +231,7 @@ async function handleMedals(tswId, _req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-medals] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-medals');
   }
 }
 
@@ -238,8 +250,7 @@ async function handleMatches(tswId, req, res) {
     }
 
     try {
-      const parentResp = await tswFetch(`/sport/matches.aspx?id=${encodeURIComponent(tswId)}`);
-      if (!parentResp.ok) throw new Error(`TSW matches page HTTP ${parentResp.status}`);
+      const parentResp = tswOk(await tswFetch(`/sport/matches.aspx?id=${encodeURIComponent(tswId)}`), 'TSW matches page');
       const parentHtml = await parentResp.text();
       const dates = parseTswMatchDates(parentHtml);
       setCache(datesCacheKey, dates);
@@ -247,9 +258,7 @@ async function handleMatches(tswId, req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
       res.end(JSON.stringify({ tswId, dates }));
     } catch (err) {
-      console.error('[tournament-matches] dates error:', err.message);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message }));
+      sendError(res, err, 'tournament-matches-dates');
     }
     return;
   }
@@ -265,10 +274,9 @@ async function handleMatches(tswId, req, res) {
   }
 
   try {
-    const matchResp = await tswFetch(
+    const matchResp = tswOk(await tswFetch(
       `/tournament/${tswId.toLowerCase()}/Matches/MatchesInDay?date=${encodeURIComponent(dateParam)}`,
-    );
-    if (!matchResp.ok) throw new Error(`TSW matches AJAX HTTP ${matchResp.status}`);
+    ), 'TSW matches AJAX');
     const matchHtml = await matchResp.text();
     const matches = parseTswMatches(matchHtml);
     setCache(cacheKey, matches);
@@ -276,9 +284,7 @@ async function handleMatches(tswId, req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify({ tswId, date: formatMatchDate(dateParam), matches }));
   } catch (err) {
-    console.error('[tournament-matches] day error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-matches-day');
   }
 }
 
@@ -295,15 +301,14 @@ async function handlePlayers(tswId, _req, res) {
     }
 
     const playersUrl = `/tournament/${tswId.toLowerCase()}/Players/GetPlayersContent`;
-    const resp = await tswFetch(playersUrl, {
+    const resp = tswOk(await tswFetch(playersUrl, {
       method: 'POST',
       extraHeaders: {
         'Content-Type': 'application/x-www-form-urlencoded',
         Referer: `${TSW_BASE}/tournament/${tswId}/players`,
       },
       body: '',
-    });
-    if (!resp.ok) throw new Error(`Players content HTTP ${resp.status}`);
+    }), 'Players content');
     const html = await resp.text();
     const players = parseTswTournamentPlayersArray(html);
     const result = { tswId, playerCount: players.length, players };
@@ -312,9 +317,7 @@ async function handlePlayers(tswId, _req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-players] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-players');
   }
 }
 
@@ -329,8 +332,7 @@ async function handleDraws(tswId, _req, res) {
     }
 
     const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
-    const resp = await tswFetch(drawsPath);
-    if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
+    const resp = tswOk(await tswFetch(drawsPath), 'TSW draws page');
     const html = await resp.text();
     const draws = parseTswDrawsList(html);
     const result = { tswId, drawCount: draws.length, draws };
@@ -339,9 +341,7 @@ async function handleDraws(tswId, _req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-draws] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-draws');
   }
 }
 
@@ -356,8 +356,7 @@ async function handleEvents(tswId, _req, res) {
     }
 
     const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
-    const resp = await tswFetch(drawsPath);
-    if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
+    const resp = tswOk(await tswFetch(drawsPath), 'TSW draws page');
     const html = await resp.text();
     const draws = parseTswDrawsList(html);
 
@@ -373,9 +372,7 @@ async function handleEvents(tswId, _req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-events] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-events');
   }
 }
 
@@ -398,47 +395,12 @@ async function handlePlayerDetail(tswId, req, res) {
 
   try {
     const playerPath = `/tournament/${tswId.toLowerCase()}/player/${playerId}`;
-    const resp = await tswFetch(playerPath);
-    if (!resp.ok) throw new Error(`TSW player page HTTP ${resp.status}`);
+    const resp = tswOk(await tswFetch(playerPath), 'TSW player page');
     const html = await resp.text();
 
-    // Player name from <h4 class="media__title ..."><a ...><span>Name</span></a></h4>
-    const nameMatch = html.match(/<h4[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h4>/i);
-    let playerName = '';
-    let memberId = '';
-    if (nameMatch) {
-      const valMatch = nameMatch[1].match(/nav-link__value">([^<]+)<\/span>/);
-      if (valMatch) playerName = valMatch[1].trim();
-      const asideMatch = nameMatch[1].match(/media__title-aside[^>]*>\s*\((\d+)\)/);
-      if (asideMatch) memberId = asideMatch[1];
-    }
-
-    const club = '';
-
-    // Events + partners from media__subheading-wrapper (player-level)
-    const events = [];
-    const wrapperMatch = html.match(/<div class="media__subheading-wrapper">([\s\S]*?)<\/div>/i);
-    if (wrapperMatch) {
-      const evRegex = /nav-link__value">([^<]+)<\/span>/g;
-      let em;
-      while ((em = evRegex.exec(wrapperMatch[1])) !== null) {
-        events.push(em[1].trim());
-      }
-    }
-
-    // Win-loss from progress-bar-container
-    let winLoss = null;
-    const wlMatch = html.match(/<span class="flex-item">(\d+)-(\d+)\s*\((\d+)\)<\/span>/);
-    const pctMatch = html.match(/aria-valuenow="(\d+)"/);
-    if (wlMatch) {
-      winLoss = {
-        wins: parseInt(wlMatch[1], 10),
-        losses: parseInt(wlMatch[2], 10),
-        total: parseInt(wlMatch[3], 10),
-        winPct: pctMatch ? parseInt(pctMatch[1], 10) : 0,
-      };
-    }
-
+    const { playerName, memberId } = parseTswPlayerInfo(html);
+    const events = parseTswPlayerEvents(html);
+    const winLoss = parseTswPlayerWinLoss(html);
     const matches = parseTswPlayerMatches(html);
 
     const result = {
@@ -446,7 +408,7 @@ async function handlePlayerDetail(tswId, req, res) {
       playerId: parseInt(playerId, 10),
       playerName,
       memberId: memberId || undefined,
-      club,
+      club: '',
       events,
       winLoss,
       matches,
@@ -456,9 +418,7 @@ async function handlePlayerDetail(tswId, req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-player-detail] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-player-detail');
   }
 }
 
@@ -482,8 +442,7 @@ async function handleDrawBracket(tswId, req, res) {
   try {
     const tswIdLower = tswId.toLowerCase();
     const drawPath = `/tournament/${tswIdLower}/draw/${drawId}`;
-    const resp = await tswFetch(drawPath);
-    if (!resp.ok) throw new Error(`TSW draw page HTTP ${resp.status}`);
+    const resp = tswOk(await tswFetch(drawPath), 'TSW draw page');
     const html = await resp.text();
 
     const drawType = parseTswDrawType(html);
@@ -520,9 +479,7 @@ async function handleDrawBracket(tswId, req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[tournament-draw-bracket] error:', err.message);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: err.message }));
+    sendError(res, err, 'tournament-draw-bracket');
   }
 }
 

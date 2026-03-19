@@ -34,6 +34,11 @@ async function fetchWithRetry(url: string, timeoutMs: number, retries = 2): Prom
   }
 }
 
+async function throwApiError(res: Response, fallback: string): Promise<never> {
+  const body = await res.json().catch(() => ({}));
+  throw new Error((body as Record<string, string>).error || `${fallback} ${res.status}`);
+}
+
 // ── Cache helpers ────────────────────────────────────────────────────────────
 const MAX_CACHE_SIZE = 200;
 
@@ -240,7 +245,7 @@ export async function fetchTournaments(
 
   const url = season ? `/api/tournaments?season=${encodeURIComponent(season)}` : '/api/tournaments';
   const res = await fetchWithRetry(url, 15_000);
-  if (!res.ok) throw new Error(`Tournaments API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournaments API');
 
   const data: TournamentsResponse = await res.json();
   tournamentsCache = data;
@@ -257,7 +262,7 @@ export async function fetchTournamentDetail(
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/detail`;
   const res = await fetchWithRetry(url, 30_000);
-  if (!res.ok) throw new Error(`Tournament detail API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournament detail API');
 
   const data: TournamentDetail = await res.json();
   cappedSet(tournamentDetailCache, tswId, data);
@@ -275,7 +280,7 @@ export async function fetchTournamentWinners(
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/winners`;
   const res = await fetchWithRetry(url, 60_000);
-  if (!res.ok) throw new Error(`Tournament winners API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournament winners API');
 
   const data: TournamentWinnersResponse = await res.json();
   cappedSet(tournamentWinnersCache, tswId, data);
@@ -293,7 +298,7 @@ export async function fetchTournamentMedals(
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/medals`;
   const res = await fetchWithRetry(url, 120_000);
-  if (!res.ok) throw new Error(`Tournament medals API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournament medals API');
 
   const data: TournamentMedals = await res.json();
   cappedSet(tournamentMedalsCache, tswId, data);
@@ -311,7 +316,7 @@ export async function fetchTournamentPlayers(
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/players`;
   const res = await fetchWithRetry(url, 30_000);
-  if (!res.ok) throw new Error(`Tournament players API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournament players API');
 
   const data: TournamentPlayersResponse = await res.json();
   cappedSet(tournamentPlayersCache, tswId, data);
@@ -331,7 +336,7 @@ export async function fetchTournamentPlayerDetail(
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/player-detail?playerId=${encodeURIComponent(playerId)}`;
   const res = await fetchWithRetry(url, 30_000);
-  if (!res.ok) throw new Error(`Tournament player detail API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournament player detail API');
 
   const data: TournamentPlayerDetailResponse = await res.json();
   cappedSet(tournamentPlayerDetailCache, key, data);
@@ -350,7 +355,7 @@ export async function fetchTournamentMatchDates(
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/matches`;
   const res = await fetchWithRetry(url, 30_000);
-  if (!res.ok) throw new Error(`Tournament match dates API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournament match dates API');
 
   const data: TournamentMatchDatesResponse = await res.json();
   cappedSet(tournamentMatchDatesCache, tswId, data);
@@ -372,7 +377,7 @@ export async function fetchDrawBracket(
 
   const url = `/api/tournaments/${encodeURIComponent(tswId)}/draw-bracket?drawId=${drawId}`;
   const res = await fetchWithRetry(url, 60_000);
-  if (!res.ok) throw new Error(`Draw bracket API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Draw bracket API');
 
   const data: DrawResponse = await res.json();
   cappedSet(drawBracketCache, key, data);
@@ -390,7 +395,7 @@ export async function fetchTournamentMatchDay(
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/matches?d=${encodeURIComponent(dateParam)}`;
   if (refresh) url += '&refresh=1';
   const res = await fetchWithRetry(url, 60_000);
-  if (!res.ok) throw new Error(`Tournament matches API ${res.status}`);
+  if (!res.ok) await throwApiError(res, 'Tournament matches API');
 
   const data: TournamentMatchDayResponse = await res.json();
   cappedSet(tournamentMatchDayCache, cacheKey, data);

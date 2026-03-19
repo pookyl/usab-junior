@@ -1029,6 +1029,46 @@ export function parseTswMatches(html) {
   return matches;
 }
 
+// ── TSW Player-page info parsers ─────────────────────────────────────────────
+
+export function parseTswPlayerInfo(html) {
+  const nameMatch = html.match(/<h4[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h4>/i);
+  let playerName = '';
+  let memberId = '';
+  if (nameMatch) {
+    const valMatch = nameMatch[1].match(/nav-link__value">([^<]+)<\/span>/);
+    if (valMatch) playerName = valMatch[1].trim();
+    const asideMatch = nameMatch[1].match(/media__title-aside[^>]*>\s*\((\d+)\)/);
+    if (asideMatch) memberId = asideMatch[1];
+  }
+  return { playerName, memberId };
+}
+
+export function parseTswPlayerEvents(html) {
+  const events = [];
+  const wrapperMatch = html.match(/<div class="media__subheading-wrapper">([\s\S]*?)<\/div>/i);
+  if (wrapperMatch) {
+    const evRegex = /nav-link__value">([^<]+)<\/span>/g;
+    let em;
+    while ((em = evRegex.exec(wrapperMatch[1])) !== null) {
+      events.push(em[1].trim());
+    }
+  }
+  return events;
+}
+
+export function parseTswPlayerWinLoss(html) {
+  const wlMatch = html.match(/<span class="flex-item">(\d+)-(\d+)\s*\((\d+)\)<\/span>/);
+  const pctMatch = html.match(/aria-valuenow="(\d+)"/);
+  if (!wlMatch) return null;
+  return {
+    wins: parseInt(wlMatch[1], 10),
+    losses: parseInt(wlMatch[2], 10),
+    total: parseInt(wlMatch[3], 10),
+    winPct: pctMatch ? parseInt(pctMatch[1], 10) : 0,
+  };
+}
+
 // ── TSW Player-page match parser ────────────────────────────────────────────
 // Parses the /tournament/{id}/player/{pid} page where matches use <div class="match">
 // inside <li class="match-group__item"> elements (no match--list class, no time grouping).
