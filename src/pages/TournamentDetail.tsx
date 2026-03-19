@@ -1,15 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useSearchParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link, Navigate } from 'react-router-dom';
 import {
   ArrowLeft, ExternalLink,
-  Calendar, MapPin, List, Swords, Users, Trophy, Medal,
+  Calendar, MapPin, Swords, Users, List, Trophy, Medal,
 } from 'lucide-react';
-import { fetchTournaments } from '../services/rankingsService';
-import MatchesTab from '../components/tournament/tabs/MatchesTab';
-import PlayersTab from '../components/tournament/tabs/PlayersTab';
-import DrawsTab from '../components/tournament/tabs/DrawsTab';
-import WinnersTab from '../components/tournament/tabs/WinnersTab';
-import MedalsTab from '../components/tournament/tabs/MedalsTab';
+import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 
 // Re-export for backward compatibility (App.tsx, BracketDisplay.test.ts)
 export { default as TournamentPlayerDetail } from './TournamentPlayerDetail';
@@ -17,71 +11,35 @@ export { default as TournamentDrawDetail } from './TournamentDrawDetail';
 export { buildDisplayRounds } from '../components/tournament/BracketView';
 export type { DisplayPlayer, DisplayMatch, DisplayRound } from '../components/tournament/BracketView';
 
-// ── Tab definitions ─────────────────────────────────────────────────────────
+// ── Section definitions (single source of truth for hub pills) ───────────────
 
-const TABS = [
+const SECTIONS = [
   { id: 'matches', label: 'Matches', icon: Swords },
   { id: 'players', label: 'Players', icon: Users },
-  { id: 'draws', label: 'Draws', icon: List },
+  { id: 'draws',   label: 'Draws',   icon: List },
   { id: 'winners', label: 'Winners', icon: Trophy },
-  { id: 'medals', label: 'Medals', icon: Medal },
+  { id: 'medals',  label: 'Medals',  icon: Medal },
 ] as const;
 
-type TabId = (typeof TABS)[number]['id'];
-
-// ── Main Page ───────────────────────────────────────────────────────────────
+// ── Main Page (Hub) ──────────────────────────────────────────────────────────
 
 export default function TournamentDetail() {
   const { tswId } = useParams<{ tswId: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
-  const TAB_IDS = TABS.map(t => t.id) as readonly TabId[];
-  const rawTab = searchParams.get('tab');
-  const activeTab: TabId = TAB_IDS.includes(rawTab as TabId) ? (rawTab as TabId) : 'matches';
+  const [searchParams] = useSearchParams();
+  const meta = useTournamentMeta(tswId);
 
-  const routeState = location.state as { name?: string; hostClub?: string; startDate?: string; endDate?: string } | null;
-
-  const [tournamentName, setTournamentName] = useState(routeState?.name || '');
-  const [tournamentMeta, setTournamentMeta] = useState({
-    hostClub: routeState?.hostClub || '',
-    startDate: routeState?.startDate || '',
-    endDate: routeState?.endDate || '',
-  });
-
-  useEffect(() => {
-    if (tournamentName || !tswId) return;
-    let cancelled = false;
-    fetchTournaments()
-      .then(data => {
-        if (cancelled) return;
-        const allTournaments = data.tournaments
-          ?? Object.values(data.seasons ?? {}).flatMap(s => s.tournaments);
-        const match = allTournaments.find(t => t.tswId?.toUpperCase() === tswId.toUpperCase());
-        if (match) {
-          setTournamentName(match.name);
-          setTournamentMeta({ hostClub: match.hostClub, startDate: match.startDate ?? '', endDate: match.endDate ?? '' });
-        }
-      })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [tswId, tournamentName]);
-
-  function setTab(tab: TabId) {
-    setSearchParams({ tab }, { replace: true });
+  // Backward compatibility: redirect ?tab=X to /tournaments/:tswId/X
+  const legacyTab = searchParams.get('tab');
+  if (legacyTab && tswId) {
+    const validTabs = SECTIONS.map(s => s.id) as readonly string[];
+    if (validTabs.includes(legacyTab)) {
+      return <Navigate to={`/tournaments/${tswId}/${legacyTab}`} replace />;
+    }
   }
 
   if (!tswId) return null;
 
   const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
-
-  function formatDateRange(start: string, end: string) {
-    if (!start) return '';
-    const s = new Date(start + 'T00:00:00');
-    const e = end ? new Date(end + 'T00:00:00') : s;
-    const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-    if (start === end || !end) return s.toLocaleDateString('en-US', opts);
-    return `${s.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${e.toLocaleDateString('en-US', opts)}`;
-  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
@@ -93,19 +51,19 @@ export default function TournamentDetail() {
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8">
         <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight mb-2">
-          {tournamentName || 'Tournament'}
+          {meta.name || 'Tournament'}
         </h1>
         <div className="flex items-center gap-4 flex-wrap mt-2 text-sm text-slate-500 dark:text-slate-400">
-          {tournamentMeta.startDate && (
+          {meta.startDate && (
             <span className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
-              {formatDateRange(tournamentMeta.startDate, tournamentMeta.endDate)}
+              {formatDateRange(meta.startDate, meta.endDate)}
             </span>
           )}
-          {tournamentMeta.hostClub && (
+          {meta.hostClub && (
             <span className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4" />
-              {tournamentMeta.hostClub}
+              {meta.hostClub}
             </span>
           )}
           <a
@@ -120,39 +78,26 @@ export default function TournamentDetail() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-slate-200 dark:border-slate-700 overflow-x-auto scrollbar-hide">
-        <nav className="flex gap-1 min-w-max" role="tablist" aria-label="Tournament sections">
-          {TABS.map(tab => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setTab(tab.id)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? 'border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400'
-                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Tab content */}
-      <div role="tabpanel">
-        {activeTab === 'draws' && <DrawsTab tswId={tswId} active={activeTab === 'draws'} />}
-        {activeTab === 'players' && <PlayersTab tswId={tswId} active={activeTab === 'players'} />}
-        {activeTab === 'winners' && <WinnersTab tswId={tswId} active={activeTab === 'winners'} />}
-        {activeTab === 'medals' && <MedalsTab tswId={tswId} active={activeTab === 'medals'} />}
-        {activeTab === 'matches' && <MatchesTab tswId={tswId} active={activeTab === 'matches'} />}
+      {/* Section pills grid */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+        {SECTIONS.map(section => {
+          const Icon = section.icon;
+          return (
+            <Link
+              key={section.id}
+              to={`/tournaments/${tswId}/${section.id}`}
+              state={{ name: meta.name, hostClub: meta.hostClub, startDate: meta.startDate, endDate: meta.endDate }}
+              className="flex flex-col items-center gap-2 p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-600 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center group-hover:bg-violet-100 dark:group-hover:bg-violet-900/40 transition-colors">
+                <Icon className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              </div>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {section.label}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

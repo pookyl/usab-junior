@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar, MapPin, ChevronDown, ExternalLink, FileText,
-  Clock, CheckCircle2, Loader2, Filter, Medal,
+  Clock, CheckCircle2, Loader2, Filter, Medal, SquareArrowOutUpRight,
 } from 'lucide-react';
 import { fetchTournaments } from '../services/rankingsService';
 import type { ScheduledTournament, TournamentsResponse } from '../types/junior';
@@ -202,9 +202,10 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
           <Link
             to={`/tournaments/${tournament.tswId}`}
             state={{ name: tournament.name, hostClub: tournament.hostClub, startDate: tournament.startDate, endDate: tournament.endDate }}
-            className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+            className="inline-flex items-center gap-1 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
           >
             {tournament.name}
+            <SquareArrowOutUpRight className="w-4 h-4 text-violet-400 dark:text-violet-500 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors shrink-0" />
           </Link>
         ) : (
           tournament.name
@@ -225,7 +226,7 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
       <div className="flex items-center gap-2 flex-wrap">
         {tournament.tswId && tournament.status === 'completed' && (
           <Link
-            to={`/tournaments/${tournament.tswId}?tab=medals`}
+            to={`/tournaments/${tournament.tswId}/medals`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
           >
             <Medal className="w-3 h-3" />

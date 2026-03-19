@@ -325,21 +325,53 @@ const server = createServer(async (req, res) => {
       }
 
       let result;
+      let allTournaments = [];
       if (season) {
         const data = await loadSeason(season);
+        const list = data ? recomputeStatuses(data.tournaments) : [];
+        allTournaments = list;
         result = {
           season,
-          tournaments: data ? recomputeStatuses(data.tournaments) : [],
+          tournaments: list,
           availableSeasons,
         };
       } else {
         const allSeasons = {};
         for (const s of availableSeasons) {
           const data = await loadSeason(s);
-          if (data) allSeasons[s] = { tournaments: recomputeStatuses(data.tournaments) };
+          if (data) {
+            const list = recomputeStatuses(data.tournaments);
+            allSeasons[s] = { tournaments: list };
+            allTournaments.push(...list);
+          }
         }
         result = { seasons: allSeasons, availableSeasons };
       }
+
+      // Pick spotlight: in-progress > closest to today (upcoming or recently completed)
+      const todayMs = new Date(today + 'T00:00:00').getTime();
+      const inProgress = allTournaments.filter(t => t.status === 'in-progress');
+      let spotlight = null;
+      if (inProgress.length > 0) {
+        spotlight = inProgress[0];
+      } else {
+        const completed = allTournaments
+          .filter(t => t.status === 'completed' && t.endDate)
+          .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+        const upcoming = allTournaments
+          .filter(t => t.status === 'upcoming' && t.startDate)
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+        const recentCompleted = completed[0] ?? null;
+        const nextUpcoming = upcoming[0] ?? null;
+        if (recentCompleted && nextUpcoming) {
+          const completedGap = todayMs - new Date(recentCompleted.endDate).getTime();
+          const upcomingGap = new Date(nextUpcoming.startDate).getTime() - todayMs;
+          spotlight = upcomingGap <= completedGap ? nextUpcoming : recentCompleted;
+        } else {
+          spotlight = nextUpcoming ?? recentCompleted;
+        }
+      }
+      result.spotlight = spotlight;
 
       setCache(cacheKey, result);
       console.log(`[tournaments] serving ${season || 'all'} (${availableSeasons.length} seasons available)`);

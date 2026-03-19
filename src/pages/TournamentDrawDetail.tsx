@@ -67,7 +67,7 @@ export default function TournamentDrawDetail() {
   return (
     <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <Link
-        to={`/tournaments/${tswId}?tab=draws`}
+        to={`/tournaments/${tswId}/draws`}
         className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
       >
         <ArrowLeft className="w-4 h-4" />

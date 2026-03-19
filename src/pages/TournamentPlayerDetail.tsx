@@ -56,11 +56,11 @@ export default function TournamentPlayerDetail() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <Link
-        to={`/tournaments/${tswId}?tab=players`}
+        to={`/tournaments/${tswId}/players`}
         className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Tournament
+        Back to Players
       </Link>
 
       {loading ? (
