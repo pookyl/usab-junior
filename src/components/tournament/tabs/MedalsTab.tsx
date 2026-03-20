@@ -24,12 +24,26 @@ function PlayerName({ player, tswId, fromPath }: { player: MedalPlayer; tswId: s
 }
 
 function MedalIcon({ place, size = 22 }: { place: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number }) {
+  const iconBox = { width: size, height: size };
+
   if (place === 'fourth') {
-    return <img src={fourthPlaceMedalIcon} alt="4th place medal" className="shrink-0" style={{ width: size, height: size }} />;
+    return (
+      <span className="inline-flex items-center justify-center shrink-0" style={iconBox}>
+        <img
+          src={fourthPlaceMedalIcon}
+          alt="4th place medal"
+          className="block w-full h-full object-cover"
+        />
+      </span>
+    );
   }
 
   const emoji: Record<string, string> = { gold: '🥇', silver: '🥈', bronze: '🥉' };
-  return <span className="shrink-0 leading-none" style={{ fontSize: size }}>{emoji[place]}</span>;
+  return (
+    <span className="inline-flex items-center justify-center shrink-0 leading-none" style={iconBox}>
+      <span style={{ fontSize: size }}>{emoji[place]}</span>
+    </span>
+  );
 }
 
 const PLACE_LABEL: Record<string, string> = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze', fourth: '4th' };
@@ -57,7 +71,12 @@ function ClubMedalRow({
   const [detailAsc, setDetailAsc] = useState(true);
 
   function toggle(mode: Exclude<ExpandMode, null>) {
-    onExpandChange(expandMode === mode ? null : mode);
+    const isOpening = expandMode !== mode;
+    if (mode === 'medals' && isOpening) {
+      setDetailSort('place');
+      setDetailAsc(true);
+    }
+    onExpandChange(isOpening ? mode : null);
   }
   function handleDetailSort(key: DetailSortKey) {
     if (detailSort === key) setDetailAsc(!detailAsc);
