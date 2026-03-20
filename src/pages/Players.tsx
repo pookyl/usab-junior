@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   BarChart,
@@ -106,6 +106,11 @@ function AgeGroupCard({ ageGroup, stats }: { ageGroup: AgeGroup; stats: GroupSta
 function formatRankingsDate(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatShortDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function RankBadge({ rank }: { rank: number }) {
@@ -905,13 +910,27 @@ export default function Rankings() {
     paramEvent && EVENT_TYPES.includes(paramEvent) ? paramEvent : 'BS',
   );
   const [view, setView] = useState<ViewMode>('rankings');
-  const { rankingsDate } = usePlayers();
+  const [isDateOpen, setIsDateOpen] = useState(false);
+  const datePickerRef = useRef<HTMLDivElement>(null);
+  const { rankingsDate, availableDates, changeDate, loading } = usePlayers();
+  const hasMultipleDates = availableDates.length > 1;
 
   useEffect(() => {
     if (paramAge && AGE_GROUPS.includes(paramAge)) setAgeGroup(paramAge);
     if (paramEvent && EVENT_TYPES.includes(paramEvent)) setEventType(paramEvent);
     if (paramAge || paramEvent) setView('rankings');
   }, [paramAge, paramEvent]);
+
+  useEffect(() => {
+    if (!isDateOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(e.target as Node)) {
+        setIsDateOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isDateOpen]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-5 md:space-y-6">
@@ -933,11 +952,57 @@ export default function Rankings() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 rounded-xl text-xs md:text-sm text-blue-700 dark:text-blue-300">
-        <Calendar className="w-4 h-4 shrink-0" />
-        <span>
-          Rankings as of <span className="font-semibold">{formatRankingsDate(rankingsDate)}</span>
-        </span>
+      <div className="flex items-center justify-between gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 rounded-xl">
+        <div className="min-w-0 flex items-center gap-2 text-xs md:text-sm text-blue-700 dark:text-blue-300">
+          <Calendar className="w-4 h-4 shrink-0" />
+          <span className="truncate">
+            Rankings as of <span className="font-semibold">{formatRankingsDate(rankingsDate)}</span>
+          </span>
+        </div>
+        <div ref={datePickerRef} className="relative shrink-0">
+          <button
+            onClick={() => hasMultipleDates && setIsDateOpen((open) => !open)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs md:text-sm transition-colors border ${
+              isDateOpen
+                ? 'bg-blue-600 text-white border-blue-600'
+                : hasMultipleDates
+                  ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-200 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/40'
+                  : 'bg-white/70 dark:bg-slate-900/70 text-blue-400 dark:text-blue-400 border-blue-100 dark:border-blue-900 cursor-default'
+            }`}
+            aria-label={`Rankings date: ${formatRankingsDate(rankingsDate)}`}
+            title={`Rankings as of ${formatRankingsDate(rankingsDate)}`}
+          >
+            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Calendar className="w-3.5 h-3.5" />}
+            <span className="font-medium">{formatShortDate(rankingsDate)}</span>
+          </button>
+
+          {isDateOpen && (
+            <div className="absolute right-0 top-full mt-1.5 w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-20">
+              <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-700">
+                Rankings Date
+              </div>
+              <div className="max-h-[min(16rem,calc(100vh-11rem))] overflow-y-auto py-1">
+                {availableDates.map((date, i) => (
+                  <button
+                    key={date}
+                    onClick={() => {
+                      changeDate(date);
+                      setIsDateOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm transition-colors ${
+                      date === rankingsDate
+                        ? 'bg-violet-600 text-white font-medium'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {formatRankingsDate(date)}
+                    {i === 0 && <span className="ml-1.5 text-[10px] opacity-60">(Latest)</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* View Toggle — underline tabs */}

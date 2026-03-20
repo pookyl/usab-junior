@@ -22,7 +22,7 @@ interface Feature {
 const features: Feature[] = [
   {
     title: 'Rankings',
-    description: 'Explore junior rankings by age group and event type, with analytics and charts',
+    description: 'Explore junior rankings by age group and event type',
     icon: Trophy,
     to: '/players',
     iconBg: 'bg-amber-100 dark:bg-amber-900/30',
@@ -30,7 +30,7 @@ const features: Feature[] = [
   },
   {
     title: 'Player Directory',
-    description: 'Browse and search all ranked junior players alphabetically',
+    description: 'Browse and search ranked junior players',
     icon: Users,
     to: '/directory',
     iconBg: 'bg-emerald-100 dark:bg-emerald-900/30',
@@ -38,7 +38,7 @@ const features: Feature[] = [
   },
   {
     title: 'Head to Head',
-    description: 'Compare two players side by side across rankings and events',
+    description: 'Compare two players side by side across rankings and matches',
     icon: Swords,
     to: '/head-to-head',
     iconBg: 'bg-violet-100 dark:bg-violet-900/30',
@@ -46,7 +46,7 @@ const features: Feature[] = [
   },
   {
     title: 'Tournaments',
-    description: 'Browse the junior tournament schedule with results and links',
+    description: 'Browse tournament schedules, details, and results',
     icon: Calendar,
     to: '/tournaments',
     iconBg: 'bg-sky-100 dark:bg-sky-900/30',
@@ -115,7 +115,7 @@ export default function Home() {
           <span className="text-violet-600 dark:text-violet-400"> Hub</span>
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          Your hub for USAB junior player rankings, analytics, and head-to-head comparisons
+          Your hub for USAB junior rankings, player directory, head-to-head, and tournament info
         </p>
         {!loading && totalPlayers > 0 && (
           <p className="text-sm text-slate-400 dark:text-slate-500">
