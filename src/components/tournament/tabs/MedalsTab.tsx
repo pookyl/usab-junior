@@ -18,31 +18,9 @@ function PlayerName({ player, tswId }: { player: MedalPlayer; tswId: string }) {
   return <span>{player.name}</span>;
 }
 
-function CustomMedal({ size = 22, label, ribbon }: { size?: number; label: string; ribbon: [string, string] }) {
-  return (
-    <svg className="shrink-0" width={size} height={size} viewBox="0 0 36 36">
-      <path d="M14.5 1h-2.8L16 12.5 18 6z" fill={ribbon[0]} />
-      <path d="M21.5 1h2.8L20 12.5 18 6z" fill={ribbon[1]} />
-      <circle cx="18" cy="22.5" r="12" fill="#8B5E3C" />
-      <circle cx="18" cy="22.5" r="10.5" fill="#CD853F" />
-      <circle cx="18" cy="22.5" r="8" fill="none" stroke="#8B4513" strokeWidth="0.7" opacity="0.35" />
-      <text x="18" y="27" textAnchor="middle" fontSize={label.length > 1 ? 9 : 12} fontWeight="bold" fill="#5C2E0E" fontFamily="system-ui, -apple-system, sans-serif">{label}</text>
-    </svg>
-  );
-}
-
-const MEDAL_RIBBONS: Record<string, [string, string]> = {
-  fourth: ['#5A8BA8', '#487A96'],
-  'bronze-fourth': ['#8B5A5A', '#6E4747'],
-};
-
-function MedalIcon({ place, size = 22, label }: { place: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number; label?: string }) {
-  if (label === '3/4') {
-    return <CustomMedal size={size} label="3/4" ribbon={MEDAL_RIBBONS['bronze-fourth']} />;
-  }
-
+function MedalIcon({ place, size = 22 }: { place: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number }) {
   if (place === 'fourth') {
-    return <CustomMedal size={size} label="4" ribbon={MEDAL_RIBBONS.fourth} />;
+    return <span className="shrink-0 leading-none" style={{ fontSize: size }}>🏅</span>;
   }
 
   const emoji: Record<string, string> = { gold: '🥇', silver: '🥈', bronze: '🥉' };
@@ -279,7 +257,7 @@ export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: st
                 <span className="inline-flex items-center gap-0.5"><MedalIcon place="silver" size={20} />{sortArrow('silver')}</span>
               </th>
               <th className={`${headerCls} text-center whitespace-nowrap`} onClick={() => handleSort('bronze')}>
-                <span className="inline-flex items-center gap-0.5"><MedalIcon place="bronze" size={20} label="3/4" />{sortArrow('bronze')}</span>
+                <span className="inline-flex items-center gap-0.5"><MedalIcon place="bronze" size={20} />{sortArrow('bronze')}</span>
               </th>
               <th className={`${headerCls} text-center whitespace-nowrap`} onClick={() => handleSort('total')}>Total{sortArrow('total')}</th>
             </tr>
