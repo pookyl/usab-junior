@@ -18,7 +18,7 @@ export function TeamRow({ names, playerIds, tswId, fromPath, won, ongoing, lost,
   showRetired?: boolean;
   showWalkover?: boolean;
 }) {
-  const nameClass = (won || boldName)
+  const nameClass = (won || (boldName && !lost))
     ? 'font-semibold text-slate-800 dark:text-slate-100'
     : 'text-slate-800 dark:text-slate-100';
   const badgeClass = won
@@ -65,11 +65,13 @@ export function TeamRow({ names, playerIds, tswId, fromPath, won, ongoing, lost,
         )}
         {scores.map((s, i) => {
           const isWinningGame = s > otherScores[i];
+          const scoreClass = lost
+            ? 'text-slate-800 dark:text-slate-100'
+            : won
+              ? (isWinningGame ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400')
+              : 'text-slate-800 dark:text-slate-100';
           return (
-            <span key={i} className={`w-5 text-right tabular-nums ${
-              lost ? 'text-slate-400 dark:text-slate-500' :
-              isWinningGame ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
-            }`}>{s}</span>
+            <span key={i} className={`w-5 text-right tabular-nums ${scoreClass}`}>{s}</span>
           );
         })}
       </div>
@@ -88,10 +90,32 @@ export function teamRowPropsFromRR(players: RoundRobinPlayer[]) {
 
 // ── MatchCard ───────────────────────────────────────────────────────────────
 
-export default function MatchCard({ match, date, tswId, fromPath }: { match: TournamentMatch; date?: string; tswId?: string; fromPath?: string }) {
+export default function MatchCard({
+  match,
+  date,
+  tswId,
+  fromPath,
+  highlightPlayerId,
+  highlightPlayerName,
+}: {
+  match: TournamentMatch;
+  date?: string;
+  tswId?: string;
+  fromPath?: string;
+  highlightPlayerId?: number;
+  highlightPlayerName?: string;
+}) {
   const t1Scores = match.scores.map(g => g[0]);
   const t2Scores = match.scores.map(g => g[1]);
   const ongoing = !match.team1Won && !match.team2Won && !match.walkover && !match.bye;
+  const normalizedHighlightName = highlightPlayerName?.trim().toLowerCase();
+  const teamHasHighlightedPlayer = (teamIds?: (number | null)[], teamNames?: string[]) => {
+    if (highlightPlayerId && teamIds?.some(pid => pid === highlightPlayerId)) return true;
+    if (normalizedHighlightName && teamNames?.some(name => name.trim().toLowerCase() === normalizedHighlightName)) return true;
+    return false;
+  };
+  const team1HasHighlightedPlayer = teamHasHighlightedPlayer(match.team1Ids, match.team1);
+  const team2HasHighlightedPlayer = teamHasHighlightedPlayer(match.team2Ids, match.team2);
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
@@ -110,7 +134,7 @@ export default function MatchCard({ match, date, tswId, fromPath }: { match: Tou
           won={match.team1Won}
           ongoing={ongoing}
           lost={!match.team1Won && match.team2Won}
-          boldName
+          boldName={team1HasHighlightedPlayer}
           scores={t1Scores}
           otherScores={t2Scores}
           showWalkover={match.walkover && !match.team1Won}
@@ -132,6 +156,7 @@ export default function MatchCard({ match, date, tswId, fromPath }: { match: Tou
             won={match.team2Won}
             ongoing={ongoing}
             lost={!match.team2Won && match.team1Won}
+            boldName={team2HasHighlightedPlayer}
             scores={t2Scores}
             otherScores={t1Scores}
             showWalkover={match.walkover && !match.team2Won}

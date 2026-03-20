@@ -63,6 +63,8 @@ export default function TournamentPlayerDetail() {
   if (!tswId || !playerId) return null;
 
   const fromPath = (location.state as { fromPath?: string } | null)?.fromPath ?? getTournamentPlayerOrigin(location.pathname);
+  const parsedPlayerId = Number(playerId);
+  const highlightPlayerId = Number.isFinite(parsedPlayerId) ? parsedPlayerId : undefined;
   const isTournamentSubpage = Boolean(
     fromPath &&
       fromPath.startsWith(`/tournaments/${tswId}/`) &&
@@ -185,7 +187,14 @@ export default function TournamentPlayerDetail() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {filtered.map((m, i) => (
-                <MatchCard key={i} match={m} tswId={tswId} fromPath={location.pathname} />
+                <MatchCard
+                  key={i}
+                  match={m}
+                  tswId={tswId}
+                  fromPath={location.pathname}
+                  highlightPlayerId={highlightPlayerId}
+                  highlightPlayerName={data.playerName}
+                />
               ))}
             </div>
           )}
