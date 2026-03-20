@@ -68,7 +68,7 @@ export function TeamRow({ names, playerIds, tswId, fromPath, won, ongoing, lost,
           const scoreClass = lost
             ? 'text-slate-800 dark:text-slate-100'
             : won
-              ? (isWinningGame ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400')
+              ? (isWinningGame ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100')
               : 'text-slate-800 dark:text-slate-100';
           return (
             <span key={i} className={`w-5 text-right tabular-nums ${scoreClass}`}>{s}</span>

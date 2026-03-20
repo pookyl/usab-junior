@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Trophy, Medal } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
@@ -17,13 +17,6 @@ export default function WinnersTab({ tswId, active, refreshTrigger }: { tswId: s
   const { pathname } = useLocation();
   const { data, loading, error, retry, refresh } = useTabData<TournamentWinnersResponse>(tswId, active, fetchTournamentWinners, 'winners');
   useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [filter, setFilter] = useState<string>('all');
-
-  const filteredEvents = useMemo(() => {
-    if (!data) return [];
-    if (filter === 'all') return data.events;
-    return data.events.filter(e => e.eventName === filter);
-  }, [data, filter]);
 
   if (loading) return <TabLoading label="winners" />;
   if (error) return <TabError error={error} onRetry={retry} />;
@@ -31,38 +24,12 @@ export default function WinnersTab({ tswId, active, refreshTrigger }: { tswId: s
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setFilter('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-            filter === 'all'
-              ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-          }`}
-        >
-          All <span className="ml-1 opacity-60">{data.events.length}</span>
-        </button>
-        {data.events.map(event => {
-          const isActive = filter === event.eventName;
-          const evtColor = getEventColor(event.eventName);
-          return (
-            <button
-              key={event.eventName}
-              onClick={() => setFilter(event.eventName)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                isActive
-                  ? `${evtColor.bg} ${evtColor.text} ring-2 ring-current/20`
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              {event.eventName}
-            </button>
-          );
-        })}
-      </div>
+      <p className="text-xs text-slate-400 dark:text-slate-500">
+        {data.events.length} winner event{data.events.length === 1 ? '' : 's'}
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredEvents.map((event, idx) => {
+        {data.events.map((event, idx) => {
           const color = getEventColor(event.eventName);
           const gold = event.results.find(r => r.place.replace(/\s/g, '') === '1');
           return (
@@ -116,13 +83,6 @@ export default function WinnersTab({ tswId, active, refreshTrigger }: { tswId: s
           );
         })}
       </div>
-
-      {filteredEvents.length === 0 && (
-        <div className="text-center text-slate-400 dark:text-slate-500 py-12">
-          <Trophy className="w-8 h-8 mx-auto mb-2 opacity-40" />
-          <p className="text-sm">No winners found for this event type.</p>
-        </div>
-      )}
     </div>
   );
 }
