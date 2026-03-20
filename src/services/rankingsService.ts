@@ -77,6 +77,7 @@ export function invalidateRankingsCache() {
   directoryCache = null;
   tournamentsCache = null;
   tournamentsCacheSeason = '';
+  tournamentsCacheTs = 0;
   tournamentDetailCache.clear();
   tournamentMedalsCache.clear();
   tournamentEventsCache.clear();
@@ -248,12 +249,20 @@ export async function fetchPlayerRankingTrend(
 
 let tournamentsCache: TournamentsResponse | null = null;
 let tournamentsCacheSeason = '';
+let tournamentsCacheTs = 0;
+const TOURNAMENTS_CACHE_TTL_MS = 60_000;
 
 export async function fetchTournaments(
   season?: string,
 ): Promise<TournamentsResponse> {
   const cacheKey = season || '__all__';
-  if (tournamentsCache && tournamentsCacheSeason === cacheKey) return tournamentsCache;
+  if (
+    tournamentsCache
+    && tournamentsCacheSeason === cacheKey
+    && (Date.now() - tournamentsCacheTs) < TOURNAMENTS_CACHE_TTL_MS
+  ) {
+    return tournamentsCache;
+  }
 
   const url = season ? `/api/tournaments?season=${encodeURIComponent(season)}` : '/api/tournaments';
   const res = await fetchWithRetry(url, 15_000);
@@ -262,6 +271,7 @@ export async function fetchTournaments(
   const data: TournamentsResponse = await res.json();
   tournamentsCache = data;
   tournamentsCacheSeason = cacheKey;
+  tournamentsCacheTs = Date.now();
   return data;
 }
 

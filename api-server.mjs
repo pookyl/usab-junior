@@ -304,11 +304,184 @@ const server = createServer(async (req, res) => {
         return;
       }
 
-      const today = new Date().toISOString().slice(0, 10);
+      const REGION_TIME_ZONES = {
+        NW: 'America/Los_Angeles',
+        NorCal: 'America/Los_Angeles',
+        SoCal: 'America/Los_Angeles',
+        MW: 'America/Chicago',
+        South: 'America/Chicago',
+        NE: 'America/New_York',
+        National: 'America/New_York',
+      };
+      const STATE_TIME_ZONES = {
+        AL: 'America/Chicago',
+        AK: 'America/Anchorage',
+        AZ: 'America/Phoenix',
+        AR: 'America/Chicago',
+        CA: 'America/Los_Angeles',
+        CO: 'America/Denver',
+        CT: 'America/New_York',
+        DE: 'America/New_York',
+        FL: 'America/New_York',
+        GA: 'America/New_York',
+        HI: 'Pacific/Honolulu',
+        ID: 'America/Denver',
+        IL: 'America/Chicago',
+        IN: 'America/Indiana/Indianapolis',
+        IA: 'America/Chicago',
+        KS: 'America/Chicago',
+        KY: 'America/New_York',
+        LA: 'America/Chicago',
+        ME: 'America/New_York',
+        MD: 'America/New_York',
+        MA: 'America/New_York',
+        MI: 'America/Detroit',
+        MN: 'America/Chicago',
+        MS: 'America/Chicago',
+        MO: 'America/Chicago',
+        MT: 'America/Denver',
+        NE: 'America/Chicago',
+        NV: 'America/Los_Angeles',
+        NH: 'America/New_York',
+        NJ: 'America/New_York',
+        NM: 'America/Denver',
+        NY: 'America/New_York',
+        NC: 'America/New_York',
+        ND: 'America/Chicago',
+        OH: 'America/New_York',
+        OK: 'America/Chicago',
+        OR: 'America/Los_Angeles',
+        PA: 'America/New_York',
+        RI: 'America/New_York',
+        SC: 'America/New_York',
+        SD: 'America/Chicago',
+        TN: 'America/Chicago',
+        TX: 'America/Chicago',
+        UT: 'America/Denver',
+        VT: 'America/New_York',
+        VA: 'America/New_York',
+        WA: 'America/Los_Angeles',
+        WV: 'America/New_York',
+        WI: 'America/Chicago',
+        WY: 'America/Denver',
+        DC: 'America/New_York',
+      };
+      const STATE_NAME_TO_CODE = {
+        Alabama: 'AL',
+        Alaska: 'AK',
+        Arizona: 'AZ',
+        Arkansas: 'AR',
+        California: 'CA',
+        Colorado: 'CO',
+        Connecticut: 'CT',
+        Delaware: 'DE',
+        Florida: 'FL',
+        Georgia: 'GA',
+        Hawaii: 'HI',
+        Idaho: 'ID',
+        Illinois: 'IL',
+        Indiana: 'IN',
+        Iowa: 'IA',
+        Kansas: 'KS',
+        Kentucky: 'KY',
+        Louisiana: 'LA',
+        Maine: 'ME',
+        Maryland: 'MD',
+        Massachusetts: 'MA',
+        Michigan: 'MI',
+        Minnesota: 'MN',
+        Mississippi: 'MS',
+        Missouri: 'MO',
+        Montana: 'MT',
+        Nebraska: 'NE',
+        Nevada: 'NV',
+        'New Hampshire': 'NH',
+        'New Jersey': 'NJ',
+        'New Mexico': 'NM',
+        'New York': 'NY',
+        'North Carolina': 'NC',
+        'North Dakota': 'ND',
+        Ohio: 'OH',
+        Oklahoma: 'OK',
+        Oregon: 'OR',
+        Pennsylvania: 'PA',
+        'Rhode Island': 'RI',
+        'South Carolina': 'SC',
+        'South Dakota': 'SD',
+        Tennessee: 'TN',
+        Texas: 'TX',
+        Utah: 'UT',
+        Vermont: 'VT',
+        Virginia: 'VA',
+        Washington: 'WA',
+        'West Virginia': 'WV',
+        Wisconsin: 'WI',
+        Wyoming: 'WY',
+        'District of Columbia': 'DC',
+      };
+      const dateFormatterByTimeZone = new Map();
+
+      function getDateFormatter(timeZone) {
+        if (!dateFormatterByTimeZone.has(timeZone)) {
+          dateFormatterByTimeZone.set(
+            timeZone,
+            new Intl.DateTimeFormat('en-US', {
+              timeZone,
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }),
+          );
+        }
+        return dateFormatterByTimeZone.get(timeZone);
+      }
+
+      function todayInTimeZone(timeZone) {
+        try {
+          const formatter = getDateFormatter(timeZone);
+          const parts = formatter.formatToParts(new Date());
+          const year = parts.find((p) => p.type === 'year')?.value;
+          const month = parts.find((p) => p.type === 'month')?.value;
+          const day = parts.find((p) => p.type === 'day')?.value;
+          if (year && month && day) return `${year}-${month}-${day}`;
+        } catch {
+          // Fall back to UTC date below.
+        }
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function extractStateCode(location) {
+        if (!location) return null;
+        const text = String(location).replace(/\./g, '').trim();
+        const postalMatches = [...text.matchAll(/,\s*([A-Z]{2})(?=(?:\s+\d{5}(?:-\d{4})?)?(?:,|$))/g)];
+        for (let i = postalMatches.length - 1; i >= 0; i--) {
+          const code = postalMatches[i][1];
+          if (STATE_TIME_ZONES[code]) return code;
+        }
+        for (const [stateName, code] of Object.entries(STATE_NAME_TO_CODE)) {
+          if (new RegExp(`\\b${stateName.replace(/\s+/g, '\\s+')}\\b`, 'i').test(text)) {
+            return code;
+          }
+        }
+        return null;
+      }
+
+      function getTournamentTimeZone(tournament) {
+        const stateCode = extractStateCode(tournament.venueLocation);
+        if (stateCode) return STATE_TIME_ZONES[stateCode];
+        return REGION_TIME_ZONES[tournament.region] || 'UTC';
+      }
+
       function recomputeStatuses(tournaments) {
+        const todayByTimeZone = new Map();
         return tournaments.map(t => {
           if (!t.startDate) return { ...t, status: 'upcoming' };
           const end = t.endDate || t.startDate;
+          const timeZone = getTournamentTimeZone(t);
+          if (!todayByTimeZone.has(timeZone)) {
+            todayByTimeZone.set(timeZone, todayInTimeZone(timeZone));
+          }
+          const today = todayByTimeZone.get(timeZone);
           let status;
           if (today > end) status = 'completed';
           else if (today >= t.startDate) status = 'in-progress';
@@ -349,7 +522,7 @@ const server = createServer(async (req, res) => {
       }
 
       // Pick spotlight: in-progress > closest to today (upcoming or recently completed)
-      const todayMs = new Date(today + 'T00:00:00').getTime();
+      const todayMs = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00').getTime();
       const inProgress = allTournaments.filter(t => t.status === 'in-progress');
       let spotlight = null;
       if (inProgress.length > 0) {
