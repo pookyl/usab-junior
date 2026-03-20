@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Medal } from 'lucide-react';
+import { Bookmark } from 'lucide-react';
 import SubPageLayout from '../../components/tournament/SubPageLayout';
-import MedalsTab from '../../components/tournament/tabs/MedalsTab';
+import SeedsTab from '../../components/tournament/tabs/SeedsTab';
 
-export default function TournamentMedalsPage() {
+export default function TournamentSeedsPage() {
   const { tswId } = useParams<{ tswId: string }>();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   if (!tswId) return null;
 
   return (
-    <SubPageLayout title="Medals" icon={Medal} onRefresh={() => setRefreshTrigger(n => n + 1)}>
-      <MedalsTab tswId={tswId} active refreshTrigger={refreshTrigger} />
+    <SubPageLayout title="Seeds" icon={Bookmark} onRefresh={() => setRefreshTrigger((n) => n + 1)}>
+      <SeedsTab tswId={tswId} active refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );
 }

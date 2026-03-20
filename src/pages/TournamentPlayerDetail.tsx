@@ -69,6 +69,7 @@ export default function TournamentPlayerDetail() {
       !fromPath.includes('/player/'),
   );
   const backTarget = isTournamentSubpage ? fromPath! : `/tournaments/${tswId}/players`;
+  const backState = isTournamentSubpage ? { restoreTournamentScroll: true } : undefined;
   const tswPlayerUrl = `https://www.tournamentsoftware.com/tournament/${tswId}/player/${playerId}`;
 
   return (
@@ -76,6 +77,7 @@ export default function TournamentPlayerDetail() {
       <div className="flex items-center justify-between">
         <Link
           to={backTarget}
+          state={backState}
           className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
         >
           <ArrowLeft className="w-4 h-4" />

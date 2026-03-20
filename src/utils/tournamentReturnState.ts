@@ -1,14 +1,16 @@
 let lastTournamentSubpagePath: string | null = null;
 const playerOriginByPath = new Map<string, string>();
 const drawOriginByPath = new Map<string, string>();
+const eventOriginByPath = new Map<string, string>();
 
-type TournamentDetailType = 'player' | 'draw';
+type TournamentDetailType = 'player' | 'draw' | 'event';
 
 function getDetailMeta(pathname: string): { type: TournamentDetailType; tswId: string } | null {
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length < 4 || segments[0] !== 'tournaments' || !segments[1]) return null;
   if (segments[2] === 'player' && segments[3]) return { type: 'player', tswId: segments[1] };
   if (segments[2] === 'draw' && segments[3]) return { type: 'draw', tswId: segments[1] };
+  if (segments[2] === 'event' && segments[3]) return { type: 'event', tswId: segments[1] };
   return null;
 }
 
@@ -42,6 +44,12 @@ export function rememberTournamentDetailOrigin(pathname: string, fromPath?: stri
     return;
   }
 
+  if (detail.type === 'event') {
+    if (fromPath.includes('/event/')) return;
+    eventOriginByPath.set(pathname, fromPath);
+    return;
+  }
+
   playerOriginByPath.set(pathname, fromPath);
 }
 
@@ -51,4 +59,8 @@ export function getTournamentPlayerOrigin(pathname: string): string | null {
 
 export function getTournamentDrawOrigin(pathname: string): string | null {
   return drawOriginByPath.get(pathname) ?? null;
+}
+
+export function getTournamentEventOrigin(pathname: string): string | null {
+  return eventOriginByPath.get(pathname) ?? null;
 }

@@ -16,8 +16,11 @@ import TournamentDetail, { TournamentPlayerDetail, TournamentDrawDetail } from '
 import TournamentMatchesPage from './pages/tournament/TournamentMatchesPage';
 import TournamentPlayersPage from './pages/tournament/TournamentPlayersPage';
 import TournamentDrawsPage from './pages/tournament/TournamentDrawsPage';
+import TournamentEventsPage from './pages/tournament/TournamentEventsPage';
+import TournamentSeedsPage from './pages/tournament/TournamentSeedsPage';
 import TournamentWinnersPage from './pages/tournament/TournamentWinnersPage';
 import TournamentMedalsPage from './pages/tournament/TournamentMedalsPage';
+import TournamentEventDetail from './pages/TournamentEventDetail';
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -104,8 +107,11 @@ export default function App() {
                   <Route path="/tournaments/:tswId/matches" element={<TournamentMatchesPage />} />
                   <Route path="/tournaments/:tswId/players" element={<TournamentPlayersPage />} />
                   <Route path="/tournaments/:tswId/draws" element={<TournamentDrawsPage />} />
+                  <Route path="/tournaments/:tswId/events" element={<TournamentEventsPage />} />
+                  <Route path="/tournaments/:tswId/seeds" element={<TournamentSeedsPage />} />
                   <Route path="/tournaments/:tswId/winners" element={<TournamentWinnersPage />} />
                   <Route path="/tournaments/:tswId/medals" element={<TournamentMedalsPage />} />
+                  <Route path="/tournaments/:tswId/event/:eventId" element={<TournamentEventDetail />} />
                   <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
                   <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
                   <Route path="*" element={<Navigate to="/" replace />} />

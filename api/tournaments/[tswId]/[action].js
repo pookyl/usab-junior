@@ -2,6 +2,8 @@ import {
   setCors, getCached, setCache,
   tswFetch, parseTswDrawsList, parseTswTournamentInfo,
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
+  parseTswSeeding,
+  parseTswEvents, parseTswEventDetail,
   parseTswMatches, parseTswPlayerMatches, parseTswMatchDates, formatMatchDate,
   parseTswEliminationDraw, parseTswDrawType,
   parseTswRoundRobinGroups, parseTswRoundRobinGroupName,
@@ -357,17 +359,10 @@ async function handleEvents(tswId, _req, res) {
       return;
     }
 
-    const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
-    const resp = tswOk(await tswFetch(drawsPath), 'TSW draws page');
+    const eventsPath = `/sport/events.aspx?id=${encodeURIComponent(tswId)}`;
+    const resp = tswOk(await tswFetch(eventsPath), 'TSW events page');
     const html = await resp.text();
-    const draws = parseTswDrawsList(html);
-
-    const events = draws.map(d => ({
-      drawId: d.drawId,
-      name: d.name,
-      ageGroup: getAgeGroup(d.name),
-      eventType: getEventType(d.name),
-    }));
+    const events = parseTswEvents(html);
     const result = { tswId, eventCount: events.length, events };
 
     setCache(cacheKey, result);
@@ -375,6 +370,71 @@ async function handleEvents(tswId, _req, res) {
     res.end(JSON.stringify(result));
   } catch (err) {
     sendError(res, err, 'tournament-events');
+  }
+}
+
+async function handleSeeds(tswId, _req, res) {
+  try {
+    const cacheKey = `tournament-seeds:${tswId}`;
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    const seedsPath = `/sport/seeds.aspx?id=${encodeURIComponent(tswId)}`;
+    const resp = tswOk(await tswFetch(seedsPath), 'TSW seeds page');
+    const html = await resp.text();
+    const events = parseTswSeeding(html);
+    const result = { tswId, eventCount: events.length, events };
+
+    setCache(cacheKey, result);
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
+    res.end(JSON.stringify(result));
+  } catch (err) {
+    sendError(res, err, 'tournament-seeds');
+  }
+}
+
+async function handleEventDetail(tswId, req, res) {
+  const urlObj = new URL(req.url, 'http://localhost');
+  const eventId = req.query?.eventId || urlObj.searchParams.get('eventId');
+  if (!eventId || !/^\d+$/.test(eventId)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'eventId query parameter required (numeric)' }));
+    return;
+  }
+
+  const cacheKey = `tournament-event-detail:${tswId}:${eventId}`;
+  const cached = getCached(cacheKey);
+  if (cached) {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+    res.end(JSON.stringify(cached));
+    return;
+  }
+
+  try {
+    const eventPath = `/sport/event.aspx?id=${encodeURIComponent(tswId)}&event=${encodeURIComponent(eventId)}`;
+    const resp = tswOk(await tswFetch(eventPath), 'TSW event page');
+    const html = await resp.text();
+
+    const parsed = parseTswEventDetail(html);
+
+    const result = {
+      tswId,
+      eventId: parseInt(eventId, 10),
+      eventName: parsed.eventName,
+      entriesCount: parsed.entriesCount,
+      draws: parsed.draws,
+      entries: parsed.entries,
+    };
+
+    setCache(cacheKey, result);
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
+    res.end(JSON.stringify(result));
+  } catch (err) {
+    sendError(res, err, 'tournament-event-detail');
   }
 }
 
@@ -495,6 +555,8 @@ const ACTIONS = {
   players: handlePlayers,
   draws: handleDraws,
   events: handleEvents,
+  seeds: handleSeeds,
+  'event-detail': handleEventDetail,
   'player-detail': handlePlayerDetail,
   'draw-bracket': handleDrawBracket,
 };

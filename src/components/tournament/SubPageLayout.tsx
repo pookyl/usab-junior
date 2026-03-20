@@ -1,16 +1,18 @@
 import type { ReactNode } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useTournamentMeta } from '../../hooks/useTournamentMeta';
 import { RefreshButton } from './shared';
 
 interface SubPageLayoutProps {
   title: string;
+  icon?: LucideIcon;
   children: ReactNode;
   onRefresh?: () => void;
 }
 
-export default function SubPageLayout({ title, children, onRefresh }: SubPageLayoutProps) {
+export default function SubPageLayout({ title, icon: TitleIcon, children, onRefresh }: SubPageLayoutProps) {
   const { tswId } = useParams<{ tswId: string }>();
   const meta = useTournamentMeta(tswId);
 
@@ -28,9 +30,12 @@ export default function SubPageLayout({ title, children, onRefresh }: SubPageLay
         {onRefresh && <RefreshButton onClick={onRefresh} loading={false} />}
       </div>
 
-      <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
-        {title}
-      </h1>
+      <div className="flex items-center gap-2">
+        {TitleIcon && <TitleIcon className="w-5 h-5 md:w-6 md:h-6 text-violet-500" />}
+        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+          {title}
+        </h1>
+      </div>
 
       {children}
     </div>

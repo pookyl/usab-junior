@@ -1,7 +1,7 @@
 import { useParams, useSearchParams, Link, Navigate } from 'react-router-dom';
 import {
   ArrowLeft, ExternalLink,
-  Calendar, MapPin, Swords, Users, List, Trophy, Medal,
+  Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal,
 } from 'lucide-react';
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 
@@ -17,6 +17,8 @@ const SECTIONS = [
   { id: 'matches', label: 'Matches', icon: Swords },
   { id: 'players', label: 'Players', icon: Users },
   { id: 'draws',   label: 'Draws',   icon: List },
+  { id: 'events',  label: 'Events',  icon: CalendarDays },
+  { id: 'seeds',   label: 'Seeds',   icon: Bookmark },
   { id: 'winners', label: 'Winners', icon: Trophy },
   { id: 'medals',  label: 'Medals',  icon: Medal },
 ] as const;
@@ -79,7 +81,7 @@ export default function TournamentDetail() {
       </div>
 
       {/* Section pills grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-7 gap-3">
         {SECTIONS.map(section => {
           const Icon = section.icon;
           return (

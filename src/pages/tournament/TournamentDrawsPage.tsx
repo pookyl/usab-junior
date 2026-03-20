@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { List } from 'lucide-react';
 import SubPageLayout from '../../components/tournament/SubPageLayout';
 import DrawsTab from '../../components/tournament/tabs/DrawsTab';
 
@@ -9,7 +10,7 @@ export default function TournamentDrawsPage() {
   if (!tswId) return null;
 
   return (
-    <SubPageLayout title="Draws" onRefresh={() => setRefreshTrigger(n => n + 1)}>
+    <SubPageLayout title="Draws" icon={List} onRefresh={() => setRefreshTrigger(n => n + 1)}>
       <DrawsTab tswId={tswId} active refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );

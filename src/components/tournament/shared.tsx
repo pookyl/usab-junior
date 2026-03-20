@@ -7,6 +7,8 @@ export const TABS = [
   { id: 'matches', label: 'Matches', icon: () => null },
   { id: 'players', label: 'Players', icon: () => null },
   { id: 'draws', label: 'Draws', icon: () => null },
+  { id: 'events', label: 'Events', icon: () => null },
+  { id: 'seeds', label: 'Seeds', icon: () => null },
   { id: 'winners', label: 'Winners', icon: () => null },
   { id: 'medals', label: 'Medals', icon: () => null },
 ] as const;

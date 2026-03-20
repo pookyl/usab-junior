@@ -743,54 +743,182 @@ export function parseTswTournamentPlayers(html) {
 
 // ── TSW Events page parser ──────────────────────────────────────────────────
 // Parses /sport/events.aspx?id=<tswId>
-// Returns array of { eventId, name, entries, status }
+// Returns array of { eventId, name, draws, entries }
 
 export function parseTswEvents(html) {
+  const tableMatch = html.match(/<table[^>]*class="[^"]*admintournamentevents[^"]*"[^>]*>([\s\S]*?)<\/table>/i);
+  if (!tableMatch) return [];
+
   const events = [];
-  const linkRegex = /<a[^>]*href="[^"]*draw(?:\.aspx)?\?[^"]*draw=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
-  let m;
-  while ((m = linkRegex.exec(html)) !== null) {
-    const eventId = parseInt(m[1], 10);
-    const name = m[2].replace(/<[^>]*>/g, '').trim();
-    if (name && !events.some(e => e.eventId === eventId)) {
-      events.push({ eventId, name, entries: 0 });
+  const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let rowMatch;
+  while ((rowMatch = rowRegex.exec(tableMatch[1])) !== null) {
+    const rowHtml = rowMatch[1];
+    const linkMatch = rowHtml.match(/<a[^>]*href="[^"]*event\.aspx\?[^"]*event=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/i);
+    if (!linkMatch) continue;
+
+    const eventId = parseInt(linkMatch[1], 10);
+    const name = decodeHtmlEntities(linkMatch[2].replace(/<[^>]*>/g, '').trim());
+    if (!name) continue;
+
+    const cells = [];
+    const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+    let cellMatch;
+    while ((cellMatch = cellRegex.exec(rowHtml)) !== null) {
+      cells.push(cellMatch[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim());
     }
+
+    const draws = parseInt(cells[1] || '0', 10) || 0;
+    const entries = parseInt(cells[2] || '0', 10) || 0;
+    events.push({ eventId, name, draws, entries });
   }
 
-  const tableRegex = /<table[^>]*class="ruler"[^>]*>([\s\S]*?)<\/table>/gi;
-  let tableMatch;
-  while ((tableMatch = tableRegex.exec(html)) !== null) {
-    const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-    let rowMatch;
-    while ((rowMatch = rowRegex.exec(tableMatch[1])) !== null) {
-      const rowHtml = rowMatch[1];
-      const drawIdMatch = rowHtml.match(/draw=(\d+)/);
-      if (!drawIdMatch) continue;
-      const drawId = parseInt(drawIdMatch[1], 10);
+  return events;
+}
+
+// ── TSW Event detail parser ─────────────────────────────────────────────────
+// Parses /sport/event.aspx?id=<tswId>&event=<eventId>
+// Returns { eventName, entriesCount, draws, entries }
+
+export function parseTswEventDetail(html) {
+  const titleMatch = html.match(/<title>\s*[\s\S]*?-\s*Draws\s*-\s*([^<]+)\s*<\/title>/i);
+  const headingMatch = html.match(/<h3>\s*([^<]+)\s*<\/h3>\s*<p>\s*<\/p>\s*<table class="ruler">/i);
+  const eventName = decodeHtmlEntities((headingMatch?.[1] || titleMatch?.[1] || '').trim());
+
+  const draws = [];
+  const drawTableMatch = html.match(
+    /<table class="ruler">\s*<thead>[\s\S]*?<td>Draw<\/td>[\s\S]*?<tbody>([\s\S]*?)<\/tbody>\s*<\/table>/i,
+  );
+  if (drawTableMatch) {
+    const drawRowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let drawRow;
+    while ((drawRow = drawRowRegex.exec(drawTableMatch[1])) !== null) {
+      const rowHtml = drawRow[1];
+      const linkMatch = rowHtml.match(/draw=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/i);
+      if (!linkMatch) continue;
+
+      const drawId = parseInt(linkMatch[1], 10);
+      const drawName = decodeHtmlEntities(linkMatch[2].replace(/<[^>]*>/g, '').trim());
 
       const cells = [];
       const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
       let cellMatch;
       while ((cellMatch = cellRegex.exec(rowHtml)) !== null) {
-        cells.push(cellMatch[1].replace(/<[^>]*>/g, '').trim());
+        cells.push(cellMatch[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim());
       }
 
-      const existing = events.find(e => e.eventId === drawId);
-      if (existing && cells.length >= 2) {
-        const numMatch = cells.find(c => /^\d+$/.test(c));
-        if (numMatch) existing.entries = parseInt(numMatch, 10);
+      draws.push({
+        drawId,
+        name: drawName,
+        size: cells[1] ? parseInt(cells[1], 10) || null : null,
+        type: cells[2] || null,
+        qualification: cells[3] || null,
+        consolation: cells[4] || null,
+      });
+    }
+  }
+
+  const entries = [];
+  let entriesCount = null;
+  const entriesTableMatch = html.match(/<table class="ruler">\s*<caption>\s*Entries\s*\((\d+)\)\s*<\/caption>([\s\S]*?)<\/table>/i);
+  if (entriesTableMatch) {
+    entriesCount = parseInt(entriesTableMatch[1], 10);
+    const entriesTableHtml = entriesTableMatch[2];
+
+    const entryRowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let entryRow;
+    while ((entryRow = entryRowRegex.exec(entriesTableHtml)) !== null) {
+      const rowHtml = entryRow[1];
+      const cells = [];
+      const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+      let cellMatch;
+      while ((cellMatch = cellRegex.exec(rowHtml)) !== null) {
+        cells.push(cellMatch[1]);
       }
+      if (cells.length < 2) continue;
+
+      const entryType = decodeHtmlEntities(cells[0].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim());
+      const seedText = decodeHtmlEntities((cells[2] || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim());
+      const seed = seedText || null;
+
+      const players = [];
+      const playerRegex = /<a[^>]*href="[^"]*player=(\d+)[^"]*"[^>]*>([^<]+)<\/a>/gi;
+      let pm;
+      while ((pm = playerRegex.exec(cells[1])) !== null) {
+        players.push({
+          name: decodeHtmlEntities(pm[2].trim()),
+          playerId: parseInt(pm[1], 10),
+        });
+      }
+
+      if (players.length === 0) continue;
+      entries.push({ entryType, seed, players });
+    }
+  }
+
+  return { eventName, entriesCount, draws, entries };
+}
+
+// ── TSW Seeding overview parser ─────────────────────────────────────────────
+// Parses /sport/seedingoverview.aspx?id=<tswId>
+// Returns array of { eventId, eventName, seeds: [{ seed, players: [{ name, playerId }] }] }
+
+export function parseTswSeeding(html) {
+  // Seeded entries rows contain nested <table> tags; avoid table-level regex and
+  // parse by event headers + the segment until the next header.
+  const headers = [];
+  const headerRegex = /<th[^>]*colspan[^>]*>\s*<a[^>]*href="[^"]*event\.aspx\?[^"]*event=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>\s*<\/th>/gi;
+  let hm;
+  while ((hm = headerRegex.exec(html)) !== null) {
+    headers.push({
+      eventId: parseInt(hm[1], 10),
+      eventName: decodeHtmlEntities(hm[2].replace(/<[^>]*>/g, '').trim()),
+      index: hm.index,
+      end: headerRegex.lastIndex,
+    });
+  }
+
+  const events = [];
+  for (let i = 0; i < headers.length; i++) {
+    const current = headers[i];
+    const nextIndex = i + 1 < headers.length ? headers[i + 1].index : html.length;
+    const section = html.slice(current.end, nextIndex);
+
+    const seeds = [];
+    const rowRegex = /<td>\s*([\d]+(?:\/[\d]+)?)\s*<\/td>\s*<td[^>]*class="nowrap"[^>]*>([\s\S]*?)<\/td>/gi;
+    let rowMatch;
+    while ((rowMatch = rowRegex.exec(section)) !== null) {
+      const seed = rowMatch[1].trim();
+      const players = [];
+
+      const playerRegex = /<a[^>]*href="[^"]*player(?:\.aspx)?\?[^"]*player=(\d+)[^"]*"[^>]*>([^<]+)<\/a>/gi;
+      let pm;
+      while ((pm = playerRegex.exec(rowMatch[2])) !== null) {
+        const rawName = decodeHtmlEntities(pm[2].replace(/\s*\[[\d/]+\]\s*$/, '').trim());
+        const commaIdx = rawName.indexOf(',');
+        const name = commaIdx > -1
+          ? `${rawName.slice(commaIdx + 1).trim()} ${rawName.slice(0, commaIdx).trim()}`
+          : rawName;
+        players.push({ name, playerId: parseInt(pm[1], 10) });
+      }
+
+      if (players.length > 0) seeds.push({ seed, players });
+    }
+
+    if (seeds.length > 0) {
+      events.push({
+        eventId: current.eventId,
+        eventName: current.eventName,
+        seeds,
+      });
     }
   }
 
   return events;
 }
 
-// ── TSW Seeding overview parser ─────────────────────────────────────────────
-// Parses /sport/seedingoverview.aspx?id=<tswId>
-// Returns array of { eventName, seeds: [{ seed, players: [{ name, playerId }] }] }
-
-export function parseTswSeeding(html) {
+// ── Legacy parser kept for reference (unused) ───────────────────────────────
+export function parseTswSeeding_legacy(html) {
   const events = [];
   const tableRegex = /<table[^>]*class="ruler seeding"[^>]*>([\s\S]*?)<\/table>/gi;
   let tableMatch;

@@ -242,12 +242,42 @@ export interface TournamentMedals {
 export interface TournamentEvent {
   eventId: number;
   name: string;
+  draws: number;
   entries: number;
 }
 
 export interface TournamentEventsResponse {
   tswId: string;
   events: TournamentEvent[];
+}
+
+export interface TournamentEventEntryPlayer {
+  name: string;
+  playerId: number;
+}
+
+export interface TournamentEventDetailEntry {
+  entryType: string;
+  seed: string | null;
+  players: TournamentEventEntryPlayer[];
+}
+
+export interface TournamentEventDetailDraw {
+  drawId: number;
+  name: string;
+  size: number | null;
+  type: string | null;
+  qualification: string | null;
+  consolation: string | null;
+}
+
+export interface TournamentEventDetailResponse {
+  tswId: string;
+  eventId: number;
+  eventName: string;
+  entriesCount: number | null;
+  draws: TournamentEventDetailDraw[];
+  entries: TournamentEventDetailEntry[];
 }
 
 export interface TournamentPlayer {
@@ -280,11 +310,12 @@ export interface TournamentPlayerDetailResponse {
 }
 
 export interface SeedEntry {
-  seed: number;
+  seed: string;
   players: { name: string; playerId: number }[];
 }
 
 export interface TournamentSeedingEvent {
+  eventId: number;
   eventName: string;
   seeds: SeedEntry[];
 }
