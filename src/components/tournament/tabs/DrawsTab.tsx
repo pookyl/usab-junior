@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { List, ChevronRight } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty } from '../shared';
 import { fetchTournamentDetail } from '../../../services/rankingsService';
 
 export default function DrawsTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { data, loading, error, retry, refresh } = useTabData(tswId, active, fetchTournamentDetail, 'draws');
   useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -32,7 +33,7 @@ export default function DrawsTab({ tswId, active, refreshTrigger }: { tswId: str
           <button
             key={draw.drawId}
             type="button"
-            onClick={() => navigate(`/tournaments/${tswId}/draw/${draw.drawId}`, { state: { drawName: draw.name } })}
+            onClick={() => navigate(`/tournaments/${tswId}/draw/${draw.drawId}`, { state: { drawName: draw.name, fromPath: pathname } })}
             className="group w-full text-left bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-violet-200 dark:hover:border-violet-700 hover:shadow-md active:bg-slate-50 dark:active:bg-slate-800 transition-all p-3.5 md:p-4"
           >
             <div className="flex items-center justify-between gap-2.5">

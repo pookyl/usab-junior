@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Trophy, Medal } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
 import { fetchTournamentWinners } from '../../../services/rankingsService';
@@ -14,6 +14,7 @@ const PLACE_STYLES: Record<string, { label: string; color: string; ring: string 
 };
 
 export default function WinnersTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+  const { pathname } = useLocation();
   const { data, loading, error, retry, refresh } = useTabData<TournamentWinnersResponse>(tswId, active, fetchTournamentWinners, 'winners');
   useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
   const [filter, setFilter] = useState<string>('all');
@@ -95,6 +96,7 @@ export default function WinnersTab({ tswId, active, refreshTrigger }: { tswId: s
                               {p.playerId ? (
                                 <Link
                                   to={`/tournaments/${tswId}/player/${p.playerId}`}
+                                  state={{ fromPath: pathname }}
                                   className="text-violet-600 dark:text-violet-400 hover:underline font-medium"
                                 >
                                   {p.name}

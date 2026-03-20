@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, List } from 'lucide-react';
 import { fetchTournamentDetail, fetchDrawBracket, type DrawResponse } from '../services/rankingsService';
 import { TabLoading, TabError, TabEmpty, getEventColor, RefreshButton } from '../components/tournament/shared';
 import BracketView from '../components/tournament/BracketView';
 import RoundRobinView from '../components/tournament/RoundRobinView';
 import type { EliminationDrawResponse, RoundRobinDrawResponse } from '../types/junior';
+import { getTournamentDrawOrigin } from '../utils/tournamentReturnState';
 
 export default function TournamentDrawDetail() {
   const { tswId, drawId } = useParams<{ tswId: string; drawId: string }>();
-  const navigate = useNavigate();
   const location = useLocation();
-  const routeState = location.state as { drawName?: string } | null;
+  const routeState = location.state as { drawName?: string; fromPath?: string } | null;
 
   const [drawName, setDrawName] = useState<string | null>(routeState?.drawName ?? null);
   const [drawData, setDrawData] = useState<DrawResponse | null>(null);
@@ -69,6 +69,14 @@ export default function TournamentDrawDetail() {
 
   if (!tswId || !drawId) return null;
 
+  const fromPath = routeState?.fromPath ?? getTournamentDrawOrigin(location.pathname);
+  const isTournamentSubpage = Boolean(
+    fromPath &&
+      fromPath.startsWith(`/tournaments/${tswId}/`) &&
+      !fromPath.includes('/draw/') &&
+      !fromPath.includes('/player/'),
+  );
+  const backTarget = isTournamentSubpage ? fromPath! : `/tournaments/${tswId}/draws`;
   const tswDrawUrl = `https://www.tournamentsoftware.com/sport/draw.aspx?id=${tswId}&draw=${drawId}`;
   const color = drawName ? getEventColor(drawName) : null;
   const isRoundRobin = drawData?.drawType === 'round-robin';
@@ -77,13 +85,13 @@ export default function TournamentDrawDetail() {
   return (
     <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
+        <Link
+          to={backTarget}
+          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
-        </button>
+        </Link>
         <RefreshButton onClick={handleRefresh} loading={loading} />
       </div>
 

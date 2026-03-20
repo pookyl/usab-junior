@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Users, Search, ChevronRight } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty } from '../shared';
 import { fetchTournamentPlayers } from '../../../services/rankingsService';
@@ -8,6 +8,7 @@ import type { TournamentPlayersResponse } from '../../../types/junior';
 const PLAYERS_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 export default function PlayersTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+  const { pathname } = useLocation();
   const { data, loading, error, retry, refresh } = useTabData<TournamentPlayersResponse>(tswId, active, fetchTournamentPlayers, 'players');
   useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
   const [search, setSearch] = useState('');
@@ -174,6 +175,7 @@ export default function PlayersTab({ tswId, active, refreshTrigger }: { tswId: s
                 <Link
                   key={player.playerId}
                   to={`/tournaments/${tswId}/player/${player.playerId}`}
+                  state={{ fromPath: pathname }}
                   className="group block bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-violet-200 dark:hover:border-violet-700 hover:shadow-md active:bg-slate-50 dark:active:bg-slate-800 transition-all p-3.5"
                 >
                   <div className="flex items-center justify-between gap-2">

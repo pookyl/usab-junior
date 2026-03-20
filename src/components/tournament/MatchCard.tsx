@@ -4,10 +4,11 @@ import type { TournamentMatch, RoundRobinPlayer } from '../../types/junior';
 
 // ── TeamRow (shared between MatchCard and RoundRobinMatchCard) ──────────────
 
-export function TeamRow({ names, playerIds, tswId, won, ongoing, lost, boldName, scores, otherScores, showRetired, showWalkover }: {
+export function TeamRow({ names, playerIds, tswId, fromPath, won, ongoing, lost, boldName, scores, otherScores, showRetired, showWalkover }: {
   names: string[];
   playerIds?: (number | null)[];
   tswId?: string;
+  fromPath?: string;
   won: boolean;
   ongoing?: boolean;
   lost?: boolean;
@@ -39,7 +40,11 @@ export function TeamRow({ names, playerIds, tswId, won, ongoing, lost, boldName,
           if (pid && tswId) {
             return (
               <div key={i} className="truncate">
-                <Link to={`/tournaments/${tswId}/player/${pid}`} className="hover:text-violet-600 dark:hover:text-violet-400 hover:underline">
+                <Link
+                  to={`/tournaments/${tswId}/player/${pid}`}
+                  state={fromPath ? { fromPath } : undefined}
+                  className="hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
+                >
                   {n}
                 </Link>
               </div>
@@ -83,7 +88,7 @@ export function teamRowPropsFromRR(players: RoundRobinPlayer[]) {
 
 // ── MatchCard ───────────────────────────────────────────────────────────────
 
-export default function MatchCard({ match, date, tswId }: { match: TournamentMatch; date?: string; tswId?: string }) {
+export default function MatchCard({ match, date, tswId, fromPath }: { match: TournamentMatch; date?: string; tswId?: string; fromPath?: string }) {
   const t1Scores = match.scores.map(g => g[0]);
   const t2Scores = match.scores.map(g => g[1]);
   const ongoing = !match.team1Won && !match.team2Won && !match.walkover && !match.bye;
@@ -101,6 +106,7 @@ export default function MatchCard({ match, date, tswId }: { match: TournamentMat
           names={match.team1}
           playerIds={match.team1Ids}
           tswId={tswId}
+          fromPath={fromPath}
           won={match.team1Won}
           ongoing={ongoing}
           lost={!match.team1Won && match.team2Won}
@@ -122,6 +128,7 @@ export default function MatchCard({ match, date, tswId }: { match: TournamentMat
             names={match.team2}
             playerIds={match.team2Ids}
             tswId={tswId}
+            fromPath={fromPath}
             won={match.team2Won}
             ongoing={ongoing}
             lost={!match.team2Won && match.team1Won}

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Medal } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
 import { fetchTournamentMedals } from '../../../services/rankingsService';
@@ -8,10 +8,14 @@ import type { TournamentMedals, ClubMedalSummary, DrawMedals, MedalPlayer } from
 
 type SortKey = 'gold' | 'silver' | 'bronze' | 'total' | 'club';
 
-function PlayerName({ player, tswId }: { player: MedalPlayer; tswId: string }) {
+function PlayerName({ player, tswId, fromPath }: { player: MedalPlayer; tswId: string; fromPath?: string }) {
   if (player.playerId) {
     return (
-      <Link to={`/tournaments/${tswId}/player/${player.playerId}`} className="text-violet-600 dark:text-violet-400 hover:underline">
+      <Link
+        to={`/tournaments/${tswId}/player/${player.playerId}`}
+        state={fromPath ? { fromPath } : undefined}
+        className="text-violet-600 dark:text-violet-400 hover:underline"
+      >
         {player.name}
       </Link>
     );
@@ -43,9 +47,11 @@ let _medalsSnap: {
 
 function ClubMedalRow({
   club, rank, medals, tswId, expandMode, onExpandChange,
+  fromPath,
 }: {
   club: ClubMedalSummary; rank: number; medals: DrawMedals[];
   tswId: string; expandMode: ExpandMode; onExpandChange: (mode: ExpandMode) => void;
+  fromPath?: string;
 }) {
   const [detailSort, setDetailSort] = useState<DetailSortKey>('event');
   const [detailAsc, setDetailAsc] = useState(true);
@@ -172,7 +178,7 @@ function ClubMedalRow({
                             return show.map((p, j) => (
                               <span key={j}>
                                 {j > 0 && <span className="text-slate-400 dark:text-slate-500"> / </span>}
-                                <PlayerName player={p} tswId={tswId} />
+                                <PlayerName player={p} tswId={tswId} fromPath={fromPath} />
                               </span>
                             ));
                           })()}
@@ -191,6 +197,7 @@ function ClubMedalRow({
 }
 
 export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+  const { pathname } = useLocation();
   const { data, loading, error, retry, refresh } = useTabData<TournamentMedals>(tswId, active, fetchTournamentMedals, 'medals');
   useEffect(() => { if (refreshTrigger) refresh(); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -271,6 +278,7 @@ export default function MedalsTab({ tswId, active, refreshTrigger }: { tswId: st
                 rank={idx + 1}
                 medals={data.medals}
                 tswId={tswId}
+                fromPath={pathname}
                 expandMode={expandedClubs[club.club] ?? null}
                 onExpandChange={(mode) => setExpandedClubs(prev => ({ ...prev, [club.club]: mode }))}
               />

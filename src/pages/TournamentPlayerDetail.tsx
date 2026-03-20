@@ -1,15 +1,16 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
 import MatchCard from '../components/tournament/MatchCard';
 import type { TournamentPlayerDetailResponse } from '../types/junior';
+import { getTournamentPlayerOrigin } from '../utils/tournamentReturnState';
 
 export default function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
-  const navigate = useNavigate();
+  const location = useLocation();
   const { playerNameMap, playerIdSet } = usePlayers();
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
@@ -61,18 +62,25 @@ export default function TournamentPlayerDetail() {
 
   if (!tswId || !playerId) return null;
 
+  const fromPath = (location.state as { fromPath?: string } | null)?.fromPath ?? getTournamentPlayerOrigin(location.pathname);
+  const isTournamentSubpage = Boolean(
+    fromPath &&
+      fromPath.startsWith(`/tournaments/${tswId}/`) &&
+      !fromPath.includes('/player/'),
+  );
+  const backTarget = isTournamentSubpage ? fromPath! : `/tournaments/${tswId}/players`;
   const tswPlayerUrl = `https://www.tournamentsoftware.com/tournament/${tswId}/player/${playerId}`;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
+        <Link
+          to={backTarget}
+          className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
-        </button>
+        </Link>
         <RefreshButton onClick={handleRefresh} loading={loading} />
       </div>
 
@@ -175,7 +183,7 @@ export default function TournamentPlayerDetail() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {filtered.map((m, i) => (
-                <MatchCard key={i} match={m} tswId={tswId} />
+                <MatchCard key={i} match={m} tswId={tswId} fromPath={location.pathname} />
               ))}
             </div>
           )}

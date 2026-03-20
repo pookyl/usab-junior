@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Calendar, Swords } from 'lucide-react';
 import { TabLoading, TabError, TabEmpty, cappedMapSet } from '../shared';
 import MatchCard from '../MatchCard';
@@ -35,6 +36,7 @@ interface MatchesTabSnapshot {
 const matchesTabCache = new Map<string, MatchesTabSnapshot>();
 
 export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+  const { pathname } = useLocation();
   const snap = matchesTabCache.get(tswId);
   const meta = useTournamentMeta(tswId);
   const metaDates = useMemo(
@@ -219,7 +221,7 @@ export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: s
                 items.push(
                   <div key={`g-${gi}`} className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4">
                     {group.matches.map((m, i) => (
-                      <MatchCard key={i} match={m} date={matchDate} tswId={tswId} />
+                      <MatchCard key={i} match={m} date={matchDate} tswId={tswId} fromPath={pathname} />
                     ))}
                   </div>
                 );

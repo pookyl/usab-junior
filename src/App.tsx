@@ -1,10 +1,11 @@
-import { Component } from 'react';
+import { Component, useEffect } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import useScrollRestore from './hooks/useScrollRestore';
 import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { setLastTournamentSubpagePath, rememberTournamentDetailOrigin } from './utils/tournamentReturnState';
 import Home from './pages/Dashboard';
 import Rankings from './pages/Players';
 import AllPlayers from './pages/AllPlayers';
@@ -63,6 +64,17 @@ function ScrollManager() {
   return null;
 }
 
+function TournamentRouteTracker() {
+  const { pathname, state, key } = useLocation();
+
+  useEffect(() => {
+    setLastTournamentSubpagePath(pathname);
+    rememberTournamentDetailOrigin(pathname, (state as { fromPath?: string } | null)?.fromPath);
+  }, [pathname, state, key]);
+
+  return null;
+}
+
 function PlayerRedirect() {
   const { id } = useParams();
   return <Navigate to={`/directory/${id}`} replace />;
@@ -76,6 +88,7 @@ export default function App() {
           <PlayersProvider>
             <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
               <ScrollManager />
+              <TournamentRouteTracker />
               <Navbar />
               <main className="pb-20 md:pb-0">
                 <Routes>

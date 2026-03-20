@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
 import type {
   BracketMatch as BracketMatchData,
@@ -292,10 +292,11 @@ export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRo
 // ── Bracket sub-components ──────────────────────────────────────────────────
 
 function BracketPlayerRow({
-  player, tswId, gameScores, otherScores, isTop, lost, statusLabel, timeLabel,
+  player, tswId, fromPath, gameScores, otherScores, isTop, lost, statusLabel, timeLabel,
 }: {
   player: DisplayMatch['player1'];
   tswId: string;
+  fromPath: string;
   gameScores: number[];
   otherScores: number[];
   isTop: boolean;
@@ -331,6 +332,7 @@ function BracketPlayerRow({
     pid ? (
       <Link
         to={`/tournaments/${tswId}/player/${pid}`}
+        state={{ fromPath }}
         className={`text-[11px] truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline ${nameClass}`}
       >
         {name}
@@ -378,14 +380,18 @@ function BracketPlayerRow({
   );
 }
 
-function BracketFeedInEntry({ player, tswId }: { player: DisplayPlayer | null; tswId: string }) {
+function BracketFeedInEntry({ player, tswId, fromPath }: { player: DisplayPlayer | null; tswId: string; fromPath: string }) {
   if (!player || !player.name) {
     return <div className="w-48 h-6" />;
   }
 
   const renderName = (name: string, pid: number | null | undefined) =>
     pid ? (
-      <Link to={`/tournaments/${tswId}/player/${pid}`} className="text-[11px] text-sky-600 dark:text-sky-400 truncate hover:underline">
+      <Link
+        to={`/tournaments/${tswId}/player/${pid}`}
+        state={{ fromPath }}
+        className="text-[11px] text-sky-600 dark:text-sky-400 truncate hover:underline"
+      >
         {name}
       </Link>
     ) : (
@@ -421,7 +427,7 @@ export function formatScheduledTime(raw: string): { date: string; time: string }
   return { date: `${day} ${month}/${date}`, time: `${h}${mm} ${ampm}` };
 }
 
-function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string }) {
+function BracketMatchCard({ match, tswId, fromPath }: { match: DisplayMatch; tswId: string; fromPath: string }) {
   const p1Scores: number[] = [];
   const p2Scores: number[] = [];
   const p1IsWinner = match.player1?.won ?? false;
@@ -448,8 +454,8 @@ function BracketMatchCard({ match, tswId }: { match: DisplayMatch; tswId: string
 
   return (
     <div className="w-48 bg-white dark:bg-slate-900 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden text-left shrink-0">
-      <BracketPlayerRow player={match.player1} tswId={tswId} gameScores={p1Scores} otherScores={p2Scores} isTop lost={p1Lost} statusLabel={p1Status || undefined} timeLabel={timeParts?.date} />
-      <BracketPlayerRow player={match.player2} tswId={tswId} gameScores={p2Scores} otherScores={p1Scores} isTop={false} lost={p2Lost} statusLabel={p2Status || undefined} timeLabel={timeParts?.time} />
+      <BracketPlayerRow player={match.player1} tswId={tswId} fromPath={fromPath} gameScores={p1Scores} otherScores={p2Scores} isTop lost={p1Lost} statusLabel={p1Status || undefined} timeLabel={timeParts?.date} />
+      <BracketPlayerRow player={match.player2} tswId={tswId} fromPath={fromPath} gameScores={p2Scores} otherScores={p1Scores} isTop={false} lost={p2Lost} statusLabel={p2Status || undefined} timeLabel={timeParts?.time} />
     </div>
   );
 }
@@ -501,6 +507,7 @@ const _bracketScroll = new Map<string, { scrollLeft: number; scrollTop: number }
 
 export default function BracketView({ section, tswId, showTitle }: { section: BracketSection; tswId: string; showTitle?: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { pathname } = useLocation();
   const cacheKey = `${tswId}:${section.name}`;
 
   useEffect(() => {
@@ -589,6 +596,7 @@ export default function BracketView({ section, tswId, showTitle }: { section: Br
                               {match.player1?.playerId ? (
                                 <Link
                                   to={`/tournaments/${tswId}/player/${match.player1.playerId}`}
+                                  state={{ fromPath: pathname }}
                                   className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
                                 >
                                   {match.player1?.name}
@@ -603,6 +611,7 @@ export default function BracketView({ section, tswId, showTitle }: { section: Br
                                 match.player1.partnerPlayerId ? (
                                   <Link
                                     to={`/tournaments/${tswId}/player/${match.player1.partnerPlayerId}`}
+                                    state={{ fromPath: pathname }}
                                     className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
                                   >
                                     {match.player1.partner}
@@ -620,12 +629,12 @@ export default function BracketView({ section, tswId, showTitle }: { section: Br
                         <div>
                           {match.feedInPlayer && (
                             <div className="invisible pointer-events-none" aria-hidden="true">
-                              <BracketFeedInEntry player={match.feedInPlayer} tswId={tswId} />
+                              <BracketFeedInEntry player={match.feedInPlayer} tswId={tswId} fromPath={pathname} />
                             </div>
                           )}
-                          <BracketMatchCard match={match} tswId={tswId} />
+                          <BracketMatchCard match={match} tswId={tswId} fromPath={pathname} />
                           {match.feedInPlayer && (
-                            <BracketFeedInEntry player={match.feedInPlayer} tswId={tswId} />
+                            <BracketFeedInEntry player={match.feedInPlayer} tswId={tswId} fromPath={pathname} />
                           )}
                         </div>
                       )}

@@ -1,13 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import { TeamRow, teamRowPropsFromRR } from './MatchCard';
 import type { RoundRobinDrawResponse, RoundRobinPlayer } from '../../types/junior';
 
-function RoundRobinPlayerName({ player, tswId }: { player: RoundRobinPlayer; tswId: string }) {
+function RoundRobinPlayerName({ player, tswId, fromPath }: { player: RoundRobinPlayer; tswId: string; fromPath: string }) {
   if (player.playerId) {
     return (
       <Link
         to={`/tournaments/${tswId}/player/${player.playerId}`}
+        state={{ fromPath }}
         className="hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
       >
         {player.name}
@@ -17,7 +18,7 @@ function RoundRobinPlayerName({ player, tswId }: { player: RoundRobinPlayer; tsw
   return <span>{player.name}</span>;
 }
 
-function RoundRobinMatchCard({ match, tswId }: { match: RoundRobinDrawResponse['matches'][number]; tswId: string }) {
+function RoundRobinMatchCard({ match, tswId, fromPath }: { match: RoundRobinDrawResponse['matches'][number]; tswId: string; fromPath: string }) {
   const t1Scores = match.scores.map(g => g[0]);
   const t2Scores = match.scores.map(g => g[1]);
   const ongoing = match.winner === null && !match.walkover;
@@ -31,6 +32,7 @@ function RoundRobinMatchCard({ match, tswId }: { match: RoundRobinDrawResponse['
         <TeamRow
           {...teamRowPropsFromRR(match.team1)}
           tswId={tswId}
+          fromPath={fromPath}
           won={match.winner === 1}
           ongoing={ongoing}
           scores={t1Scores}
@@ -39,6 +41,7 @@ function RoundRobinMatchCard({ match, tswId }: { match: RoundRobinDrawResponse['
         <TeamRow
           {...teamRowPropsFromRR(match.team2)}
           tswId={tswId}
+          fromPath={fromPath}
           won={match.winner === 2}
           ongoing={ongoing}
           scores={t2Scores}
@@ -59,6 +62,7 @@ function RoundRobinMatchCard({ match, tswId }: { match: RoundRobinDrawResponse['
 
 export default function RoundRobinView({ data, tswId }: { data: RoundRobinDrawResponse; tswId: string }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   return (
     <div className="space-y-6">
@@ -121,7 +125,7 @@ export default function RoundRobinView({ data, tswId }: { data: RoundRobinDrawRe
                       <div className="space-y-0.5">
                         {s.players.map((p, i) => (
                           <div key={i} className="text-sm truncate text-slate-800 dark:text-slate-100">
-                            <RoundRobinPlayerName player={p} tswId={tswId} />
+                            <RoundRobinPlayerName player={p} tswId={tswId} fromPath={pathname} />
                           </div>
                         ))}
                       </div>
@@ -165,7 +169,7 @@ export default function RoundRobinView({ data, tswId }: { data: RoundRobinDrawRe
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Matches</h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {data.matches.map((m) => (
-              <RoundRobinMatchCard key={m.matchId} match={m} tswId={tswId} />
+              <RoundRobinMatchCard key={m.matchId} match={m} tswId={tswId} fromPath={pathname} />
             ))}
           </div>
         </div>
