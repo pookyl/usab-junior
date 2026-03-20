@@ -1,4 +1,5 @@
 import { useParams, useSearchParams, Link, Navigate, useNavigate } from 'react-router-dom';
+import { track } from '@vercel/analytics';
 import {
   ArrowLeft, ExternalLink,
   Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal,
@@ -7,7 +8,9 @@ import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
 import { clearLastTournamentSubpagePath } from '../utils/tournamentReturnState';
 
-// Re-export for backward compatibility (App.tsx, BracketDisplay.test.ts)
+declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
+
+// Re-export for backward compatibility
 export { default as TournamentPlayerDetail } from './TournamentPlayerDetail';
 export { default as TournamentDrawDetail } from './TournamentDrawDetail';
 export { buildDisplayRounds } from '../components/tournament/BracketView';
@@ -27,7 +30,7 @@ const SECTIONS = [
 
 // ── Main Page (Hub) ──────────────────────────────────────────────────────────
 
-export default function TournamentDetail() {
+export default function TournamentHub() {
   const { tswId } = useParams<{ tswId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -47,6 +50,7 @@ export default function TournamentDetail() {
 
   const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
   const isFocusedTournament = isActive && activeTswId === tswId;
+  const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
@@ -66,6 +70,12 @@ export default function TournamentDetail() {
         <button
           type="button"
           onClick={() => {
+            track('mode_toggle', {
+              releaseVersion,
+              mode: 'tournament_focus',
+              tournamentId: tswId,
+              nextState: isFocusedTournament ? 'exit_focus_mode' : 'enter_focus_mode',
+            });
             if (isFocusedTournament) {
               clearLastTournamentSubpagePath();
               exitMode();
@@ -109,6 +119,13 @@ export default function TournamentDetail() {
             href={tswUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              track('tournament_external_link_click', {
+                releaseVersion,
+                tournamentId: tswId,
+                target: 'tournamentsoftware',
+              });
+            }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
           >
             <ExternalLink className="w-3 h-3" />
@@ -126,6 +143,13 @@ export default function TournamentDetail() {
               key={section.id}
               to={`/tournaments/${tswId}/${section.id}`}
               state={{ name: meta.name, hostClub: meta.hostClub, startDate: meta.startDate, endDate: meta.endDate }}
+              onClick={() => {
+                track('tournament_section_click', {
+                  releaseVersion,
+                  tournamentId: tswId,
+                  section: section.id,
+                });
+              }}
               className="flex flex-col items-center gap-2 p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-600 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
             >
               <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center group-hover:bg-violet-100 dark:group-hover:bg-violet-900/40 transition-colors">

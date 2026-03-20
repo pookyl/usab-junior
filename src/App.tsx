@@ -14,7 +14,7 @@ import AllPlayers from './pages/AllPlayers';
 import PlayerProfile from './pages/PlayerProfile';
 import HeadToHead from './pages/HeadToHead';
 import Tournaments from './pages/Tournaments';
-import TournamentDetail, { TournamentPlayerDetail, TournamentDrawDetail } from './pages/TournamentDetail';
+import TournamentHub, { TournamentPlayerDetail, TournamentDrawDetail } from './pages/TournamentHub';
 import TournamentMatchesPage from './pages/tournament/TournamentMatchesPage';
 import TournamentPlayersPage from './pages/tournament/TournamentPlayersPage';
 import TournamentDrawsPage from './pages/tournament/TournamentDrawsPage';
@@ -147,7 +147,7 @@ export default function App() {
                     <Route path="/analytics" element={<Navigate to="/players" replace />} />
                     <Route path="/head-to-head" element={<HeadToHead />} />
                     <Route path="/tournaments" element={<Tournaments />} />
-                    <Route path="/tournaments/:tswId" element={<TournamentDetail />} />
+                    <Route path="/tournaments/:tswId" element={<TournamentHub />} />
                     <Route path="/tournaments/:tswId/matches" element={<TournamentMatchesPage />} />
                     <Route path="/tournaments/:tswId/players" element={<TournamentPlayersPage />} />
                     <Route path="/tournaments/:tswId/draws" element={<TournamentDrawsPage />} />

@@ -79,7 +79,7 @@ fetchTournamentMedals(tswId: string): Promise<TournamentMedals>
 - 120s fetch timeout
 - Returns `TournamentMedals` to the UI
 
-### 5. Client UI — `src/pages/TournamentDetail.tsx`
+### 5. Client UI — `src/pages/TournamentHub.tsx`
 
 - Renders a **club medal tally table** (gold / silver / bronze / total columns)
 - Each row expands to show per-event detail with player names

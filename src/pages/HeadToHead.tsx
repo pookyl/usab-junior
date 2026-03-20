@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { track } from '@vercel/analytics';
 import {
   Swords, Search, RefreshCw, Trophy, ExternalLink, TrendingUp,
 } from 'lucide-react';
@@ -24,6 +25,8 @@ import {
 } from '../services/rankingsService';
 import { formatDateLabel, inferGender, parseScoreString } from '../utils/playerUtils';
 export { parseScoreString } from '../utils/playerUtils';
+
+declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
 
 type Gender = 'Boy' | 'Girl' | 'All';
 
@@ -643,6 +646,7 @@ let _h2hSnap: {
 
 export default function HeadToHead() {
   const { players: allPlayers, directoryPlayers, directoryLoading, loading: playersLoading, rankingsDate } = usePlayers();
+  const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
 
   const snap = _h2hSnap;
   const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(snap?.ageGroup ?? 'U13');
@@ -742,6 +746,13 @@ export default function HeadToHead() {
 
   const handleCompare = useCallback(async () => {
     if (!playerA || !playerB) return;
+    track('head_to_head_run', {
+      releaseVersion,
+      playerAId: playerA.usabId,
+      playerBId: playerB.usabId,
+      ageGroup: ageGroup ?? 'all',
+      gender,
+    });
     setComparing(true);
     setCompared(false);
     setH2hResult(null);
@@ -781,7 +792,7 @@ export default function HeadToHead() {
     } finally {
       setComparing(false);
     }
-  }, [playerA, playerB]);
+  }, [playerA, playerB, ageGroup, gender, releaseVersion]);
 
   const ALL_FILTER_CATS: { key: 'All' | 'Singles' | 'Doubles' | 'Mixed'; label: string }[] = [
     { key: 'All', label: 'All' },

@@ -1,11 +1,14 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { track } from '@vercel/analytics';
 import {
   Calendar, MapPin, ChevronDown, ExternalLink, FileText,
   Clock, CheckCircle2, Loader2, Filter, Medal, SquareArrowOutUpRight,
 } from 'lucide-react';
 import { fetchTournaments } from '../services/rankingsService';
 import type { ScheduledTournament, TournamentsResponse } from '../types/junior';
+
+declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
 
 // ── Color maps ───────────────────────────────────────────────────────────────
 
@@ -109,6 +112,7 @@ function SeasonPicker({ seasons, selected, onChange }: {
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const labelFor = (season: string) => `Season ${season.replace(/^Season\s+/i, '')}`;
 
   useEffect(() => {
     if (!open) return;
@@ -126,7 +130,7 @@ function SeasonPicker({ seasons, selected, onChange }: {
         className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 hover:border-violet-300 dark:hover:border-violet-600 transition-colors cursor-pointer"
       >
         <Calendar className="w-4 h-4 text-violet-500" />
-        {selected}
+        {labelFor(selected)}
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
@@ -141,7 +145,7 @@ function SeasonPicker({ seasons, selected, onChange }: {
                   : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
-              {s}
+              {labelFor(s)}
             </button>
           ))}
         </div>
@@ -181,6 +185,7 @@ function FilterPills({ label, options, selected, onChange }: {
 function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
   const days = tournament.status === 'upcoming' ? daysUntil(tournament.startDate) : null;
   const year = formatYear(tournament.startDate);
+  const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
@@ -202,6 +207,15 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
           <Link
             to={`/tournaments/${tournament.tswId}`}
             state={{ name: tournament.name, hostClub: tournament.hostClub, startDate: tournament.startDate, endDate: tournament.endDate }}
+            onClick={() => {
+              track('tournament_card_click', {
+                releaseVersion,
+                tournamentId: tournament.tswId,
+                tournamentStatus: tournament.status,
+                tournamentRegion: tournament.region,
+                tournamentType: tournament.type,
+              });
+            }}
             className="inline-flex items-center gap-1 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
           >
             {tournament.name}
