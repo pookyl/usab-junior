@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Medal } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
 import { fetchTournamentMedals } from '../../../services/rankingsService';
+import fourthPlaceMedalIcon from '../../../assets/icons/fourth-place-medal.png';
 import type { TournamentMedals, ClubMedalSummary, DrawMedals, MedalPlayer } from '../../../types/junior';
 
 type SortKey = 'gold' | 'silver' | 'bronze' | 'total' | 'club';
@@ -20,7 +21,7 @@ function PlayerName({ player, tswId }: { player: MedalPlayer; tswId: string }) {
 
 function MedalIcon({ place, size = 22 }: { place: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number }) {
   if (place === 'fourth') {
-    return <span className="shrink-0 leading-none" style={{ fontSize: size }}>🏅</span>;
+    return <img src={fourthPlaceMedalIcon} alt="4th place medal" className="shrink-0" style={{ width: size, height: size }} />;
   }
 
   const emoji: Record<string, string> = { gold: '🥇', silver: '🥈', bronze: '🥉' };
