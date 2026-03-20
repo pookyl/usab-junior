@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List } from 'lucide-react';
-import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
+import { List, ChevronRight } from 'lucide-react';
+import { useTabData, TabLoading, TabError, TabEmpty } from '../shared';
 import { fetchTournamentDetail } from '../../../services/rankingsService';
 
 export default function DrawsTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
@@ -13,49 +13,42 @@ export default function DrawsTab({ tswId, active, refreshTrigger }: { tswId: str
   if (error) return <TabError error={error} onRetry={retry} />;
   if (!data || data.draws.length === 0) return <TabEmpty icon={List} message="No draws available for this tournament." />;
 
+  const getFeedInInfo = (stage: string | null, consolation: string | null): string | null => {
+    const candidates = [stage, consolation].filter((v): v is string => Boolean(v));
+    return candidates.find(v => /feed[\s-]?in/i.test(v)) ?? null;
+  };
+
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 dark:border-slate-700 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-            <th className="px-4 py-3">Draw</th>
-            <th className="px-4 py-3 text-right">Size</th>
-            <th className="px-4 py-3">Type</th>
-            <th className="px-4 py-3">Stage</th>
-            <th className="px-4 py-3 hidden sm:table-cell">Consolation</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-          {data.draws.map(draw => {
-            const color = getEventColor(draw.name);
-            return (
-              <tr
-                key={draw.drawId}
-                onClick={() => navigate(`/tournaments/${tswId}/draw/${draw.drawId}`, { state: { drawName: draw.name } })}
-                className="hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors"
-              >
-                <td className="px-4 py-3">
-                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${color.bg} ${color.text}`}>
-                    {draw.name}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-300 tabular-nums">
-                  {draw.size ?? '–'}
-                </td>
-                <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                  {draw.type ?? '–'}
-                </td>
-                <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                  {draw.stage ?? '–'}
-                </td>
-                <td className="px-4 py-3 hidden sm:table-cell text-slate-400 dark:text-slate-500">
-                  {draw.consolation || '–'}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className="space-y-2.5">
+      {data.draws.map(draw => {
+        const feedInInfo = getFeedInInfo(draw.stage, draw.consolation);
+        const metaParts = [
+          draw.type,
+          feedInInfo,
+          draw.size != null ? `Size ${draw.size}` : null,
+        ].filter((part): part is string => Boolean(part));
+
+        return (
+          <button
+            key={draw.drawId}
+            type="button"
+            onClick={() => navigate(`/tournaments/${tswId}/draw/${draw.drawId}`, { state: { drawName: draw.name } })}
+            className="group w-full text-left bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-violet-200 dark:hover:border-violet-700 hover:shadow-md active:bg-slate-50 dark:active:bg-slate-800 transition-all p-3.5 md:p-4"
+          >
+            <div className="flex items-center justify-between gap-2.5">
+              <div className="min-w-0">
+                <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 group-hover:text-violet-700 dark:group-hover:text-violet-400 transition-colors truncate">
+                  {draw.name}
+                </p>
+                <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500 truncate">
+                  {metaParts.length > 0 ? metaParts.join(' · ') : '—'}
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-violet-400 transition-colors shrink-0" />
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }
