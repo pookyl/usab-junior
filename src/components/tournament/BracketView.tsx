@@ -35,6 +35,14 @@ export interface DisplayRound {
   matches: DisplayMatch[];
 }
 
+function appendSeed(name: string, seed?: string): string {
+  const cleanName = name?.trim() ?? '';
+  const cleanSeed = seed?.trim() ?? '';
+  if (!cleanName || !cleanSeed) return cleanName;
+  if (/\s\[[\d/]+\]\s*$/i.test(cleanName)) return cleanName;
+  return `${cleanName} [${cleanSeed}]`;
+}
+
 // ── buildDisplayRounds ──────────────────────────────────────────────────────
 
 export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRound[]; hasFeedIn: boolean } {
@@ -328,27 +336,26 @@ function BracketPlayerRow({
       ? 'text-slate-400 dark:text-slate-500'
       : 'text-slate-800 dark:text-slate-100';
 
-  const renderName = (name: string, pid: number | null) =>
-    pid ? (
+  const renderName = (name: string, pid: number | null, seed?: string) => {
+    const displayName = appendSeed(name, seed);
+    return pid ? (
       <Link
         to={`/tournaments/${tswId}/player/${pid}`}
         state={{ fromPath }}
         className={`text-[11px] truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline ${nameClass}`}
       >
-        {name}
+        {displayName}
       </Link>
     ) : (
-      <span className={`text-[11px] truncate ${nameClass}`}>{name || 'TBD'}</span>
+      <span className={`text-[11px] truncate ${nameClass}`}>{displayName || 'TBD'}</span>
     );
+  };
 
   return (
     <div className={`flex items-center justify-between gap-1 px-2 py-1 min-w-0 ${isTop ? '' : 'border-t border-slate-100 dark:border-slate-700/50'}`}>
       <div className="flex flex-col min-w-0 flex-1">
         <div className="flex items-center gap-1 min-w-0">
-          {renderName(player.name, player.playerId)}
-          {player.seed && (
-            <span className={`text-[10px] font-semibold shrink-0 ${lost ? 'text-violet-400/50 dark:text-violet-500/50' : 'text-violet-500 dark:text-violet-400'}`}>({player.seed})</span>
-          )}
+          {renderName(player.name, player.playerId, player.seed)}
         </div>
         {player.partner && (
           <div className="flex items-center gap-1 min-w-0">
@@ -385,24 +392,25 @@ function BracketFeedInEntry({ player, tswId, fromPath }: { player: DisplayPlayer
     return <div className="w-48 h-6" />;
   }
 
-  const renderName = (name: string, pid: number | null | undefined) =>
-    pid ? (
+  const renderName = (name: string, pid: number | null | undefined, seed?: string) => {
+    const displayName = appendSeed(name, seed);
+    return pid ? (
       <Link
         to={`/tournaments/${tswId}/player/${pid}`}
         state={{ fromPath }}
         className="text-[11px] text-sky-600 dark:text-sky-400 truncate hover:underline"
       >
-        {name}
+        {displayName}
       </Link>
     ) : (
-      <span className="text-[11px] text-slate-600 dark:text-slate-400 truncate">{name}</span>
+      <span className="text-[11px] text-slate-600 dark:text-slate-400 truncate">{displayName}</span>
     );
+  };
 
   return (
     <div className="w-48 flex flex-col px-2 py-0.5 min-w-0">
       <div className="flex items-center gap-1 min-w-0">
-        {renderName(player.name, player.playerId)}
-        {player.seed && <span className="text-[10px] text-violet-500 dark:text-violet-400 shrink-0">({player.seed})</span>}
+        {renderName(player.name, player.playerId, player.seed)}
       </div>
       {player.partner && (
         <div className="flex items-center min-w-0">
@@ -599,12 +607,11 @@ export default function BracketView({ section, tswId, showTitle }: { section: Br
                                   state={{ fromPath: pathname }}
                                   className="text-xs font-bold text-slate-900 dark:text-white truncate hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
                                 >
-                                  {match.player1?.name}
-                                  {match.player1?.seed && <span className="text-violet-500 dark:text-violet-400 ml-1">({match.player1.seed})</span>}
+                                  {appendSeed(match.player1?.name || '', match.player1?.seed)}
                                 </Link>
                               ) : (
                                 <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                                  {match.player1?.name || 'TBD'}
+                                  {appendSeed(match.player1?.name || 'TBD', match.player1?.seed)}
                                 </span>
                               )}
                               {match.player1?.partner && (

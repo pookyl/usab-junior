@@ -701,11 +701,15 @@ export function parseTswWinners(html) {
       if (!placeStr || !/\d/.test(placeStr)) continue;
 
       const players = [];
-      const playerRegex = /<a\s+href="[^"]*player=(\d+)[^"]*">([^<]+)<\/a>/gi;
+      const playerRegex = /<a\s+href="[^"]*player=(\d+)[^"]*">([^<]+)<\/a>([\s\S]*?)(?=<a\s+href="[^"]*player=|<\/td>|$)/gi;
       let pm;
       while ((pm = playerRegex.exec(rowHtml)) !== null) {
-        const name = pm[2].replace(/\s*\[[\d/]+\]\s*$/, '').trim();
-        players.push({ name, playerId: parseInt(pm[1], 10) });
+        const playerId = parseInt(pm[1], 10);
+        const baseName = decodeHtmlEntities(pm[2]).trim();
+        const trailingSeed = pm[3].match(/^\s*(?:<[^>]+>\s*)*\[([\d/]+)\]/i)?.[1]?.trim();
+        const hasInlineSeed = /\s*\[[\d/]+\]\s*$/.test(baseName);
+        const name = trailingSeed && !hasInlineSeed ? `${baseName} [${trailingSeed}]` : baseName;
+        players.push({ name, playerId });
       }
 
       if (players.length > 0) {
