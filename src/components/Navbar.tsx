@@ -40,20 +40,26 @@ export default function Navbar() {
   const getNavTarget = (path: string) => (path === '/tournaments' ? tournamentsTarget : path);
   const getNavState = (path: string) => (path === '/tournaments' ? tournamentsState : undefined);
   const desktopNavItems = showTournamentNav ? tournamentNavItems : navItems;
+  const topBarBackgroundClass = showTournamentNav
+    ? 'bg-gradient-to-r from-violet-900 to-indigo-900'
+    : 'bg-slate-900';
+  const topBarMutedTextClass = showTournamentNav ? 'text-violet-200' : 'text-slate-400';
+  const topBarHoverClass = showTournamentNav ? 'hover:bg-violet-800/70' : 'hover:bg-slate-800';
+  const topBarButtonTextClass = showTournamentNav ? 'text-violet-200' : 'text-slate-300';
 
   const ThemeIcon = MODE_ICON[mode];
 
   return (
     <>
       {/* Desktop top nav (md+) */}
-      <nav className="hidden md:block bg-slate-900 text-white shadow-lg sticky top-0 z-40 pt-[env(safe-area-inset-top)]">
+      <nav className={`hidden md:block ${topBarBackgroundClass} text-white shadow-lg sticky top-0 z-40 pt-[env(safe-area-inset-top)] transition-colors duration-200 motion-reduce:transition-none`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <img src="/icon-192.png" alt="" className="w-9 h-9 rounded-lg" />
               <span className="text-xl font-bold tracking-tight">
                 USAB<span className="text-violet-400"> Junior</span>
-                <span className="text-slate-400 font-normal text-sm ml-1.5">
+                <span className={`${topBarMutedTextClass} font-normal text-sm ml-1.5`}>
                   Hub
                   {showTournamentNav && <span className="ml-2 text-violet-300">· Tournament mode</span>}
                 </span>
@@ -74,7 +80,7 @@ export default function Navbar() {
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       active
                         ? 'bg-violet-600 text-white'
-                        : 'text-white hover:bg-slate-800'
+                        : `text-white ${topBarHoverClass}`
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -85,7 +91,7 @@ export default function Navbar() {
               <div className="ml-2 flex items-center gap-1">
                 <button
                   onClick={cycleMode}
-                  className="p-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                  className={`p-2 rounded-lg ${topBarButtonTextClass} ${topBarHoverClass} hover:text-white transition-colors`}
                   aria-label={`Theme: ${MODE_LABEL[mode]}`}
                   title={`Theme: ${MODE_LABEL[mode]}`}
                 >
@@ -98,12 +104,12 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile top bar (< md) — compact branding only */}
-      <header className="md:hidden bg-slate-900 text-white px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3 sticky top-0 z-40">
+      <header className={`md:hidden ${topBarBackgroundClass} text-white px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3 sticky top-0 z-40 transition-colors duration-200 motion-reduce:transition-none`}>
         <div className="flex items-center gap-2.5 flex-1">
           <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="text-lg font-bold tracking-tight">
             USAB<span className="text-violet-400"> Junior</span>
-            <span className="text-slate-400 font-normal text-xs ml-1">
+            <span className={`${topBarMutedTextClass} font-normal text-xs ml-1`}>
               Hub
               {showTournamentNav && <span className="ml-1 text-violet-300">· Tournament mode</span>}
             </span>
@@ -111,7 +117,7 @@ export default function Navbar() {
         </div>
         <button
           onClick={cycleMode}
-          className="p-1.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+          className={`p-1.5 rounded-lg ${topBarButtonTextClass} ${topBarHoverClass} hover:text-white transition-colors`}
           aria-label={`Theme: ${MODE_LABEL[mode]}`}
           title={`Theme: ${MODE_LABEL[mode]}`}
         >

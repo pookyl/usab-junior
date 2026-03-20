@@ -51,10 +51,27 @@ export default function TournamentHub() {
   const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
   const isFocusedTournament = isActive && activeTswId === tswId;
   const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
+  const handleTournamentModeToggle = () => {
+    track('mode_toggle', {
+      releaseVersion,
+      mode: 'tournament_focus',
+      tournamentId: tswId,
+      nextState: isFocusedTournament ? 'exit_focus_mode' : 'enter_focus_mode',
+    });
+    if (isFocusedTournament) {
+      clearLastTournamentSubpagePath();
+      exitMode();
+      navigate('/', { replace: true });
+      return;
+    }
+    clearLastTournamentSubpagePath();
+    enterMode(tswId);
+    navigate(`/tournaments/${tswId}`, { replace: true });
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
         <div className="min-w-0">
           {isFocusedTournament ? (
             <span className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-700 dark:text-violet-300">
@@ -67,34 +84,6 @@ export default function TournamentHub() {
             </Link>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            track('mode_toggle', {
-              releaseVersion,
-              mode: 'tournament_focus',
-              tournamentId: tswId,
-              nextState: isFocusedTournament ? 'exit_focus_mode' : 'enter_focus_mode',
-            });
-            if (isFocusedTournament) {
-              clearLastTournamentSubpagePath();
-              exitMode();
-              navigate('/tournaments', { replace: true });
-              return;
-            }
-            clearLastTournamentSubpagePath();
-            enterMode(tswId);
-            navigate(`/tournaments/${tswId}`, { replace: true });
-          }}
-          aria-pressed={isFocusedTournament}
-          className={`shrink-0 inline-flex items-center rounded-lg px-3 py-1.5 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors ${
-            isFocusedTournament
-              ? 'bg-indigo-100 text-indigo-700 border border-indigo-200 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-700 dark:hover:bg-indigo-900/60'
-              : 'bg-violet-600 text-white hover:bg-violet-700'
-          }`}
-        >
-          {isFocusedTournament ? 'Exit tournament mode' : 'Focus on this tournament'}
-        </button>
       </div>
 
       {/* Header */}
@@ -115,6 +104,8 @@ export default function TournamentHub() {
               {meta.hostClub}
             </span>
           )}
+        </div>
+        <div className="flex items-center gap-3 flex-wrap mt-4">
           <a
             href={tswUrl}
             target="_blank"
@@ -131,6 +122,18 @@ export default function TournamentHub() {
             <ExternalLink className="w-3 h-3" />
             TournamentSoftware
           </a>
+          <button
+            type="button"
+            onClick={handleTournamentModeToggle}
+            aria-pressed={isFocusedTournament}
+            className={`ml-auto shrink-0 inline-flex items-center rounded-lg px-3 py-1.5 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors ${
+              isFocusedTournament
+                ? 'bg-indigo-100 text-indigo-700 border border-indigo-200 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-700 dark:hover:bg-indigo-900/60'
+                : 'bg-violet-600 text-white hover:bg-violet-700'
+            }`}
+          >
+            {isFocusedTournament ? 'Exit Tournament Mode' : 'Enter Tournament Mode'}
+          </button>
         </div>
       </div>
 
