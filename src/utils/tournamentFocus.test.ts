@@ -36,5 +36,16 @@ describe('isWithinTournamentFocusScope', () => {
   it('rejects partial id prefix matches', () => {
     expect(isWithinTournamentFocusScope('/tournaments/abc-1234', 'abc-123')).toBe(false);
   });
+
+  it('keeps focus mode on player profile opened from active tournament flow', () => {
+    expect(
+      isWithinTournamentFocusScope('/directory/9999', 'abc-123', '/tournaments/abc-123/player/42'),
+    ).toBe(true);
+  });
+
+  it('does not keep focus mode on player profile opened outside active tournament flow', () => {
+    expect(isWithinTournamentFocusScope('/directory/9999', 'abc-123', '/directory/1234')).toBe(false);
+    expect(isWithinTournamentFocusScope('/directory/9999', 'abc-123', null)).toBe(false);
+  });
 });
 

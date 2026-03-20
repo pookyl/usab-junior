@@ -17,9 +17,20 @@ export function buildTournamentFocusNavItems(tswId: string | null): TournamentFo
   ];
 }
 
-export function isWithinTournamentFocusScope(pathname: string, activeTswId: string | null): boolean {
+export function isWithinTournamentFocusScope(
+  pathname: string,
+  activeTswId: string | null,
+  fromPath?: string | null,
+): boolean {
   if (!activeTswId) return false;
   const basePath = `/tournaments/${activeTswId}`;
-  return pathname === basePath || pathname.startsWith(`${basePath}/`);
+  if (pathname === basePath || pathname.startsWith(`${basePath}/`)) return true;
+
+  // Keep tournament mode when opening player profiles from a tournament route.
+  if (pathname.startsWith('/directory/') && fromPath) {
+    return fromPath === basePath || fromPath.startsWith(`${basePath}/`);
+  }
+
+  return false;
 }
 

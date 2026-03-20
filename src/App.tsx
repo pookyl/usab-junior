@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { TournamentFocusProvider, useTournamentFocus } from './contexts/TournamentFocusContext';
-import { setLastTournamentSubpagePath, rememberTournamentDetailOrigin } from './utils/tournamentReturnState';
+import { setLastTournamentSubpagePath, rememberTournamentDetailOrigin, clearLastTournamentSubpagePath } from './utils/tournamentReturnState';
 import { isWithinTournamentFocusScope } from './utils/tournamentFocus';
 import Home from './pages/Dashboard';
 import Rankings from './pages/Players';
@@ -81,20 +81,23 @@ function TournamentRouteTracker() {
 }
 
 function TournamentFocusAutoExit() {
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
   const { isActive, activeTswId, exitMode } = useTournamentFocus();
 
   useEffect(() => {
     if (!isActive) return;
     if (!activeTswId) {
+      clearLastTournamentSubpagePath();
       exitMode();
       return;
     }
 
-    if (!isWithinTournamentFocusScope(pathname, activeTswId)) {
+    const fromPath = (state as { fromPath?: string } | null)?.fromPath ?? null;
+    if (!isWithinTournamentFocusScope(pathname, activeTswId, fromPath)) {
+      clearLastTournamentSubpagePath();
       exitMode();
     }
-  }, [pathname, isActive, activeTswId, exitMode]);
+  }, [pathname, state, isActive, activeTswId, exitMode]);
 
   return null;
 }

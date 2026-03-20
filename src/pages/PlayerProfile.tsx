@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
   ExternalLink,
@@ -525,7 +525,12 @@ function PlayerNameLink({
 
 export default function PlayerProfile() {
   const { id: usabId } = useParams<{ id: string }>();
+  const location = useLocation();
   const { players: allPlayers, directoryPlayers, directoryLoading, loading: loadingAllPlayers, playerNameMap, rankingsDate } = usePlayers();
+  const fromPath = (location.state as { fromPath?: string } | null)?.fromPath;
+  const backTarget = fromPath ?? '/directory';
+  const backLabel = fromPath ? 'Back' : 'Back to Players';
+  const backState = fromPath?.startsWith('/tournaments/') ? { restoreTournamentScroll: true } : undefined;
 
   const rankedPlayer = allPlayers.find((p) => p.usabId === usabId) ?? null;
   const dirPlayer = directoryPlayers.find((p) => p.usabId === usabId) ?? null;
@@ -601,10 +606,11 @@ export default function PlayerProfile() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
         <Link
-          to="/directory"
+          to={backTarget}
+          state={backState}
           className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Players
+          <ArrowLeft className="w-4 h-4" /> {backLabel}
         </Link>
         <div className="py-16 text-center">
           <p className="text-slate-400 dark:text-slate-500 text-lg">Player USAB #{usabId} not found.</p>
@@ -638,11 +644,12 @@ export default function PlayerProfile() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
       {/* Back */}
       <Link
-        to="/directory"
+        to={backTarget}
+        state={backState}
         className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Players
+        {backLabel}
       </Link>
 
       {/* Hero card */}

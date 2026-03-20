@@ -49,13 +49,16 @@ export default function Navbar() {
       <nav className="hidden md:block bg-slate-900 text-white shadow-lg sticky top-0 z-40 pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <img src="/icon-192.png" alt="" className="w-9 h-9 rounded-lg" />
               <span className="text-xl font-bold tracking-tight">
                 USAB<span className="text-violet-400"> Junior</span>
-                <span className="text-slate-400 font-normal text-sm ml-1.5">Hub</span>
+                <span className="text-slate-400 font-normal text-sm ml-1.5">
+                  Hub
+                  {showTournamentNav && <span className="ml-2 text-violet-300">· Tournament mode</span>}
+                </span>
               </span>
-            </Link>
+            </div>
 
             <div className="flex items-center gap-1">
               {desktopNavItems.map(({ path, label, icon: Icon }) => {
@@ -96,13 +99,16 @@ export default function Navbar() {
 
       {/* Mobile top bar (< md) — compact branding only */}
       <header className="md:hidden bg-slate-900 text-white px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3 sticky top-0 z-40">
-        <Link to="/" className="flex items-center gap-2.5 flex-1">
+        <div className="flex items-center gap-2.5 flex-1">
           <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-lg" />
           <span className="text-lg font-bold tracking-tight">
             USAB<span className="text-violet-400"> Junior</span>
-            <span className="text-slate-400 font-normal text-xs ml-1">Hub</span>
+            <span className="text-slate-400 font-normal text-xs ml-1">
+              Hub
+              {showTournamentNav && <span className="ml-1 text-violet-300">· Tournament mode</span>}
+            </span>
           </span>
-        </Link>
+        </div>
         <button
           onClick={cycleMode}
           className="p-1.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
@@ -114,11 +120,7 @@ export default function Navbar() {
       </header>
 
       {/* Mobile bottom tab bar (< md) */}
-      <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-50 border-t pb-[env(safe-area-inset-bottom)] transition-colors duration-200 motion-reduce:transition-none ${
-        showTournamentNav
-          ? 'bg-violet-50 dark:bg-violet-950/90 border-violet-200 dark:border-violet-800'
-          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
-      }`}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 pb-[env(safe-area-inset-bottom)] transition-colors duration-200 motion-reduce:transition-none">
         <div className={`flex items-stretch transition-all duration-200 motion-reduce:transition-none ${
           isTransitioning ? 'opacity-80 scale-[0.99]' : 'opacity-100 scale-100'
         }`}>
@@ -134,8 +136,8 @@ export default function Navbar() {
                   to={path}
                   className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
                     active
-                      ? 'text-violet-700 dark:text-violet-300'
-                      : 'text-violet-500 dark:text-violet-400 active:text-violet-700 dark:active:text-violet-300'
+                      ? 'text-violet-600 dark:text-violet-400'
+                      : 'text-slate-400 dark:text-slate-500 active:text-slate-600'
                   }`}
                 >
                   <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />

@@ -32,6 +32,10 @@ export function getLastTournamentSubpagePath(): string | null {
   return lastTournamentSubpagePath;
 }
 
+export function clearLastTournamentSubpagePath(): void {
+  lastTournamentSubpagePath = null;
+}
+
 export function rememberTournamentDetailOrigin(pathname: string, fromPath?: string): void {
   if (!fromPath) return;
   const detail = getDetailMeta(pathname);

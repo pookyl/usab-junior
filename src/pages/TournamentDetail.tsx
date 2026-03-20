@@ -1,10 +1,11 @@
-import { useParams, useSearchParams, Link, Navigate } from 'react-router-dom';
+import { useParams, useSearchParams, Link, Navigate, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ExternalLink,
   Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal,
 } from 'lucide-react';
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
+import { clearLastTournamentSubpagePath } from '../utils/tournamentReturnState';
 
 // Re-export for backward compatibility (App.tsx, BracketDisplay.test.ts)
 export { default as TournamentPlayerDetail } from './TournamentPlayerDetail';
@@ -29,6 +30,7 @@ const SECTIONS = [
 export default function TournamentDetail() {
   const { tswId } = useParams<{ tswId: string }>();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const meta = useTournamentMeta(tswId);
   const { isActive, activeTswId, enterMode, exitMode } = useTournamentFocus();
 
@@ -48,28 +50,34 @@ export default function TournamentDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        {isFocusedTournament ? (
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-700 dark:text-violet-300">
-            Tournament mode is on
-          </span>
-        ) : (
-          <Link to="/tournaments" className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Tournaments
-          </Link>
-        )}
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          {isFocusedTournament ? (
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-700 dark:text-violet-300">
+              Tournament mode
+            </span>
+          ) : (
+            <Link to="/tournaments" className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Tournaments
+            </Link>
+          )}
+        </div>
         <button
           type="button"
           onClick={() => {
             if (isFocusedTournament) {
+              clearLastTournamentSubpagePath();
               exitMode();
+              navigate('/tournaments', { replace: true });
               return;
             }
+            clearLastTournamentSubpagePath();
             enterMode(tswId);
+            navigate(`/tournaments/${tswId}`, { replace: true });
           }}
           aria-pressed={isFocusedTournament}
-          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+          className={`shrink-0 inline-flex items-center rounded-lg px-3 py-1.5 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors ${
             isFocusedTournament
               ? 'bg-indigo-100 text-indigo-700 border border-indigo-200 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-700 dark:hover:bg-indigo-900/60'
               : 'bg-violet-600 text-white hover:bg-violet-700'

@@ -149,6 +149,7 @@ export default function TournamentPlayerDetail() {
               {resolvedUsabId && (
                 <Link
                   to={`/directory/${resolvedUsabId}`}
+                  state={{ fromPath: location.pathname }}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
                 >
                   <Users className="w-3 h-3" />

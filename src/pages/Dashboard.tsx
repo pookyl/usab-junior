@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Trophy, Users, Swords, Calendar, Clock,
   MapPin, CheckCircle2, Loader2, Medal, FileText, ExternalLink,
-  SquareArrowOutUpRight, ArrowRight,
+  SquareArrowOutUpRight,
 } from 'lucide-react';
 import { usePlayers } from '../contexts/PlayersContext';
 import { fetchTournaments } from '../services/rankingsService';
@@ -215,14 +215,6 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-
-                <Link
-                  to="/tournaments"
-                  className="self-start shrink-0 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition-colors"
-                >
-                  All Tournaments
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
               </div>
             </div>
           </div>
