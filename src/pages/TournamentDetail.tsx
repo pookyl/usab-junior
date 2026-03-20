@@ -4,6 +4,7 @@ import {
   Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal,
 } from 'lucide-react';
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
+import { useTournamentFocus } from '../contexts/TournamentFocusContext';
 
 // Re-export for backward compatibility (App.tsx, BracketDisplay.test.ts)
 export { default as TournamentPlayerDetail } from './TournamentPlayerDetail';
@@ -29,6 +30,7 @@ export default function TournamentDetail() {
   const { tswId } = useParams<{ tswId: string }>();
   const [searchParams] = useSearchParams();
   const meta = useTournamentMeta(tswId);
+  const { isActive, activeTswId, enterMode, exitMode } = useTournamentFocus();
 
   // Backward compatibility: redirect ?tab=X to /tournaments/:tswId/X
   const legacyTab = searchParams.get('tab');
@@ -42,13 +44,40 @@ export default function TournamentDetail() {
   if (!tswId) return null;
 
   const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
+  const isFocusedTournament = isActive && activeTswId === tswId;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
-      <Link to="/tournaments" className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Tournaments
-      </Link>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        {isFocusedTournament ? (
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-700 dark:text-violet-300">
+            Tournament mode is on
+          </span>
+        ) : (
+          <Link to="/tournaments" className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Tournaments
+          </Link>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            if (isFocusedTournament) {
+              exitMode();
+              return;
+            }
+            enterMode(tswId);
+          }}
+          aria-pressed={isFocusedTournament}
+          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+            isFocusedTournament
+              ? 'bg-indigo-100 text-indigo-700 border border-indigo-200 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-700 dark:hover:bg-indigo-900/60'
+              : 'bg-violet-600 text-white hover:bg-violet-700'
+          }`}
+        >
+          {isFocusedTournament ? 'Exit tournament mode' : 'Focus on this tournament'}
+        </button>
+      </div>
 
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8">

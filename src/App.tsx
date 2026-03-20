@@ -5,7 +5,9 @@ import useScrollRestore from './hooks/useScrollRestore';
 import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { TournamentFocusProvider, useTournamentFocus } from './contexts/TournamentFocusContext';
 import { setLastTournamentSubpagePath, rememberTournamentDetailOrigin } from './utils/tournamentReturnState';
+import { isWithinTournamentFocusScope } from './utils/tournamentFocus';
 import Home from './pages/Dashboard';
 import Rankings from './pages/Players';
 import AllPlayers from './pages/AllPlayers';
@@ -78,6 +80,42 @@ function TournamentRouteTracker() {
   return null;
 }
 
+function TournamentFocusAutoExit() {
+  const { pathname } = useLocation();
+  const { isActive, activeTswId, exitMode } = useTournamentFocus();
+
+  useEffect(() => {
+    if (!isActive) return;
+    if (!activeTswId) {
+      exitMode();
+      return;
+    }
+
+    if (!isWithinTournamentFocusScope(pathname, activeTswId)) {
+      exitMode();
+    }
+  }, [pathname, isActive, activeTswId, exitMode]);
+
+  return null;
+}
+
+function TournamentModeTransitionLayer() {
+  const { isTransitioning, isActive } = useTournamentFocus();
+
+  return (
+    <div
+      aria-hidden="true"
+      className={`pointer-events-none fixed inset-0 z-30 transition-opacity duration-200 motion-reduce:transition-none ${
+        isTransitioning ? 'opacity-100' : 'opacity-0'
+      } ${
+        isActive
+          ? 'bg-violet-500/5 dark:bg-violet-300/5'
+          : 'bg-slate-900/5 dark:bg-slate-100/5'
+      }`}
+    />
+  );
+}
+
 function PlayerRedirect() {
   const { id } = useParams();
   return <Navigate to={`/directory/${id}`} replace />;
@@ -89,35 +127,39 @@ export default function App() {
       <ThemeProvider>
         <BrowserRouter>
           <PlayersProvider>
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-              <ScrollManager />
-              <TournamentRouteTracker />
-              <Navbar />
-              <main className="pb-20 md:pb-0">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/players" element={<Rankings />} />
-                  <Route path="/players/:id" element={<PlayerRedirect />} />
-                  <Route path="/directory" element={<AllPlayers />} />
-                  <Route path="/directory/:id" element={<PlayerProfile />} />
-                  <Route path="/analytics" element={<Navigate to="/players" replace />} />
-                  <Route path="/head-to-head" element={<HeadToHead />} />
-                  <Route path="/tournaments" element={<Tournaments />} />
-                  <Route path="/tournaments/:tswId" element={<TournamentDetail />} />
-                  <Route path="/tournaments/:tswId/matches" element={<TournamentMatchesPage />} />
-                  <Route path="/tournaments/:tswId/players" element={<TournamentPlayersPage />} />
-                  <Route path="/tournaments/:tswId/draws" element={<TournamentDrawsPage />} />
-                  <Route path="/tournaments/:tswId/events" element={<TournamentEventsPage />} />
-                  <Route path="/tournaments/:tswId/seeds" element={<TournamentSeedsPage />} />
-                  <Route path="/tournaments/:tswId/winners" element={<TournamentWinnersPage />} />
-                  <Route path="/tournaments/:tswId/medals" element={<TournamentMedalsPage />} />
-                  <Route path="/tournaments/:tswId/event/:eventId" element={<TournamentEventDetail />} />
-                  <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
-                  <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </main>
-            </div>
+            <TournamentFocusProvider>
+              <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
+                <ScrollManager />
+                <TournamentRouteTracker />
+                <TournamentFocusAutoExit />
+                <TournamentModeTransitionLayer />
+                <Navbar />
+                <main className="pb-20 md:pb-0">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/players" element={<Rankings />} />
+                    <Route path="/players/:id" element={<PlayerRedirect />} />
+                    <Route path="/directory" element={<AllPlayers />} />
+                    <Route path="/directory/:id" element={<PlayerProfile />} />
+                    <Route path="/analytics" element={<Navigate to="/players" replace />} />
+                    <Route path="/head-to-head" element={<HeadToHead />} />
+                    <Route path="/tournaments" element={<Tournaments />} />
+                    <Route path="/tournaments/:tswId" element={<TournamentDetail />} />
+                    <Route path="/tournaments/:tswId/matches" element={<TournamentMatchesPage />} />
+                    <Route path="/tournaments/:tswId/players" element={<TournamentPlayersPage />} />
+                    <Route path="/tournaments/:tswId/draws" element={<TournamentDrawsPage />} />
+                    <Route path="/tournaments/:tswId/events" element={<TournamentEventsPage />} />
+                    <Route path="/tournaments/:tswId/seeds" element={<TournamentSeedsPage />} />
+                    <Route path="/tournaments/:tswId/winners" element={<TournamentWinnersPage />} />
+                    <Route path="/tournaments/:tswId/medals" element={<TournamentMedalsPage />} />
+                    <Route path="/tournaments/:tswId/event/:eventId" element={<TournamentEventDetail />} />
+                    <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
+                    <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </main>
+              </div>
+            </TournamentFocusProvider>
           </PlayersProvider>
         </BrowserRouter>
       </ThemeProvider>

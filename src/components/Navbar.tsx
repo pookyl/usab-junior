@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Trophy, Home, Swords, Users, Moon, Sun, Monitor, Calendar, RefreshCw, Award } from 'lucide-react';
+import { Trophy, Home, Swords, Users, Moon, Sun, Monitor, Calendar, RefreshCw, Award, List } from 'lucide-react';
 import { useTheme, type ThemeMode } from '../contexts/ThemeContext';
 import { usePlayers } from '../contexts/PlayersContext';
+import { useTournamentFocus } from '../contexts/TournamentFocusContext';
+import { buildTournamentFocusNavItems } from '../utils/tournamentFocus';
 import { getLastTournamentSubpagePath } from '../utils/tournamentReturnState';
 
 const navItems = [
@@ -16,6 +18,7 @@ const navItems = [
 const MODE_CYCLE: ThemeMode[] = ['system', 'light', 'dark'];
 const MODE_ICON = { light: Sun, dark: Moon, system: Monitor };
 const MODE_LABEL = { light: 'Light', dark: 'Dark', system: 'Auto' };
+const TOURNAMENT_NAV_ICON = { home: Home, matches: Swords, players: Users, draws: List } as const;
 
 function formatShortDate(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');
@@ -94,9 +97,16 @@ function DatePickerButton() {
 export default function Navbar() {
   const location = useLocation();
   const { mode, setMode } = useTheme();
+  const { isActive: isTournamentModeActive, activeTswId, isTransitioning } = useTournamentFocus();
   const tournamentReturnPath = getLastTournamentSubpagePath();
   const tournamentsTarget = tournamentReturnPath ?? '/tournaments';
   const tournamentsState = tournamentReturnPath ? { restoreTournamentScroll: true } : undefined;
+  const tournamentNavItems = buildTournamentFocusNavItems(activeTswId).map((item) => ({
+    ...item,
+    icon: TOURNAMENT_NAV_ICON[item.key],
+  }));
+  const showTournamentNav = isTournamentModeActive && tournamentNavItems.length > 0;
+  const tournamentOverviewPath = tournamentNavItems[0]?.path ?? null;
 
   const cycleMode = () => {
     const idx = MODE_CYCLE.indexOf(mode);
@@ -105,6 +115,7 @@ export default function Navbar() {
 
   const getNavTarget = (path: string) => (path === '/tournaments' ? tournamentsTarget : path);
   const getNavState = (path: string) => (path === '/tournaments' ? tournamentsState : undefined);
+  const desktopNavItems = showTournamentNav ? tournamentNavItems : navItems;
 
   const ThemeIcon = MODE_ICON[mode];
 
@@ -123,16 +134,16 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center gap-1">
-              {navItems.map(({ path, label, icon: Icon }) => {
+              {desktopNavItems.map(({ path, label, icon: Icon }) => {
                 const active =
-                  path === '/'
-                    ? location.pathname === '/'
+                  path === '/' || path === tournamentOverviewPath
+                    ? location.pathname === path
                     : location.pathname.startsWith(path);
                 return (
                   <Link
                     key={path}
-                    to={getNavTarget(path)}
-                    state={getNavState(path)}
+                    to={showTournamentNav ? path : getNavTarget(path)}
+                    state={showTournamentNav ? undefined : getNavState(path)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       active
                         ? 'bg-violet-600 text-white'
@@ -181,31 +192,60 @@ export default function Navbar() {
       </header>
 
       {/* Mobile bottom tab bar (< md) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 pb-[env(safe-area-inset-bottom)]">
-        <div className="flex items-stretch">
-          {navItems.map(({ path, shortLabel, icon: Icon }) => {
-            const active =
-              path === '/'
-                ? location.pathname === '/'
-                : location.pathname.startsWith(path);
-            return (
-              <Link
-                key={path}
-                to={getNavTarget(path)}
-                state={getNavState(path)}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
-                  active
-                    ? 'text-violet-600 dark:text-violet-400'
-                    : 'text-slate-400 dark:text-slate-500 active:text-slate-600'
-                }`}
-              >
-                <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />
-                <span className={`text-[10px] font-medium ${active ? 'font-semibold' : ''}`}>
-                  {shortLabel}
-                </span>
-              </Link>
-            );
-          })}
+      <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-50 border-t pb-[env(safe-area-inset-bottom)] transition-colors duration-200 motion-reduce:transition-none ${
+        showTournamentNav
+          ? 'bg-violet-50 dark:bg-violet-950/90 border-violet-200 dark:border-violet-800'
+          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
+      }`}>
+        <div className={`flex items-stretch transition-all duration-200 motion-reduce:transition-none ${
+          isTransitioning ? 'opacity-80 scale-[0.99]' : 'opacity-100 scale-100'
+        }`}>
+          {showTournamentNav
+            ? tournamentNavItems.map(({ path, shortLabel, icon: Icon }) => {
+              const active =
+                path === tournamentOverviewPath
+                  ? location.pathname === path
+                  : location.pathname.startsWith(path);
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+                    active
+                      ? 'text-violet-700 dark:text-violet-300'
+                      : 'text-violet-500 dark:text-violet-400 active:text-violet-700 dark:active:text-violet-300'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`text-[10px] font-medium ${active ? 'font-semibold' : ''}`}>
+                    {shortLabel}
+                  </span>
+                </Link>
+              );
+            })
+            : navItems.map(({ path, shortLabel, icon: Icon }) => {
+              const active =
+                path === '/'
+                  ? location.pathname === '/'
+                  : location.pathname.startsWith(path);
+              return (
+                <Link
+                  key={path}
+                  to={getNavTarget(path)}
+                  state={getNavState(path)}
+                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+                    active
+                      ? 'text-violet-600 dark:text-violet-400'
+                      : 'text-slate-400 dark:text-slate-500 active:text-slate-600'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`text-[10px] font-medium ${active ? 'font-semibold' : ''}`}>
+                    {shortLabel}
+                  </span>
+                </Link>
+              );
+            })}
         </div>
       </nav>
     </>
