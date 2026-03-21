@@ -90,28 +90,59 @@ function isNowPlayingMatch(m: TournamentMatch): boolean {
   return /\bNow\s*playing\b/i.test(raw);
 }
 
+interface WatchlistUIState {
+  summaryOpen?: boolean;
+  pickerOpen?: boolean;
+  playerFilter?: number | null;
+  todayOnly?: boolean;
+}
+
+function loadWatchlistUI(tswId: string): WatchlistUIState {
+  try {
+    const raw = sessionStorage.getItem(`watchlist-ui-${tswId}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveWatchlistUI(tswId: string, state: WatchlistUIState): void {
+  try {
+    sessionStorage.setItem(`watchlist-ui-${tswId}`, JSON.stringify(state));
+  } catch { /* quota errors are non-critical */ }
+}
+
 export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string; refreshTrigger?: number }) {
   const { pathname } = useLocation();
   const { players: watchedPlayers, playerIds: watchedIds, addPlayer, removePlayer, clearAll } = useWatchlist();
   const meta = useTournamentMeta(tswId);
   const showTodayPill = useMemo(() => isTodayInRange(meta.startDate, meta.endDate), [meta.startDate, meta.endDate]);
 
+  const savedUI = useMemo(() => loadWatchlistUI(tswId), [tswId]);
+  const hadSavedTodayOnly = useRef(savedUI.todayOnly !== undefined);
+
   const [tournamentPlayers, setTournamentPlayers] = useState<TournamentPlayer[]>([]);
   const [playersLoading, setPlayersLoading] = useState(false);
   const [playersError, setPlayersError] = useState<string | null>(null);
 
   const [playerData, setPlayerData] = useState<Map<number, PlayerMatchData>>(new Map());
-  const [pickerOpen, setPickerOpen] = useState(true);
-  const [summaryOpen, setSummaryOpen] = useState(true);
+  const [pickerOpen, setPickerOpen] = useState(savedUI.pickerOpen ?? true);
+  const [summaryOpen, setSummaryOpen] = useState(savedUI.summaryOpen ?? true);
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [clubFilter, setClubFilter] = useState('');
-  const [playerFilter, setPlayerFilter] = useState<number | null>(null);
-  const [todayOnly, setTodayOnly] = useState(showTodayPill);
+  const [playerFilter, setPlayerFilter] = useState<number | null>(savedUI.playerFilter ?? null);
+  const [todayOnly, setTodayOnly] = useState(savedUI.todayOnly ?? showTodayPill);
 
   useEffect(() => {
-    setTodayOnly(showTodayPill);
+    if (!hadSavedTodayOnly.current) {
+      setTodayOnly(showTodayPill);
+    }
   }, [showTodayPill]);
+
+  useEffect(() => {
+    saveWatchlistUI(tswId, { summaryOpen, pickerOpen, playerFilter, todayOnly });
+  }, [tswId, summaryOpen, pickerOpen, playerFilter, todayOnly]);
 
   const fetchedPlayerIds = useRef(new Set<number>());
   const refreshSeq = useRef(0);
