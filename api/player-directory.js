@@ -3,6 +3,7 @@ import {
   listCachedDates, loadDiskCacheForDate,
   setCors,
 } from './_lib/shared.js';
+import { sendApiError, sendJson } from './_lib/http.js';
 
 export default async function handler(req, res) {
   setCors(res);
@@ -11,7 +12,7 @@ export default async function handler(req, res) {
   const cacheKey = 'player-directory';
 
   const cached = getCached(cacheKey);
-  if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
+  if (cached) return sendJson(res, 200, cached, { 'X-Cache': 'HIT' });
 
   try {
     const dates = (await listCachedDates()).sort();
@@ -46,8 +47,8 @@ export default async function handler(req, res) {
       .sort((a, b) => a.name.localeCompare(b.name));
 
     setCache(cacheKey, directory);
-    return res.setHeader('X-Cache', 'MISS').status(200).json(directory);
+    return sendJson(res, 200, directory, { 'X-Cache': 'MISS' });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return sendApiError(res, err, { logLabel: 'player-directory' });
   }
 }

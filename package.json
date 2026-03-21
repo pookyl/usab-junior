@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
+    "lint:api": "eslint api-server.mjs \"api/**/*.js\"",
     "preview": "vite preview"
   },
   "dependencies": {

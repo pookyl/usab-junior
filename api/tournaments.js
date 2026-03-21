@@ -1,6 +1,7 @@
 import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import { setCors, getCached, setCache } from './_lib/shared.js';
+import { sendApiError, sendJson, ValidationError } from './_lib/http.js';
 
 const DATA_DIR = join(process.cwd(), 'data');
 
@@ -44,29 +45,24 @@ export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const season = url.searchParams.get('season');
+  try {
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const season = url.searchParams.get('season');
 
-  if (season && !/^\d{4}-\d{4}$/.test(season)) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Invalid season format' }));
-    return;
-  }
+    if (season && !/^\d{4}-\d{4}$/.test(season)) {
+      return sendApiError(res, new ValidationError('Invalid season format', { field: 'season' }));
+    }
 
-  const cacheKey = `tournaments:${season || 'all'}`;
-  const cached = getCached(cacheKey);
-  if (cached) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-    res.end(JSON.stringify(cached));
-    return;
-  }
+    const cacheKey = `tournaments:${season || 'all'}`;
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return sendJson(res, 200, cached, { 'X-Cache': 'HIT' });
+    }
 
-  const availableSeasons = await listTournamentSeasons();
-  if (availableSeasons.length === 0) {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ seasons: {}, availableSeasons: [] }));
-    return;
-  }
+    const availableSeasons = await listTournamentSeasons();
+    if (availableSeasons.length === 0) {
+      return sendJson(res, 200, { seasons: {}, availableSeasons: [] });
+    }
 
   let result;
   let allTournaments = [];
@@ -117,7 +113,9 @@ export default async function handler(req, res) {
   }
   result.spotlight = spotlight;
 
-  setCache(cacheKey, result);
-  res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'DISK' });
-  res.end(JSON.stringify(result));
+    setCache(cacheKey, result);
+    return sendJson(res, 200, result, { 'X-Cache': 'DISK' });
+  } catch (err) {
+    return sendApiError(res, err, { logLabel: 'tournaments' });
+  }
 }

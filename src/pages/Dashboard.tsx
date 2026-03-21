@@ -88,12 +88,21 @@ export default function Home() {
 
   const [spotlight, setSpotlight] = useState<ScheduledTournament | null>(null);
   const [spotlightLoading, setSpotlightLoading] = useState(true);
+  const [spotlightError, setSpotlightError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     fetchTournaments()
-      .then(data => { if (!cancelled) setSpotlight(data.spotlight ?? null); })
-      .catch(() => {})
+      .then(data => {
+        if (cancelled) return;
+        setSpotlight(data.spotlight ?? null);
+        setSpotlightError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setSpotlightError(err instanceof Error ? err.message : 'Could not load spotlight tournament');
+        setSpotlight(null);
+      })
       .finally(() => { if (!cancelled) setSpotlightLoading(false); });
     return () => { cancelled = true; };
   }, []);
@@ -220,6 +229,12 @@ export default function Home() {
           </div>
         );
       })()}
+
+      {!spotlightLoading && !spotlight && spotlightError && (
+        <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+          Spotlight tournament is currently unavailable. {spotlightError}
+        </div>
+      )}
 
       {/* Feature Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">

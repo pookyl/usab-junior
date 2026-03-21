@@ -6,7 +6,7 @@
  */
 import { createServer } from 'http';
 import { URL } from 'url';
-import { readFile, writeFile, stat, mkdir, readdir } from 'fs/promises';
+import { readFile, stat, readdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join, extname, resolve, normalize } from 'path';
 import { fileURLToPath } from 'url';
@@ -14,126 +14,30 @@ import { fileURLToPath } from 'url';
 import {
   USAB_BASE, TSW_BASE, TSW_ORG_CODE, BROWSER_HEADERS,
   getCached, setCache,
+  fetchWithRetry,
   parseRankings, parsePlayerGender, parsePlayerDetail,
-  parseH2HContent, parseTswOverviewStats, parseTswTournaments,
-  tswFetch, tswUsabProfilePath, tswUsabTournamentsPath, tswUsabOverviewPath,
-  emptyCat,
+  parseH2HContent,
+  tswFetch,
   isValidDate, isValidAgeGroup, isValidEventType, isValidUsabId, isValidSeason,
 } from './api/_lib/shared.js';
+import {
+  listCachedDates,
+  loadDiskCacheForDate,
+  getDiskCachedRankings,
+  getDiskCachedAllPlayers,
+  getDiskCachedDate,
+  saveDiskCache,
+} from './api/_lib/rankingsDiskCache.js';
+import {
+  sendJson,
+  sendApiError,
+  ValidationError,
+  UpstreamError,
+  UnavailableError,
+} from './api/_lib/http.js';
 
 const PORT = process.env.PORT || 3001;
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const DISK_CACHE_DIR = join(__dirname, 'data');
-const DISK_CACHE_FILE = join(DISK_CACHE_DIR, 'rankings-cache.json');
-
-// ── Persistent disk cache (synchronous for local dev server) ──────────────────
-function diskCachePath(date) {
-  return join(DISK_CACHE_DIR, `rankings-${date}.json`);
-}
-
-async function listCachedDates() {
-  try {
-    if (!existsSync(DISK_CACHE_DIR)) return [];
-    const files = await readdir(DISK_CACHE_DIR);
-    const dates = [];
-    for (const f of files) {
-      const m = f.match(/^rankings-(\d{4}-\d{2}-\d{2})\.json$/);
-      if (m) dates.push(m[1]);
-    }
-    return dates.sort().reverse();
-  } catch {
-    return [];
-  }
-}
-
-function rebuildRankingsFromPlayers(allPlayers) {
-  const rankings = {};
-  for (const player of allPlayers) {
-    for (const e of player.entries) {
-      const key = `${e.ageGroup}-${e.eventType}`;
-      if (!rankings[key]) rankings[key] = [];
-      rankings[key].push({
-        usabId: player.usabId,
-        name: player.name,
-        rank: e.rank,
-        rankingPoints: e.rankingPoints,
-        ageGroup: e.ageGroup,
-        eventType: e.eventType,
-      });
-    }
-  }
-  for (const key of Object.keys(rankings)) {
-    rankings[key].sort((a, b) => a.rank - b.rank);
-  }
-  return rankings;
-}
-
-async function loadDiskCacheForDate(date) {
-  if (!isValidDate(date)) return null;
-  try {
-    const filePath = diskCachePath(date);
-    const raw = await readFile(filePath, 'utf-8');
-    const data = JSON.parse(raw);
-    if (!data.rankings && data.allPlayers) {
-      data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
-    }
-    console.log(`[disk-cache] loaded per-date cache for ${date} (saved ${data.savedAt})`);
-    return data;
-  } catch (err) {
-    if (err.code !== 'ENOENT') console.warn(`[disk-cache] failed to load per-date cache for ${date}:`, err.message);
-  }
-  return null;
-}
-
-async function loadDiskCache() {
-  try {
-    const raw = await readFile(DISK_CACHE_FILE, 'utf-8');
-    const data = JSON.parse(raw);
-    console.log(`[disk-cache] loaded cache for date ${data.date} (saved ${data.savedAt})`);
-    return data;
-  } catch (err) {
-    if (err.code !== 'ENOENT') console.warn('[disk-cache] failed to load:', err.message);
-  }
-  return null;
-}
-
-async function saveDiskCache(date, rankings, allPlayers) {
-  try {
-    await mkdir(DISK_CACHE_DIR, { recursive: true });
-
-    const perDateFile = diskCachePath(date);
-    try {
-      await stat(perDateFile);
-    } catch {
-      const lean = { date, allPlayers, savedAt: new Date().toISOString() };
-      await writeFile(perDateFile, JSON.stringify(lean));
-      console.log(`[disk-cache] saved per-date cache for ${date} (${allPlayers.length} players, compact)`);
-    }
-
-    const full = { date, rankings, allPlayers, savedAt: new Date().toISOString() };
-    await writeFile(DISK_CACHE_FILE, JSON.stringify(full, null, 2));
-    console.log(`[disk-cache] updated latest cache (rankings-cache.json) for ${date}`);
-  } catch (err) {
-    console.warn('[disk-cache] failed to save:', err.message);
-  }
-}
-
-async function getDiskCachedRankings(key, date) {
-  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
-  if (disk?.rankings?.[key]) return disk.rankings[key];
-  return null;
-}
-
-async function getDiskCachedAllPlayers(date) {
-  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
-  if (disk?.allPlayers) return { players: disk.allPlayers, date: disk.date };
-  return null;
-}
-
-async function getDiskCachedDate() {
-  const disk = await loadDiskCache();
-  return disk?.date ?? null;
-}
 
 async function getDefaultDate() {
   const dates = await listCachedDates();
@@ -155,8 +59,9 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  const reqUrl = new URL(req.url, `http://localhost:${PORT}`);
-  const defaultDate = await getDefaultDate();
+  try {
+    const reqUrl = new URL(req.url, `http://localhost:${PORT}`);
+    const defaultDate = await getDefaultDate();
 
   // GET /api/rankings?age_group=U13&category=BS&date=2026-03-01
   if (reqUrl.pathname === '/api/rankings') {
@@ -164,19 +69,13 @@ const server = createServer(async (req, res) => {
     const eventType = reqUrl.searchParams.get('category') ?? 'BS';
     const date = reqUrl.searchParams.get('date') ?? defaultDate;
     if (!isValidAgeGroup(ageGroup)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid age_group' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid age_group', { field: 'age_group' }));
     }
     if (!isValidEventType(eventType)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid category' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid category', { field: 'category' }));
     }
     if (!isValidDate(date)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid date format' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid date format', { field: 'date' }));
     }
     const cacheKey = `rankings:${ageGroup}:${eventType}:${date}`;
 
@@ -200,24 +99,21 @@ const server = createServer(async (req, res) => {
     try {
       const url = `${USAB_BASE}/?age_group=${encodeURIComponent(ageGroup)}&category=${encodeURIComponent(eventType)}&date=${encodeURIComponent(date)}`;
       console.log(`[rankings] fetching ${url}`);
-      const response = await fetch(url, { headers: BROWSER_HEADERS });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 });
+      if (!response.ok) throw new UpstreamError(`USAB rankings HTTP ${response.status}`);
       const html = await response.text();
       const players = parseRankings(html, ageGroup, eventType);
       console.log(`[rankings] parsed ${players.length} players for ${ageGroup} ${eventType}`);
       setCache(cacheKey, players);
-      res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(players));
+      sendJson(res, 200, players, { 'X-Cache': 'MISS' });
     } catch (err) {
       console.error(`[rankings] error:`, err.message);
       const diskData = await getDiskCachedRankings(diskKey);
       if (diskData) {
         console.log(`[rankings] serving from disk cache for ${diskKey}`);
-        res.writeHead(200, { 'X-Cache': 'DISK' });
-        res.end(JSON.stringify(diskData));
+        sendJson(res, 200, diskData, { 'X-Cache': 'DISK' });
       } else {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: err.message }));
+        sendApiError(res, new UnavailableError('No data available'));
       }
     }
     return;
@@ -231,24 +127,16 @@ const server = createServer(async (req, res) => {
     const eventType = reqUrl.searchParams.get('category') ?? 'BS';
     const date = reqUrl.searchParams.get('date') ?? defaultDate;
     if (!isValidUsabId(usabId)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid player ID format' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid player ID format', { field: 'id' }));
     }
     if (!isValidAgeGroup(ageGroup)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid age_group' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid age_group', { field: 'age_group' }));
     }
     if (!isValidEventType(eventType)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid category' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid category', { field: 'category' }));
     }
     if (!isValidDate(date)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid date format' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid date format', { field: 'date' }));
     }
     const cacheKey = `player:${usabId}:${ageGroup}:${eventType}:${date}`;
 
@@ -262,20 +150,17 @@ const server = createServer(async (req, res) => {
     try {
       const url = `${USAB_BASE}/${encodeURIComponent(usabId)}/details?age_group=${encodeURIComponent(ageGroup)}&category=${encodeURIComponent(eventType)}&date=${encodeURIComponent(date)}`;
       console.log(`[player] fetching ${url}`);
-      const response = await fetch(url, { headers: BROWSER_HEADERS });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 });
+      if (!response.ok) throw new UpstreamError(`USAB player detail HTTP ${response.status}`);
       const html = await response.text();
       const history = parsePlayerDetail(html);
       const gender = parsePlayerGender(html);
       console.log(`[player] parsed ${history.length} tournament entries for USAB ${usabId}, gender=${gender}`);
       const result = { gender, entries: history };
       setCache(cacheKey, result);
-      res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(result));
+      sendJson(res, 200, result, { 'X-Cache': 'MISS' });
     } catch (err) {
-      console.error(`[player] error:`, err.message);
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: err.message }));
+      sendApiError(res, err, { logLabel: 'player' });
     }
     return;
   }
@@ -285,14 +170,10 @@ const server = createServer(async (req, res) => {
     const p1 = reqUrl.searchParams.get('player1');
     const p2 = reqUrl.searchParams.get('player2');
     if (!p1 || !p2) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'player1 and player2 query params required' }));
-      return;
+      return sendApiError(res, new ValidationError('player1 and player2 query params required'));
     }
     if (!isValidUsabId(p1) || !isValidUsabId(p2)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid player ID format' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid player ID format'));
     }
     const cacheKey = `h2h:${[p1, p2].sort().join(':')}`;
     const cached = getCached(cacheKey);
@@ -306,17 +187,14 @@ const server = createServer(async (req, res) => {
       const path = `/head-2-head/Head2HeadContent?OrganizationCode=${TSW_ORG_CODE}&t1p1memberid=${encodeURIComponent(p1)}&t2p1memberid=${encodeURIComponent(p2)}`;
       console.log(`[h2h] fetching ${TSW_BASE}${path}`);
       const resp = await tswFetch(path);
-      if (!resp.ok) throw new Error(`TSW HTTP ${resp.status}`);
+      if (!resp.ok) throw new UpstreamError(`TSW HTTP ${resp.status}`);
       const html = await resp.text();
       const data = parseH2HContent(html, resp.headers);
       console.log(`[h2h] parsed ${data.matches.length} matches, score ${data.team1wins}-${data.team2wins}`);
       setCache(cacheKey, data);
-      res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(data));
+      sendJson(res, 200, data, { 'X-Cache': 'MISS' });
     } catch (err) {
-      console.error('[h2h] error:', err.message);
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: err.message }));
+      sendApiError(res, err, { logLabel: 'h2h' });
     }
     return;
   }
@@ -325,9 +203,7 @@ const server = createServer(async (req, res) => {
   if (reqUrl.pathname === '/api/tournaments') {
     const season = reqUrl.searchParams.get('season');
     if (season && !isValidSeason(season)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid season format' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid season format', { field: 'season' }));
     }
     const cacheKey = `tournaments:${season || 'all'}`;
     const cached = getCached(cacheKey);
@@ -349,8 +225,7 @@ const server = createServer(async (req, res) => {
       availableSeasons.sort().reverse();
 
       if (availableSeasons.length === 0) {
-        res.writeHead(200);
-        res.end(JSON.stringify({ seasons: {}, availableSeasons: [] }));
+        sendJson(res, 200, { seasons: {}, availableSeasons: [] });
         return;
       }
 
@@ -599,12 +474,9 @@ const server = createServer(async (req, res) => {
 
       setCache(cacheKey, result);
       console.log(`[tournaments] serving ${season || 'all'} (${availableSeasons.length} seasons available)`);
-      res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(result));
+      sendJson(res, 200, result, { 'X-Cache': 'MISS' });
     } catch (err) {
-      console.error('[tournaments] error:', err.message);
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: err.message }));
+      sendApiError(res, err, { logLabel: 'tournaments' });
     }
     return;
   }
@@ -628,8 +500,7 @@ const server = createServer(async (req, res) => {
   if (reqUrl.pathname === '/api/cached-dates') {
     const dates = await listCachedDates();
     console.log(`[cached-dates] found ${dates.length} cached date files`);
-    res.writeHead(200);
-    res.end(JSON.stringify({ dates }));
+    sendJson(res, 200, { dates });
     return;
   }
 
@@ -638,8 +509,7 @@ const server = createServer(async (req, res) => {
     const cacheKey = 'player-directory';
     const cached = getCached(cacheKey);
     if (cached) {
-      res.writeHead(200, { 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
+      sendJson(res, 200, cached, { 'X-Cache': 'HIT' });
       return;
     }
 
@@ -677,12 +547,9 @@ const server = createServer(async (req, res) => {
 
       console.log(`[player-directory] ${directory.length} unique players across ${dates.length} dates`);
       setCache(cacheKey, directory);
-      res.writeHead(200, { 'X-Cache': 'MISS' });
-      res.end(JSON.stringify(directory));
+      sendJson(res, 200, directory, { 'X-Cache': 'MISS' });
     } catch (err) {
-      console.error('[player-directory] error:', err.message);
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: err.message }));
+      sendApiError(res, err, { logLabel: 'player-directory' });
     }
     return;
   }
@@ -691,16 +558,13 @@ const server = createServer(async (req, res) => {
   if (reqUrl.pathname === '/api/all-players') {
     const date = reqUrl.searchParams.get('date') ?? defaultDate;
     if (!isValidDate(date)) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid date format' }));
-      return;
+      return sendApiError(res, new ValidationError('Invalid date format', { field: 'date' }));
     }
     const cacheKey = `all-players:${date}`;
 
     const cached = getCached(cacheKey);
     if (cached) {
-      res.writeHead(200, { 'X-Cache': 'HIT', 'X-Partial': 'false' });
-      res.end(JSON.stringify(cached));
+      sendJson(res, 200, cached, { 'X-Cache': 'HIT', 'X-Partial': 'false' });
       return;
     }
 
@@ -708,8 +572,7 @@ const server = createServer(async (req, res) => {
     if (perDateDisk) {
       console.log(`[all-players] serving from per-date disk cache for ${date}`);
       setCache(cacheKey, perDateDisk.players);
-      res.writeHead(200, { 'X-Cache': 'DISK', 'X-Partial': 'false' });
-      res.end(JSON.stringify(perDateDisk.players));
+      sendJson(res, 200, perDateDisk.players, { 'X-Cache': 'DISK', 'X-Partial': 'false' });
       return;
     }
 
@@ -738,7 +601,7 @@ const server = createServer(async (req, res) => {
           if (rankCached) return { players: rankCached, ag, et, fromWeb: false };
 
           const url = `${USAB_BASE}/?age_group=${encodeURIComponent(ag)}&category=${encodeURIComponent(et)}&date=${encodeURIComponent(date)}`;
-          const response = await fetch(url, { headers: BROWSER_HEADERS });
+          const response = await fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const html = await response.text();
           const players = parseRankings(html, ag, et);
@@ -795,17 +658,14 @@ const server = createServer(async (req, res) => {
       if (partial) {
         headers['X-Failed-Categories'] = failedCategories.join(',');
       }
-      res.writeHead(200, headers);
-      res.end(JSON.stringify(uniquePlayers));
+      sendJson(res, 200, uniquePlayers, headers);
     } else {
       const diskData = await getDiskCachedAllPlayers();
       if (diskData) {
         console.log(`[all-players] website returned no data, serving from disk cache (date ${diskData.date})`);
-        res.writeHead(200, { 'X-Cache': 'DISK', 'X-Partial': 'false' });
-        res.end(JSON.stringify(diskData.players));
+        sendJson(res, 200, diskData.players, { 'X-Cache': 'DISK', 'X-Partial': 'false' });
       } else {
-        res.writeHead(200, { 'X-Partial': 'false' });
-        res.end(JSON.stringify([]));
+        sendApiError(res, new UnavailableError('No data available'));
       }
     }
     return;
@@ -842,8 +702,7 @@ const server = createServer(async (req, res) => {
     const filePath = resolve(distDir, normalize(reqUrl.pathname === '/' ? 'index.html' : '.' + reqUrl.pathname));
 
     if (!filePath.startsWith(distDir)) {
-      res.writeHead(403);
-      res.end(JSON.stringify({ error: 'Forbidden' }));
+      sendJson(res, 403, { error: { code: 'FORBIDDEN', message: 'Forbidden' } });
       return;
     }
 
@@ -869,8 +728,14 @@ const server = createServer(async (req, res) => {
     } catch { /* no index.html */ }
   }
 
-  res.writeHead(404);
-  res.end(JSON.stringify({ error: 'Not found' }));
+    sendJson(res, 404, { error: { code: 'NOT_FOUND', message: 'Not found' } });
+  } catch (err) {
+    if (res.writableEnded) {
+      console.error('[api-server] uncaught error after response:', err);
+      return;
+    }
+    sendApiError(res, err, { logLabel: 'api-server' });
+  }
 });
 
 server.listen(PORT, () => {
