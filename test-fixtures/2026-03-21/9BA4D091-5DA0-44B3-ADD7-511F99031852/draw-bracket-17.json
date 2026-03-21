@@ -1,0 +1,208 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 17,
+  "drawType": "elimination",
+  "sections": [
+    {
+      "name": "GD U15",
+      "rounds": [
+        "",
+        "Club",
+        "Quarter Finals",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [
+        {
+          "position": 1,
+          "name": "Tanvi Gaddam",
+          "seed": "1",
+          "club": "",
+          "playerId": 31,
+          "bye": false,
+          "partner": "Chingpei Lin",
+          "partnerPlayerId": 78
+        },
+        {
+          "position": 2,
+          "name": "Pragathi Maadawada",
+          "seed": "",
+          "club": "",
+          "playerId": 85,
+          "bye": false,
+          "partner": "Soudamini Reddy",
+          "partnerPlayerId": 108
+        },
+        {
+          "position": 3,
+          "name": "Sritha Gundala",
+          "seed": "",
+          "club": "",
+          "playerId": 198,
+          "bye": false,
+          "partner": "Mysha Jain",
+          "partnerPlayerId": 49
+        },
+        {
+          "position": 4,
+          "name": "Neha Murali",
+          "seed": "",
+          "club": "",
+          "playerId": 92,
+          "bye": false,
+          "partner": "Chaturveda Samhitha Shanigaram",
+          "partnerPlayerId": 161
+        },
+        {
+          "position": 5,
+          "name": "Dhyuti Aruru",
+          "seed": "",
+          "club": "",
+          "playerId": 6,
+          "bye": false,
+          "partner": "Deetya Palla",
+          "partnerPlayerId": 238
+        },
+        {
+          "position": 6,
+          "name": "Gowri Ashrita Potnuru",
+          "seed": "",
+          "club": "",
+          "playerId": 174,
+          "bye": false,
+          "partner": "Kathy Yan",
+          "partnerPlayerId": 142
+        },
+        {
+          "position": 7,
+          "name": "Brooklyn Chen",
+          "seed": "",
+          "club": "",
+          "playerId": 16,
+          "bye": false,
+          "partner": "Amber Wu",
+          "partnerPlayerId": 136
+        },
+        {
+          "position": 8,
+          "name": "Ava Ilena Raju Cimala",
+          "seed": "2",
+          "club": "",
+          "playerId": 24,
+          "bye": false,
+          "partner": "Shaoyao Luo",
+          "partnerPlayerId": 84
+        }
+      ],
+      "matches": [
+        {
+          "matchId": "3001",
+          "roundLevel": 3,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 6:00 PM"
+        },
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3002",
+          "roundLevel": 3,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 6:15 PM"
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3003",
+          "roundLevel": 3,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 6:15 PM"
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3004",
+          "roundLevel": 3,
+          "matchNum": 4,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 6:15 PM"
+        }
+      ]
+    },
+    {
+      "name": "GD U15 - Play-off 3/4",
+      "rounds": [
+        "",
+        "Club",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    }
+  ]
+}

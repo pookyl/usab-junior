@@ -1,0 +1,142 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "eventId": 12,
+  "eventName": "GD U11",
+  "entriesCount": 8,
+  "draws": [
+    {
+      "drawId": 7,
+      "name": "GD U11",
+      "size": 4,
+      "type": "Elimination",
+      "qualification": "No",
+      "consolation": null
+    },
+    {
+      "drawId": 5,
+      "name": "Group A",
+      "size": 3,
+      "type": "Round Robin",
+      "qualification": "Yes",
+      "consolation": null
+    },
+    {
+      "drawId": 6,
+      "name": "Group B",
+      "size": 4,
+      "type": "Round Robin",
+      "qualification": "Yes",
+      "consolation": null
+    }
+  ],
+  "entries": [
+    {
+      "entryType": "Maindraw",
+      "seed": "1",
+      "players": [
+        {
+          "name": "Ariel An",
+          "playerId": 216
+        },
+        {
+          "name": "Vihaa Reddy Keesara",
+          "playerId": 69
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "2",
+      "players": [
+        {
+          "name": "Puah Adalyn",
+          "playerId": 104
+        },
+        {
+          "name": "Darlene Axella Purwanto",
+          "playerId": 105
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Meera Bhalekar",
+          "playerId": 10
+        },
+        {
+          "name": "Shanaya Sirsgi",
+          "playerId": 117
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vaishavie Dhivakar",
+          "playerId": 221
+        },
+        {
+          "name": "Sahasra Vudum",
+          "playerId": 132
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Tanvisri Gadde",
+          "playerId": 211
+        },
+        {
+          "name": "Diya Vikram",
+          "playerId": 130
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Eeshani Devasena Josyula",
+          "playerId": 59
+        },
+        {
+          "name": "Meher Sharma",
+          "playerId": 114
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Elizabeth Sarah Mark",
+          "playerId": 88
+        },
+        {
+          "name": "Samara Vakula Varasala",
+          "playerId": 128
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Rachel Wang",
+          "playerId": 134
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,829 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 18,
+  "drawType": "elimination",
+  "sections": [
+    {
+      "name": "BS U17",
+      "rounds": [
+        "",
+        "Club",
+        "Round 1",
+        "Round 2",
+        "Quarter Finals",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [
+        {
+          "position": 1,
+          "name": "Aarya Vijay",
+          "seed": "1",
+          "club": "",
+          "playerId": 194,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 2,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 3,
+          "name": "Ishan Ramachandra Prakash",
+          "seed": "",
+          "club": "",
+          "playerId": 100,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 4,
+          "name": "Sarthak Saha",
+          "seed": "",
+          "club": "",
+          "playerId": 241,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 5,
+          "name": "Conner Hsu",
+          "seed": "",
+          "club": "",
+          "playerId": 47,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 6,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 7,
+          "name": "Rishvik Mallam",
+          "seed": "",
+          "club": "",
+          "playerId": 214,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 8,
+          "name": "Vedant Shukla",
+          "seed": "",
+          "club": "",
+          "playerId": 115,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 9,
+          "name": "Varin Karri",
+          "seed": "3/4",
+          "club": "",
+          "playerId": 64,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 10,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 11,
+          "name": "Isaac Joseph",
+          "seed": "",
+          "club": "",
+          "playerId": 56,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 12,
+          "name": "Jiahao Fu",
+          "seed": "",
+          "club": "",
+          "playerId": 29,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 13,
+          "name": "Aakash Unnikrishnan",
+          "seed": "",
+          "club": "",
+          "playerId": 176,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 14,
+          "name": "Niranjan Manjith",
+          "seed": "",
+          "club": "",
+          "playerId": 87,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 15,
+          "name": "Manas Kathuria",
+          "seed": "",
+          "club": "",
+          "playerId": 67,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 16,
+          "name": "Carsten Lam",
+          "seed": "",
+          "club": "",
+          "playerId": 212,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 17,
+          "name": "Sashanth Senthil",
+          "seed": "",
+          "club": "",
+          "playerId": 111,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 18,
+          "name": "Akshay Kumar Pallam Reddy",
+          "seed": "",
+          "club": "",
+          "playerId": 203,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 19,
+          "name": "Arjun Aditya Hariharan",
+          "seed": "",
+          "club": "",
+          "playerId": 168,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 20,
+          "name": "Neel J Reddy",
+          "seed": "",
+          "club": "",
+          "playerId": 107,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 21,
+          "name": "Tarakeshwar Madhana Sundar",
+          "seed": "",
+          "club": "",
+          "playerId": 188,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 22,
+          "name": "Allen Lan",
+          "seed": "",
+          "club": "",
+          "playerId": 73,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 23,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 24,
+          "name": "Bhavesh Sai Varma Tammu",
+          "seed": "3/4",
+          "club": "",
+          "playerId": 207,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 25,
+          "name": "Harshith Yoganand",
+          "seed": "",
+          "club": "",
+          "playerId": 145,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 26,
+          "name": "Vedant Bansal",
+          "seed": "",
+          "club": "",
+          "playerId": 218,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 27,
+          "name": "Akshath Potnuru",
+          "seed": "",
+          "club": "",
+          "playerId": 173,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 28,
+          "name": "Sudeep Reddy Chintamreddy",
+          "seed": "",
+          "club": "",
+          "playerId": 220,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 29,
+          "name": "Sreevishnu Teja Chennapragada",
+          "seed": "",
+          "club": "",
+          "playerId": 182,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 30,
+          "name": "Samiksh Talapally",
+          "seed": "",
+          "club": "",
+          "playerId": 121,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 31,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 32,
+          "name": "Abhiram Tripuraneni",
+          "seed": "2",
+          "club": "",
+          "playerId": 209,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        }
+      ],
+      "matches": [
+        {
+          "matchId": "5001",
+          "roundLevel": 5,
+          "matchNum": 1,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 194,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4001",
+          "roundLevel": 4,
+          "matchNum": 1,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 194,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5002",
+          "roundLevel": 5,
+          "matchNum": 2,
+          "winner": {
+            "name": "Ishan Ramachandra Prakash",
+            "playerId": 100,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "14-21",
+            "21-9",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3001",
+          "roundLevel": 3,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 5:30 PM"
+        },
+        {
+          "matchId": "5003",
+          "roundLevel": 5,
+          "matchNum": 3,
+          "winner": {
+            "name": "Conner Hsu",
+            "playerId": 47,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4002",
+          "roundLevel": 4,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 10:45 AM"
+        },
+        {
+          "matchId": "5004",
+          "roundLevel": 5,
+          "matchNum": 4,
+          "winner": {
+            "name": "Vedant Shukla",
+            "playerId": 115,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-2",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5005",
+          "roundLevel": 5,
+          "matchNum": 5,
+          "winner": {
+            "name": "Varin Karri",
+            "playerId": 64,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4003",
+          "roundLevel": 4,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 10:45 AM"
+        },
+        {
+          "matchId": "5006",
+          "roundLevel": 5,
+          "matchNum": 6,
+          "winner": {
+            "name": "Isaac Joseph",
+            "playerId": 56,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3002",
+          "roundLevel": 3,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 3:30 PM"
+        },
+        {
+          "matchId": "5007",
+          "roundLevel": 5,
+          "matchNum": 7,
+          "winner": {
+            "name": "Niranjan Manjith",
+            "playerId": 87,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-5",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4004",
+          "roundLevel": 4,
+          "matchNum": 4,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 10:45 AM"
+        },
+        {
+          "matchId": "5008",
+          "roundLevel": 5,
+          "matchNum": 8,
+          "winner": {
+            "name": "Carsten Lam",
+            "playerId": 212,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5009",
+          "roundLevel": 5,
+          "matchNum": 9,
+          "winner": {
+            "name": "Sashanth Senthil",
+            "playerId": 111,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-8",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4005",
+          "roundLevel": 4,
+          "matchNum": 5,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 10:45 AM"
+        },
+        {
+          "matchId": "5010",
+          "roundLevel": 5,
+          "matchNum": 10,
+          "winner": {
+            "name": "Arjun Aditya Hariharan",
+            "playerId": 168,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-17",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3003",
+          "roundLevel": 3,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 5:30 PM"
+        },
+        {
+          "matchId": "5011",
+          "roundLevel": 5,
+          "matchNum": 11,
+          "winner": {
+            "name": "Allen Lan",
+            "playerId": 73,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4006",
+          "roundLevel": 4,
+          "matchNum": 6,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 10:45 AM"
+        },
+        {
+          "matchId": "5012",
+          "roundLevel": 5,
+          "matchNum": 12,
+          "winner": {
+            "name": "Bhavesh Sai Varma Tammu",
+            "playerId": 207,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5013",
+          "roundLevel": 5,
+          "matchNum": 13,
+          "winner": {
+            "name": "Harshith Yoganand",
+            "playerId": 145,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-6",
+            "21-5"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4007",
+          "roundLevel": 4,
+          "matchNum": 7,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 11:00 AM"
+        },
+        {
+          "matchId": "5014",
+          "roundLevel": 5,
+          "matchNum": 14,
+          "winner": {
+            "name": "Akshath Potnuru",
+            "playerId": 173,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3004",
+          "roundLevel": 3,
+          "matchNum": 4,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 6:00 PM"
+        },
+        {
+          "matchId": "5015",
+          "roundLevel": 5,
+          "matchNum": 15,
+          "winner": {
+            "name": "Samiksh Talapally",
+            "playerId": 121,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4008",
+          "roundLevel": 4,
+          "matchNum": 8,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 11:00 AM"
+        },
+        {
+          "matchId": "5016",
+          "roundLevel": 5,
+          "matchNum": 16,
+          "winner": {
+            "name": "Abhiram Tripuraneni",
+            "playerId": 209,
+            "seed": "2",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    },
+    {
+      "name": "BS U17 - Play-off 3/4",
+      "rounds": [
+        "",
+        "Club",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    }
+  ]
+}

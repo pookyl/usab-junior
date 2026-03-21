@@ -1,0 +1,127 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 25,
+  "drawType": "elimination",
+  "sections": [
+    {
+      "name": "BS U19",
+      "rounds": [
+        "",
+        "Club",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [
+        {
+          "position": 1,
+          "name": "",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 2,
+          "name": "",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 3,
+          "name": "",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 4,
+          "name": "",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        }
+      ],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    },
+    {
+      "name": "BS U19 - Play-off 3/4",
+      "rounds": [
+        "",
+        "Club",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    }
+  ]
+}

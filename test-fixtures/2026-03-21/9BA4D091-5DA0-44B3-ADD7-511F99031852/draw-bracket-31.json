@@ -1,0 +1,198 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 31,
+  "drawType": "round-robin",
+  "groupName": "BD U19 - Group B",
+  "groups": [
+    {
+      "name": "Group A",
+      "drawId": 30,
+      "active": false
+    },
+    {
+      "name": "Group B",
+      "drawId": 31,
+      "active": true
+    },
+    {
+      "name": "BD U19",
+      "drawId": 32,
+      "active": false
+    }
+  ],
+  "standings": [
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Adhyaan Balaji",
+          "playerId": 7,
+          "club": "Frisco Badminton Academy [FBA]"
+        },
+        {
+          "name": "Varin Karri",
+          "playerId": 64,
+          "club": "Frisco Badminton Academy [FBA]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205,
+          "club": "Frisco Badminton Academy [FBA]"
+        },
+        {
+          "name": "Kyson Tu",
+          "playerId": 127,
+          "club": "Plano Badminton Center[PBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Afraz Muhammed Baig",
+          "playerId": 178,
+          "club": "Plano Badminton Center[PBC]"
+        },
+        {
+          "name": "Ayaaz Muhammed Baig",
+          "playerId": 179,
+          "club": "Plano Badminton Center[PBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    }
+  ],
+  "matches": [
+    {
+      "matchId": "1558",
+      "round": "Round 1",
+      "team1": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205,
+          "club": ""
+        },
+        {
+          "name": "Kyson Tu",
+          "playerId": 127,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Afraz Muhammed Baig",
+          "playerId": 178,
+          "club": ""
+        },
+        {
+          "name": "Ayaaz Muhammed Baig",
+          "playerId": 179,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1555",
+      "round": "Round 2",
+      "team1": [
+        {
+          "name": "Adhyaan Balaji",
+          "playerId": 7,
+          "club": ""
+        },
+        {
+          "name": "Varin Karri",
+          "playerId": 64,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205,
+          "club": ""
+        },
+        {
+          "name": "Kyson Tu",
+          "playerId": 127,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1557",
+      "round": "Round 3",
+      "team1": [
+        {
+          "name": "Adhyaan Balaji",
+          "playerId": 7,
+          "club": ""
+        },
+        {
+          "name": "Varin Karri",
+          "playerId": 64,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Afraz Muhammed Baig",
+          "playerId": 178,
+          "club": ""
+        },
+        {
+          "name": "Ayaaz Muhammed Baig",
+          "playerId": 179,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    }
+  ]
+}

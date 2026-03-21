@@ -1,0 +1,130 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "eventId": 14,
+  "eventName": "GD U15",
+  "entriesCount": 8,
+  "draws": [
+    {
+      "drawId": 17,
+      "name": "GD U15",
+      "size": 8,
+      "type": "Elimination",
+      "qualification": "No",
+      "consolation": null
+    }
+  ],
+  "entries": [
+    {
+      "entryType": "Maindraw",
+      "seed": "1",
+      "players": [
+        {
+          "name": "Tanvi Gaddam",
+          "playerId": 31
+        },
+        {
+          "name": "Chingpei Lin",
+          "playerId": 78
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "2",
+      "players": [
+        {
+          "name": "Ava Ilena Raju Cimala",
+          "playerId": 24
+        },
+        {
+          "name": "Shaoyao Luo",
+          "playerId": 84
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Dhyuti Aruru",
+          "playerId": 6
+        },
+        {
+          "name": "Deetya Palla",
+          "playerId": 238
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Brooklyn Chen",
+          "playerId": 16
+        },
+        {
+          "name": "Amber Wu",
+          "playerId": 136
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Sritha Gundala",
+          "playerId": 198
+        },
+        {
+          "name": "Mysha Jain",
+          "playerId": 49
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Pragathi Maadawada",
+          "playerId": 85
+        },
+        {
+          "name": "Soudamini Reddy",
+          "playerId": 108
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Neha Murali",
+          "playerId": 92
+        },
+        {
+          "name": "Chaturveda Samhitha Shanigaram",
+          "playerId": 161
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Gowri Ashrita Potnuru",
+          "playerId": 174
+        },
+        {
+          "name": "Kathy Yan",
+          "playerId": 142
+        }
+      ]
+    }
+  ]
+}

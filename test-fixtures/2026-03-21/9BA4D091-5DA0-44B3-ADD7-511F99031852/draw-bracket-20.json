@@ -1,0 +1,429 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 20,
+  "drawType": "elimination",
+  "sections": [
+    {
+      "name": "XD U17",
+      "rounds": [
+        "",
+        "Club",
+        "Round 1",
+        "Quarter Finals",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [
+        {
+          "position": 1,
+          "name": "Aarya Vijay",
+          "seed": "1",
+          "club": "",
+          "playerId": 194,
+          "bye": false,
+          "partner": "Shraddha Prakash",
+          "partnerPlayerId": 101
+        },
+        {
+          "position": 2,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 3,
+          "name": "Rishvik Mallam",
+          "seed": "",
+          "club": "",
+          "playerId": 214,
+          "bye": false,
+          "partner": "Jyoshika Jakkula",
+          "partnerPlayerId": 51
+        },
+        {
+          "position": 4,
+          "name": "Manas Kathuria",
+          "seed": "",
+          "club": "",
+          "playerId": 67,
+          "bye": false,
+          "partner": "Devanshi Joshi",
+          "partnerPlayerId": 57
+        },
+        {
+          "position": 5,
+          "name": "Aakash Unnikrishnan",
+          "seed": "",
+          "club": "",
+          "playerId": 176,
+          "bye": false,
+          "partner": "Sanjana Thouda",
+          "partnerPlayerId": 126
+        },
+        {
+          "position": 6,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 7,
+          "name": "Sashanth Senthil",
+          "seed": "",
+          "club": "",
+          "playerId": 111,
+          "bye": false,
+          "partner": "Charvi Murali",
+          "partnerPlayerId": 91
+        },
+        {
+          "position": 8,
+          "name": "Allen Lan",
+          "seed": "",
+          "club": "",
+          "playerId": 73,
+          "bye": false,
+          "partner": "Mingyang Liu",
+          "partnerPlayerId": 172
+        },
+        {
+          "position": 9,
+          "name": "Varin Karri",
+          "seed": "",
+          "club": "",
+          "playerId": 64,
+          "bye": false,
+          "partner": "Tatthva Sharma",
+          "partnerPlayerId": 242
+        },
+        {
+          "position": 10,
+          "name": "Hanyi Zhang",
+          "seed": "",
+          "club": "",
+          "playerId": 149,
+          "bye": false,
+          "partner": "Ariel An",
+          "partnerPlayerId": 216
+        },
+        {
+          "position": 11,
+          "name": "Isaac Joseph",
+          "seed": "",
+          "club": "",
+          "playerId": 56,
+          "bye": false,
+          "partner": "Ashni Mathure",
+          "partnerPlayerId": 90
+        },
+        {
+          "position": 12,
+          "name": "Samiksh Talapally",
+          "seed": "",
+          "club": "",
+          "playerId": 121,
+          "bye": false,
+          "partner": "Amy Gao",
+          "partnerPlayerId": 32
+        },
+        {
+          "position": 13,
+          "name": "Bhavesh Sai Varma Tammu",
+          "seed": "",
+          "club": "",
+          "playerId": 207,
+          "bye": false,
+          "partner": "Tanvi Jandhyala",
+          "partnerPlayerId": 184
+        },
+        {
+          "position": 14,
+          "name": "Akshath Potnuru",
+          "seed": "",
+          "club": "",
+          "playerId": 173,
+          "bye": false,
+          "partner": "Aashritha Chintireddy",
+          "partnerPlayerId": 22
+        },
+        {
+          "position": 15,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 16,
+          "name": "Marzuq Mathani",
+          "seed": "2",
+          "club": "",
+          "playerId": 159,
+          "bye": false,
+          "partner": "Diksha Chandrasekaran",
+          "partnerPlayerId": 13
+        }
+      ],
+      "matches": [
+        {
+          "matchId": "4001",
+          "roundLevel": 4,
+          "matchNum": 1,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 194,
+            "seed": "1",
+            "club": "",
+            "partner": "Shraddha Prakash",
+            "partnerPlayerId": 101
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3001",
+          "roundLevel": 3,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 4:00 PM"
+        },
+        {
+          "matchId": "4002",
+          "roundLevel": 4,
+          "matchNum": 2,
+          "winner": {
+            "name": "Manas Kathuria",
+            "playerId": 67,
+            "seed": "",
+            "club": "",
+            "partner": "Devanshi Joshi",
+            "partnerPlayerId": 57
+          },
+          "score": [
+            "21-13",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4003",
+          "roundLevel": 4,
+          "matchNum": 3,
+          "winner": {
+            "name": "Aakash Unnikrishnan",
+            "playerId": 176,
+            "seed": "",
+            "club": "",
+            "partner": "Sanjana Thouda",
+            "partnerPlayerId": 126
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3002",
+          "roundLevel": 3,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 3:30 PM"
+        },
+        {
+          "matchId": "4004",
+          "roundLevel": 4,
+          "matchNum": 4,
+          "winner": {
+            "name": "Sashanth Senthil",
+            "playerId": 111,
+            "seed": "",
+            "club": "",
+            "partner": "Charvi Murali",
+            "partnerPlayerId": 91
+          },
+          "score": [
+            "21-16",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4005",
+          "roundLevel": 4,
+          "matchNum": 5,
+          "winner": {
+            "name": "Varin Karri",
+            "playerId": 64,
+            "seed": "",
+            "club": "",
+            "partner": "Tatthva Sharma",
+            "partnerPlayerId": 242
+          },
+          "score": [
+            "21-14",
+            "21-5"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3003",
+          "roundLevel": 3,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 7:45 PM"
+        },
+        {
+          "matchId": "4006",
+          "roundLevel": 4,
+          "matchNum": 6,
+          "winner": {
+            "name": "Samiksh Talapally",
+            "playerId": 121,
+            "seed": "",
+            "club": "",
+            "partner": "Amy Gao",
+            "partnerPlayerId": 32
+          },
+          "score": [
+            "21-18",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4007",
+          "roundLevel": 4,
+          "matchNum": 7,
+          "winner": {
+            "name": "Akshath Potnuru",
+            "playerId": 173,
+            "seed": "",
+            "club": "",
+            "partner": "Aashritha Chintireddy",
+            "partnerPlayerId": 22
+          },
+          "score": [],
+          "retired": false,
+          "walkover": true
+        },
+        {
+          "matchId": "3004",
+          "roundLevel": 3,
+          "matchNum": 4,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 3:30 PM"
+        },
+        {
+          "matchId": "4008",
+          "roundLevel": 4,
+          "matchNum": 8,
+          "winner": {
+            "name": "Marzuq Mathani",
+            "playerId": 159,
+            "seed": "2",
+            "club": "",
+            "partner": "Diksha Chandrasekaran",
+            "partnerPlayerId": 13
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    },
+    {
+      "name": "XD U17 - Play-off 3/4",
+      "rounds": [
+        "",
+        "Club",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    }
+  ]
+}

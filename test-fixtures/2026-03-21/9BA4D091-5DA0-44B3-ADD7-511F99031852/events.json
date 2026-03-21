@@ -1,0 +1,156 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "eventCount": 25,
+  "events": [
+    {
+      "eventId": 7,
+      "name": "BS U11",
+      "draws": 1,
+      "entries": 43
+    },
+    {
+      "eventId": 17,
+      "name": "GS U11",
+      "draws": 1,
+      "entries": 15
+    },
+    {
+      "eventId": 22,
+      "name": "XD U11",
+      "draws": 1,
+      "entries": 21
+    },
+    {
+      "eventId": 2,
+      "name": "BD U11",
+      "draws": 1,
+      "entries": 22
+    },
+    {
+      "eventId": 12,
+      "name": "GD U11",
+      "draws": 3,
+      "entries": 8
+    },
+    {
+      "eventId": 8,
+      "name": "BS U13",
+      "draws": 1,
+      "entries": 44
+    },
+    {
+      "eventId": 18,
+      "name": "GS U13",
+      "draws": 1,
+      "entries": 23
+    },
+    {
+      "eventId": 23,
+      "name": "XD U13",
+      "draws": 1,
+      "entries": 31
+    },
+    {
+      "eventId": 3,
+      "name": "BD U13",
+      "draws": 1,
+      "entries": 21
+    },
+    {
+      "eventId": 13,
+      "name": "GD U13",
+      "draws": 1,
+      "entries": 11
+    },
+    {
+      "eventId": 9,
+      "name": "BS U15",
+      "draws": 1,
+      "entries": 27
+    },
+    {
+      "eventId": 19,
+      "name": "GS U15",
+      "draws": 1,
+      "entries": 21
+    },
+    {
+      "eventId": 24,
+      "name": "XD U15",
+      "draws": 1,
+      "entries": 18
+    },
+    {
+      "eventId": 4,
+      "name": "BD U15",
+      "draws": 1,
+      "entries": 12
+    },
+    {
+      "eventId": 14,
+      "name": "GD U15",
+      "draws": 1,
+      "entries": 8
+    },
+    {
+      "eventId": 10,
+      "name": "BS U17",
+      "draws": 1,
+      "entries": 27
+    },
+    {
+      "eventId": 20,
+      "name": "GS U17",
+      "draws": 1,
+      "entries": 18
+    },
+    {
+      "eventId": 1,
+      "name": "XD U17",
+      "draws": 1,
+      "entries": 15
+    },
+    {
+      "eventId": 5,
+      "name": "BD U17",
+      "draws": 1,
+      "entries": 14
+    },
+    {
+      "eventId": 15,
+      "name": "GD U17",
+      "draws": 1,
+      "entries": 8
+    },
+    {
+      "eventId": 11,
+      "name": "BS U19",
+      "draws": 3,
+      "entries": 7
+    },
+    {
+      "eventId": 21,
+      "name": "GS U19",
+      "draws": 0,
+      "entries": 2
+    },
+    {
+      "eventId": 25,
+      "name": "XD U19",
+      "draws": 1,
+      "entries": 4
+    },
+    {
+      "eventId": 6,
+      "name": "BD U19",
+      "draws": 3,
+      "entries": 8
+    },
+    {
+      "eventId": 16,
+      "name": "GD U19",
+      "draws": 0,
+      "entries": 2
+    }
+  ]
+}

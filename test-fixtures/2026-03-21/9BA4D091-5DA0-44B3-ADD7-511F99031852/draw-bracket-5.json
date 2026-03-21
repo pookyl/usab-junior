@@ -1,0 +1,198 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 5,
+  "drawType": "round-robin",
+  "groupName": "GD U11 - Group A",
+  "groups": [
+    {
+      "name": "Group A",
+      "drawId": 5,
+      "active": true
+    },
+    {
+      "name": "Group B",
+      "drawId": 6,
+      "active": false
+    },
+    {
+      "name": "GD U11",
+      "drawId": 7,
+      "active": false
+    }
+  ],
+  "standings": [
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Ariel An",
+          "playerId": 216,
+          "club": "Mckinney Badminton Club [MKBC]"
+        },
+        {
+          "name": "Vihaa Reddy Keesara",
+          "playerId": 69,
+          "club": "Mckinney Badminton Club [MKBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Tanvisri Gadde",
+          "playerId": 211,
+          "club": "DFW [DFW]"
+        },
+        {
+          "name": "Diya Vikram",
+          "playerId": 130,
+          "club": "Houston Badminton Academy [HBA]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Vaishavie Dhivakar",
+          "playerId": 221,
+          "club": "Mckinney Badminton Club [MKBC]"
+        },
+        {
+          "name": "Sahasra Vudum",
+          "playerId": 132,
+          "club": "Austin Badminton Academy [AUBA]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    }
+  ],
+  "matches": [
+    {
+      "matchId": "402",
+      "round": "Round 1",
+      "team1": [
+        {
+          "name": "Tanvisri Gadde",
+          "playerId": 211,
+          "club": ""
+        },
+        {
+          "name": "Diya Vikram",
+          "playerId": 130,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Vaishavie Dhivakar",
+          "playerId": 221,
+          "club": ""
+        },
+        {
+          "name": "Sahasra Vudum",
+          "playerId": 132,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "398",
+      "round": "Round 2",
+      "team1": [
+        {
+          "name": "Ariel An",
+          "playerId": 216,
+          "club": ""
+        },
+        {
+          "name": "Vihaa Reddy Keesara",
+          "playerId": 69,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Tanvisri Gadde",
+          "playerId": 211,
+          "club": ""
+        },
+        {
+          "name": "Diya Vikram",
+          "playerId": 130,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "401",
+      "round": "Round 3",
+      "team1": [
+        {
+          "name": "Ariel An",
+          "playerId": 216,
+          "club": ""
+        },
+        {
+          "name": "Vihaa Reddy Keesara",
+          "playerId": 69,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Vaishavie Dhivakar",
+          "playerId": 221,
+          "club": ""
+        },
+        {
+          "name": "Sahasra Vudum",
+          "playerId": 132,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    }
+  ]
+}

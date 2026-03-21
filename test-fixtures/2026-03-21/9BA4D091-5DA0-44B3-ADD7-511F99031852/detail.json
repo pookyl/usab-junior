@@ -1,0 +1,241 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "name": "Tournamentsoftware.com - 2026 VISTARA SOUTH OPEN LOCAL CHAMPIONSHIPS - Draws",
+  "dates": "3/20/2026 - 3/22/2026",
+  "location": "Favorite",
+  "draws": [
+    {
+      "drawId": 1,
+      "name": "BS U11",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "First match"
+    },
+    {
+      "drawId": 2,
+      "name": "GS U11",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "First match"
+    },
+    {
+      "drawId": 3,
+      "name": "XD U11",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 4,
+      "name": "BD U11",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 7,
+      "name": "GD U11",
+      "size": 4,
+      "type": "Elimination",
+      "stage": "Playoff",
+      "consolation": null
+    },
+    {
+      "drawId": 5,
+      "name": "GD U11 - Group A",
+      "size": 3,
+      "type": "Round Robin",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 6,
+      "name": "GD U11 - Group B",
+      "size": 4,
+      "type": "Round Robin",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 8,
+      "name": "BS U13",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "First match"
+    },
+    {
+      "drawId": 9,
+      "name": "GS U13",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "First match"
+    },
+    {
+      "drawId": 10,
+      "name": "XD U13",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 11,
+      "name": "BD U13",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 12,
+      "name": "GD U13",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 13,
+      "name": "BS U15",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 14,
+      "name": "GS U15",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 15,
+      "name": "XD U15",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 16,
+      "name": "BD U15",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 17,
+      "name": "GD U15",
+      "size": 8,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 18,
+      "name": "BS U17",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 19,
+      "name": "GS U17",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 20,
+      "name": "XD U17",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 21,
+      "name": "BD U17",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 22,
+      "name": "GD U17",
+      "size": 8,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 25,
+      "name": "BS U19",
+      "size": 4,
+      "type": "Elimination",
+      "stage": "Playoff",
+      "consolation": null
+    },
+    {
+      "drawId": 23,
+      "name": "BS U19 - Group A",
+      "size": 3,
+      "type": "Round Robin",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 24,
+      "name": "BS U19 - Group B",
+      "size": 4,
+      "type": "Round Robin",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 26,
+      "name": "XD U19",
+      "size": 4,
+      "type": "Round Robin",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 32,
+      "name": "BD U19",
+      "size": 4,
+      "type": "Elimination",
+      "stage": "Playoff",
+      "consolation": null
+    },
+    {
+      "drawId": 30,
+      "name": "BD U19 - Group A",
+      "size": 3,
+      "type": "Round Robin",
+      "stage": "Main Draw",
+      "consolation": null
+    },
+    {
+      "drawId": 31,
+      "name": "BD U19 - Group B",
+      "size": 3,
+      "type": "Round Robin",
+      "stage": "Main Draw",
+      "consolation": null
+    }
+  ],
+  "tswUrl": "https://www.tournamentsoftware.com/tournament/9BA4D091-5DA0-44B3-ADD7-511F99031852"
+}

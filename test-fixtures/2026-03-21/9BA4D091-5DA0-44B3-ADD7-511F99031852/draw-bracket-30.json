@@ -1,0 +1,198 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 30,
+  "drawType": "round-robin",
+  "groupName": "BD U19 - Group A",
+  "groups": [
+    {
+      "name": "Group A",
+      "drawId": 30,
+      "active": true
+    },
+    {
+      "name": "Group B",
+      "drawId": 31,
+      "active": false
+    },
+    {
+      "name": "BD U19",
+      "drawId": 32,
+      "active": false
+    }
+  ],
+  "standings": [
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Hudson Abidin",
+          "playerId": 1,
+          "club": "Plano Badminton Center[PBC]"
+        },
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149,
+          "club": "Plano Badminton Center[PBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15,
+          "club": "Plano Badminton Center[PBC]"
+        },
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204,
+          "club": "USA Badminton [USAB]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Srinivas Raghav Subash",
+          "playerId": 206,
+          "club": "Frisco Badminton Academy [FBA]"
+        },
+        {
+          "name": "Aarya Vijay",
+          "playerId": 194,
+          "club": "Frisco Badminton Academy [FBA]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    }
+  ],
+  "matches": [
+    {
+      "matchId": "1549",
+      "round": "Round 1",
+      "team1": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15,
+          "club": ""
+        },
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Srinivas Raghav Subash",
+          "playerId": 206,
+          "club": ""
+        },
+        {
+          "name": "Aarya Vijay",
+          "playerId": 194,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1546",
+      "round": "Round 2",
+      "team1": [
+        {
+          "name": "Hudson Abidin",
+          "playerId": 1,
+          "club": ""
+        },
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15,
+          "club": ""
+        },
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1548",
+      "round": "Round 3",
+      "team1": [
+        {
+          "name": "Hudson Abidin",
+          "playerId": 1,
+          "club": ""
+        },
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Srinivas Raghav Subash",
+          "playerId": 206,
+          "club": ""
+        },
+        {
+          "name": "Aarya Vijay",
+          "playerId": 194,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    }
+  ]
+}

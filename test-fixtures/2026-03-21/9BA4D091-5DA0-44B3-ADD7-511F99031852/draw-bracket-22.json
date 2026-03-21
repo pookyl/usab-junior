@@ -1,0 +1,208 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 22,
+  "drawType": "elimination",
+  "sections": [
+    {
+      "name": "GD U17",
+      "rounds": [
+        "",
+        "Club",
+        "Quarter Finals",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [
+        {
+          "position": 1,
+          "name": "Diksha Chandrasekaran",
+          "seed": "1",
+          "club": "",
+          "playerId": 13,
+          "bye": false,
+          "partner": "Haziqa H Mathani",
+          "partnerPlayerId": 158
+        },
+        {
+          "position": 2,
+          "name": "Bhavya Nirmal",
+          "seed": "",
+          "club": "",
+          "playerId": 237,
+          "bye": false,
+          "partner": "Ranya Reddy Vookanti",
+          "partnerPlayerId": 195
+        },
+        {
+          "position": 3,
+          "name": "Devanshi Joshi",
+          "seed": "",
+          "club": "",
+          "playerId": 57,
+          "bye": false,
+          "partner": "Samhitha Prakash",
+          "partnerPlayerId": 239
+        },
+        {
+          "position": 4,
+          "name": "Amy Gao",
+          "seed": "",
+          "club": "",
+          "playerId": 32,
+          "bye": false,
+          "partner": "Mingyang Liu",
+          "partnerPlayerId": 172
+        },
+        {
+          "position": 5,
+          "name": "Mrugakshi Kulkarni",
+          "seed": "",
+          "club": "",
+          "playerId": 187,
+          "bye": false,
+          "partner": "Ashni Mathure",
+          "partnerPlayerId": 90
+        },
+        {
+          "position": 6,
+          "name": "Jyoshika Jakkula",
+          "seed": "",
+          "club": "",
+          "playerId": 51,
+          "bye": false,
+          "partner": "Sanjana Thouda",
+          "partnerPlayerId": 126
+        },
+        {
+          "position": 7,
+          "name": "Aashritha Chintireddy",
+          "seed": "",
+          "club": "",
+          "playerId": 22,
+          "bye": false,
+          "partner": "Vidushi Karn",
+          "partnerPlayerId": 199
+        },
+        {
+          "position": 8,
+          "name": "Charvi Murali",
+          "seed": "2",
+          "club": "",
+          "playerId": 91,
+          "bye": false,
+          "partner": "Tatthva Sharma",
+          "partnerPlayerId": 242
+        }
+      ],
+      "matches": [
+        {
+          "matchId": "3001",
+          "roundLevel": 3,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 6:15 PM"
+        },
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3002",
+          "roundLevel": 3,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 8:45 PM"
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3003",
+          "roundLevel": 3,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 8:45 PM"
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3004",
+          "roundLevel": 3,
+          "matchNum": 4,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 8:45 PM"
+        }
+      ]
+    },
+    {
+      "name": "GD U17 - Play-off 3/4",
+      "rounds": [
+        "",
+        "Club",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    }
+  ]
+}

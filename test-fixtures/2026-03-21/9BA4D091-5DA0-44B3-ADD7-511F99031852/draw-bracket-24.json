@@ -1,0 +1,241 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 24,
+  "drawType": "round-robin",
+  "groupName": "BS U19 - Group B",
+  "groups": [
+    {
+      "name": "Group A",
+      "drawId": 23,
+      "active": false
+    },
+    {
+      "name": "Group B",
+      "drawId": 24,
+      "active": true
+    },
+    {
+      "name": "BS U19",
+      "drawId": 25,
+      "active": false
+    }
+  ],
+  "standings": [
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149,
+          "club": "Plano Badminton Center[PBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204,
+          "club": "USA Badminton [USAB]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205,
+          "club": "Frisco Badminton Academy [FBA]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15,
+          "club": "Plano Badminton Center[PBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    }
+  ],
+  "matches": [
+    {
+      "matchId": "1464",
+      "round": "Round 1",
+      "team1": [
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1466",
+      "round": "Round 1",
+      "team1": [
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1460",
+      "round": "Round 2",
+      "team1": [
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1468",
+      "round": "Round 2",
+      "team1": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1463",
+      "round": "Round 3",
+      "team1": [
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1467",
+      "round": "Round 3",
+      "team1": [
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    }
+  ]
+}

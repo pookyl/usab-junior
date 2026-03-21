@@ -1,0 +1,3313 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "date": "Fri 3/20/2026",
+  "matches": [
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Bhuvan Kolla"
+      ],
+      "team2": [
+        "Aadyot Kadavala"
+      ],
+      "team1Ids": [
+        171
+      ],
+      "team2Ids": [
+        169
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          12,
+          21
+        ],
+        [
+          4,
+          21
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 01",
+      "duration": "01m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Rithvik Enugonda"
+      ],
+      "team2": [
+        "Jathniel Enoch Reddy Kodamati"
+      ],
+      "team1Ids": [
+        27
+      ],
+      "team2Ids": [
+        200
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          2
+        ],
+        [
+          21,
+          3
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 09",
+      "duration": "29m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Siraj S L"
+      ],
+      "team2": [
+        "Jesse Lai Liu"
+      ],
+      "team1Ids": [
+        155
+      ],
+      "team2Ids": [
+        82
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          6,
+          21
+        ],
+        [
+          5,
+          21
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 02",
+      "duration": "20m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Winston Hsu"
+      ],
+      "team2": [
+        "Avniel Ajit Patankar"
+      ],
+      "team1Ids": [
+        48
+      ],
+      "team2Ids": [
+        98
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          18
+        ],
+        [
+          21,
+          18
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 08",
+      "duration": "35m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Avyaan Krishna Gattoju"
+      ],
+      "team2": [
+        "Ian Chen"
+      ],
+      "team1Ids": [
+        154
+      ],
+      "team2Ids": [
+        17
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          11,
+          21
+        ],
+        [
+          11,
+          21
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 03",
+      "duration": "25m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Rudransh Chalamalasetti"
+      ],
+      "team2": [
+        "Casper Hsu"
+      ],
+      "team1Ids": [
+        219
+      ],
+      "team2Ids": [
+        46
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 07",
+      "duration": "27m",
+      "location": "Main Location - 07"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Aadithya Pranav Pamarthi"
+      ],
+      "team2": [
+        "Aayansh Gaddam"
+      ],
+      "team1Ids": [
+        97
+      ],
+      "team2Ids": [
+        30
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          28,
+          30
+        ],
+        [
+          15,
+          21
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 06",
+      "duration": "41m",
+      "location": "Main Location - 06"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Vihaan Karthick"
+      ],
+      "team2": [
+        "Advith Vihaan Yalagala"
+      ],
+      "team1Ids": [
+        66
+      ],
+      "team2Ids": [
+        139
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          11
+        ],
+        [
+          21,
+          14
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 05",
+      "duration": "33m",
+      "location": "Main Location - 05"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Jordon Y Guan"
+      ],
+      "team2": [
+        "Dhayal Krishna Anish"
+      ],
+      "team1Ids": [
+        36
+      ],
+      "team2Ids": [
+        217
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          14
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 12",
+      "duration": "34m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 64",
+      "header": "BS U11 · Round of 64",
+      "team1": [
+        "Kason Wang"
+      ],
+      "team2": [
+        "Amey P Ahinave"
+      ],
+      "team1Ids": [
+        133
+      ],
+      "team2Ids": [
+        3
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          4
+        ],
+        [
+          21,
+          10
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 04",
+      "duration": "26m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Richard Wang"
+      ],
+      "team2": [
+        "Darmikh Pallabothula"
+      ],
+      "team1Ids": [
+        135
+      ],
+      "team2Ids": [
+        96
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [],
+      "walkover": true,
+      "time": "6:00 PM",
+      "court": "",
+      "duration": "",
+      "location": "Vistara Sports"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Duc Huy Nguyen"
+      ],
+      "team2": [
+        "Charlie Hanke Wang"
+      ],
+      "team1Ids": [
+        94
+      ],
+      "team2Ids": [
+        251
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          2
+        ],
+        [
+          21,
+          1
+        ]
+      ],
+      "time": "6:00 PM",
+      "court": "Main Location - 11",
+      "duration": "33m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Eli Darmawan"
+      ],
+      "team2": [
+        "Jashwanth Vaddempudi"
+      ],
+      "team1Ids": [
+        152
+      ],
+      "team2Ids": [
+        177
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          23
+        ],
+        [
+          21,
+          19
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 04",
+      "duration": "56m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Vedhanth Kumar Kanthala"
+      ],
+      "team2": [
+        "Anish Sai Narasani"
+      ],
+      "team1Ids": [
+        62
+      ],
+      "team2Ids": [
+        236
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          8
+        ],
+        [
+          21,
+          3
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 06",
+      "duration": "27m",
+      "location": "Main Location - 06"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Franklin Xu Cheng"
+      ],
+      "team2": [
+        "Andrew Sinyushkin"
+      ],
+      "team1Ids": [
+        19
+      ],
+      "team2Ids": [
+        244
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          20,
+          22
+        ],
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          13
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 14",
+      "duration": "46m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Yize Han"
+      ],
+      "team2": [
+        "Advith Karnam"
+      ],
+      "team1Ids": [
+        41
+      ],
+      "team2Ids": [
+        230
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          18,
+          21
+        ],
+        [
+          18,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 08",
+      "duration": "32m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Aarav Lokesh Kumar"
+      ],
+      "team2": [
+        "Ethan Yin"
+      ],
+      "team1Ids": [
+        83
+      ],
+      "team2Ids": [
+        144
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          14,
+          21
+        ],
+        [
+          8,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 09",
+      "duration": "30m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Vibhu Ramachandra Prakash"
+      ],
+      "team2": [
+        "Pranav Iyer"
+      ],
+      "team1Ids": [
+        103
+      ],
+      "team2Ids": [
+        227
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          2,
+          21
+        ],
+        [
+          5,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 07",
+      "duration": "23m",
+      "location": "Main Location - 07"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Jingyang Guo"
+      ],
+      "team2": [
+        "Emmanuel Thomas Joseph"
+      ],
+      "team1Ids": [
+        37
+      ],
+      "team2Ids": [
+        55
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          7,
+          21
+        ],
+        [
+          10,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 03",
+      "duration": "26m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Aaron Thomas Nitish"
+      ],
+      "team2": [
+        "Abhinav Yadagiri"
+      ],
+      "team1Ids": [
+        95
+      ],
+      "team2Ids": [
+        254
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          9,
+          21
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 12",
+      "duration": "28m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Fonghong Lin"
+      ],
+      "team2": [
+        "Venkata Sai Sreekar Kondamuri"
+      ],
+      "team1Ids": [
+        80
+      ],
+      "team2Ids": [
+        71
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          8,
+          21
+        ],
+        [
+          16,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 01",
+      "duration": "25m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 64",
+      "header": "BS U13 · Round of 64",
+      "team1": [
+        "Arham Jain"
+      ],
+      "team2": [
+        "Allen Wang"
+      ],
+      "team1Ids": [
+        228
+      ],
+      "team2Ids": [
+        250
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          5,
+          21
+        ],
+        [
+          7,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 02",
+      "duration": "26m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "GS U13",
+      "round": "Round of 32",
+      "header": "GS U13 · Round of 32",
+      "team1": [
+        "Aadhya Vankayala"
+      ],
+      "team2": [
+        "Ivy Wang"
+      ],
+      "team1Ids": [
+        248
+      ],
+      "team2Ids": [
+        252
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 05",
+      "duration": "23m",
+      "location": "Main Location - 05"
+    },
+    {
+      "event": "GS U13",
+      "round": "Round of 32",
+      "header": "GS U13 · Round of 32",
+      "team1": [
+        "Gourangna Manchikanti"
+      ],
+      "team2": [
+        "Tanvika Kantipudi"
+      ],
+      "team1Ids": [
+        235
+      ],
+      "team2Ids": [
+        63
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          11,
+          21
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "time": "6:25 PM",
+      "court": "Main Location - 11",
+      "duration": "26m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "GS U13",
+      "round": "Round of 32",
+      "header": "GS U13 · Round of 32",
+      "team1": [
+        "Anika Gattoju"
+      ],
+      "team2": [
+        "Abigail Tran Duong"
+      ],
+      "team1Ids": [
+        153
+      ],
+      "team2Ids": [
+        26
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          11
+        ],
+        [
+          14,
+          21
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 09",
+      "duration": "41m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "GS U13",
+      "round": "Round of 32",
+      "header": "GS U13 · Round of 32",
+      "team1": [
+        "Hasini Mateti"
+      ],
+      "team2": [
+        "Manvi Jandhyala"
+      ],
+      "team1Ids": [
+        89
+      ],
+      "team2Ids": [
+        54
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          8,
+          21
+        ],
+        [
+          11,
+          21
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 14",
+      "duration": "30m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "GS U13",
+      "round": "Round of 32",
+      "header": "GS U13 · Round of 32",
+      "team1": [
+        "Diya Abbineni"
+      ],
+      "team2": [
+        "Vihaa Reddy Keesara"
+      ],
+      "team1Ids": [
+        164
+      ],
+      "team2Ids": [
+        69
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          10,
+          21
+        ],
+        [
+          5,
+          21
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 12",
+      "duration": "27m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "GS U13",
+      "round": "Round of 32",
+      "header": "GS U13 · Round of 32",
+      "team1": [
+        "Sri Lahari Vemulapati"
+      ],
+      "team2": [
+        "Prisha Tushar Govani"
+      ],
+      "team1Ids": [
+        249
+      ],
+      "team2Ids": [
+        35
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [],
+      "walkover": true,
+      "time": "6:50 PM",
+      "court": "",
+      "duration": "",
+      "location": "Vistara Sports"
+    },
+    {
+      "event": "GS U13",
+      "round": "Round of 32",
+      "header": "GS U13 · Round of 32",
+      "team1": [
+        "Ananya Kumar"
+      ],
+      "team2": [
+        "Ella Zhang"
+      ],
+      "team1Ids": [
+        72
+      ],
+      "team2Ids": [
+        148
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          6
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 02",
+      "duration": "24m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "GS U15",
+      "round": "Round of 32",
+      "header": "GS U15 · Round of 32",
+      "team1": [
+        "Yashasvi Joshi"
+      ],
+      "team2": [
+        "Brooklyn Chen"
+      ],
+      "team1Ids": [
+        58
+      ],
+      "team2Ids": [
+        16
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          7
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 11",
+      "duration": "30m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "GS U15",
+      "round": "Round of 32",
+      "header": "GS U15 · Round of 32",
+      "team1": [
+        "Neha Murali"
+      ],
+      "team2": [
+        "Amber Wu"
+      ],
+      "team1Ids": [
+        92
+      ],
+      "team2Ids": [
+        136
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          2
+        ],
+        [
+          21,
+          6
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 06",
+      "duration": "03m",
+      "location": "Main Location - 06"
+    },
+    {
+      "event": "GS U15",
+      "round": "Round of 32",
+      "header": "GS U15 · Round of 32",
+      "team1": [
+        "Kathy Yan"
+      ],
+      "team2": [
+        "Chaturveda Samhitha Shanigaram"
+      ],
+      "team1Ids": [
+        142
+      ],
+      "team2Ids": [
+        161
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          8,
+          21
+        ],
+        [
+          16,
+          21
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 08",
+      "duration": "27m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "GS U15",
+      "round": "Round of 32",
+      "header": "GS U15 · Round of 32",
+      "team1": [
+        "Gowri Ashrita Potnuru"
+      ],
+      "team2": [
+        "Mysha Jain"
+      ],
+      "team1Ids": [
+        174
+      ],
+      "team2Ids": [
+        49
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          11
+        ],
+        [
+          21,
+          13
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 07",
+      "duration": "33m",
+      "location": "Main Location - 07"
+    },
+    {
+      "event": "GS U15",
+      "round": "Round of 32",
+      "header": "GS U15 · Round of 32",
+      "team1": [
+        "Fiona Liu"
+      ],
+      "team2": [
+        "Tanvi Gaddam"
+      ],
+      "team1Ids": [
+        81
+      ],
+      "team2Ids": [
+        31
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          23
+        ],
+        [
+          17,
+          21
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 01",
+      "duration": "48m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Neel Achari [1]"
+      ],
+      "team2": [
+        "Akul Arjun Jakkula"
+      ],
+      "team1Ids": [
+        215
+      ],
+      "team2Ids": [
+        50
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          4
+        ],
+        [
+          21,
+          10
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 03",
+      "duration": "34m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Ayaan Kale [3/4]"
+      ],
+      "team2": [
+        "Vedin Thota"
+      ],
+      "team1Ids": [
+        61
+      ],
+      "team2Ids": [
+        208
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          5
+        ],
+        [
+          21,
+          6
+        ]
+      ],
+      "time": "6:50 PM",
+      "court": "Main Location - 05",
+      "duration": "31m",
+      "location": "Main Location - 05"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Vidhu Reddy Keesara"
+      ],
+      "team2": [
+        "Richard Wang"
+      ],
+      "team1Ids": [
+        68
+      ],
+      "team2Ids": [
+        135
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          15
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 05",
+      "duration": "45m",
+      "location": "Main Location - 05"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Ritvik Singh [5/8]"
+      ],
+      "team2": [
+        "Duc Huy Nguyen"
+      ],
+      "team1Ids": [
+        243
+      ],
+      "team2Ids": [
+        94
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          6
+        ],
+        [
+          21,
+          5
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 02",
+      "duration": "22m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Jonathan Yu"
+      ],
+      "team2": [
+        "Adithya Yeluguri [3/4]"
+      ],
+      "team1Ids": [
+        146
+      ],
+      "team2Ids": [
+        255
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          11,
+          21
+        ],
+        [
+          11,
+          21
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 04",
+      "duration": "28m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Jeffrey Yan"
+      ],
+      "team2": [
+        "Avyukth Reddy Pati [2]"
+      ],
+      "team1Ids": [
+        141
+      ],
+      "team2Ids": [
+        160
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          7,
+          21
+        ],
+        [
+          2,
+          21
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 03",
+      "duration": "24m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Harry H Song [1]"
+      ],
+      "team2": [
+        "Aaryan Mallam"
+      ],
+      "team1Ids": [
+        118
+      ],
+      "team2Ids": [
+        213
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          0
+        ],
+        [
+          21,
+          2
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 02",
+      "duration": "01m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Aarush Arun"
+      ],
+      "team2": [
+        "Aadyot Kadavala"
+      ],
+      "team1Ids": [
+        4
+      ],
+      "team2Ids": [
+        169
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          14
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 01",
+      "duration": "26m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Shen Hao Lim [5/8]"
+      ],
+      "team2": [
+        "Travis Cheng"
+      ],
+      "team1Ids": [
+        76
+      ],
+      "team2Ids": [
+        21
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 11",
+      "duration": "28m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Kabir Gupta"
+      ],
+      "team2": [
+        "Rithvik Enugonda"
+      ],
+      "team1Ids": [
+        167
+      ],
+      "team2Ids": [
+        27
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          17,
+          21
+        ],
+        [
+          16,
+          21
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 07",
+      "duration": "45m",
+      "location": "Main Location - 07"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Aaditya Lanka [3/4]"
+      ],
+      "team2": [
+        "Skandha Prakash"
+      ],
+      "team1Ids": [
+        156
+      ],
+      "team2Ids": [
+        102
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          6
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 14",
+      "duration": "33m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Reyansh Ghai"
+      ],
+      "team2": [
+        "Jesse Lai Liu"
+      ],
+      "team1Ids": [
+        223
+      ],
+      "team2Ids": [
+        82
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          2,
+          21
+        ],
+        [
+          5,
+          21
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 12",
+      "duration": "23m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Tingxin Tan [5/8]"
+      ],
+      "team2": [
+        "Winston Hsu"
+      ],
+      "team1Ids": [
+        246
+      ],
+      "team2Ids": [
+        48
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          7
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 06",
+      "duration": "35m",
+      "location": "Main Location - 06"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Divith Pradeep Handral"
+      ],
+      "team2": [
+        "Ian Chen"
+      ],
+      "team1Ids": [
+        226
+      ],
+      "team2Ids": [
+        17
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          18,
+          21
+        ],
+        [
+          10,
+          21
+        ]
+      ],
+      "time": "7:15 PM",
+      "court": "Main Location - 08",
+      "duration": "40m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Udbhav H Ram"
+      ],
+      "team2": [
+        "Eli Darmawan"
+      ],
+      "team1Ids": [
+        225
+      ],
+      "team2Ids": [
+        152
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          23
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 02",
+      "duration": "1h 20m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Kyle Chen"
+      ],
+      "team2": [
+        "Vedhanth Kumar Kanthala"
+      ],
+      "team1Ids": [
+        18
+      ],
+      "team2Ids": [
+        62
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          16
+        ],
+        [
+          22,
+          20
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 03",
+      "duration": "37m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Srinivas Shankar [5/8]"
+      ],
+      "team2": [
+        "Franklin Xu Cheng"
+      ],
+      "team1Ids": [
+        112
+      ],
+      "team2Ids": [
+        19
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          12,
+          21
+        ],
+        [
+          11,
+          21
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 04",
+      "duration": "26m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Philip Thayil"
+      ],
+      "team2": [
+        "Advith Karnam"
+      ],
+      "team1Ids": [
+        124
+      ],
+      "team2Ids": [
+        230
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          10,
+          21
+        ],
+        [
+          8,
+          21
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 11",
+      "duration": "27m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Ethan Yin"
+      ],
+      "team2": [
+        "Aayush Jaltar"
+      ],
+      "team1Ids": [
+        144
+      ],
+      "team2Ids": [
+        229
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          11
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 09",
+      "duration": "29m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Pranav Iyer"
+      ],
+      "team2": [
+        "Daksh Thakur [5/8]"
+      ],
+      "team1Ids": [
+        227
+      ],
+      "team2Ids": [
+        175
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          23
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 01",
+      "duration": "1h 01m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Emmanuel Thomas Joseph"
+      ],
+      "team2": [
+        "Reo Qian Bao"
+      ],
+      "team1Ids": [
+        55
+      ],
+      "team2Ids": [
+        9
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          10
+        ],
+        [
+          21,
+          18
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 12",
+      "duration": "31m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Abhinav Yadagiri"
+      ],
+      "team2": [
+        "Amogh Lanka"
+      ],
+      "team1Ids": [
+        254
+      ],
+      "team2Ids": [
+        157
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          9,
+          21
+        ],
+        [
+          12,
+          21
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 07",
+      "duration": "58m",
+      "location": "Main Location - 07"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Venkata Sai Sreekar Kondamuri"
+      ],
+      "team2": [
+        "David Zhang [5/8]"
+      ],
+      "team1Ids": [
+        71
+      ],
+      "team2Ids": [
+        147
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          15,
+          21
+        ],
+        [
+          15,
+          21
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 08",
+      "duration": "55m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "BS U13",
+      "round": "Round of 32",
+      "header": "BS U13 · Round of 32",
+      "team1": [
+        "Allen Wang"
+      ],
+      "team2": [
+        "Aarav Muthu Rajavel"
+      ],
+      "team1Ids": [
+        250
+      ],
+      "team2Ids": [
+        93
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          16
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 09",
+      "duration": "28m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Rudransh Chalamalasetti"
+      ],
+      "team2": [
+        "Barry Xu"
+      ],
+      "team1Ids": [
+        219
+      ],
+      "team2Ids": [
+        138
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          19
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 05",
+      "duration": "52m",
+      "location": "Main Location - 05"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Aayansh Gaddam"
+      ],
+      "team2": [
+        "Rayan Shyam [5/8]"
+      ],
+      "team1Ids": [
+        30
+      ],
+      "team2Ids": [
+        116
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          10
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "7:40 PM",
+      "court": "Main Location - 06",
+      "duration": "1h 08m",
+      "location": "Main Location - 06"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Vihaan Karthick"
+      ],
+      "team2": [
+        "Yashveer Daliparthi"
+      ],
+      "team1Ids": [
+        66
+      ],
+      "team2Ids": [
+        25
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          10
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 12",
+      "duration": "26m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Potter Han Schafer"
+      ],
+      "team2": [
+        "Tanush Jaltar [3/4]"
+      ],
+      "team1Ids": [
+        109
+      ],
+      "team2Ids": [
+        53
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          12,
+          21
+        ],
+        [
+          11,
+          21
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 03",
+      "duration": "35m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Jordon Y Guan"
+      ],
+      "team2": [
+        "Akshay Nainaknti"
+      ],
+      "team1Ids": [
+        36
+      ],
+      "team2Ids": [
+        190
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          8
+        ],
+        [
+          21,
+          3
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 01",
+      "duration": "29m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Prayaag Suresh"
+      ],
+      "team2": [
+        "Xintong Lu [5/8]"
+      ],
+      "team1Ids": [
+        163
+      ],
+      "team2Ids": [
+        234
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          8,
+          21
+        ],
+        [
+          2,
+          21
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 04",
+      "duration": "47m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Kason Wang"
+      ],
+      "team2": [
+        "Derek J Hou"
+      ],
+      "team1Ids": [
+        133
+      ],
+      "team2Ids": [
+        44
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          14
+        ],
+        [
+          21,
+          13
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 09",
+      "duration": "39m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "BS U11",
+      "round": "Round of 32",
+      "header": "BS U11 · Round of 32",
+      "team1": [
+        "Arjun Chada"
+      ],
+      "team2": [
+        "Ayushmaan Senapati [2]"
+      ],
+      "team1Ids": [
+        180
+      ],
+      "team2Ids": [
+        110
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          8,
+          21
+        ],
+        [
+          7,
+          21
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 08",
+      "duration": "26m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Liam Xiao"
+      ],
+      "team2": [
+        "Zmy Gao"
+      ],
+      "team1Ids": [
+        253
+      ],
+      "team2Ids": [
+        33
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          15,
+          21
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 11",
+      "duration": "36m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Matthew Qiu"
+      ],
+      "team2": [
+        "Travin Cheng"
+      ],
+      "team1Ids": [
+        240
+      ],
+      "team2Ids": [
+        20
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          19
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 14",
+      "duration": "51m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Ramatejas Prabhala"
+      ],
+      "team2": [
+        "Rahul Kashyap Josyula"
+      ],
+      "team1Ids": [
+        99
+      ],
+      "team2Ids": [
+        60
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          13
+        ],
+        [
+          21,
+          17
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 06",
+      "duration": "38m",
+      "location": "Main Location - 06"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Reyansh Chalamalasetti"
+      ],
+      "team2": [
+        "Shixin Guo"
+      ],
+      "team1Ids": [
+        12
+      ],
+      "team2Ids": [
+        38
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          0
+        ],
+        [
+          21,
+          2
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 02",
+      "duration": "28m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Dev Charan Saravanan Devaraj"
+      ],
+      "team2": [
+        "Saipranav Kalla"
+      ],
+      "team1Ids": [
+        245
+      ],
+      "team2Ids": [
+        185
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          5,
+          21
+        ],
+        [
+          1,
+          21
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 04",
+      "duration": "46m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Shaurya Maddela"
+      ],
+      "team2": [
+        "Gautam Vasanth Raj"
+      ],
+      "team1Ids": [
+        86
+      ],
+      "team2Ids": [
+        129
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          5
+        ],
+        [
+          21,
+          3
+        ]
+      ],
+      "time": "8:05 PM",
+      "court": "Main Location - 14",
+      "duration": "22m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Mathew Zhu"
+      ],
+      "team2": [
+        "Vivaan Chada"
+      ],
+      "team1Ids": [
+        150
+      ],
+      "team2Ids": [
+        11
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          4,
+          21
+        ],
+        [
+          2,
+          21
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 08",
+      "duration": "20m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Virinchi Gorrela"
+      ],
+      "team2": [
+        "Harshit Thavidishetty"
+      ],
+      "team1Ids": [
+        224
+      ],
+      "team2Ids": [
+        247
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [],
+      "walkover": true,
+      "time": "8:30 PM",
+      "court": "",
+      "duration": "",
+      "location": "Vistara Sports"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Tanush Manikanta Gadde"
+      ],
+      "team2": [
+        "Yeewei Yap"
+      ],
+      "team1Ids": [
+        210
+      ],
+      "team2Ids": [
+        143
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          11,
+          21
+        ],
+        [
+          3,
+          21
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 05",
+      "duration": "26m",
+      "location": "Main Location - 05"
+    },
+    {
+      "event": "BS U15",
+      "round": "Round of 32",
+      "header": "BS U15 · Round of 32",
+      "team1": [
+        "Zi Chen Shao"
+      ],
+      "team2": [
+        "Nihal Reddy Gajjala"
+      ],
+      "team1Ids": [
+        113
+      ],
+      "team2Ids": [
+        166
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          15,
+          21
+        ],
+        [
+          17,
+          21
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "",
+      "duration": "",
+      "location": "Vistara Sports"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Ishan Ramachandra Prakash"
+      ],
+      "team2": [
+        "Sarthak Saha"
+      ],
+      "team1Ids": [
+        100
+      ],
+      "team2Ids": [
+        241
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          14,
+          21
+        ],
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          10
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 11",
+      "duration": "35m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Rishvik Mallam"
+      ],
+      "team2": [
+        "Vedant Shukla"
+      ],
+      "team1Ids": [
+        214
+      ],
+      "team2Ids": [
+        115
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          2,
+          21
+        ],
+        [
+          6,
+          21
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 12",
+      "duration": "25m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Isaac Joseph"
+      ],
+      "team2": [
+        "Jiahao Fu"
+      ],
+      "team1Ids": [
+        56
+      ],
+      "team2Ids": [
+        29
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          10
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 04",
+      "duration": "27m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Aakash Unnikrishnan"
+      ],
+      "team2": [
+        "Niranjan Manjith"
+      ],
+      "team1Ids": [
+        176
+      ],
+      "team2Ids": [
+        87
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          5,
+          21
+        ],
+        [
+          9,
+          21
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 02",
+      "duration": "24m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Manas Kathuria"
+      ],
+      "team2": [
+        "Carsten Lam"
+      ],
+      "team1Ids": [
+        67
+      ],
+      "team2Ids": [
+        212
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          14,
+          21
+        ],
+        [
+          12,
+          21
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 03",
+      "duration": "27m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Sashanth Senthil"
+      ],
+      "team2": [
+        "Akshay Kumar Pallam Reddy"
+      ],
+      "team1Ids": [
+        111
+      ],
+      "team2Ids": [
+        203
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          8
+        ],
+        [
+          21,
+          6
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 01",
+      "duration": "27m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Arjun Aditya Hariharan"
+      ],
+      "team2": [
+        "Neel J Reddy"
+      ],
+      "team1Ids": [
+        168
+      ],
+      "team2Ids": [
+        107
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          22,
+          20
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 09",
+      "duration": "38m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Tarakeshwar Madhana Sundar"
+      ],
+      "team2": [
+        "Allen Lan"
+      ],
+      "team1Ids": [
+        188
+      ],
+      "team2Ids": [
+        73
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "time": "8:30 PM",
+      "court": "Main Location - 09",
+      "duration": "38m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "BD U13",
+      "round": "Round of 32",
+      "header": "BD U13 · Round of 32",
+      "team1": [
+        "Venkata Sai Sreekar Kondamuri",
+        "Aarav Muthu Rajavel"
+      ],
+      "team2": [
+        "Vibhu Ramachandra Prakash",
+        "Vedin Thota"
+      ],
+      "team1Ids": [
+        71,
+        93
+      ],
+      "team2Ids": [
+        103,
+        208
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          4
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 11",
+      "duration": "28m",
+      "location": "Main Location - 11"
+    },
+    {
+      "event": "BD U13",
+      "round": "Round of 32",
+      "header": "BD U13 · Round of 32",
+      "team1": [
+        "Yize Han",
+        "Vidhu Reddy Keesara"
+      ],
+      "team2": [
+        "Jingyang Guo",
+        "Jonathan Yu"
+      ],
+      "team1Ids": [
+        41,
+        68
+      ],
+      "team2Ids": [
+        37,
+        146
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          14
+        ],
+        [
+          21,
+          13
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 01",
+      "duration": "28m",
+      "location": "Main Location - 01"
+    },
+    {
+      "event": "BD U13",
+      "round": "Round of 32",
+      "header": "BD U13 · Round of 32",
+      "team1": [
+        "Kyle Chen",
+        "David Zhang"
+      ],
+      "team2": [
+        "Arham Jain",
+        "Akul Arjun Jakkula"
+      ],
+      "team1Ids": [
+        18,
+        147
+      ],
+      "team2Ids": [
+        228,
+        50
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          10
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 12",
+      "duration": "33m",
+      "location": "Main Location - 12"
+    },
+    {
+      "event": "BD U13",
+      "round": "Round of 32",
+      "header": "BD U13 · Round of 32",
+      "team1": [
+        "Pranav Iyer",
+        "Aaryan Mallam"
+      ],
+      "team2": [
+        "Aayansh Gaddam",
+        "Jeffrey Yan"
+      ],
+      "team1Ids": [
+        227,
+        213
+      ],
+      "team2Ids": [
+        30,
+        141
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          9,
+          21
+        ],
+        [
+          7,
+          21
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 05",
+      "duration": "35m",
+      "location": "Main Location - 05"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Harshith Yoganand"
+      ],
+      "team2": [
+        "Vedant Bansal"
+      ],
+      "team1Ids": [
+        145
+      ],
+      "team2Ids": [
+        218
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          6
+        ],
+        [
+          21,
+          5
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 02",
+      "duration": "24m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Akshath Potnuru"
+      ],
+      "team2": [
+        "Sudeep Reddy Chintamreddy"
+      ],
+      "team1Ids": [
+        173
+      ],
+      "team2Ids": [
+        220
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          12
+        ],
+        [
+          21,
+          10
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 04",
+      "duration": "27m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BS U17",
+      "round": "Round of 32",
+      "header": "BS U17 · Round of 32",
+      "team1": [
+        "Sreevishnu Teja Chennapragada"
+      ],
+      "team2": [
+        "Samiksh Talapally"
+      ],
+      "team1Ids": [
+        182
+      ],
+      "team2Ids": [
+        121
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          10,
+          21
+        ],
+        [
+          12,
+          21
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 07",
+      "duration": "27m",
+      "location": "Main Location - 07"
+    },
+    {
+      "event": "GS U17",
+      "round": "Round of 32",
+      "header": "GS U17 · Round of 32",
+      "team1": [
+        "Mannat Kaur"
+      ],
+      "team2": [
+        "Ranya Reddy Vookanti"
+      ],
+      "team1Ids": [
+        232
+      ],
+      "team2Ids": [
+        195
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          19,
+          21
+        ],
+        [
+          19,
+          21
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 08",
+      "duration": "29m",
+      "location": "Main Location - 08"
+    },
+    {
+      "event": "GS U17",
+      "round": "Round of 32",
+      "header": "GS U17 · Round of 32",
+      "team1": [
+        "Bhavya Nirmal"
+      ],
+      "team2": [
+        "Diksha Chandrasekaran"
+      ],
+      "team1Ids": [
+        237
+      ],
+      "team2Ids": [
+        13
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          2,
+          21
+        ],
+        [
+          6,
+          21
+        ]
+      ],
+      "time": "8:55 PM",
+      "court": "Main Location - 03",
+      "duration": "31m",
+      "location": "Main Location - 03"
+    },
+    {
+      "event": "BD U11",
+      "round": "Round of 32",
+      "header": "BD U11 · Round of 32",
+      "team1": [
+        "Bhuvan Kolla",
+        "Xintong Lu"
+      ],
+      "team2": [
+        "Avniel Ajit Patankar",
+        "Advith Vihaan Yalagala"
+      ],
+      "team1Ids": [
+        171,
+        234
+      ],
+      "team2Ids": [
+        98,
+        139
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          9,
+          21
+        ],
+        [
+          21,
+          16
+        ],
+        [
+          10,
+          21
+        ]
+      ],
+      "time": "9:20 PM",
+      "court": "Main Location - 14",
+      "duration": "40m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BD U11",
+      "round": "Round of 32",
+      "header": "BD U11 · Round of 32",
+      "team1": [
+        "Ian Chen",
+        "Potter Han Schafer"
+      ],
+      "team2": [
+        "Mathew Thayil",
+        "Barry Xu"
+      ],
+      "team1Ids": [
+        17,
+        109
+      ],
+      "team2Ids": [
+        123,
+        138
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          16
+        ],
+        [
+          21,
+          14
+        ]
+      ],
+      "time": "9:20 PM",
+      "court": "Main Location - 06",
+      "duration": "39m",
+      "location": "Main Location - 06"
+    },
+    {
+      "event": "BD U11",
+      "round": "Round of 32",
+      "header": "BD U11 · Round of 32",
+      "team1": [
+        "Aarush Arun",
+        "Yashveer Daliparthi"
+      ],
+      "team2": [
+        "Kabir Gupta",
+        "Prayaag Suresh"
+      ],
+      "team1Ids": [
+        4,
+        25
+      ],
+      "team2Ids": [
+        167,
+        163
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          18
+        ]
+      ],
+      "time": "9:20 PM",
+      "court": "Main Location - 02",
+      "duration": "32m",
+      "location": "Main Location - 02"
+    },
+    {
+      "event": "BD U11",
+      "round": "Round of 32",
+      "header": "BD U11 · Round of 32",
+      "team1": [
+        "Derek J Hou",
+        "Jesse Lai Liu"
+      ],
+      "team2": [
+        "Jathniel Enoch Reddy Kodamati",
+        "Siraj S L"
+      ],
+      "team1Ids": [
+        44,
+        82
+      ],
+      "team2Ids": [
+        200,
+        155
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          4
+        ]
+      ],
+      "time": "9:20 PM",
+      "court": "Main Location - 04",
+      "duration": "27m",
+      "location": "Main Location - 04"
+    },
+    {
+      "event": "BD U11",
+      "round": "Round of 32",
+      "header": "BD U11 · Round of 32",
+      "team1": [
+        "Shen Hao Lim",
+        "Rayan Shyam"
+      ],
+      "team2": [
+        "Arjun Chada",
+        "Akshay Nainaknti"
+      ],
+      "team1Ids": [
+        76,
+        116
+      ],
+      "team2Ids": [
+        180,
+        190
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          4
+        ]
+      ],
+      "time": "9:20 PM",
+      "court": "Main Location - 09",
+      "duration": "23m",
+      "location": "Main Location - 09"
+    },
+    {
+      "event": "XD U15",
+      "round": "Round of 32",
+      "header": "XD U15 · Round of 32",
+      "team1": [
+        "Shixin Guo",
+        "Dhyuti Aruru"
+      ],
+      "team2": [
+        "Jida Wu",
+        "Neha Murali"
+      ],
+      "team1Ids": [
+        38,
+        6
+      ],
+      "team2Ids": [
+        137,
+        92
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          6,
+          21
+        ],
+        [
+          3,
+          21
+        ]
+      ],
+      "time": "9:20 PM",
+      "court": "Main Location - 03",
+      "duration": "19m",
+      "location": "Main Location - 03"
+    }
+  ]
+}

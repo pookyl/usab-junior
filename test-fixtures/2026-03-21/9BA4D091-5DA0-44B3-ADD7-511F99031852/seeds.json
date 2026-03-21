@@ -1,0 +1,804 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "eventCount": 22,
+  "events": [
+    {
+      "eventId": 22,
+      "eventName": "XD U11 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Harry H Song",
+              "playerId": 118
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Aaditya Lanka",
+              "playerId": 156
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 7,
+      "eventName": "BS U11 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Harry H Song",
+              "playerId": 118
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Ayushmaan Senapati",
+              "playerId": 110
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Tanush Jaltar",
+              "playerId": 53
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Aaditya Lanka",
+              "playerId": 156
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "Shen Hao Lim",
+              "playerId": 76
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "Xintong Lu",
+              "playerId": 234
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "Rayan Shyam",
+              "playerId": 116
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "Tingxin Tan",
+              "playerId": 246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 17,
+      "eventName": "GS U11 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Puah Adalyn",
+              "playerId": 104
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Ariel An",
+              "playerId": 216
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 8,
+      "eventName": "BS U13 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Neel Achari",
+              "playerId": 215
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Avyukth Reddy Pati",
+              "playerId": 160
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Ayaan Kale",
+              "playerId": 61
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Adithya Yeluguri",
+              "playerId": 255
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "Srinivas Shankar",
+              "playerId": 112
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "Ritvik Singh",
+              "playerId": 243
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "Daksh Thakur",
+              "playerId": 175
+            }
+          ]
+        },
+        {
+          "seed": "5/8",
+          "players": [
+            {
+              "name": "David Zhang",
+              "playerId": 147
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 18,
+      "eventName": "GS U13 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Kavya Balaji",
+              "playerId": 8
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Eesha Vikram",
+              "playerId": 131
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Emily Feng",
+              "playerId": 28
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Riana Soprala",
+              "playerId": 162
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 9,
+      "eventName": "BS U15 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Varish Karri",
+              "playerId": 65
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Aayush Jaladurgam",
+              "playerId": 52
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Vishaant Harish",
+              "playerId": 42
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Jida Wu",
+              "playerId": 137
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 19,
+      "eventName": "GS U15 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Claire QiuChen Li",
+              "playerId": 233
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Shaoyao Luo",
+              "playerId": 84
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Mrugakshi Kulkarni",
+              "playerId": 187
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Chingpei Lin",
+              "playerId": 78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 10,
+      "eventName": "BS U17 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Aarya Vijay",
+              "playerId": 194
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Abhiram Tripuraneni",
+              "playerId": 209
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Varin Karri",
+              "playerId": 64
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Bhavesh Sai Varma Tammu",
+              "playerId": 207
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 20,
+      "eventName": "GS U17 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Shraddha Prakash",
+              "playerId": 101
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Mihika Jaiswal",
+              "playerId": 183
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Haziqa H Mathani",
+              "playerId": 158
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Tatthva Sharma",
+              "playerId": 242
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 11,
+      "eventName": "BS U19 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Srinivas Raghav Subash",
+              "playerId": 206
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Hanyi Zhang",
+              "playerId": 149
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 2,
+      "eventName": "BD U11 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Avyukth Reddy Pati",
+              "playerId": 160
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Srinivas Shankar",
+              "playerId": 112
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Neel Achari",
+              "playerId": 215
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Aaditya Lanka",
+              "playerId": 156
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 12,
+      "eventName": "GD U11 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Ariel An",
+              "playerId": 216
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Puah Adalyn",
+              "playerId": 104
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 23,
+      "eventName": "XD U13 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Neel Achari",
+              "playerId": 215
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Amogh Lanka",
+              "playerId": 157
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Franklin Xu Cheng",
+              "playerId": 19
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "David Zhang",
+              "playerId": 147
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 3,
+      "eventName": "BD U13 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Fonghong Lin",
+              "playerId": 80
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Reyansh Chalamalasetti",
+              "playerId": 12
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Reo Qian Bao",
+              "playerId": 9
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Ayaan Kale",
+              "playerId": 61
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 13,
+      "eventName": "GD U13 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Claire QiuChen Li",
+              "playerId": 233
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Riana Soprala",
+              "playerId": 162
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 24,
+      "eventName": "XD U15 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Aayush Jaladurgam",
+              "playerId": 52
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Zmy Gao",
+              "playerId": 33
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Liam Xiao",
+              "playerId": 253
+            }
+          ]
+        },
+        {
+          "seed": "3/4",
+          "players": [
+            {
+              "name": "Yeewei Yap",
+              "playerId": 143
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 4,
+      "eventName": "BD U15 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Varish Karri",
+              "playerId": 65
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Jida Wu",
+              "playerId": 137
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 14,
+      "eventName": "GD U15 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Tanvi Gaddam",
+              "playerId": 31
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Ava Ilena Raju Cimala",
+              "playerId": 24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 1,
+      "eventName": "XD U17 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Aarya Vijay",
+              "playerId": 194
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Marzuq Mathani",
+              "playerId": 159
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 5,
+      "eventName": "BD U17 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Carsten Lam",
+              "playerId": 212
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Niranjan Manjith",
+              "playerId": 87
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 15,
+      "eventName": "GD U17 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Diksha Chandrasekaran",
+              "playerId": 13
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Charvi Murali",
+              "playerId": 91
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventId": 6,
+      "eventName": "BD U19 - Main Draw",
+      "seeds": [
+        {
+          "seed": "1",
+          "players": [
+            {
+              "name": "Hudson Abidin",
+              "playerId": 1
+            }
+          ]
+        },
+        {
+          "seed": "2",
+          "players": [
+            {
+              "name": "Adhyaan Balaji",
+              "playerId": 7
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

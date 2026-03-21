@@ -1,0 +1,138 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "eventId": 6,
+  "eventName": "BD U19",
+  "entriesCount": 8,
+  "draws": [
+    {
+      "drawId": 32,
+      "name": "BD U19",
+      "size": 4,
+      "type": "Elimination",
+      "qualification": "No",
+      "consolation": null
+    },
+    {
+      "drawId": 30,
+      "name": "Group A",
+      "size": 3,
+      "type": "Round Robin",
+      "qualification": "Yes",
+      "consolation": null
+    },
+    {
+      "drawId": 31,
+      "name": "Group B",
+      "size": 3,
+      "type": "Round Robin",
+      "qualification": "Yes",
+      "consolation": null
+    }
+  ],
+  "entries": [
+    {
+      "entryType": "Maindraw",
+      "seed": "1",
+      "players": [
+        {
+          "name": "Hudson Abidin",
+          "playerId": 1
+        },
+        {
+          "name": "Hanyi Zhang",
+          "playerId": 149
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "2",
+      "players": [
+        {
+          "name": "Adhyaan Balaji",
+          "playerId": 7
+        },
+        {
+          "name": "Varin Karri",
+          "playerId": 64
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Afraz Muhammed Baig",
+          "playerId": 178
+        },
+        {
+          "name": "Ayaaz Muhammed Baig",
+          "playerId": 179
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Sanjay Chellamuthu",
+          "playerId": 15
+        },
+        {
+          "name": "Pranavsai Pitchuka",
+          "playerId": 204
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vishwwa Sirigineedi",
+          "playerId": 205
+        },
+        {
+          "name": "Kyson Tu",
+          "playerId": 127
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Srinivas Raghav Subash",
+          "playerId": 206
+        },
+        {
+          "name": "Aarya Vijay",
+          "playerId": 194
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Tarakeshwar Madhana Sundar",
+          "playerId": 188
+        }
+      ]
+    },
+    {
+      "entryType": "Exclude list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Anirudh Sai Maruth Palaparty",
+          "playerId": 202
+        }
+      ]
+    }
+  ]
+}

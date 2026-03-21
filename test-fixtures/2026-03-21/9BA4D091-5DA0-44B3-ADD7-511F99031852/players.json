@@ -1,0 +1,1186 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "playerCount": 236,
+  "players": [
+    {
+      "playerId": 164,
+      "name": "Diya Abbineni",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 1,
+      "name": "Hudson Abidin",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 215,
+      "name": "Neel Achari",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 3,
+      "name": "Amey P Ahinave",
+      "club": "MOMN [MOMN]"
+    },
+    {
+      "playerId": 216,
+      "name": "Ariel An",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 217,
+      "name": "Dhayal Krishna Anish",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 4,
+      "name": "Aarush Arun",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 6,
+      "name": "Dhyuti Aruru",
+      "club": "TOPS [TOPS]"
+    },
+    {
+      "playerId": 178,
+      "name": "Afraz Muhammed Baig",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 179,
+      "name": "Ayaaz Muhammed Baig",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 7,
+      "name": "Adhyaan Balaji",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 8,
+      "name": "Kavya Balaji",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 218,
+      "name": "Vedant Bansal",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 9,
+      "name": "Reo Qian Bao",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 10,
+      "name": "Meera Bhalekar",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 180,
+      "name": "Arjun Chada",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 11,
+      "name": "Vivaan Chada",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 12,
+      "name": "Reyansh Chalamalasetti",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 219,
+      "name": "Rudransh Chalamalasetti",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 181,
+      "name": "Sarah Chandrasekar",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 13,
+      "name": "Diksha Chandrasekaran",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 14,
+      "name": "Vignan Chandrasekaran",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 15,
+      "name": "Sanjay Chellamuthu",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 16,
+      "name": "Brooklyn Chen",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 17,
+      "name": "Ian Chen",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 18,
+      "name": "Kyle Chen",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 165,
+      "name": "Naomi Chen",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 20,
+      "name": "Travin Cheng",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 21,
+      "name": "Travis Cheng",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 19,
+      "name": "Franklin Xu Cheng",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 182,
+      "name": "Sreevishnu Teja Chennapragada",
+      "club": "TOPS [TOPS]"
+    },
+    {
+      "playerId": 220,
+      "name": "Sudeep Reddy Chintamreddy",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 22,
+      "name": "Aashritha Chintireddy",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 24,
+      "name": "Ava Ilena Raju Cimala",
+      "club": "ABA [ABA]"
+    },
+    {
+      "playerId": 25,
+      "name": "Yashveer Daliparthi",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 152,
+      "name": "Eli Darmawan",
+      "club": "NGB [NGB]"
+    },
+    {
+      "playerId": 221,
+      "name": "Vaishavie Dhivakar",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 26,
+      "name": "Abigail Tran Duong",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 27,
+      "name": "Rithvik Enugonda",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 28,
+      "name": "Emily Feng",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 29,
+      "name": "Jiahao Fu",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 30,
+      "name": "Aayansh Gaddam",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 31,
+      "name": "Tanvi Gaddam",
+      "club": "TOPS [TOPS]"
+    },
+    {
+      "playerId": 210,
+      "name": "Tanush Manikanta Gadde",
+      "club": "USA Badminton [USAB]"
+    },
+    {
+      "playerId": 211,
+      "name": "Tanvisri Gadde",
+      "club": "DFW [DFW]"
+    },
+    {
+      "playerId": 166,
+      "name": "Nihal Reddy Gajjala",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 222,
+      "name": "Akshara Ganesh",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 32,
+      "name": "Amy Gao",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 33,
+      "name": "Zmy Gao",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 153,
+      "name": "Anika Gattoju",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 154,
+      "name": "Avyaan Krishna Gattoju",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 223,
+      "name": "Reyansh Ghai",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 224,
+      "name": "Virinchi Gorrela",
+      "club": "NWA [NWA]"
+    },
+    {
+      "playerId": 35,
+      "name": "Prisha Tushar Govani",
+      "club": "Triangle Badminton Club [TBA]"
+    },
+    {
+      "playerId": 197,
+      "name": "Aryav Goyal",
+      "club": "USA Badminton [USAB]"
+    },
+    {
+      "playerId": 36,
+      "name": "Jordon Y Guan",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 198,
+      "name": "Sritha Gundala",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 37,
+      "name": "Jingyang Guo",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 38,
+      "name": "Shixin Guo",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 39,
+      "name": "Aashi Gupta",
+      "club": "Velocity Badminton [VBA]"
+    },
+    {
+      "playerId": 167,
+      "name": "Kabir Gupta",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 225,
+      "name": "Udbhav H Ram",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 41,
+      "name": "Yize Han",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 226,
+      "name": "Divith Pradeep Handral",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 168,
+      "name": "Arjun Aditya Hariharan",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 42,
+      "name": "Vishaant Harish",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 43,
+      "name": "Esther He",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 45,
+      "name": "Olivia Hou",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 44,
+      "name": "Derek J Hou",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 46,
+      "name": "Casper Hsu",
+      "club": "NEXUS [NXBC]"
+    },
+    {
+      "playerId": 47,
+      "name": "Conner Hsu",
+      "club": "NEXUS [NXBC]"
+    },
+    {
+      "playerId": 48,
+      "name": "Winston Hsu",
+      "club": "NEXUS [NXBC]"
+    },
+    {
+      "playerId": 227,
+      "name": "Pranav Iyer",
+      "club": "Triangle Badminton Club [TBA]"
+    },
+    {
+      "playerId": 228,
+      "name": "Arham Jain",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 49,
+      "name": "Mysha Jain",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 183,
+      "name": "Mihika Jaiswal",
+      "club": "Velocity Badminton [VBA]"
+    },
+    {
+      "playerId": 51,
+      "name": "Jyoshika Jakkula",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 50,
+      "name": "Akul Arjun Jakkula",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 52,
+      "name": "Aayush Jaladurgam",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 229,
+      "name": "Aayush Jaltar",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 53,
+      "name": "Tanush Jaltar",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 54,
+      "name": "Manvi Jandhyala",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 184,
+      "name": "Tanvi Jandhyala",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 56,
+      "name": "Isaac Joseph",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 55,
+      "name": "Emmanuel Thomas Joseph",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 57,
+      "name": "Devanshi Joshi",
+      "club": "DFW [DFW]"
+    },
+    {
+      "playerId": 58,
+      "name": "Yashasvi Joshi",
+      "club": "DFW [DFW]"
+    },
+    {
+      "playerId": 59,
+      "name": "Eeshani Devasena Josyula",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 60,
+      "name": "Rahul Kashyap Josyula",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 169,
+      "name": "Aadyot Kadavala",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 61,
+      "name": "Ayaan Kale",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 185,
+      "name": "Saipranav Kalla",
+      "club": "Triangle Badminton Club [TBA]"
+    },
+    {
+      "playerId": 62,
+      "name": "Vedhanth Kumar Kanthala",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 63,
+      "name": "Tanvika Kantipudi",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 186,
+      "name": "Riyan Karanth",
+      "club": "Triangle Badminton Club [TBA]"
+    },
+    {
+      "playerId": 199,
+      "name": "Vidushi Karn",
+      "club": "N/A"
+    },
+    {
+      "playerId": 230,
+      "name": "Advith Karnam",
+      "club": "Elite Sports [ESC]"
+    },
+    {
+      "playerId": 64,
+      "name": "Varin Karri",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 65,
+      "name": "Varish Karri",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 66,
+      "name": "Vihaan Karthick",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 231,
+      "name": "Anika R Katepalli",
+      "club": "Elite Sports [ESC]"
+    },
+    {
+      "playerId": 67,
+      "name": "Manas Kathuria",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 232,
+      "name": "Mannat Kaur",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 68,
+      "name": "Vidhu Reddy Keesara",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 69,
+      "name": "Vihaa Reddy Keesara",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 70,
+      "name": "Arohi Khandelwal",
+      "club": "Velocity Badminton [VBA]"
+    },
+    {
+      "playerId": 200,
+      "name": "Jathniel Enoch Reddy Kodamati",
+      "club": "MOMN [MOMN]"
+    },
+    {
+      "playerId": 171,
+      "name": "Bhuvan Kolla",
+      "club": "Triangle Badminton Club [TBA]"
+    },
+    {
+      "playerId": 71,
+      "name": "Venkata Sai Sreekar Kondamuri",
+      "club": "Elite Sports [ESC]"
+    },
+    {
+      "playerId": 187,
+      "name": "Mrugakshi Kulkarni",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 72,
+      "name": "Ananya Kumar",
+      "club": "NEXUS [NXBC]"
+    },
+    {
+      "playerId": 155,
+      "name": "Siraj S L",
+      "club": "MOMN [MOMN]"
+    },
+    {
+      "playerId": 212,
+      "name": "Carsten Lam",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 201,
+      "name": "Charity Lam",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 73,
+      "name": "Allen Lan",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 156,
+      "name": "Aaditya Lanka",
+      "club": "ABA [ABA]"
+    },
+    {
+      "playerId": 157,
+      "name": "Amogh Lanka",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 74,
+      "name": "Seungwoo Lee",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 233,
+      "name": "Claire QiuChen Li",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 76,
+      "name": "Shen Hao Lim",
+      "club": "USA Badminton [USAB]"
+    },
+    {
+      "playerId": 78,
+      "name": "Chingpei Lin",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 80,
+      "name": "Fonghong Lin",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 81,
+      "name": "Fiona Liu",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 172,
+      "name": "Mingyang Liu",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 82,
+      "name": "Jesse Lai Liu",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 83,
+      "name": "Aarav Lokesh Kumar",
+      "club": "DFW [DFW]"
+    },
+    {
+      "playerId": 234,
+      "name": "Xintong Lu",
+      "club": "New Jersey Badminton Club [NJBC]"
+    },
+    {
+      "playerId": 84,
+      "name": "Shaoyao Luo",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 85,
+      "name": "Pragathi Maadawada",
+      "club": "NEXUS [NXBC]"
+    },
+    {
+      "playerId": 86,
+      "name": "Shaurya Maddela",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 188,
+      "name": "Tarakeshwar Madhana Sundar",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 213,
+      "name": "Aaryan Mallam",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 214,
+      "name": "Rishvik Mallam",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 235,
+      "name": "Gourangna Manchikanti",
+      "club": "Velocity Badminton [VBA]"
+    },
+    {
+      "playerId": 87,
+      "name": "Niranjan Manjith",
+      "club": "ABA [ABA]"
+    },
+    {
+      "playerId": 88,
+      "name": "Elizabeth Sarah Mark",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 89,
+      "name": "Hasini Mateti",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 159,
+      "name": "Marzuq Mathani",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 158,
+      "name": "Haziqa H Mathani",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 90,
+      "name": "Ashni Mathure",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 91,
+      "name": "Charvi Murali",
+      "club": "ABA [ABA]"
+    },
+    {
+      "playerId": 92,
+      "name": "Neha Murali",
+      "club": "ABA [ABA]"
+    },
+    {
+      "playerId": 93,
+      "name": "Aarav Muthu Rajavel",
+      "club": "ATLA [ATLA]"
+    },
+    {
+      "playerId": 190,
+      "name": "Akshay Nainaknti",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 236,
+      "name": "Anish Sai Narasani",
+      "club": "DFW [DFW]"
+    },
+    {
+      "playerId": 94,
+      "name": "Duc Huy Nguyen",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 237,
+      "name": "Bhavya Nirmal",
+      "club": "Velocity Badminton [VBA]"
+    },
+    {
+      "playerId": 95,
+      "name": "Aaron Thomas Nitish",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 202,
+      "name": "Anirudh Sai Maruth Palaparty",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 238,
+      "name": "Deetya Palla",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 96,
+      "name": "Darmikh Pallabothula",
+      "club": "DFW [DFW]"
+    },
+    {
+      "playerId": 203,
+      "name": "Akshay Kumar Pallam Reddy",
+      "club": "USA Badminton [USAB]"
+    },
+    {
+      "playerId": 97,
+      "name": "Aadithya Pranav Pamarthi",
+      "club": "USA Badminton [USAB]"
+    },
+    {
+      "playerId": 98,
+      "name": "Avniel Ajit Patankar",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 160,
+      "name": "Avyukth Reddy Pati",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 204,
+      "name": "Pranavsai Pitchuka",
+      "club": "USA Badminton [USAB]"
+    },
+    {
+      "playerId": 173,
+      "name": "Akshath Potnuru",
+      "club": "ABA [ABA]"
+    },
+    {
+      "playerId": 174,
+      "name": "Gowri Ashrita Potnuru",
+      "club": "TOPS [TOPS]"
+    },
+    {
+      "playerId": 99,
+      "name": "Ramatejas Prabhala",
+      "club": "Velocity Badminton [VBA]"
+    },
+    {
+      "playerId": 100,
+      "name": "Ishan Ramachandra Prakash",
+      "club": "TOPS [TOPS]"
+    },
+    {
+      "playerId": 239,
+      "name": "Samhitha Prakash",
+      "club": "N/A"
+    },
+    {
+      "playerId": 101,
+      "name": "Shraddha Prakash",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 102,
+      "name": "Skandha Prakash",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 103,
+      "name": "Vibhu Ramachandra Prakash",
+      "club": "TOPS [TOPS]"
+    },
+    {
+      "playerId": 104,
+      "name": "Puah Adalyn",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 105,
+      "name": "Darlene Axella Purwanto",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 240,
+      "name": "Matthew Qiu",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 108,
+      "name": "Soudamini Reddy",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 107,
+      "name": "Neel J Reddy",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 241,
+      "name": "Sarthak Saha",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 245,
+      "name": "Dev Charan Saravanan Devaraj",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 109,
+      "name": "Potter Han Schafer",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 110,
+      "name": "Ayushmaan Senapati",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 111,
+      "name": "Sashanth Senthil",
+      "club": "ABA [ABA]"
+    },
+    {
+      "playerId": 161,
+      "name": "Chaturveda Samhitha Shanigaram",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 112,
+      "name": "Srinivas Shankar",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 113,
+      "name": "Zi Chen Shao",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 114,
+      "name": "Meher Sharma",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 242,
+      "name": "Tatthva Sharma",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 115,
+      "name": "Vedant Shukla",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 116,
+      "name": "Rayan Shyam",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 243,
+      "name": "Ritvik Singh",
+      "club": "Fortius [FBC]"
+    },
+    {
+      "playerId": 244,
+      "name": "Andrew Sinyushkin",
+      "club": "Capital Badminton Academy [CBA]"
+    },
+    {
+      "playerId": 205,
+      "name": "Vishwwa Sirigineedi",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 117,
+      "name": "Shanaya Sirsgi",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 118,
+      "name": "Harry H Song",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 162,
+      "name": "Riana Soprala",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 206,
+      "name": "Srinivas Raghav Subash",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 163,
+      "name": "Prayaag Suresh",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 121,
+      "name": "Samiksh Talapally",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 207,
+      "name": "Bhavesh Sai Varma Tammu",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 246,
+      "name": "Tingxin Tan",
+      "club": "Midwest Badminton Club[MBC]"
+    },
+    {
+      "playerId": 122,
+      "name": "Chaarvi Telikuntla",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 175,
+      "name": "Daksh Thakur",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 247,
+      "name": "Harshit Thavidishetty",
+      "club": "ABC [ABC]"
+    },
+    {
+      "playerId": 123,
+      "name": "Mathew Thayil",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 124,
+      "name": "Philip Thayil",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 125,
+      "name": "Varshini Thirupathi Pandiaraj",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 208,
+      "name": "Vedin Thota",
+      "club": "TOPS [TOPS]"
+    },
+    {
+      "playerId": 126,
+      "name": "Sanjana Thouda",
+      "club": "Vistara Sports [VSBA]"
+    },
+    {
+      "playerId": 209,
+      "name": "Abhiram Tripuraneni",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 127,
+      "name": "Kyson Tu",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 176,
+      "name": "Aakash Unnikrishnan",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 177,
+      "name": "Jashwanth Vaddempudi",
+      "club": "USA Badminton [USAB]"
+    },
+    {
+      "playerId": 248,
+      "name": "Aadhya Vankayala",
+      "club": "N/A"
+    },
+    {
+      "playerId": 128,
+      "name": "Samara Vakula Varasala",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 129,
+      "name": "Gautam Vasanth Raj",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 249,
+      "name": "Sri Lahari Vemulapati",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 194,
+      "name": "Aarya Vijay",
+      "club": "Frisco Badminton Academy [FBA]"
+    },
+    {
+      "playerId": 130,
+      "name": "Diya Vikram",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 131,
+      "name": "Eesha Vikram",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 195,
+      "name": "Ranya Reddy Vookanti",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 132,
+      "name": "Sahasra Vudum",
+      "club": "Austin Badminton Academy [AUBA]"
+    },
+    {
+      "playerId": 250,
+      "name": "Allen Wang",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 252,
+      "name": "Ivy Wang",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 133,
+      "name": "Kason Wang",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 134,
+      "name": "Rachel Wang",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 135,
+      "name": "Richard Wang",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 251,
+      "name": "Charlie Hanke Wang",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 136,
+      "name": "Amber Wu",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 137,
+      "name": "Jida Wu",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 253,
+      "name": "Liam Xiao",
+      "club": "New Jersey Badminton Club [NJBC]"
+    },
+    {
+      "playerId": 138,
+      "name": "Barry Xu",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    },
+    {
+      "playerId": 254,
+      "name": "Abhinav Yadagiri",
+      "club": "Fortius [FBC]"
+    },
+    {
+      "playerId": 139,
+      "name": "Advith Vihaan Yalagala",
+      "club": "Triangle Badminton Club [TBA]"
+    },
+    {
+      "playerId": 141,
+      "name": "Jeffrey Yan",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 142,
+      "name": "Kathy Yan",
+      "club": "Houston Badminton Academy [HBA]"
+    },
+    {
+      "playerId": 143,
+      "name": "Yeewei Yap",
+      "club": "Mckinney Badminton Club [MKBC]"
+    },
+    {
+      "playerId": 255,
+      "name": "Adithya Yeluguri",
+      "club": "Fortius [FBC]"
+    },
+    {
+      "playerId": 144,
+      "name": "Ethan Yin",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 145,
+      "name": "Harshith Yoganand",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 146,
+      "name": "Jonathan Yu",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 147,
+      "name": "David Zhang",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 148,
+      "name": "Ella Zhang",
+      "club": "Schafer Badminton Academy[SCHBA]"
+    },
+    {
+      "playerId": 149,
+      "name": "Hanyi Zhang",
+      "club": "Plano Badminton Center[PBC]"
+    },
+    {
+      "playerId": 150,
+      "name": "Mathew Zhu",
+      "club": "Twin Tiger Badminton Academy [TTBA]"
+    }
+  ]
+}

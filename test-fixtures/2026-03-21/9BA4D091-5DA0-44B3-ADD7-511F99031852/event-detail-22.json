@@ -1,0 +1,280 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "eventId": 22,
+  "eventName": "XD U11",
+  "entriesCount": 21,
+  "draws": [
+    {
+      "drawId": 3,
+      "name": "XD U11",
+      "size": 16,
+      "type": "Elimination",
+      "qualification": "No",
+      "consolation": null
+    }
+  ],
+  "entries": [
+    {
+      "entryType": "Maindraw",
+      "seed": "1",
+      "players": [
+        {
+          "name": "Harry H Song",
+          "playerId": 118
+        },
+        {
+          "name": "Puah Adalyn",
+          "playerId": 104
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "2",
+      "players": [
+        {
+          "name": "Aaditya Lanka",
+          "playerId": 156
+        },
+        {
+          "name": "Sahasra Vudum",
+          "playerId": 132
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Dhayal Krishna Anish",
+          "playerId": 217
+        },
+        {
+          "name": "Elizabeth Sarah Mark",
+          "playerId": 88
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Aarush Arun",
+          "playerId": 4
+        },
+        {
+          "name": "Diya Vikram",
+          "playerId": 130
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Rudransh Chalamalasetti",
+          "playerId": 219
+        },
+        {
+          "name": "Vaishavie Dhivakar",
+          "playerId": 221
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Avyaan Krishna Gattoju",
+          "playerId": 154
+        },
+        {
+          "name": "Akshara Ganesh",
+          "playerId": 222
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Derek J Hou",
+          "playerId": 44
+        },
+        {
+          "name": "Rachel Wang",
+          "playerId": 134
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Tanush Jaltar",
+          "playerId": 53
+        },
+        {
+          "name": "Samara Vakula Varasala",
+          "playerId": 128
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Skandha Prakash",
+          "playerId": 102
+        },
+        {
+          "name": "Meher Sharma",
+          "playerId": 114
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Potter Han Schafer",
+          "playerId": 109
+        },
+        {
+          "name": "Darlene Axella Purwanto",
+          "playerId": 105
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Ayushmaan Senapati",
+          "playerId": 110
+        },
+        {
+          "name": "Eeshani Devasena Josyula",
+          "playerId": 59
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Tingxin Tan",
+          "playerId": 246
+        },
+        {
+          "name": "Shanaya Sirsgi",
+          "playerId": 117
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Kason Wang",
+          "playerId": 133
+        },
+        {
+          "name": "Meera Bhalekar",
+          "playerId": 10
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Travis Cheng",
+          "playerId": 21
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Yashveer Daliparthi",
+          "playerId": 25
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Rithvik Enugonda",
+          "playerId": 27
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jesse Lai Liu",
+          "playerId": 82
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Xintong Lu",
+          "playerId": 234
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Aaryan Mallam",
+          "playerId": 213
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Mathew Thayil",
+          "playerId": 123
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Barry Xu",
+          "playerId": 138
+        }
+      ]
+    }
+  ]
+}

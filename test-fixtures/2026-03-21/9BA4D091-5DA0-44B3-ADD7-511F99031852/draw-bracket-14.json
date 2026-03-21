@@ -1,0 +1,801 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 14,
+  "drawType": "elimination",
+  "sections": [
+    {
+      "name": "GS U15",
+      "rounds": [
+        "",
+        "Club",
+        "Round 1",
+        "Round 2",
+        "Quarter Finals",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [
+        {
+          "position": 1,
+          "name": "Claire QiuChen Li",
+          "seed": "1",
+          "club": "",
+          "playerId": 233,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 2,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 3,
+          "name": "Dhyuti Aruru",
+          "seed": "",
+          "club": "",
+          "playerId": 6,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 4,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 5,
+          "name": "Anika R Katepalli",
+          "seed": "",
+          "club": "",
+          "playerId": 231,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 6,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 7,
+          "name": "Yashasvi Joshi",
+          "seed": "",
+          "club": "",
+          "playerId": 58,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 8,
+          "name": "Brooklyn Chen",
+          "seed": "",
+          "club": "",
+          "playerId": 16,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 9,
+          "name": "Mrugakshi Kulkarni",
+          "seed": "3/4",
+          "club": "",
+          "playerId": 187,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 10,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 11,
+          "name": "Deetya Palla",
+          "seed": "",
+          "club": "",
+          "playerId": 238,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 12,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 13,
+          "name": "Soudamini Reddy",
+          "seed": "",
+          "club": "",
+          "playerId": 108,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 14,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 15,
+          "name": "Neha Murali",
+          "seed": "",
+          "club": "",
+          "playerId": 92,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 16,
+          "name": "Amber Wu",
+          "seed": "",
+          "club": "",
+          "playerId": 136,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 17,
+          "name": "Kathy Yan",
+          "seed": "",
+          "club": "",
+          "playerId": 142,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 18,
+          "name": "Chaturveda Samhitha Shanigaram",
+          "seed": "",
+          "club": "",
+          "playerId": 161,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 19,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 20,
+          "name": "Pragathi Maadawada",
+          "seed": "",
+          "club": "",
+          "playerId": 85,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 21,
+          "name": "Gowri Ashrita Potnuru",
+          "seed": "",
+          "club": "",
+          "playerId": 174,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 22,
+          "name": "Mysha Jain",
+          "seed": "",
+          "club": "",
+          "playerId": 49,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 23,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 24,
+          "name": "Chingpei Lin",
+          "seed": "3/4",
+          "club": "",
+          "playerId": 78,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 25,
+          "name": "Fiona Liu",
+          "seed": "",
+          "club": "",
+          "playerId": 81,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 26,
+          "name": "Tanvi Gaddam",
+          "seed": "",
+          "club": "",
+          "playerId": 31,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 27,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 28,
+          "name": "Sritha Gundala",
+          "seed": "",
+          "club": "",
+          "playerId": 198,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 29,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 30,
+          "name": "Naomi Chen",
+          "seed": "",
+          "club": "",
+          "playerId": 165,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 31,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 32,
+          "name": "Shaoyao Luo",
+          "seed": "2",
+          "club": "",
+          "playerId": 84,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        }
+      ],
+      "matches": [
+        {
+          "matchId": "5001",
+          "roundLevel": 5,
+          "matchNum": 1,
+          "winner": {
+            "name": "Claire QiuChen Li",
+            "playerId": 233,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4001",
+          "roundLevel": 4,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 12:45 PM"
+        },
+        {
+          "matchId": "5002",
+          "roundLevel": 5,
+          "matchNum": 2,
+          "winner": {
+            "name": "Dhyuti Aruru",
+            "playerId": 6,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3001",
+          "roundLevel": 3,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 5:15 PM"
+        },
+        {
+          "matchId": "5003",
+          "roundLevel": 5,
+          "matchNum": 3,
+          "winner": {
+            "name": "Anika R Katepalli",
+            "playerId": 231,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4002",
+          "roundLevel": 4,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 12:45 PM"
+        },
+        {
+          "matchId": "5004",
+          "roundLevel": 5,
+          "matchNum": 4,
+          "winner": {
+            "name": "Yashasvi Joshi",
+            "playerId": 58,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-7"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5005",
+          "roundLevel": 5,
+          "matchNum": 5,
+          "winner": {
+            "name": "Mrugakshi Kulkarni",
+            "playerId": 187,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4003",
+          "roundLevel": 4,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 12:45 PM"
+        },
+        {
+          "matchId": "5006",
+          "roundLevel": 5,
+          "matchNum": 6,
+          "winner": {
+            "name": "Deetya Palla",
+            "playerId": 238,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3002",
+          "roundLevel": 3,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 4:30 PM"
+        },
+        {
+          "matchId": "5007",
+          "roundLevel": 5,
+          "matchNum": 7,
+          "winner": {
+            "name": "Soudamini Reddy",
+            "playerId": 108,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4004",
+          "roundLevel": 4,
+          "matchNum": 4,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 12:45 PM"
+        },
+        {
+          "matchId": "5008",
+          "roundLevel": 5,
+          "matchNum": 8,
+          "winner": {
+            "name": "Neha Murali",
+            "playerId": 92,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-2",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5009",
+          "roundLevel": 5,
+          "matchNum": 9,
+          "winner": {
+            "name": "Chaturveda Samhitha Shanigaram",
+            "playerId": 161,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-8",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4005",
+          "roundLevel": 4,
+          "matchNum": 5,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 1:00 PM"
+        },
+        {
+          "matchId": "5010",
+          "roundLevel": 5,
+          "matchNum": 10,
+          "winner": {
+            "name": "Pragathi Maadawada",
+            "playerId": 85,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3003",
+          "roundLevel": 3,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 4:30 PM"
+        },
+        {
+          "matchId": "5011",
+          "roundLevel": 5,
+          "matchNum": 11,
+          "winner": {
+            "name": "Gowri Ashrita Potnuru",
+            "playerId": 174,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4006",
+          "roundLevel": 4,
+          "matchNum": 6,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 1:00 PM"
+        },
+        {
+          "matchId": "5012",
+          "roundLevel": 5,
+          "matchNum": 12,
+          "winner": {
+            "name": "Chingpei Lin",
+            "playerId": 78,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5013",
+          "roundLevel": 5,
+          "matchNum": 13,
+          "winner": {
+            "name": "Tanvi Gaddam",
+            "playerId": 31,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "23-21",
+            "21-17"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4007",
+          "roundLevel": 4,
+          "matchNum": 7,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 1:00 PM"
+        },
+        {
+          "matchId": "5014",
+          "roundLevel": 5,
+          "matchNum": 14,
+          "winner": {
+            "name": "Sritha Gundala",
+            "playerId": 198,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3004",
+          "roundLevel": 3,
+          "matchNum": 4,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 4:30 PM"
+        },
+        {
+          "matchId": "5015",
+          "roundLevel": 5,
+          "matchNum": 15,
+          "winner": {
+            "name": "Naomi Chen",
+            "playerId": 165,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4008",
+          "roundLevel": 4,
+          "matchNum": 8,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false,
+          "scheduledTime": "3/21/2026 1:00 PM"
+        },
+        {
+          "matchId": "5016",
+          "roundLevel": 5,
+          "matchNum": 16,
+          "winner": {
+            "name": "Shaoyao Luo",
+            "playerId": 84,
+            "seed": "2",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    },
+    {
+      "name": "GS U15 - Play-off 3/4",
+      "rounds": [
+        "",
+        "Club",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    }
+  ]
+}

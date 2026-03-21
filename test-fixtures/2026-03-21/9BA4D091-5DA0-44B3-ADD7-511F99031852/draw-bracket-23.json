@@ -1,0 +1,157 @@
+{
+  "tswId": "9BA4D091-5DA0-44B3-ADD7-511F99031852",
+  "drawId": 23,
+  "drawType": "round-robin",
+  "groupName": "BS U19 - Group A",
+  "groups": [
+    {
+      "name": "Group A",
+      "drawId": 23,
+      "active": true
+    },
+    {
+      "name": "Group B",
+      "drawId": 24,
+      "active": false
+    },
+    {
+      "name": "BS U19",
+      "drawId": 25,
+      "active": false
+    }
+  ],
+  "standings": [
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Srinivas Raghav Subash",
+          "playerId": 206,
+          "club": "Frisco Badminton Academy [FBA]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": []
+    },
+    {
+      "position": 1,
+      "players": [
+        {
+          "name": "Marzuq Mathani",
+          "playerId": 159,
+          "club": "Plano Badminton Center[PBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": [
+        "W"
+      ]
+    },
+    {
+      "position": 3,
+      "players": [
+        {
+          "name": "Kyson Tu",
+          "playerId": 127,
+          "club": "Plano Badminton Center[PBC]"
+        }
+      ],
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "matchRecord": "0-0",
+      "gameRecord": "0-0",
+      "pointRecord": "0-0",
+      "points": 0,
+      "history": [
+        "L"
+      ]
+    }
+  ],
+  "matches": [
+    {
+      "matchId": "1448",
+      "round": "Round 1",
+      "team1": [
+        {
+          "name": "Kyson Tu",
+          "playerId": 127,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Marzuq Mathani",
+          "playerId": 159,
+          "club": ""
+        }
+      ],
+      "winner": 2,
+      "scores": [],
+      "dateTime": "Sat 3/21/2026 11:00 AM",
+      "retired": false,
+      "walkover": true
+    },
+    {
+      "matchId": "1444",
+      "round": "Round 2",
+      "team1": [
+        {
+          "name": "Srinivas Raghav Subash",
+          "playerId": 206,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Kyson Tu",
+          "playerId": 127,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    },
+    {
+      "matchId": "1447",
+      "round": "Round 3",
+      "team1": [
+        {
+          "name": "Srinivas Raghav Subash",
+          "playerId": 206,
+          "club": ""
+        }
+      ],
+      "team2": [
+        {
+          "name": "Marzuq Mathani",
+          "playerId": 159,
+          "club": ""
+        }
+      ],
+      "winner": null,
+      "scores": [],
+      "dateTime": "",
+      "retired": false,
+      "walkover": false
+    }
+  ]
+}
