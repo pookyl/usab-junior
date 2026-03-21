@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
@@ -10,7 +10,6 @@ import type { TournamentPlayerDetailResponse } from '../types/junior';
 export default function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
   const location = useLocation();
-  const navigate = useNavigate();
   const { playerNameMap, playerIdSet } = usePlayers();
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
@@ -70,7 +69,7 @@ export default function TournamentPlayerDetail() {
       <div className="flex items-center justify-between">
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => window.history.back()}
           className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
         >
           <ArrowLeft className="w-4 h-4" />

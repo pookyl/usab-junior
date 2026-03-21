@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { TournamentFocusProvider, useTournamentFocus } from './contexts/TournamentFocusContext';
+import { WatchlistProvider } from './contexts/WatchlistContext';
 import { rememberTournamentDetailOrigin } from './utils/tournamentReturnState';
 import { isWithinTournamentFocusScope, getLastTournamentPath, setLastTournamentPath } from './utils/tournamentFocus';
 import Home from './pages/Dashboard';
@@ -23,6 +24,7 @@ import TournamentEventsPage from './pages/tournament/TournamentEventsPage';
 import TournamentSeedsPage from './pages/tournament/TournamentSeedsPage';
 import TournamentWinnersPage from './pages/tournament/TournamentWinnersPage';
 import TournamentMedalsPage from './pages/tournament/TournamentMedalsPage';
+import TournamentWatchlistPage from './pages/tournament/TournamentWatchlistPage';
 import TournamentEventDetail from './pages/TournamentEventDetail';
 
 class ErrorBoundary extends Component<
@@ -139,6 +141,7 @@ const ROUTE_PATTERNS = [
   '/tournaments/:tswId/seeds',
   '/tournaments/:tswId/winners',
   '/tournaments/:tswId/medals',
+  '/tournaments/:tswId/watchlist',
   '/tournaments/:tswId',
   '/directory/:id',
   '/players/:id',
@@ -162,6 +165,7 @@ export default function App() {
         <BrowserRouter>
           <PlayersProvider>
             <TournamentFocusProvider>
+              <WatchlistProvider>
               <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
                 <AnalyticsWithRoutes />
                 <ScrollManager />
@@ -187,6 +191,7 @@ export default function App() {
                     <Route path="/tournaments/:tswId/seeds" element={<TournamentSeedsPage />} />
                     <Route path="/tournaments/:tswId/winners" element={<TournamentWinnersPage />} />
                     <Route path="/tournaments/:tswId/medals" element={<TournamentMedalsPage />} />
+                    <Route path="/tournaments/:tswId/watchlist" element={<TournamentWatchlistPage />} />
                     <Route path="/tournaments/:tswId/event/:eventId" element={<TournamentEventDetail />} />
                     <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
                     <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
@@ -194,6 +199,7 @@ export default function App() {
                   </Routes>
                 </main>
               </div>
+            </WatchlistProvider>
             </TournamentFocusProvider>
           </PlayersProvider>
         </BrowserRouter>

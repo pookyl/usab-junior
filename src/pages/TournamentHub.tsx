@@ -2,7 +2,7 @@ import { useParams, useSearchParams, Link, Navigate, useNavigate } from 'react-r
 import { track } from '@vercel/analytics';
 import {
   ArrowLeft, ExternalLink,
-  Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal,
+  Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal, Eye,
 } from 'lucide-react';
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
@@ -133,6 +133,30 @@ export default function TournamentHub() {
           </button>
         </div>
       </div>
+
+      {/* Watchlist — only in tournament mode, above section grid */}
+      {isFocusedTournament && (
+        <Link
+          to={`/tournaments/${tswId}/watchlist`}
+          state={{ name: meta.name, hostClub: meta.hostClub, startDate: meta.startDate, endDate: meta.endDate }}
+          onClick={() => {
+            track('tournament_section_click', {
+              releaseVersion,
+              tournamentId: tswId,
+              section: 'watchlist',
+            });
+          }}
+          className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 hover:border-amber-300 dark:hover:border-amber-600 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+        >
+          <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition-colors shrink-0">
+            <Eye className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Watchlist</span>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Track selected players and their match results</p>
+          </div>
+        </Link>
+      )}
 
       {/* Section pills grid */}
       <div className="grid grid-cols-3 sm:grid-cols-7 gap-3">

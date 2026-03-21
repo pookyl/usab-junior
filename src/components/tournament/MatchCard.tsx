@@ -97,6 +97,7 @@ export default function MatchCard({
   fromPath,
   highlightPlayerId,
   highlightPlayerName,
+  internalMatch,
 }: {
   match: TournamentMatch;
   date?: string;
@@ -104,6 +105,7 @@ export default function MatchCard({
   fromPath?: string;
   highlightPlayerId?: number;
   highlightPlayerName?: string;
+  internalMatch?: boolean;
 }) {
   const t1Scores = match.scores.map(g => g[0]);
   const t2Scores = match.scores.map(g => g[1]);
@@ -138,17 +140,21 @@ export default function MatchCard({
     <div className={`rounded-xl border overflow-hidden hover:shadow-md transition-shadow ${
       isNowPlaying
         ? 'border-sky-200 dark:border-sky-800/70 bg-white dark:bg-slate-900'
-        : highlightedWon
-          ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 border-l-[3px] border-l-emerald-500'
-          : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
+        : internalMatch
+          ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 border-l-[3px] border-l-amber-500'
+          : highlightedWon
+            ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 border-l-[3px] border-l-emerald-500'
+            : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
     }`}>
       <div
         className={`px-4 py-2 rounded-t-xl ${
           isNowPlaying
             ? 'bg-sky-100 dark:bg-sky-900/30'
-            : highlightedWon
-              ? 'bg-emerald-100/60 dark:bg-emerald-900/30'
-              : 'bg-slate-200/70 dark:bg-slate-800/60'
+            : internalMatch
+              ? 'bg-amber-100/60 dark:bg-amber-900/30'
+              : highlightedWon
+                ? 'bg-emerald-100/60 dark:bg-emerald-900/30'
+                : 'bg-slate-200/70 dark:bg-slate-800/60'
         }`}
       >
         <div className="flex items-center justify-between gap-2">
@@ -208,16 +214,20 @@ export default function MatchCard({
         )}
       </div>
 
-      <div className="px-4 py-2 flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800">
+      <div className={`px-4 py-2 flex items-center gap-3 text-[11px] border-t ${
+        isNowPlaying
+          ? 'text-sky-700 dark:text-sky-300 font-semibold border-sky-100 dark:border-sky-800/50'
+          : 'text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-800'
+      }`}>
         {(date || match.time) && (
           <span className="flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
+            <Calendar className={`w-3 h-3 ${isNowPlaying ? 'text-sky-500' : ''}`} />
             {[date, match.time].filter(Boolean).join(' ')}
           </span>
         )}
         {match.location && (
           <span className="flex items-center gap-1">
-            <MapPin className="w-3 h-3" />
+            <MapPin className={`w-3 h-3 ${isNowPlaying ? 'text-sky-500' : ''}`} />
             {match.location}
           </span>
         )}
