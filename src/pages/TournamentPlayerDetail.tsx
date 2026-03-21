@@ -144,7 +144,7 @@ export default function TournamentPlayerDetail() {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
               >
                 <ExternalLink className="w-3 h-3" />
-                TournamentSoftware
+                TSW
               </a>
               {resolvedUsabId && (
                 <Link
