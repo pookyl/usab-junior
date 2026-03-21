@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 const TRANSITION_MS = 220;
+const SESSION_KEY = 'tournament-focus-tswId';
 
 interface TournamentFocusContextValue {
   isActive: boolean;
@@ -16,9 +17,20 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+function readPersistedTswId(): string | null {
+  try { return sessionStorage.getItem(SESSION_KEY); } catch { return null; }
+}
+
+function persistTswId(tswId: string | null) {
+  try {
+    if (tswId) sessionStorage.setItem(SESSION_KEY, tswId);
+    else sessionStorage.removeItem(SESSION_KEY);
+  } catch { /* storage unavailable */ }
+}
+
 export function TournamentFocusProvider({ children }: { children: ReactNode }) {
-  const [isActive, setIsActive] = useState(false);
-  const [activeTswId, setActiveTswId] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(() => readPersistedTswId() !== null);
+  const [activeTswId, setActiveTswId] = useState<string | null>(() => readPersistedTswId());
   const [isTransitioning, setIsTransitioning] = useState(false);
   const transitionTimerRef = useRef<number | null>(null);
 
@@ -46,12 +58,14 @@ export function TournamentFocusProvider({ children }: { children: ReactNode }) {
     if (!tswId) return;
     setActiveTswId(tswId);
     setIsActive(true);
+    persistTswId(tswId);
     triggerTransition();
   }, [triggerTransition]);
 
   const exitMode = useCallback(() => {
     setIsActive(false);
     setActiveTswId(null);
+    persistTswId(null);
     triggerTransition();
   }, [triggerTransition]);
 
