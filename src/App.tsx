@@ -8,7 +8,7 @@ import { PlayersProvider } from './contexts/PlayersContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { TournamentFocusProvider, useTournamentFocus } from './contexts/TournamentFocusContext';
 import { rememberTournamentDetailOrigin } from './utils/tournamentReturnState';
-import { isWithinTournamentFocusScope } from './utils/tournamentFocus';
+import { isWithinTournamentFocusScope, getLastTournamentPath, setLastTournamentPath } from './utils/tournamentFocus';
 import Home from './pages/Dashboard';
 import Rankings from './pages/Players';
 import AllPlayers from './pages/AllPlayers';
@@ -91,8 +91,14 @@ function TournamentFocusAutoExit() {
       return;
     }
 
+    const basePath = `/tournaments/${activeTswId}`;
+    if (pathname === basePath || pathname.startsWith(`${basePath}/`)) {
+      setLastTournamentPath(pathname);
+    }
+
     const fromPath = (state as { fromPath?: string } | null)?.fromPath ?? null;
-    if (!isWithinTournamentFocusScope(pathname, activeTswId, fromPath)) {
+    const lastTournamentPath = getLastTournamentPath();
+    if (!isWithinTournamentFocusScope(pathname, activeTswId, fromPath, lastTournamentPath)) {
       exitMode();
     }
   }, [pathname, state, isActive, activeTswId, exitMode]);

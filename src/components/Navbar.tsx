@@ -25,7 +25,8 @@ export default function Navbar() {
   const fromPath = routeState?.fromPath ?? null;
   const isTournamentDetailPath = /^\/tournaments\/[^/]+\/(player|draw|event)\/[^/]+$/.test(location.pathname);
   const shouldKeepOriginNavHighlight = Boolean(
-    isTournamentDetailPath
+    !isTournamentModeActive
+      && isTournamentDetailPath
       && fromPath
       && !fromPath.startsWith('/tournaments/'),
   );

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { clearLastTournamentPath } from '../utils/tournamentFocus';
 
 const TRANSITION_MS = 220;
 const SESSION_KEY = 'tournament-focus-tswId';
@@ -66,6 +67,7 @@ export function TournamentFocusProvider({ children }: { children: ReactNode }) {
     setIsActive(false);
     setActiveTswId(null);
     persistTswId(null);
+    clearLastTournamentPath();
     triggerTransition();
   }, [triggerTransition]);
 
