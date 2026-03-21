@@ -68,27 +68,10 @@ export interface FetchAllPlayersResult {
 let allPlayersCacheResult: FetchAllPlayersResult | null = null;
 
 export function invalidateRankingsCache() {
+  // Date changes should only invalidate rankings-specific payloads.
   allPlayersCache = null;
   allPlayersCacheDate = '';
   allPlayersCacheResult = null;
-  cachedDatesCache = null;
-  tswStatsCache.clear();
-  trendCache.clear();
-  directoryCache = null;
-  tournamentsCache = null;
-  tournamentsCacheSeason = '';
-  tournamentsCacheTs = 0;
-  tournamentDetailCache.clear();
-  tournamentMedalsCache.clear();
-  tournamentEventsCache.clear();
-  tournamentEventDetailCache.clear();
-  tournamentSeedingCache.clear();
-  tournamentWinnersCache.clear();
-  tournamentPlayersCache.clear();
-  tournamentPlayerDetailCache.clear();
-  tournamentMatchDatesCache.clear();
-  tournamentMatchDayCache.clear();
-  drawBracketCache.clear();
 }
 
 // ── Player directory (cumulative across all dates, NOT invalidated on date change)

@@ -15,17 +15,25 @@ export default async function handler(req, res) {
   const cacheKey = `all-players:${date}`;
 
   const cached = getCached(cacheKey);
-  if (cached) return res.setHeader('X-Cache', 'HIT').status(200).json(cached);
+  if (cached) {
+    res.setHeader('X-Cache', 'HIT');
+    res.setHeader('X-Partial', 'false');
+    return res.status(200).json(cached);
+  }
 
   const perDateDisk = await getDiskCachedAllPlayers(date);
   if (perDateDisk) {
     setCache(cacheKey, perDateDisk.players);
-    return res.setHeader('X-Cache', 'DISK').status(200).json(perDateDisk.players);
+    res.setHeader('X-Cache', 'DISK');
+    res.setHeader('X-Partial', 'false');
+    return res.status(200).json(perDateDisk.players);
   }
 
   const fallback = await getDiskCachedAllPlayers();
   if (fallback) {
-    return res.setHeader('X-Cache', 'DISK').status(200).json(fallback.players);
+    res.setHeader('X-Cache', 'DISK');
+    res.setHeader('X-Partial', 'false');
+    return res.status(200).json(fallback.players);
   }
 
   return res.status(503).json({ error: 'No data available' });

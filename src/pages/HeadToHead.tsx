@@ -666,6 +666,7 @@ export default function HeadToHead() {
   const [error, setError] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState<'All' | 'Singles' | 'Doubles' | 'Mixed'>(snap?.filterCat ?? 'All');
   const [expandedRankingKey, setExpandedRankingKey] = useState<string | null>(null);
+  const compareRequestId = useRef(0);
 
   const allDirectoryPool: UniquePlayer[] = useMemo(() => {
     if (directoryPlayers.length === 0) return allPlayers;
@@ -746,6 +747,7 @@ export default function HeadToHead() {
 
   const handleCompare = useCallback(async () => {
     if (!playerA || !playerB) return;
+    const requestId = ++compareRequestId.current;
     track('head_to_head_run', {
       releaseVersion,
       playerAId: playerA.usabId,
@@ -775,6 +777,8 @@ export default function HeadToHead() {
       const statsAVal = statsA.status === 'fulfilled' ? statsA.value : null;
       const statsBVal = statsB.status === 'fulfilled' ? statsB.value : null;
 
+      if (requestId !== compareRequestId.current) return;
+
       setH2hResult(h2hVal);
       setTswStatsA(statsAVal);
       setTswStatsB(statsBVal);
@@ -788,8 +792,10 @@ export default function HeadToHead() {
         });
       }
     } catch {
+      if (requestId !== compareRequestId.current) return;
       setError('Unexpected error. Please try again.');
     } finally {
+      if (requestId !== compareRequestId.current) return;
       setComparing(false);
     }
   }, [playerA, playerB, ageGroup, gender, releaseVersion]);

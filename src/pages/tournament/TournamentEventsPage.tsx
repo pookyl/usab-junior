@@ -11,7 +11,7 @@ export default function TournamentEventsPage() {
 
   return (
     <SubPageLayout title="Events" icon={CalendarDays} onRefresh={() => setRefreshTrigger(n => n + 1)}>
-      <EventsTab tswId={tswId} active refreshTrigger={refreshTrigger} />
+      <EventsTab key={tswId} tswId={tswId} active refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );
 }

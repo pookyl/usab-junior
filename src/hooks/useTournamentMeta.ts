@@ -45,7 +45,9 @@ export function useTournamentMeta(tswId: string | undefined): TournamentMeta {
           });
         }
       })
-      .catch(() => {});
+      .catch((err: Error) => {
+        if (!cancelled) console.warn('[useTournamentMeta] failed to load metadata:', err.message);
+      });
     return () => { cancelled = true; };
   }, [tswId, meta.name]);
 

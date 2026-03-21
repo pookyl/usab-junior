@@ -11,7 +11,7 @@ export default function TournamentSeedsPage() {
 
   return (
     <SubPageLayout title="Seeds" icon={Bookmark} onRefresh={() => setRefreshTrigger((n) => n + 1)}>
-      <SeedsTab tswId={tswId} active refreshTrigger={refreshTrigger} />
+      <SeedsTab key={tswId} tswId={tswId} active refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );
 }

@@ -18,6 +18,7 @@ import {
   parseH2HContent, parseTswOverviewStats, parseTswTournaments,
   tswFetch, tswUsabProfilePath, tswUsabTournamentsPath, tswUsabOverviewPath,
   emptyCat,
+  isValidDate, isValidAgeGroup, isValidEventType, isValidUsabId, isValidSeason,
 } from './api/_lib/shared.js';
 
 const PORT = process.env.PORT || 3001;
@@ -68,6 +69,7 @@ function rebuildRankingsFromPlayers(allPlayers) {
 }
 
 async function loadDiskCacheForDate(date) {
+  if (!isValidDate(date)) return null;
   try {
     const filePath = diskCachePath(date);
     const raw = await readFile(filePath, 'utf-8');
@@ -135,7 +137,10 @@ async function getDiskCachedDate() {
 
 async function getDefaultDate() {
   const dates = await listCachedDates();
-  return dates[0] ?? null;
+  if (dates[0]) return dates[0];
+  const diskDate = await getDiskCachedDate();
+  if (diskDate && isValidDate(diskDate)) return diskDate;
+  return new Date().toISOString().slice(0, 10);
 }
 
 // ── HTTP server ───────────────────────────────────────────────────────────────
@@ -158,6 +163,21 @@ const server = createServer(async (req, res) => {
     const ageGroup = reqUrl.searchParams.get('age_group') ?? 'U11';
     const eventType = reqUrl.searchParams.get('category') ?? 'BS';
     const date = reqUrl.searchParams.get('date') ?? defaultDate;
+    if (!isValidAgeGroup(ageGroup)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid age_group' }));
+      return;
+    }
+    if (!isValidEventType(eventType)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid category' }));
+      return;
+    }
+    if (!isValidDate(date)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid date format' }));
+      return;
+    }
     const cacheKey = `rankings:${ageGroup}:${eventType}:${date}`;
 
     const cached = getCached(cacheKey);
@@ -210,6 +230,26 @@ const server = createServer(async (req, res) => {
     const ageGroup = reqUrl.searchParams.get('age_group') ?? 'U11';
     const eventType = reqUrl.searchParams.get('category') ?? 'BS';
     const date = reqUrl.searchParams.get('date') ?? defaultDate;
+    if (!isValidUsabId(usabId)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid player ID format' }));
+      return;
+    }
+    if (!isValidAgeGroup(ageGroup)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid age_group' }));
+      return;
+    }
+    if (!isValidEventType(eventType)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid category' }));
+      return;
+    }
+    if (!isValidDate(date)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid date format' }));
+      return;
+    }
     const cacheKey = `player:${usabId}:${ageGroup}:${eventType}:${date}`;
 
     const cached = getCached(cacheKey);
@@ -249,6 +289,11 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify({ error: 'player1 and player2 query params required' }));
       return;
     }
+    if (!isValidUsabId(p1) || !isValidUsabId(p2)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid player ID format' }));
+      return;
+    }
     const cacheKey = `h2h:${[p1, p2].sort().join(':')}`;
     const cached = getCached(cacheKey);
     if (cached) {
@@ -279,6 +324,11 @@ const server = createServer(async (req, res) => {
   // GET /api/tournaments?season=2025-2026
   if (reqUrl.pathname === '/api/tournaments') {
     const season = reqUrl.searchParams.get('season');
+    if (season && !isValidSeason(season)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid season format' }));
+      return;
+    }
     const cacheKey = `tournaments:${season || 'all'}`;
     const cached = getCached(cacheKey);
     if (cached) {
@@ -491,6 +541,7 @@ const server = createServer(async (req, res) => {
       }
 
       async function loadSeason(s) {
+        if (!isValidSeason(s)) return null;
         try {
           const raw = await readFile(join(tournamentDir, `tournaments-${s}.json`), 'utf-8');
           return JSON.parse(raw);
@@ -639,11 +690,16 @@ const server = createServer(async (req, res) => {
   // GET /api/all-players?date=2026-03-01
   if (reqUrl.pathname === '/api/all-players') {
     const date = reqUrl.searchParams.get('date') ?? defaultDate;
+    if (!isValidDate(date)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid date format' }));
+      return;
+    }
     const cacheKey = `all-players:${date}`;
 
     const cached = getCached(cacheKey);
     if (cached) {
-      res.writeHead(200, { 'X-Cache': 'HIT' });
+      res.writeHead(200, { 'X-Cache': 'HIT', 'X-Partial': 'false' });
       res.end(JSON.stringify(cached));
       return;
     }
@@ -652,7 +708,7 @@ const server = createServer(async (req, res) => {
     if (perDateDisk) {
       console.log(`[all-players] serving from per-date disk cache for ${date}`);
       setCache(cacheKey, perDateDisk.players);
-      res.writeHead(200, { 'X-Cache': 'DISK' });
+      res.writeHead(200, { 'X-Cache': 'DISK', 'X-Partial': 'false' });
       res.end(JSON.stringify(perDateDisk.players));
       return;
     }
@@ -662,6 +718,7 @@ const server = createServer(async (req, res) => {
     const allPlayers = new Map();
     const rankingsByCategory = {};
     let fetchedFromWeb = false;
+    const failedCategories = [];
 
     const tasks = [];
     for (const ag of ageGroups) {
@@ -690,7 +747,7 @@ const server = createServer(async (req, res) => {
         }),
       );
 
-      for (const result of results) {
+      for (const [idx, result] of results.entries()) {
         if (result.status === 'fulfilled' && result.value) {
           const { players, ag, et, fromWeb } = result.value;
           if (fromWeb) fetchedFromWeb = true;
@@ -711,6 +768,9 @@ const server = createServer(async (req, res) => {
               rankingPoints: player.rankingPoints,
             });
           }
+        } else {
+          const failed = batch[idx];
+          if (failed) failedCategories.push(`${failed.ag}-${failed.et}`);
         }
       }
     }
@@ -727,16 +787,24 @@ const server = createServer(async (req, res) => {
         await saveDiskCache(date, rankingsByCategory, uniquePlayers);
       }
 
-      res.writeHead(200, { 'X-Cache': 'MISS' });
+      const partial = failedCategories.length > 0;
+      const headers = {
+        'X-Cache': 'MISS',
+        'X-Partial': partial ? 'true' : 'false',
+      };
+      if (partial) {
+        headers['X-Failed-Categories'] = failedCategories.join(',');
+      }
+      res.writeHead(200, headers);
       res.end(JSON.stringify(uniquePlayers));
     } else {
       const diskData = await getDiskCachedAllPlayers();
       if (diskData) {
         console.log(`[all-players] website returned no data, serving from disk cache (date ${diskData.date})`);
-        res.writeHead(200, { 'X-Cache': 'DISK' });
+        res.writeHead(200, { 'X-Cache': 'DISK', 'X-Partial': 'false' });
         res.end(JSON.stringify(diskData.players));
       } else {
-        res.writeHead(200);
+        res.writeHead(200, { 'X-Partial': 'false' });
         res.end(JSON.stringify([]));
       }
     }

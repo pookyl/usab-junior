@@ -11,7 +11,7 @@ export default function TournamentDrawsPage() {
 
   return (
     <SubPageLayout title="Draws" icon={List} onRefresh={() => setRefreshTrigger(n => n + 1)}>
-      <DrawsTab tswId={tswId} active refreshTrigger={refreshTrigger} />
+      <DrawsTab key={tswId} tswId={tswId} active refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );
 }

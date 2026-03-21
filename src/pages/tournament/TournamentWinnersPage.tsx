@@ -11,7 +11,7 @@ export default function TournamentWinnersPage() {
 
   return (
     <SubPageLayout title="Winners" icon={Trophy} onRefresh={() => setRefreshTrigger(n => n + 1)}>
-      <WinnersTab tswId={tswId} active refreshTrigger={refreshTrigger} />
+      <WinnersTab key={tswId} tswId={tswId} active refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );
 }

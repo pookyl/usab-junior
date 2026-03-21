@@ -31,6 +31,7 @@ function SingleToast({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: s
       <p className="flex-1">{toast.message}</p>
       <button
         onClick={() => onDismiss(toast.id)}
+        aria-label="Dismiss notification"
         className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors shrink-0"
       >
         <X className="w-3.5 h-3.5" />

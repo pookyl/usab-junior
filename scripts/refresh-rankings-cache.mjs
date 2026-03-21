@@ -8,8 +8,8 @@
  * if the existing cache is already up-to-date (useful for CI to skip commits).
  *
  * Usage:
- *   node scripts/refresh-cache.mjs            # auto-detect latest date
- *   node scripts/refresh-cache.mjs 2026-03-01 # force a specific date
+ *   node scripts/refresh-rankings-cache.mjs            # auto-detect latest date
+ *   node scripts/refresh-rankings-cache.mjs 2026-03-01 # force a specific date
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';

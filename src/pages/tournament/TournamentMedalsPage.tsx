@@ -11,7 +11,7 @@ export default function TournamentMedalsPage() {
 
   return (
     <SubPageLayout title="Medals" icon={Medal} onRefresh={() => setRefreshTrigger(n => n + 1)}>
-      <MedalsTab tswId={tswId} active refreshTrigger={refreshTrigger} />
+      <MedalsTab key={tswId} tswId={tswId} active refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );
 }

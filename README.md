@@ -76,12 +76,15 @@ All endpoints are served by `api-server.mjs` on port 3001.
 
 | Endpoint | Description |
 | --- | --- |
-| `GET /api/latest-date` | Latest available ranking date and all available dates |
+| `GET /api/cached-dates` | Ranking dates available in disk cache |
 | `GET /api/rankings?age_group=U13&category=BS&date=...` | Rankings for a specific age group + event |
 | `GET /api/all-players?date=...` | All ranked players across every age group and event |
+| `GET /api/player-directory` | Cumulative directory of players across cached dates |
 | `GET /api/player/:usabId?age_group=U11&category=BS&date=...` | USAB ranking detail for a player |
 | `GET /api/player/:usabId/tsw-stats?name=...` | Tournament history, W-L stats, and recent matches from TournamentSoftware |
+| `GET /api/player/:usabId/ranking-trend` | Historical ranking entries across cached dates |
 | `GET /api/h2h?player1=ID1&player2=ID2` | Head-to-head match history between two players |
+| `GET /api/tournaments` | Tournament seasons + spotlight from cached season files |
 
 ## Project Structure
 
@@ -91,11 +94,12 @@ All endpoints are served by `api-server.mjs` on port 3001.
 │   ├── _lib/shared.js        # Shared parsers, caching, and TSW helpers
 │   ├── rankings.js
 │   ├── all-players.js
-│   ├── latest-date.js
+│   ├── cached-dates.js
+│   ├── player-directory.js
 │   ├── h2h.js
 │   └── player/
-│       ├── [id].js           # Player detail
-│       └── [id]/tsw-stats.js # TournamentSoftware stats
+│       ├── [id].js                # Player detail
+│       └── [id]/[action].js       # Player actions (tsw-stats, ranking-trend)
 ├── scripts/
 │   └── refresh-rankings-cache.mjs  # Fetch latest rankings into disk cache
 ├── .github/workflows/
