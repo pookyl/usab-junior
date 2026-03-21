@@ -107,7 +107,11 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [clubFilter, setClubFilter] = useState('');
   const [playerFilter, setPlayerFilter] = useState<number | null>(null);
-  const [todayOnly, setTodayOnly] = useState(true);
+  const [todayOnly, setTodayOnly] = useState(showTodayPill);
+
+  useEffect(() => {
+    setTodayOnly(showTodayPill);
+  }, [showTodayPill]);
 
   const fetchedPlayerIds = useRef(new Set<number>());
   const refreshSeq = useRef(0);
@@ -673,7 +677,7 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
           <p className="text-xs text-slate-400 dark:text-slate-500">
             {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''}
             {playerFilter !== null && ` for ${playerData.get(playerFilter)?.playerName ?? 'player'}`}
-            {todayOnly && ' (today)'}
+            {todayOnly && showTodayPill && ' (today)'}
           </p>
         </div>
       )}
