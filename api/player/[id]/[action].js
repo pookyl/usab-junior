@@ -30,7 +30,7 @@ async function handleTswStats(req, res, usabId) {
   }
 
   const playerName = req.query.name ?? '';
-  const cacheKey = `tsw-stats:${usabId}`;
+  const cacheKey = `tsw-stats:v2:${usabId}`;
 
   const cached = getCached(cacheKey);
   if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }

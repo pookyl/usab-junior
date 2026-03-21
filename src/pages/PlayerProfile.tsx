@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -338,24 +338,42 @@ function StatsTabContent({ cat }: { cat: CategoryStats }) {
 function TournamentMatchCard({
   match,
   playerName,
-  playerUsabId,
-  nameMap,
+  tournamentId,
+  fromPath,
+  onBeforePlayerNavigate,
   location,
   showTournament = true,
 }: {
   match: import('../types/junior').TswMatchResult;
   playerName: string;
-  playerUsabId: string;
-  nameMap: Map<string, string[]>;
+  tournamentId?: string;
+  fromPath?: string;
+  onBeforePlayerNavigate?: () => void;
   location?: string;
   showTournament?: boolean;
 }) {
+  const splitTeamNames = (raw: string): Array<{ name: string; playerId: number | null }> =>
+    raw
+      .split(/\s*\/\s*/)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((name) => ({ name, playerId: null }));
+
+  const playerTeam = match.playerTeam && match.playerTeam.length > 0
+    ? match.playerTeam
+    : [
+        { name: playerName, playerId: null },
+        ...splitTeamNames(match.partner),
+      ];
+  const opponentTeam = match.opponentTeam && match.opponentTeam.length > 0
+    ? match.opponentTeam
+    : splitTeamNames(match.opponent);
+
   const scores = parseScoreString(match.score);
   const isWalkover = match.walkover || match.score.toLowerCase() === 'walkover';
   const catLabel =
     match.category === 'singles' ? 'Singles' : match.category === 'doubles' ? 'Doubles' : 'Mixed';
   const headerLabel = [match.round, match.event || catLabel].filter(Boolean).join(' · ');
-  const playerDisplayName = match.partner ? `${playerName} / ${match.partner}` : playerName;
 
   const tswBase = 'https://www.tournamentsoftware.com';
   const tournamentHref = match.tournamentUrl
@@ -399,10 +417,11 @@ function TournamentMatchCard({
           </span>
           <div className={`text-sm min-w-0 flex-1 ${match.won ? 'font-semibold' : ''} text-slate-800 dark:text-slate-100`}>
             <div className="truncate">
-              <PlayerNameLink
-                name={playerDisplayName}
-                nameMap={nameMap}
-                currentUsabId={playerUsabId}
+              <PlayerNameLinkGroup
+                players={playerTeam}
+                tournamentId={tournamentId ?? match.tournamentId}
+                fromPath={fromPath}
+                onBeforeNavigate={onBeforePlayerNavigate}
                 className="text-slate-800 dark:text-slate-100 hover:text-violet-600"
               />
             </div>
@@ -430,10 +449,11 @@ function TournamentMatchCard({
           </span>
           <div className={`text-sm min-w-0 flex-1 ${!match.won ? 'font-semibold' : ''} text-slate-800 dark:text-slate-100`}>
             <div className="truncate">
-              <PlayerNameLink
-                name={match.opponent}
-                nameMap={nameMap}
-                currentUsabId={playerUsabId}
+              <PlayerNameLinkGroup
+                players={opponentTeam}
+                tournamentId={tournamentId ?? match.tournamentId}
+                fromPath={fromPath}
+                onBeforeNavigate={onBeforePlayerNavigate}
                 className="text-slate-800 dark:text-slate-100 hover:text-violet-600"
               />
             </div>
@@ -472,32 +492,37 @@ function TournamentMatchCard({
   );
 }
 
-function PlayerNameLink({
-  name,
-  nameMap,
-  currentUsabId,
+function PlayerNameLinkGroup({
+  players,
+  tournamentId,
+  fromPath,
+  onBeforeNavigate,
   className,
 }: {
-  name: string;
-  nameMap: Map<string, string[]>;
-  currentUsabId: string;
+  players: Array<{ name: string; playerId: number | null }>;
+  tournamentId?: string;
+  fromPath?: string;
+  onBeforeNavigate?: () => void;
   className?: string;
 }) {
-  const parts = name.split(/\s*\/\s*/);
   return (
     <>
-      {parts.map((part, i) => {
-        const trimmed = part.trim();
-        const foundIds = nameMap.get(trimmed.toLowerCase());
-        const uniqueId = foundIds?.length === 1 && foundIds[0] !== currentUsabId ? foundIds[0] : null;
+      {players.map((player, i) => {
+        const trimmed = player.name.trim();
+        const playerId = player.playerId;
+        const canLink = Boolean(tournamentId && playerId);
         return (
           <span key={i}>
             {i > 0 && ' / '}
-            {uniqueId ? (
+            {canLink ? (
               <Link
-                to={`/directory/${uniqueId}`}
+                to={`/tournaments/${tournamentId}/player/${playerId}`}
+                state={fromPath ? { fromPath } : undefined}
                 className={`no-underline hover:text-violet-600 transition-colors ${className ?? ''}`}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  onBeforeNavigate?.();
+                  e.stopPropagation();
+                }}
               >
                 {trimmed}
               </Link>
@@ -514,7 +539,7 @@ function PlayerNameLink({
 export default function PlayerProfile() {
   const { id: usabId } = useParams<{ id: string }>();
   const location = useLocation();
-  const { players: allPlayers, directoryPlayers, directoryLoading, loading: loadingAllPlayers, playerNameMap, rankingsDate } = usePlayers();
+  const { players: allPlayers, directoryPlayers, directoryLoading, loading: loadingAllPlayers, rankingsDate } = usePlayers();
   const fromPath = (location.state as { fromPath?: string } | null)?.fromPath;
   const backTarget = fromPath ?? '/directory';
   const backLabel = fromPath ? 'Back' : 'Back to Players';
@@ -536,10 +561,91 @@ export default function PlayerProfile() {
   const [detailError, setDetailError] = useState<string | null>(null);
   const [statsTab, setStatsTab] = useState<StatsCategory>('total');
   const [expandedTournaments, setExpandedTournaments] = useState<Set<string>>(new Set());
+  const expandedTournamentsRef = useRef(expandedTournaments);
+  const statsTabRef = useRef(statsTab);
+  const restoreScrollYRef = useRef<number | null>(null);
+
+  const viewStateStorageKey = useMemo(
+    () => (usabId ? `player-profile:view:${usabId}` : ''),
+    [usabId],
+  );
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [usabId]);
+    expandedTournamentsRef.current = expandedTournaments;
+  }, [expandedTournaments]);
+
+  useEffect(() => {
+    statsTabRef.current = statsTab;
+  }, [statsTab]);
+
+  const saveProfileReturnSnapshot = useCallback(() => {
+    if (!viewStateStorageKey) return;
+    try {
+      sessionStorage.setItem(
+        viewStateStorageKey,
+        JSON.stringify({
+          restorePending: true,
+          scrollY: window.scrollY,
+          expandedTournaments: [...expandedTournamentsRef.current],
+          statsTab: statsTabRef.current,
+        }),
+      );
+    } catch {
+      // Ignore sessionStorage errors.
+    }
+  }, [viewStateStorageKey]);
+
+  useEffect(() => {
+    if (!usabId || !viewStateStorageKey) return;
+
+    try {
+      const raw = sessionStorage.getItem(viewStateStorageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as {
+        restorePending?: unknown;
+        scrollY?: unknown;
+        expandedTournaments?: unknown;
+        statsTab?: unknown;
+      };
+      if (parsed.restorePending !== true) return;
+
+      if (Array.isArray(parsed.expandedTournaments)) {
+        const expanded = parsed.expandedTournaments.filter(
+          (v): v is string => typeof v === 'string' && v.length > 0,
+        );
+        setExpandedTournaments(new Set(expanded));
+      }
+      if (
+        typeof parsed.statsTab === 'string'
+        && STATS_TABS.some((tab) => tab.key === parsed.statsTab)
+      ) {
+        setStatsTab(parsed.statsTab as StatsCategory);
+      }
+      if (typeof parsed.scrollY === 'number' && Number.isFinite(parsed.scrollY)) {
+        restoreScrollYRef.current = parsed.scrollY;
+      }
+    } catch {
+      // Ignore malformed state.
+    }
+  }, [usabId, viewStateStorageKey]);
+
+  useEffect(() => {
+    if (!viewStateStorageKey) return;
+    if (restoreScrollYRef.current === null) return;
+    if (loadingTsw) return;
+
+    const targetY = restoreScrollYRef.current;
+    restoreScrollYRef.current = null;
+
+    requestAnimationFrame(() => {
+      window.scrollTo(0, targetY);
+      try {
+        sessionStorage.removeItem(viewStateStorageKey);
+      } catch {
+        // Ignore sessionStorage errors.
+      }
+    });
+  }, [loadingTsw, viewStateStorageKey]);
 
   useEffect(() => {
     if (!usabId || !playerName) {
@@ -1020,8 +1126,9 @@ export default function PlayerProfile() {
                                     key={mi}
                                     match={match}
                                     playerName={displayName}
-                                    playerUsabId={usabId}
-                                    nameMap={playerNameMap}
+                                    tournamentId={t.tswId}
+                                    fromPath={location.pathname}
+                                    onBeforePlayerNavigate={saveProfileReturnSnapshot}
                                     location={t.location}
                                     showTournament={false}
                                   />

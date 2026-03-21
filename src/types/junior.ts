@@ -63,11 +63,14 @@ export interface DirectoryPlayer {
 
 export interface TswMatchResult {
   tournament: string;
+  tournamentId?: string;
   tournamentUrl?: string;
   event: string;
   round: string;
   opponent: string;
   partner: string;
+  playerTeam?: Array<{ name: string; playerId: number | null }>;
+  opponentTeam?: Array<{ name: string; playerId: number | null }>;
   category: 'singles' | 'doubles' | 'mixed';
   score: string;
   won: boolean;
@@ -98,6 +101,7 @@ export interface TswTournamentEvent {
 
 export interface TswTournament {
   name: string;
+  tswId?: string;
   url: string;
   dates: string;
   location: string;
@@ -129,12 +133,15 @@ export interface PlayerRankingTrend {
 
 export interface H2HMatch {
   tournament: string;
+  tournamentId?: string;
   tournamentUrl: string;
   event: string;
   round: string;
   duration: string;
   team1Players: string[];
   team2Players: string[];
+  team1Ids?: (number | null)[];
+  team2Ids?: (number | null)[];
   team1Won: boolean;
   team2Won: boolean;
   scores: number[][];

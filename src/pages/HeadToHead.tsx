@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { track } from '@vercel/analytics';
 import {
   Swords, Search, RefreshCw, Trophy, ExternalLink, TrendingUp, Calendar, MapPin,
@@ -83,6 +83,8 @@ export function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
       ...match,
       team1Players: match.team2Players,
       team2Players: match.team1Players,
+      team1Ids: match.team2Ids,
+      team2Ids: match.team1Ids,
       team1Won: match.team2Won,
       team2Won: match.team1Won,
       scores: match.scores.map(([a, b]) => [b, a]),
@@ -91,20 +93,40 @@ export function normalizeMatch(match: H2HMatch, playerAName: string): H2HMatch {
   return match;
 }
 
+function extractTswIdFromTournamentUrl(url: string): string | undefined {
+  if (!url) return undefined;
+  const byQuery = url.match(/(?:[?&]|&amp;)id=([0-9A-Fa-f-]+)/i);
+  if (byQuery) return byQuery[1];
+  const byPath = url.match(/\/tournament\/([0-9A-Fa-f-]+)/i);
+  return byPath?.[1];
+}
+
 function matchResultToH2HMatch(
   mr: TswMatchResult,
   playerName: string,
 ): H2HMatch {
-  const playerTeam = mr.partner ? [playerName, mr.partner] : [playerName];
-  const opponentTeam = mr.opponent.split(' / ').map((s) => s.trim());
+  const splitTeam = (raw: string): Array<{ name: string; playerId: number | null }> =>
+    raw.split('/').map((s) => s.trim()).filter(Boolean).map((name) => ({ name, playerId: null }));
+  const playerTeam = mr.playerTeam && mr.playerTeam.length > 0
+    ? mr.playerTeam
+    : [{ name: playerName, playerId: null }, ...splitTeam(mr.partner)];
+  const opponentTeam = mr.opponentTeam && mr.opponentTeam.length > 0
+    ? mr.opponentTeam
+    : splitTeam(mr.opponent);
+  const team1Ids = playerTeam.map((p) => p.playerId);
+  const team2Ids = opponentTeam.map((p) => p.playerId);
+  const tournamentId = mr.tournamentId ?? extractTswIdFromTournamentUrl(mr.tournamentUrl ?? '');
   return {
     tournament: mr.tournament,
+    tournamentId,
     tournamentUrl: mr.tournamentUrl ?? '',
     event: mr.event,
     round: mr.round,
     duration: '',
-    team1Players: playerTeam,
-    team2Players: opponentTeam,
+    team1Players: playerTeam.map((p) => p.name),
+    team2Players: opponentTeam.map((p) => p.name),
+    team1Ids: team1Ids.some((id) => id !== null) ? team1Ids : undefined,
+    team2Ids: team2Ids.some((id) => id !== null) ? team2Ids : undefined,
     team1Won: mr.won,
     team2Won: !mr.won,
     scores: parseScoreString(mr.score),
@@ -280,25 +302,32 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
 
 function PlayerNameLinks({
   players,
-  playerLookup,
+  playerIds,
+  tournamentId,
+  fromPath,
   won,
   boldName,
 }: {
   players: string[];
-  playerLookup: Map<string, string>;
+  playerIds?: (number | null)[];
+  tournamentId?: string;
+  fromPath?: string;
   won: boolean;
   boldName?: boolean;
 }) {
   return (
     <div className={`text-sm min-w-0 flex-1 text-slate-800 dark:text-slate-100 ${won || boldName ? 'font-semibold' : ''}`}>
       {players.map((name, i) => {
-        const usabId = playerLookup.get(name.toLowerCase().trim());
+        const playerId = playerIds?.[i];
+        const canLink = Boolean(tournamentId && playerId);
         return (
           <div key={i} className="truncate">
-            {usabId ? (
+            {canLink ? (
               <Link
-                to={`/directory/${usabId}`}
-                className="hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
+                to={`/tournaments/${tournamentId}/player/${playerId}`}
+                state={fromPath ? { fromPath } : undefined}
+                className="cursor-pointer underline-offset-2 decoration-violet-400/70 hover:underline hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+                title="Open tournament player detail"
               >
                 {name}
               </Link>
@@ -312,7 +341,13 @@ function PlayerNameLinks({
   );
 }
 
-function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map<string, string> }) {
+function MatchCard({
+  match,
+  fromPath,
+}: {
+  match: H2HMatch;
+  fromPath: string;
+}) {
   const tswBase = 'https://www.tournamentsoftware.com';
   const tournamentHref = match.tournamentUrl
     ? (match.tournamentUrl.startsWith('http') ? match.tournamentUrl : `${tswBase}${match.tournamentUrl}`)
@@ -354,7 +389,9 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
           </span>
           <PlayerNameLinks
             players={match.team1Players}
-            playerLookup={playerLookup}
+            playerIds={match.team1Ids}
+            tournamentId={match.tournamentId}
+            fromPath={fromPath}
             won={match.team1Won}
           />
           <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
@@ -382,7 +419,9 @@ function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map
           </span>
           <PlayerNameLinks
             players={match.team2Players}
-            playerLookup={playerLookup}
+            playerIds={match.team2Ids}
+            tournamentId={match.tournamentId}
+            fromPath={fromPath}
             won={match.team2Won}
           />
           <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
@@ -637,6 +676,7 @@ let _h2hSnap: {
 } | null = null;
 
 export default function HeadToHead() {
+  const location = useLocation();
   const { players: allPlayers, directoryPlayers, directoryLoading, loading: playersLoading, rankingsDate } = usePlayers();
   const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
 
@@ -841,14 +881,6 @@ export default function HeadToHead() {
     team2: filteredMatches.filter((m) => m.team2Won).length,
     total: filteredMatches.length,
   }), [filteredMatches]);
-
-  const playerLookup = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const p of allPlayers) {
-      map.set(p.name.toLowerCase().trim(), p.usabId);
-    }
-    return map;
-  }, [allPlayers]);
 
   const tswCatKey: StatsCategory = filterCat === 'All' ? 'total'
     : filterCat === 'Singles' ? 'singles'
@@ -1270,7 +1302,7 @@ export default function HeadToHead() {
               ) : (
                 <div className="space-y-2.5 md:space-y-3">
                   {filteredMatches.map((match, i) => (
-                    <MatchCard key={i} match={match} playerLookup={playerLookup} />
+                    <MatchCard key={i} match={match} fromPath={location.pathname} />
                   ))}
                 </div>
               )}

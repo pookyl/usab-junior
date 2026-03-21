@@ -1,16 +1,16 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
 import MatchCard from '../components/tournament/MatchCard';
 import type { TournamentPlayerDetailResponse } from '../types/junior';
-import { getTournamentPlayerOrigin } from '../utils/tournamentReturnState';
 
 export default function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { playerNameMap, playerIdSet } = usePlayers();
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
@@ -62,29 +62,22 @@ export default function TournamentPlayerDetail() {
 
   if (!tswId || !playerId) return null;
 
-  const fromPath = (location.state as { fromPath?: string } | null)?.fromPath ?? getTournamentPlayerOrigin(location.pathname);
   const parsedPlayerId = Number(playerId);
   const highlightPlayerId = Number.isFinite(parsedPlayerId) ? parsedPlayerId : undefined;
-  const isTournamentSubpage = Boolean(
-    fromPath &&
-      fromPath.startsWith(`/tournaments/${tswId}/`) &&
-      !fromPath.includes('/player/'),
-  );
-  const backTarget = isTournamentSubpage ? fromPath! : `/tournaments/${tswId}/players`;
-  const backState = isTournamentSubpage ? { restoreTournamentScroll: true } : undefined;
+  const originFromPath = (location.state as { fromPath?: string } | null)?.fromPath ?? location.pathname;
   const tswPlayerUrl = `https://www.tournamentsoftware.com/tournament/${tswId}/player/${playerId}`;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <div className="flex items-center justify-between">
-        <Link
-          to={backTarget}
-          state={backState}
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
           className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
-        </Link>
+        </button>
         <RefreshButton onClick={handleRefresh} loading={loading} />
       </div>
 
@@ -149,7 +142,7 @@ export default function TournamentPlayerDetail() {
               {resolvedUsabId && (
                 <Link
                   to={`/directory/${resolvedUsabId}`}
-                  state={{ fromPath: location.pathname }}
+                  state={{ fromPath: originFromPath }}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
                 >
                   <Users className="w-3 h-3" />
@@ -192,7 +185,7 @@ export default function TournamentPlayerDetail() {
                   key={i}
                   match={m}
                   tswId={tswId}
-                  fromPath={location.pathname}
+                  fromPath={originFromPath}
                   highlightPlayerId={highlightPlayerId}
                   highlightPlayerName={data.playerName}
                 />

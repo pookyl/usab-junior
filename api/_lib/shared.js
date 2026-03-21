@@ -230,9 +230,11 @@ export function parseH2HContent(html, headers) {
     const event = headerItems[1] ?? '';
     const round = headerItems[2] ?? '';
 
-    const tournamentIdMatch = block.match(/\/sport\/player\.aspx\?id=([0-9A-Fa-f-]+)/);
+    const tournamentIdMatch = block.match(/(?:[?&]|&amp;)id=([0-9A-Fa-f-]+)/i)
+      || block.match(/\/tournament\/([0-9A-Fa-f-]+)/i);
+    const tournamentId = tournamentIdMatch?.[1] ?? '';
     const tournamentUrl = tournamentIdMatch
-      ? `/tournament/${tournamentIdMatch[1]}`
+      ? `/tournament/${tournamentId}`
       : '';
 
     const durationMatch = block.match(/<time[^>]*>([\dhmHM\s]+)<\/time>/);
@@ -245,15 +247,45 @@ export function parseH2HContent(html, headers) {
     const team2Won = (rowBlocks[1] ?? '').includes('has-won');
 
     function extractPlayers(rowHtml) {
-      const names = [];
-      const pRegex = /match__row-title-value-content[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/g;
-      let pm;
-      while ((pm = pRegex.exec(rowHtml)) !== null) names.push(pm[1].trim());
-      return names;
+      const players = [];
+      const contentBlocks = rowHtml.split(/match__row-title-value-content/).slice(1);
+      for (const cb of contentBlocks) {
+        const nameMatch = cb.match(/nav-link__value">([^<]+)<\/span>/);
+        if (!nameMatch) continue;
+        const parsedName = decodeHtmlEntities(nameMatch[1].trim());
+        if (!parsedName || parsedName === 'Bye') continue;
+        const idMatch = cb.match(/data-player-id="(\d+)"/)
+          || cb.match(/(?:[?&]|&amp;)player=(\d+)/i)
+          || cb.match(/\/player\/(\d+)(?:[/"?]|$)/i);
+        players.push({
+          name: parsedName,
+          playerId: idMatch ? parseInt(idMatch[1], 10) : null,
+        });
+      }
+      if (players.length === 0) {
+        const pRegex = /<a[^>]*href="([^"]+)"[^>]*>[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>[\s\S]*?<\/a>/gi;
+        let pm;
+        while ((pm = pRegex.exec(rowHtml)) !== null) {
+          const href = pm[1];
+          const parsedName = decodeHtmlEntities(pm[2].trim());
+          if (!parsedName || parsedName === 'Bye') continue;
+          const idMatch = href.match(/(?:[?&]|&amp;)player=(\d+)/i)
+            || href.match(/\/player\/(\d+)(?:[/"?]|$)/i);
+          players.push({
+            name: parsedName,
+            playerId: idMatch ? parseInt(idMatch[1], 10) : null,
+          });
+        }
+      }
+      return players;
     }
 
-    const team1Players = extractPlayers(rowBlocks[0] ?? '');
-    const team2Players = extractPlayers(rowBlocks[1] ?? '');
+    const team1 = extractPlayers(rowBlocks[0] ?? '');
+    const team2 = extractPlayers(rowBlocks[1] ?? '');
+    const team1Players = team1.map((p) => p.name);
+    const team2Players = team2.map((p) => p.name);
+    const team1Ids = team1.map((p) => p.playerId);
+    const team2Ids = team2.map((p) => p.playerId);
 
     const scores = [];
     const setRegex = /<ul class="points">([\s\S]*?)<\/ul>/g;
@@ -270,8 +302,15 @@ export function parseH2HContent(html, headers) {
     const venueMatch = block.match(/icon-marker[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/);
 
     matches.push({
-      tournament, tournamentUrl, event, round, duration,
+      tournament,
+      tournamentId: tournamentId || undefined,
+      tournamentUrl,
+      event,
+      round,
+      duration,
       team1Players, team2Players, team1Won, team2Won, scores,
+      team1Ids: team1Ids.some((id) => id !== null) ? team1Ids : undefined,
+      team2Ids: team2Ids.some((id) => id !== null) ? team2Ids : undefined,
       date: dateMatch ? dateMatch[1].trim() : '',
       venue: venueMatch ? venueMatch[1].trim() : '',
     });
@@ -528,8 +567,12 @@ export function parseTswTournaments(html, playerName) {
     if (!nameMatch) continue;
     const name = nameMatch[1].trim().replace(/&amp;/g, '&');
 
-    const urlMatch = tournBlock.match(/href="(\/sport\/tournament\?id=[^"]+)"/);
+    const urlMatch = tournBlock.match(/href="((?:\/sport\/tournament\?id=[^"]+)|(?:\/tournament\/[0-9A-Fa-f-]+[^"]*))"/i);
     const url = urlMatch ? `https://www.tournamentsoftware.com${urlMatch[1].replace(/&amp;/g, '&')}` : '';
+    const tournamentIdMatch = url.match(/(?:[?&]|&amp;)id=([0-9A-Fa-f-]+)/i)
+      || url.match(/\/tournament\/([0-9A-Fa-f-]+)/i)
+      || tournBlock.match(/\/tournament\/([0-9A-Fa-f-]+)\/player\/\d+/i);
+    const tournamentId = tournamentIdMatch ? tournamentIdMatch[1] : '';
 
     const dateMatch = tournBlock.match(/<time[^>]*>([^<]+)<\/time>\s*(?:to\s*<time[^>]*>([^<]+)<\/time>)?/);
     const dates = dateMatch ? (dateMatch[2] ? `${dateMatch[1].trim()} - ${dateMatch[2].trim()}` : dateMatch[1].trim()) : '';
@@ -561,15 +604,41 @@ export function parseTswTournaments(html, playerName) {
         const isWalkover = block.includes('>Walkover<');
         if (!status1 && !status2 && !isWalkover) continue;
 
-        function extractNames(rowHtml) {
-          const names = [];
-          const re = /nav-link__value">([^<]+)<\/span><\/a>\s*<\/span>/g;
-          let nm;
-          while ((nm = re.exec(rowHtml)) !== null) names.push(nm[1].trim());
-          return names;
+        function extractTeam(rowHtml) {
+          const players = [];
+          const contentBlocks = rowHtml.split(/match__row-title-value-content/).slice(1);
+          for (const cb of contentBlocks) {
+            const nameMatch = cb.match(/nav-link__value">([^<]+)<\/span>/);
+            if (!nameMatch) continue;
+            const parsedName = decodeHtmlEntities(nameMatch[1].trim());
+            if (!parsedName || parsedName === 'Bye') continue;
+            const idMatch = cb.match(/data-player-id="(\d+)"/)
+              || cb.match(/\/player\/(\d+)(?:[/"?]|$)/i)
+              || cb.match(/(?:[?&]|&amp;)player=(\d+)/i);
+            players.push({
+              name: parsedName,
+              playerId: idMatch ? parseInt(idMatch[1], 10) : null,
+            });
+          }
+          if (players.length === 0) {
+            const re = /<a[^>]*href="([^"]+)"[^>]*>[\s\S]*?<span[^>]*class="[^"]*nav-link__value[^"]*"[^>]*>([^<]+)<\/span>[\s\S]*?<\/a>/gi;
+            let nm;
+            while ((nm = re.exec(rowHtml)) !== null) {
+              const href = nm[1];
+              const parsedName = decodeHtmlEntities(nm[2].trim());
+              if (!parsedName || parsedName === 'Bye') continue;
+              const idMatch = href.match(/\/player\/(\d+)(?:[/"?]|$)/i)
+                || href.match(/(?:[?&]|&amp;)player=(\d+)/i);
+              players.push({
+                name: parsedName,
+                playerId: idMatch ? parseInt(idMatch[1], 10) : null,
+              });
+            }
+          }
+          return players;
         }
-        const row1Names = extractNames(rowBlocks[0]);
-        const row2Names = extractNames(rowBlocks[1]);
+        const row1Team = extractTeam(rowBlocks[0]);
+        const row2Team = extractTeam(rowBlocks[1]);
 
         let row1IsPlayer, playerWon;
         if (status1 || status2) {
@@ -577,7 +646,7 @@ export function parseTswTournaments(html, playerName) {
           playerWon = status1 ? status1[1] === 'W' : status2[1] === 'W';
         } else {
           const pLower = playerName.toLowerCase();
-          const row1HasPlayer = row1Names.some((n) => {
+          const row1HasPlayer = row1Team.some(({ name: n }) => {
             const nLower = n.toLowerCase();
             return nLower.includes(pLower) || pLower.includes(nLower)
               || pLower.split(/\s+/).every((p) => nLower.includes(p));
@@ -594,8 +663,10 @@ export function parseTswTournaments(html, playerName) {
           else rec.losses++;
         }
 
-        const opponentNames = row1IsPlayer ? row2Names : row1Names;
-        const teamNames = row1IsPlayer ? row1Names : row2Names;
+        const opponentTeam = row1IsPlayer ? row2Team : row1Team;
+        const playerTeam = row1IsPlayer ? row1Team : row2Team;
+        const opponentNames = opponentTeam.map((p) => p.name);
+        const teamNames = playerTeam.map((p) => p.name);
         const nameParts = playerName.toLowerCase().split(/\s+/);
         const partnerNames = teamNames.filter((n) =>
           !nameParts.every((p) => new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(n)),
@@ -619,9 +690,15 @@ export function parseTswTournaments(html, playerName) {
         const dateM = block.match(/icon-clock[\s\S]*?nav-link__value">([^<]+)/);
 
         tournamentMatches.push({
-          tournament: name, tournamentUrl: url, event: currentEvent, round,
+          tournament: name,
+          tournamentId: tournamentId || undefined,
+          tournamentUrl: url,
+          event: currentEvent,
+          round,
           opponent: opponentNames.join(' / ') || 'Unknown',
           partner: partnerNames.join(' / '),
+          playerTeam,
+          opponentTeam,
           category,
           score: isWalkover ? 'Walkover' : scores.map((s) => s.join('-')).join(', '),
           won: playerWon,
@@ -636,7 +713,15 @@ export function parseTswTournaments(html, playerName) {
       .map(([n, wl]) => ({ name: n, category: deriveCategoryFromEvent(n), ...wl }));
 
     if (events.length > 0) {
-      tournaments.push({ name, url, dates, location, events, matches: tournamentMatches });
+      tournaments.push({
+        name,
+        tswId: tournamentId || undefined,
+        url,
+        dates,
+        location,
+        events,
+        matches: tournamentMatches,
+      });
     }
   }
 

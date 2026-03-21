@@ -22,6 +22,15 @@ export default function Navbar() {
   const location = useLocation();
   const { mode, setMode } = useTheme();
   const { isActive: isTournamentModeActive, activeTswId, isTransitioning } = useTournamentFocus();
+  const routeState = location.state as { fromPath?: string } | null;
+  const fromPath = routeState?.fromPath ?? null;
+  const isTournamentDetailPath = /^\/tournaments\/[^/]+\/(player|draw|event)\/[^/]+$/.test(location.pathname);
+  const shouldKeepOriginNavHighlight = Boolean(
+    isTournamentDetailPath
+      && fromPath
+      && !fromPath.startsWith('/tournaments/'),
+  );
+  const activePathname = shouldKeepOriginNavHighlight ? fromPath! : location.pathname;
   const tournamentReturnPath = getLastTournamentSubpagePath();
   const tournamentsTarget = tournamentReturnPath ?? '/tournaments';
   const tournamentsState = tournamentReturnPath ? { restoreTournamentScroll: true } : undefined;
@@ -29,7 +38,9 @@ export default function Navbar() {
     ...item,
     icon: TOURNAMENT_NAV_ICON[item.key],
   }));
-  const showTournamentNav = isTournamentModeActive && tournamentNavItems.length > 0;
+  const showTournamentNav = isTournamentModeActive
+    && tournamentNavItems.length > 0
+    && !shouldKeepOriginNavHighlight;
   const tournamentOverviewPath = tournamentNavItems[0]?.path ?? null;
 
   const cycleMode = () => {
@@ -70,8 +81,8 @@ export default function Navbar() {
               {desktopNavItems.map(({ path, label, icon: Icon }) => {
                 const active =
                   path === '/' || path === tournamentOverviewPath
-                    ? location.pathname === path
-                    : location.pathname.startsWith(path);
+                    ? activePathname === path
+                    : activePathname.startsWith(path);
                 return (
                   <Link
                     key={path}
@@ -134,8 +145,8 @@ export default function Navbar() {
             ? tournamentNavItems.map(({ path, shortLabel, icon: Icon }) => {
               const active =
                 path === tournamentOverviewPath
-                  ? location.pathname === path
-                  : location.pathname.startsWith(path);
+                  ? activePathname === path
+                  : activePathname.startsWith(path);
               return (
                 <Link
                   key={path}
@@ -156,8 +167,8 @@ export default function Navbar() {
             : navItems.map(({ path, shortLabel, icon: Icon }) => {
               const active =
                 path === '/'
-                  ? location.pathname === '/'
-                  : location.pathname.startsWith(path);
+                  ? activePathname === '/'
+                  : activePathname.startsWith(path);
               return (
                 <Link
                   key={path}
