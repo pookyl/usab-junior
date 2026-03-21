@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
-import { clearLastTournamentSubpagePath } from '../utils/tournamentReturnState';
 
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
 
@@ -59,12 +58,10 @@ export default function TournamentHub() {
       nextState: isFocusedTournament ? 'exit_focus_mode' : 'enter_focus_mode',
     });
     if (isFocusedTournament) {
-      clearLastTournamentSubpagePath();
       exitMode();
       navigate('/', { replace: true });
       return;
     }
-    clearLastTournamentSubpagePath();
     enterMode(tswId);
     navigate(`/tournaments/${tswId}`, { replace: true });
   };

@@ -1,4 +1,3 @@
-let lastTournamentSubpagePath: string | null = null;
 const playerOriginByPath = new Map<string, string>();
 const drawOriginByPath = new Map<string, string>();
 const eventOriginByPath = new Map<string, string>();
@@ -16,24 +15,6 @@ function getDetailMeta(pathname: string): { type: TournamentDetailType; tswId: s
 
 function isValidOriginForTournament(tswId: string, fromPath: string): boolean {
   return fromPath.startsWith(`/tournaments/${tswId}/`) && !fromPath.includes('/player/');
-}
-
-export function isTournamentSubpagePath(pathname: string): boolean {
-  const segments = pathname.split('/').filter(Boolean);
-  return segments.length >= 3 && segments[0] === 'tournaments' && segments[1].length > 0;
-}
-
-export function setLastTournamentSubpagePath(pathname: string): void {
-  if (!isTournamentSubpagePath(pathname)) return;
-  lastTournamentSubpagePath = pathname;
-}
-
-export function getLastTournamentSubpagePath(): string | null {
-  return lastTournamentSubpagePath;
-}
-
-export function clearLastTournamentSubpagePath(): void {
-  lastTournamentSubpagePath = null;
 }
 
 export function rememberTournamentDetailOrigin(pathname: string, fromPath?: string): void {

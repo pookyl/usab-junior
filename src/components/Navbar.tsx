@@ -3,7 +3,6 @@ import { Trophy, Home, Swords, Users, Moon, Sun, Monitor, Award, List } from 'lu
 import { useTheme, type ThemeMode } from '../contexts/ThemeContext';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
 import { buildTournamentFocusNavItems } from '../utils/tournamentFocus';
-import { getLastTournamentSubpagePath } from '../utils/tournamentReturnState';
 
 const navItems = [
   { path: '/', label: 'Home', shortLabel: 'Home', icon: Home },
@@ -31,9 +30,6 @@ export default function Navbar() {
       && !fromPath.startsWith('/tournaments/'),
   );
   const activePathname = shouldKeepOriginNavHighlight ? fromPath! : location.pathname;
-  const tournamentReturnPath = getLastTournamentSubpagePath();
-  const tournamentsTarget = tournamentReturnPath ?? '/tournaments';
-  const tournamentsState = tournamentReturnPath ? { restoreTournamentScroll: true } : undefined;
   const tournamentNavItems = buildTournamentFocusNavItems(activeTswId).map((item) => ({
     ...item,
     icon: TOURNAMENT_NAV_ICON[item.key],
@@ -48,8 +44,6 @@ export default function Navbar() {
     setMode(MODE_CYCLE[(idx + 1) % MODE_CYCLE.length]);
   };
 
-  const getNavTarget = (path: string) => (path === '/tournaments' ? tournamentsTarget : path);
-  const getNavState = (path: string) => (path === '/tournaments' ? tournamentsState : undefined);
   const desktopNavItems = showTournamentNav ? tournamentNavItems : navItems;
   const topBarBackgroundClass = showTournamentNav
     ? 'bg-gradient-to-r from-violet-900 to-indigo-900'
@@ -86,8 +80,7 @@ export default function Navbar() {
                 return (
                   <Link
                     key={path}
-                    to={showTournamentNav ? path : getNavTarget(path)}
-                    state={showTournamentNav ? undefined : getNavState(path)}
+                    to={path}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       active
                         ? 'bg-violet-600 text-white'
@@ -172,8 +165,7 @@ export default function Navbar() {
               return (
                 <Link
                   key={path}
-                  to={getNavTarget(path)}
-                  state={getNavState(path)}
+                  to={path}
                   className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
                     active
                       ? 'text-violet-600 dark:text-violet-400'
