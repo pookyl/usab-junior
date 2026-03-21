@@ -5,11 +5,12 @@ import {
   emptyCat, parseTswOverviewStats, parseTswTournaments,
   setCors, isValidUsabId,
 } from '../../_lib/shared.js';
-
-function sendJson(res, status, data, extraHeaders) {
-  res.writeHead(status, { 'Content-Type': 'application/json', ...extraHeaders });
-  res.end(JSON.stringify(data));
-}
+import {
+  sendApiError,
+  sendJson,
+  UpstreamError,
+  ValidationError,
+} from '../../_lib/http.js';
 
 export default async function handler(req, res) {
   setCors(res);
@@ -20,10 +21,14 @@ export default async function handler(req, res) {
   if (action === 'tsw-stats') return handleTswStats(req, res, usabId);
   if (action === 'ranking-trend') return handleRankingTrend(req, res, usabId);
 
-  sendJson(res, 404, { error: `Unknown action: ${action}` });
+  return sendJson(res, 404, { error: { code: 'NOT_FOUND', message: `Unknown action: ${action}` } });
 }
 
 async function handleTswStats(req, res, usabId) {
+  if (!usabId || !isValidUsabId(usabId)) {
+    return sendApiError(res, new ValidationError('Invalid player ID', { field: 'id' }));
+  }
+
   const playerName = req.query.name ?? '';
   const cacheKey = `tsw-stats:${usabId}`;
 
@@ -33,21 +38,19 @@ async function handleTswStats(req, res, usabId) {
   const profilePath = tswUsabProfilePath(usabId);
   const tswProfileUrl = `${TSW_BASE}${profilePath}`;
   const tswSearchLink = `${TSW_BASE}/find/player?q=${encodeURIComponent(playerName)}`;
-  const fallback = {
-    tswProfileUrl, tswSearchUrl: tswSearchLink,
-    total: emptyCat(), singles: emptyCat(),
-    doubles: emptyCat(), mixed: emptyCat(),
-    recentHistory: [], recentResults: [], tournamentsByYear: {},
-  };
-
   try {
     const encoded = Buffer.from('base64:' + usabId).toString('base64');
     const encodedNoPad = encoded.replace(/=+$/, '');
+    const warnings = [];
 
     const [overviewResp, tournamentsResp] = await Promise.all([
       tswFetch(tswUsabOverviewPath(usabId)),
       tswFetch(tswUsabTournamentsPath(usabId)),
     ]);
+
+    if (!overviewResp.ok && !tournamentsResp.ok) {
+      throw new UpstreamError(`TSW profile unavailable (overview=${overviewResp.status}, tournaments=${tournamentsResp.status})`);
+    }
 
     let overviewStats = {
       total: emptyCat(), singles: emptyCat(),
@@ -56,10 +59,11 @@ async function handleTswStats(req, res, usabId) {
     };
     if (overviewResp.ok) {
       overviewStats = parseTswOverviewStats(await overviewResp.text());
+    } else {
+      warnings.push(`overview:${overviewResp.status}`);
     }
 
     const tournamentsByYear = {};
-    let recentResults = [];
 
     if (tournamentsResp.ok) {
       const tournamentsHtml = await tournamentsResp.text();
@@ -70,7 +74,6 @@ async function handleTswStats(req, res, usabId) {
       while ((ym = yearRegex.exec(tournamentsHtml)) !== null) years.push(parseInt(ym[1]));
 
       const currentYearData = parseTswTournaments(tournamentsHtml, playerName);
-      recentResults = currentYearData.recentResults;
       if (years[0] && currentYearData.tournaments.length > 0) {
         tournamentsByYear[years[0]] = currentYearData.tournaments;
       }
@@ -81,10 +84,10 @@ async function handleTswStats(req, res, usabId) {
           olderYears.map(async (year) => {
             const path = `/player/${TSW_ORG_CODE}/${encodeURIComponent(encoded)}/tournaments/GetPlayerTournamentsByYear?AOrganizationCode=${TSW_ORG_CODE}&AMemberID=${encodedNoPad}&Year=${year}&IncludeOlderTournaments=False`;
             const resp = await tswFetch(path);
-            if (!resp.ok) return { year, tournaments: [], results: [] };
+            if (!resp.ok) return { year, tournaments: [] };
             const html = await resp.text();
             const data = parseTswTournaments(html, playerName);
-            return { year, tournaments: data.tournaments, results: data.recentResults };
+            return { year, tournaments: data.tournaments };
           }),
         );
 
@@ -92,9 +95,6 @@ async function handleTswStats(req, res, usabId) {
           if (r.status === 'fulfilled') {
             if (r.value.tournaments.length > 0) {
               tournamentsByYear[r.value.year] = r.value.tournaments;
-            }
-            if (r.value.results.length > 0) {
-              recentResults = recentResults.concat(r.value.results);
             }
           }
         }
@@ -116,29 +116,35 @@ async function handleTswStats(req, res, usabId) {
                 tournamentsByYear[y].push(t);
               }
             }
-            if (olderData.recentResults.length > 0) {
-              recentResults = recentResults.concat(olderData.recentResults);
-            }
           }
-        } catch (_) { /* older tab fetch is best-effort */ }
+        } catch (err) {
+          warnings.push(`older-tab:${err instanceof Error ? err.message : 'request-failed'}`);
+        }
       }
+    } else {
+      warnings.push(`tournaments:${tournamentsResp.status}`);
     }
 
     const stats = {
       tswProfileUrl, tswSearchUrl: tswSearchLink,
-      ...overviewStats, recentResults, tournamentsByYear,
+      ...overviewStats, tournamentsByYear,
     };
 
+    if (warnings.length > 0) {
+      stats.degraded = true;
+      stats.warnings = warnings;
+    }
     setCache(cacheKey, stats);
     sendJson(res, 200, stats, { 'X-Cache': 'MISS' });
   } catch (err) {
-    console.error('[tsw-stats] error:', err.message);
-    sendJson(res, 200, fallback);
+    sendApiError(res, err, { logLabel: 'tsw-stats' });
   }
 }
 
 async function handleRankingTrend(req, res, usabId) {
-  if (!usabId || !isValidUsabId(usabId)) { sendJson(res, 400, { error: 'Invalid player ID' }); return; }
+  if (!usabId || !isValidUsabId(usabId)) {
+    return sendApiError(res, new ValidationError('Invalid player ID', { field: 'id' }));
+  }
 
   const cacheKey = `trend:${usabId}`;
 
@@ -163,7 +169,6 @@ async function handleRankingTrend(req, res, usabId) {
     setCache(cacheKey, result);
     sendJson(res, 200, result, { 'X-Cache': 'MISS' });
   } catch (err) {
-    console.error('[ranking-trend] error:', err.message);
-    sendJson(res, 500, { error: err.message });
+    sendApiError(res, err, { logLabel: 'ranking-trend' });
   }
 }

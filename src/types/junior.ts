@@ -113,7 +113,6 @@ export interface TswPlayerStats {
   doubles: CategoryStats;
   mixed: CategoryStats;
   recentHistory: Array<{ won: boolean; date: string }>;
-  recentResults: TswMatchResult[];
   tournamentsByYear: Record<string, TswTournament[]>;
 }
 

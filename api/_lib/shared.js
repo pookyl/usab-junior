@@ -520,7 +520,6 @@ export function deriveCategoryFromEvent(eventName) {
 
 export function parseTswTournaments(html, playerName) {
   const tournaments = [];
-  const recentResults = [];
 
   const tournBlocks = html.split(/<div class="media">/g).slice(1);
 
@@ -539,6 +538,7 @@ export function parseTswTournaments(html, playerName) {
     const location = locMatch ? locMatch[1].trim().replace(/^\|\s*/, '') : '';
 
     const eventMap = new Map();
+    const tournamentMatches = [];
     let currentEvent = '';
 
     const innerRegex = /module-divider__body[^>]*>\s*(?:Event:\s*)?([^<]+)|<div class="match">([\s\S]*?)(?=<div class="match">|<h[45] class="module-divider|<\/li>\s*<li class="module|$)/g;
@@ -618,7 +618,7 @@ export function parseTswTournaments(html, playerName) {
 
         const dateM = block.match(/icon-clock[\s\S]*?nav-link__value">([^<]+)/);
 
-        recentResults.push({
+        tournamentMatches.push({
           tournament: name, tournamentUrl: url, event: currentEvent, round,
           opponent: opponentNames.join(' / ') || 'Unknown',
           partner: partnerNames.join(' / '),
@@ -635,13 +635,12 @@ export function parseTswTournaments(html, playerName) {
       .filter(([n]) => n.length > 0)
       .map(([n, wl]) => ({ name: n, category: deriveCategoryFromEvent(n), ...wl }));
 
-    const tournamentMatches = recentResults.filter((r) => r.tournament === name);
     if (events.length > 0) {
       tournaments.push({ name, url, dates, location, events, matches: tournamentMatches });
     }
   }
 
-  return { tournaments, recentResults };
+  return { tournaments };
 }
 
 // ── TSW Winners page parser ─────────────────────────────────────────────────

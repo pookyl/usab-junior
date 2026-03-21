@@ -224,13 +224,23 @@ describe('findMatchesBetween', () => {
     doubles: emptyCat,
     mixed: emptyCat,
     recentHistory: [],
-    tournamentsByYear: {},
-    recentResults: [
-      makeTswMatch({ opponent: 'Kennedy Y Wu', event: 'BS U13', date: 'Fri 3/21/2025', won: false }),
-      makeTswMatch({ opponent: 'Derik S Li', event: 'BS U11', date: 'Sat 1/14/2023', won: true }),
-      makeTswMatch({ opponent: 'Sophia Li', event: 'GS U13', date: 'Mon 2/19/2024', won: false }),
-      makeTswMatch({ opponent: 'Kennedy Y Wu / Partner', event: 'BD U11', date: 'Sun 9/1/2024', category: 'doubles', won: false }),
-    ],
+    tournamentsByYear: {
+      '2025': [
+        {
+          name: 'Test Tournament',
+          url: '',
+          dates: '2025',
+          location: '',
+          events: [],
+          matches: [
+            makeTswMatch({ opponent: 'Kennedy Y Wu', event: 'BS U13', date: 'Fri 3/21/2025', won: false }),
+            makeTswMatch({ opponent: 'Derik S Li', event: 'BS U11', date: 'Sat 1/14/2023', won: true }),
+            makeTswMatch({ opponent: 'Sophia Li', event: 'GS U13', date: 'Mon 2/19/2024', won: false }),
+            makeTswMatch({ opponent: 'Kennedy Y Wu / Partner', event: 'BD U11', date: 'Sun 9/1/2024', category: 'doubles', won: false }),
+          ],
+        },
+      ],
+    },
   };
 
   it('finds exact matches against player B (singles and doubles)', () => {
@@ -268,3 +278,4 @@ describe('findMatchesBetween', () => {
     expect(findMatchesBetween(null, 'Daniel Li', 'Kennedy Y Wu')).toEqual([]);
   });
 });
+

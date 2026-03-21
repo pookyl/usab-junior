@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { track } from '@vercel/analytics';
 import {
-  Swords, Search, RefreshCw, Trophy, ExternalLink, TrendingUp,
+  Swords, Search, RefreshCw, Trophy, ExternalLink, TrendingUp, Calendar, MapPin,
 } from 'lucide-react';
 import {
   LineChart,
@@ -24,19 +24,12 @@ import {
   fetchH2H, fetchPlayerTswStats, fetchPlayerRankingTrend, tswH2HUrl, tswSearchUrl,
 } from '../services/rankingsService';
 import { formatDateLabel, inferGender, parseScoreString } from '../utils/playerUtils';
+import { AGE_COLORS } from '../constants/ageGroupStyles';
 export { parseScoreString } from '../utils/playerUtils';
 
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
 
 type Gender = 'Boy' | 'Girl' | 'All';
-
-const AGE_COLORS: Record<AgeGroup, string> = {
-  U11: 'bg-violet-600',
-  U13: 'bg-blue-600',
-  U15: 'bg-emerald-600',
-  U17: 'bg-amber-500',
-  U19: 'bg-rose-600',
-};
 
 const PLAYER_A_HEX = '#8b5cf6';
 const PLAYER_B_HEX = '#3b82f6';
@@ -134,7 +127,10 @@ export function findMatchesBetween(
   playerBName: string,
 ): H2HMatch[] {
   if (!statsA) return [];
-  return statsA.recentResults
+  const allMatches = Object.values(statsA.tournamentsByYear).flatMap((tournaments) =>
+    tournaments.flatMap((tournament) => tournament.matches ?? []),
+  );
+  return allMatches
     .filter((mr) => opponentMatches(mr, playerBName))
     .map((mr) => matchResultToH2HMatch(mr, playerAName));
 }
@@ -285,149 +281,145 @@ function PlayerPicker({ label, accent, players, selected, onSelect, loading, exc
 function PlayerNameLinks({
   players,
   playerLookup,
-  colorClass,
+  won,
+  boldName,
 }: {
   players: string[];
   playerLookup: Map<string, string>;
-  colorClass: string;
+  won: boolean;
+  boldName?: boolean;
 }) {
   return (
-    <p className={`text-xs md:text-sm truncate ${colorClass}`}>
+    <div className={`text-sm min-w-0 flex-1 text-slate-800 dark:text-slate-100 ${won || boldName ? 'font-semibold' : ''}`}>
       {players.map((name, i) => {
         const usabId = playerLookup.get(name.toLowerCase().trim());
         return (
-          <span key={i}>
-            {i > 0 && ' / '}
+          <div key={i} className="truncate">
             {usabId ? (
               <Link
                 to={`/directory/${usabId}`}
-                className="hover:underline"
+                className="hover:text-violet-600 dark:hover:text-violet-400 hover:underline"
               >
                 {name}
               </Link>
             ) : (
               name
             )}
-          </span>
+          </div>
         );
       })}
-    </p>
+    </div>
   );
 }
 
 function MatchCard({ match, playerLookup }: { match: H2HMatch; playerLookup: Map<string, string> }) {
-  const cat = eventCategory(match.event);
   const tswBase = 'https://www.tournamentsoftware.com';
   const tournamentHref = match.tournamentUrl
     ? (match.tournamentUrl.startsWith('http') ? match.tournamentUrl : `${tswBase}${match.tournamentUrl}`)
     : '';
+  const headerLabel = [match.round, match.event].filter(Boolean).join(' · ');
+  const team1Scores = match.scores.map(([a]) => a);
+  const team2Scores = match.scores.map(([, b]) => b);
+  const isWalkover = match.scores.length === 0 && (match.team1Won || match.team2Won);
 
   return (
-    <div className={`border rounded-xl overflow-hidden transition-shadow hover:shadow-md ${
-      match.team1Won
-        ? 'border-l-4 border-l-violet-400 border-t-slate-100 dark:border-t-slate-800 border-r-slate-100 dark:border-r-slate-800 border-b-slate-100 dark:border-b-slate-800'
-        : match.team2Won
-        ? 'border-l-4 border-l-blue-400 border-t-slate-100 dark:border-t-slate-800 border-r-slate-100 dark:border-r-slate-800 border-b-slate-100 dark:border-b-slate-800'
-        : 'border-slate-100 dark:border-slate-800'
-    }`}>
-      <div className="bg-slate-50 dark:bg-slate-800/50 px-3 md:px-4 py-2 md:py-2.5 border-b border-slate-100 dark:border-slate-800">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-            cat === 'Singles'
-              ? 'bg-green-100 text-green-700'
-              : cat === 'Doubles'
-              ? 'bg-orange-100 text-orange-700'
-              : 'bg-purple-100 text-purple-700'
-          }`}>
-            {match.event}
-          </span>
-          <span className="text-xs text-slate-400 dark:text-slate-500">·</span>
-          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{match.round}</span>
-        </div>
-        <div className="flex items-center gap-1.5 mt-1 min-w-0">
-          {tournamentHref ? (
-            <a
-              href={tournamentHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-orange-600 truncate transition-colors inline-flex items-center gap-1.5"
-            >
-              {match.tournament}
-              <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-500 shrink-0" />
-            </a>
-          ) : (
-            <p className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">{match.tournament}</p>
-          )}
-        </div>
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow overflow-hidden">
+      <div className="px-4 py-2 rounded-t-xl bg-slate-200/70 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800">
+        {tournamentHref ? (
+          <a
+            href={tournamentHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-orange-600 truncate transition-colors inline-flex items-center gap-1.5"
+          >
+            {match.tournament}
+            <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-500 shrink-0" />
+          </a>
+        ) : (
+          <p className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">{match.tournament}</p>
+        )}
+        <p className="text-xs font-medium min-w-0 truncate text-slate-600 dark:text-slate-300 mt-1">
+          {headerLabel}
+        </p>
       </div>
 
-      <div className="px-3 md:px-4 py-2.5 md:py-3">
-        <div className={`flex items-center gap-2 md:gap-3 py-1 md:py-1.5 ${match.team1Won ? 'font-bold' : ''}`}>
-          <span className={`w-5 h-5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[10px] md:text-xs font-bold text-white shrink-0 ${
-            match.team1Won ? 'bg-violet-500' : 'bg-slate-300'
+      <div className="px-4 divide-y divide-slate-100 dark:divide-slate-800">
+        <div className="flex items-start gap-2 py-1.5">
+          <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5 ${
+            match.team1Won
+              ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
           }`}>
             {match.team1Won ? 'W' : 'L'}
           </span>
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <PlayerNameLinks
-              players={match.team1Players}
-              playerLookup={playerLookup}
-              colorClass={match.team1Won ? 'text-violet-700' : 'text-slate-600 dark:text-slate-300'}
-            />
-          </div>
-          <div className="flex gap-1.5 md:gap-2 shrink-0">
-            {match.scores.length > 0 ? match.scores.map(([a, b], i) => (
-              <span key={i} className={`text-xs md:text-sm font-mono tabular-nums ${
-                a > b
-                  ? `${match.team1Won ? 'text-violet-700' : 'text-blue-700'} font-bold`
-                  : 'text-slate-600 dark:text-slate-300 font-normal'
-              }`}>
-                {a}
+          <PlayerNameLinks
+            players={match.team1Players}
+            playerLookup={playerLookup}
+            won={match.team1Won}
+          />
+          <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
+            {isWalkover && !match.team1Won && (
+              <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold">Walkover</span>
+            )}
+            {match.team1Won && (
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+            )}
+            {team1Scores.map((s, i) => (
+              <span key={i} className={`w-5 text-right tabular-nums ${match.team1Won && s > team2Scores[i] ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100'}`}>
+                {s}
               </span>
-            )) : !match.team1Won ? (
-              <span className="text-xs md:text-sm font-normal text-slate-400 dark:text-slate-500">Walkover</span>
-            ) : null}
+            ))}
           </div>
         </div>
 
-        <div className={`flex items-center gap-2 md:gap-3 py-1 md:py-1.5 ${match.team2Won ? 'font-bold' : ''}`}>
-          <span className={`w-5 h-5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[10px] md:text-xs font-bold text-white shrink-0 ${
-            match.team2Won ? 'bg-blue-500' : 'bg-slate-300'
+        <div className="flex items-start gap-2 py-1.5">
+          <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5 ${
+            match.team2Won
+              ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
           }`}>
             {match.team2Won ? 'W' : 'L'}
           </span>
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <PlayerNameLinks
-              players={match.team2Players}
-              playerLookup={playerLookup}
-              colorClass={match.team2Won ? 'text-blue-700' : 'text-slate-600 dark:text-slate-300'}
-            />
-          </div>
-          <div className="flex gap-1.5 md:gap-2 shrink-0">
-            {match.scores.length > 0 ? match.scores.map(([a, b], i) => (
-              <span key={i} className={`text-xs md:text-sm font-mono tabular-nums ${
-                b > a
-                  ? `${match.team1Won ? 'text-violet-700' : 'text-blue-700'} font-bold`
-                  : 'text-slate-600 dark:text-slate-300 font-normal'
-              }`}>
-                {b}
+          <PlayerNameLinks
+            players={match.team2Players}
+            playerLookup={playerLookup}
+            won={match.team2Won}
+          />
+          <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
+            {isWalkover && !match.team2Won && (
+              <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold">Walkover</span>
+            )}
+            {match.team2Won && (
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+            )}
+            {team2Scores.map((s, i) => (
+              <span key={i} className={`w-5 text-right tabular-nums ${match.team2Won && s > team1Scores[i] ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100'}`}>
+                {s}
               </span>
-            )) : !match.team2Won ? (
-              <span className="text-xs md:text-sm font-normal text-slate-400 dark:text-slate-500">Walkover</span>
-            ) : null}
+            ))}
           </div>
         </div>
-
-        {(match.date || match.venue || match.duration) && (
-          <div className="mt-1.5 md:mt-2 pt-1.5 md:pt-2 border-t border-slate-50 dark:border-slate-800 flex items-center gap-2 text-[10px] md:text-xs text-slate-400 dark:text-slate-500">
-            {match.date && <span>{match.date}</span>}
-            {match.date && match.duration && <span>·</span>}
-            {match.duration && <span>{match.duration}</span>}
-            {(match.date || match.duration) && match.venue && <span>·</span>}
-            {match.venue && <span>{match.venue}</span>}
-          </div>
-        )}
       </div>
+
+      {(match.date || match.venue || match.duration) && (
+        <div className="px-4 py-2 flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800">
+          {match.date && (
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              {match.date}
+            </span>
+          )}
+          {match.venue && (
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3 h-3" />
+              {match.venue}
+            </span>
+          )}
+          {match.duration && (
+            <span className="ml-auto">{match.duration}</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
