@@ -358,8 +358,20 @@ function MatchCard({
   const isWalkover = match.scores.length === 0 && (match.team1Won || match.team2Won);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow overflow-hidden">
-      <div className="px-4 py-2 rounded-t-xl bg-slate-200/70 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800">
+    <div className={`rounded-xl border overflow-hidden hover:shadow-md transition-shadow ${
+      match.team1Won
+        ? 'bg-violet-50/50 dark:bg-violet-950/20 border-violet-200 dark:border-violet-900/50 border-l-[3px] border-l-violet-500'
+        : match.team2Won
+          ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/50 border-l-[3px] border-l-blue-500'
+          : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
+    }`}>
+      <div className={`px-4 py-2 rounded-t-xl border-b ${
+        match.team1Won
+          ? 'bg-violet-100/60 dark:bg-violet-900/30 border-violet-100 dark:border-violet-900/40'
+          : match.team2Won
+            ? 'bg-blue-100/60 dark:bg-blue-900/30 border-blue-100 dark:border-blue-900/40'
+            : 'bg-slate-200/70 dark:bg-slate-800/60 border-slate-100 dark:border-slate-800'
+      }`}>
         {tournamentHref ? (
           <a
             href={tournamentHref}

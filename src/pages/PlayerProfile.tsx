@@ -315,6 +315,64 @@ const STATS_TABS: { key: StatsCategory; label: string }[] = [
   { key: 'mixed', label: 'Mixed' },
 ];
 
+const SEASON_BOUNDARY_MONTH = 8;
+const SEASON_BOUNDARY_DAY = 15;
+
+function getSeasonKey(t: TswTournament, yearHint: number): string {
+  let year = yearHint;
+  let month = -1;
+  let day = 1;
+
+  if (t.startDate) {
+    const parts = t.startDate.split('-');
+    if (parts.length >= 3) {
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+      day = parseInt(parts[2], 10);
+    }
+  }
+
+  if (month < 0) {
+    const d = new Date(t.dates.split(' - ')[0]);
+    if (!isNaN(d.getTime())) {
+      year = d.getFullYear();
+      month = d.getMonth() + 1;
+      day = d.getDate();
+    }
+  }
+
+  if (month < 0) return `${yearHint - 1}-${yearHint}`;
+
+  if (month > SEASON_BOUNDARY_MONTH || (month === SEASON_BOUNDARY_MONTH && day >= SEASON_BOUNDARY_DAY)) {
+    return `${year}-${year + 1}`;
+  }
+  return `${year - 1}-${year}`;
+}
+
+function groupBySeason(tournamentsByYear: Record<string, TswTournament[]>): Record<string, TswTournament[]> {
+  const bySeason: Record<string, TswTournament[]> = {};
+  for (const [yearStr, tournaments] of Object.entries(tournamentsByYear)) {
+    const yearHint = parseInt(yearStr, 10);
+    for (const t of tournaments) {
+      const key = getSeasonKey(t, yearHint);
+      if (!bySeason[key]) bySeason[key] = [];
+      bySeason[key].push(t);
+    }
+  }
+  return bySeason;
+}
+
+function currentSeasonKey(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+  if (m > SEASON_BOUNDARY_MONTH || (m === SEASON_BOUNDARY_MONTH && d >= SEASON_BOUNDARY_DAY)) {
+    return `${y}-${y + 1}`;
+  }
+  return `${y - 1}-${y}`;
+}
+
 function StatsTabContent({ cat }: { cat: CategoryStats }) {
   return (
     <div className="space-y-3 pt-3 md:pt-4">
@@ -381,8 +439,16 @@ function TournamentMatchCard({
     : '';
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow overflow-hidden">
-      <div className="px-4 py-2 rounded-t-xl bg-slate-200/70 dark:bg-slate-800/60">
+    <div className={`rounded-xl border overflow-hidden transition-shadow hover:shadow-md ${
+      match.won
+        ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 border-l-[3px] border-l-emerald-500'
+        : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
+    }`}>
+      <div className={`px-4 py-2 rounded-t-xl ${
+        match.won
+          ? 'bg-emerald-100/60 dark:bg-emerald-900/30'
+          : 'bg-slate-200/70 dark:bg-slate-800/60'
+      }`}>
         <p className="text-xs font-medium min-w-0 truncate text-slate-600 dark:text-slate-300">
           {headerLabel}
         </p>
@@ -560,10 +626,13 @@ export default function PlayerProfile() {
   const [trendError, setTrendError] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [statsTab, setStatsTab] = useState<StatsCategory>('total');
-  const [expandedTournaments, setExpandedTournaments] = useState<Set<string>>(new Set());
-  const expandedTournamentsRef = useRef(expandedTournaments);
+  const [expandedYears, setExpandedYears] = useState<Set<string>>(new Set());
+  const [collapsedTournaments, setCollapsedTournaments] = useState<Set<string>>(new Set());
+  const expandedYearsRef = useRef(expandedYears);
+  const collapsedTournamentsRef = useRef(collapsedTournaments);
   const statsTabRef = useRef(statsTab);
   const restoreScrollYRef = useRef<number | null>(null);
+  const yearsInitializedRef = useRef(false);
 
   const viewStateStorageKey = useMemo(
     () => (usabId ? `player-profile:view:${usabId}` : ''),
@@ -571,8 +640,12 @@ export default function PlayerProfile() {
   );
 
   useEffect(() => {
-    expandedTournamentsRef.current = expandedTournaments;
-  }, [expandedTournaments]);
+    expandedYearsRef.current = expandedYears;
+  }, [expandedYears]);
+
+  useEffect(() => {
+    collapsedTournamentsRef.current = collapsedTournaments;
+  }, [collapsedTournaments]);
 
   useEffect(() => {
     statsTabRef.current = statsTab;
@@ -586,7 +659,8 @@ export default function PlayerProfile() {
         JSON.stringify({
           restorePending: true,
           scrollY: window.scrollY,
-          expandedTournaments: [...expandedTournamentsRef.current],
+          expandedYears: [...expandedYearsRef.current],
+          collapsedTournaments: [...collapsedTournamentsRef.current],
           statsTab: statsTabRef.current,
         }),
       );
@@ -604,17 +678,22 @@ export default function PlayerProfile() {
       const parsed = JSON.parse(raw) as {
         restorePending?: unknown;
         scrollY?: unknown;
-        expandedTournaments?: unknown;
+        expandedYears?: unknown;
+        collapsedTournaments?: unknown;
         statsTab?: unknown;
       };
       if (parsed.restorePending !== true) return;
 
-      if (Array.isArray(parsed.expandedTournaments)) {
-        const expanded = parsed.expandedTournaments.filter(
-          (v): v is string => typeof v === 'string' && v.length > 0,
-        );
-        setExpandedTournaments(new Set(expanded));
+      const filterStrings = (arr: unknown) =>
+        Array.isArray(arr) ? arr.filter((v): v is string => typeof v === 'string' && v.length > 0) : [];
+
+      const restoredYears = filterStrings(parsed.expandedYears);
+      if (restoredYears.length > 0) {
+        setExpandedYears(new Set(restoredYears));
+        yearsInitializedRef.current = true;
       }
+      setCollapsedTournaments(new Set(filterStrings(parsed.collapsedTournaments)));
+
       if (
         typeof parsed.statsTab === 'string'
         && STATS_TABS.some((tab) => tab.key === parsed.statsTab)
@@ -646,6 +725,24 @@ export default function PlayerProfile() {
       }
     });
   }, [loadingTsw, viewStateStorageKey]);
+
+  useEffect(() => {
+    if (loadingTsw || yearsInitializedRef.current) return;
+    const tby = tswStats?.tournamentsByYear;
+    if (!tby) return;
+    const bySeason = groupBySeason(tby);
+    const seasons = Object.keys(bySeason).sort((a, b) => {
+      const aStart = parseInt(a.split('-')[0], 10);
+      const bStart = parseInt(b.split('-')[0], 10);
+      return bStart - aStart;
+    });
+    const current = currentSeasonKey();
+    const defaultSeason = seasons.includes(current) ? current : seasons[0];
+    if (defaultSeason) {
+      setExpandedYears(new Set([defaultSeason]));
+    }
+    yearsInitializedRef.current = true;
+  }, [loadingTsw, tswStats]);
 
   useEffect(() => {
     if (!usabId || !playerName) {
@@ -1011,7 +1108,12 @@ export default function PlayerProfile() {
           </div>
         ) : (() => {
           const tby = tswStats?.tournamentsByYear ?? {};
-          const years = Object.keys(tby).sort((a, b) => Number(b) - Number(a));
+          const bySeason = groupBySeason(tby);
+          const seasons = Object.keys(bySeason).sort((a, b) => {
+            const aStart = parseInt(a.split('-')[0], 10);
+            const bStart = parseInt(b.split('-')[0], 10);
+            return bStart - aStart;
+          });
 
           const filterTournament = (t: TswTournament): TswTournament | null => {
             if (statsTab === 'total') return t;
@@ -1020,7 +1122,7 @@ export default function PlayerProfile() {
             return { ...t, events: filtered };
           };
 
-          const hasAny = years.some((y) => tby[y].some((t) => filterTournament(t)));
+          const hasAny = seasons.some((s) => bySeason[s].some((t) => filterTournament(t)));
 
           if (!hasAny) {
             return (
@@ -1034,111 +1136,145 @@ export default function PlayerProfile() {
           }
 
           return (
-            <div className="space-y-5 md:space-y-6">
-              {years.map((year) => {
-                const filtered = tby[year].map(filterTournament).filter(Boolean) as TswTournament[];
+            <div className="space-y-3 md:space-y-4">
+              {seasons.map((season) => {
+                const filtered = bySeason[season].map(filterTournament).filter(Boolean) as TswTournament[];
                 if (filtered.length === 0) return null;
+                const seasonExpanded = expandedYears.has(season);
+                const seasonWins = filtered.reduce((s, t) => s + t.events.reduce((a, e) => a + e.wins, 0), 0);
+                const seasonLosses = filtered.reduce((s, t) => s + t.events.reduce((a, e) => a + e.losses, 0), 0);
                 return (
-                  <div key={year}>
-                    <h3 className="text-xs md:text-sm font-bold text-slate-600 dark:text-slate-300 mb-2.5 md:mb-3 flex items-center gap-2">
-                      <span className="px-2 md:px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full">{year}</span>
-                      <span className="text-slate-400 dark:text-slate-500 font-normal">{filtered.length} {filtered.length === 1 ? 'tournament' : 'tournaments'}</span>
-                    </h3>
-                    <div className="space-y-2.5 md:space-y-3">
-                      {filtered.map((t, ti) => {
-                        const tournKey = `${year}-${ti}`;
-                        const isExpanded = expandedTournaments.has(tournKey);
-                        const matchesForTournament = (t.matches ?? []).filter(
-                          (m) => statsTab === 'total' || m.category === statsTab,
-                        );
-                        return (
-                          <div key={ti} className="border border-slate-100 dark:border-slate-800 rounded-xl p-3 md:p-4 hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
-                            <div className="flex items-start justify-between gap-2 md:gap-3">
-                              <div className="min-w-0">
-                                {t.url ? (
-                                  <a
-                                    href={t.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-100 hover:text-orange-600 transition-colors"
-                                  >
-                                    {t.name}
-                                  </a>
-                                ) : (
-                                  <p className="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-100">{t.name}</p>
-                                )}
-                                <div className="flex flex-wrap gap-x-2 md:gap-x-3 gap-y-0.5 mt-1 text-[10px] md:text-xs text-slate-400 dark:text-slate-500">
-                                  {t.dates && <span>{t.dates}</span>}
-                                  {t.location && <span className="hidden sm:inline">{t.location}</span>}
+                  <div key={season} className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+                    <button
+                      onClick={() => {
+                        setExpandedYears((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(season)) {
+                            next.delete(season);
+                          } else {
+                            next.add(season);
+                            setCollapsedTournaments((ct) => {
+                              const updated = new Set(ct);
+                              filtered.forEach((_, i) => updated.delete(`${season}-${i}`));
+                              return updated;
+                            });
+                          }
+                          return next;
+                        });
+                      }}
+                      className="w-full flex items-center justify-between gap-3 px-3 md:px-4 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <ChevronDown className={`w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform shrink-0 ${seasonExpanded ? 'rotate-0' : '-rotate-90'}`} />
+                        <span className="text-sm md:text-base font-bold text-slate-700 dark:text-slate-200">Season {season}</span>
+                        <span className="text-[10px] md:text-xs text-slate-400 dark:text-slate-500 font-normal">{filtered.length} {filtered.length === 1 ? 'tournament' : 'tournaments'}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[10px] md:text-xs font-semibold text-emerald-600 dark:text-emerald-400">{seasonWins}W</span>
+                        <span className="text-[10px] md:text-xs text-slate-300 dark:text-slate-600">-</span>
+                        <span className="text-[10px] md:text-xs font-semibold text-rose-600 dark:text-rose-400">{seasonLosses}L</span>
+                      </div>
+                    </button>
+                    {seasonExpanded && (
+                      <div className="px-3 md:px-4 py-2.5 md:py-3 space-y-2.5 md:space-y-3">
+                        {filtered.map((t, ti) => {
+                          const tournKey = `${season}-${ti}`;
+                          const matchesForTournament = (t.matches ?? []).filter(
+                            (m) => statsTab === 'total' || m.category === statsTab,
+                          );
+                          const isCollapsed = collapsedTournaments.has(tournKey);
+                          const showMatches = !isCollapsed && matchesForTournament.length > 0;
+                          return (
+                            <div key={ti} className="border border-slate-100 dark:border-slate-800 rounded-xl p-3 md:p-4 hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
+                              <div className="flex items-start justify-between gap-2 md:gap-3">
+                                <div className="min-w-0">
+                                  {t.url ? (
+                                    <a
+                                      href={t.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-100 hover:text-orange-600 transition-colors"
+                                    >
+                                      {t.name}
+                                    </a>
+                                  ) : (
+                                    <p className="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-100">{t.name}</p>
+                                  )}
+                                  <div className="flex flex-wrap gap-x-2 md:gap-x-3 gap-y-0.5 mt-1 text-[10px] md:text-xs text-slate-400 dark:text-slate-500">
+                                    {t.dates && <span>{t.dates}</span>}
+                                    {t.location && <span className="hidden sm:inline">{t.location}</span>}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {t.url && (
+                                    <a
+                                      href={t.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-orange-500 hover:text-orange-600"
+                                    >
+                                      <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                    </a>
+                                  )}
+                                  {matchesForTournament.length > 0 && (
+                                    <button
+                                      onClick={() => setCollapsedTournaments((prev) => {
+                                        const next = new Set(prev);
+                                        if (next.has(tournKey)) next.delete(tournKey);
+                                        else next.add(tournKey);
+                                        return next;
+                                      })}
+                                      className="inline-flex items-center gap-0.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                                      title={isCollapsed ? 'Show results' : 'Hide results'}
+                                    >
+                                      <ChevronDown className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform ${isCollapsed ? '-rotate-90' : 'rotate-0'}`} />
+                                    </button>
+                                  )}
                                 </div>
                               </div>
-                              {t.url && (
-                                <a
-                                  href={t.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="shrink-0 text-orange-500 hover:text-orange-600"
-                                >
-                                  <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                </a>
-                              )}
-                            </div>
-                            <div className="mt-2.5 md:mt-3 flex flex-wrap items-center gap-1.5 md:gap-2">
-                              {t.events.map((ev, ei) => {
-                                const total = ev.wins + ev.losses;
-                                const allWins = ev.wins === total;
-                                const allLosses = ev.losses === total;
-                                return (
-                                  <span
-                                    key={ei}
-                                    className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 rounded-lg text-[10px] md:text-xs font-medium border ${
-                                      allWins
-                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300'
-                                        : allLosses
-                                          ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950 dark:border-rose-800 dark:text-rose-300'
-                                          : 'bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-800/50 dark:border-slate-700 dark:text-slate-300'
-                                    }`}
-                                  >
-                                    {ev.name}
-                                    <span className="font-bold">{ev.wins}W-{ev.losses}L</span>
-                                  </span>
-                                );
-                              })}
-                              {matchesForTournament.length > 0 && (
-                                <button
-                                  onClick={() => setExpandedTournaments((prev) => {
-                                    const next = new Set(prev);
-                                    if (next.has(tournKey)) next.delete(tournKey);
-                                    else next.add(tournKey);
-                                    return next;
-                                  })}
-                                  className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-lg text-[10px] md:text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                                >
-                                  {isExpanded ? 'Hide' : 'Results'}
-                                  <ChevronDown className={`w-3 h-3 md:w-3.5 md:h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                                </button>
-                              )}
-                            </div>
-                            {isExpanded && matchesForTournament.length > 0 && (
-                              <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 md:space-y-2.5">
-                                {matchesForTournament.map((match, mi) => (
-                                  <TournamentMatchCard
-                                    key={mi}
-                                    match={match}
-                                    playerName={displayName}
-                                    tournamentId={t.tswId}
-                                    fromPath={location.pathname}
-                                    onBeforePlayerNavigate={saveProfileReturnSnapshot}
-                                    location={t.location}
-                                    showTournament={false}
-                                  />
-                                ))}
+                              <div className="mt-2.5 md:mt-3 flex flex-wrap items-center gap-1.5 md:gap-2">
+                                {t.events.map((ev, ei) => {
+                                  const total = ev.wins + ev.losses;
+                                  const allWins = ev.wins === total;
+                                  const allLosses = ev.losses === total;
+                                  return (
+                                    <span
+                                      key={ei}
+                                      className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 rounded-lg text-[10px] md:text-xs font-medium border ${
+                                        allWins
+                                          ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300'
+                                          : allLosses
+                                            ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950 dark:border-rose-800 dark:text-rose-300'
+                                            : 'bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-800/50 dark:border-slate-700 dark:text-slate-300'
+                                      }`}
+                                    >
+                                      {ev.name}
+                                      <span className="font-bold">{ev.wins}W-{ev.losses}L</span>
+                                    </span>
+                                  );
+                                })}
                               </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                              {showMatches && (
+                                <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 md:space-y-2.5">
+                                  {matchesForTournament.map((match, mi) => (
+                                    <TournamentMatchCard
+                                      key={mi}
+                                      match={match}
+                                      playerName={displayName}
+                                      tournamentId={t.tswId}
+                                      fromPath={location.pathname}
+                                      onBeforePlayerNavigate={saveProfileReturnSnapshot}
+                                      location={t.location}
+                                      showTournament={false}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}

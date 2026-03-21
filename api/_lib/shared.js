@@ -576,6 +576,8 @@ export function parseTswTournaments(html, playerName) {
 
     const dateMatch = tournBlock.match(/<time[^>]*>([^<]+)<\/time>\s*(?:to\s*<time[^>]*>([^<]+)<\/time>)?/);
     const dates = dateMatch ? (dateMatch[2] ? `${dateMatch[1].trim()} - ${dateMatch[2].trim()}` : dateMatch[1].trim()) : '';
+    const startDateAttr = tournBlock.match(/<time[^>]*datetime="([^"]*)"[^>]*>/);
+    const startDate = startDateAttr ? startDateAttr[1].trim() : '';
 
     const locMatch = tournBlock.match(/icon-lang[^>]*\/>\s*([^<]+)/);
     const location = locMatch ? locMatch[1].trim().replace(/^\|\s*/, '') : '';
@@ -718,6 +720,7 @@ export function parseTswTournaments(html, playerName) {
         tswId: tournamentId || undefined,
         url,
         dates,
+        startDate: startDate || undefined,
         location,
         events,
         matches: tournamentMatches,

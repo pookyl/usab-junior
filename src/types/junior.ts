@@ -104,6 +104,7 @@ export interface TswTournament {
   tswId?: string;
   url: string;
   dates: string;
+  startDate?: string;
   location: string;
   events: TswTournamentEvent[];
   matches: TswMatchResult[];

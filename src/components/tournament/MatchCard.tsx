@@ -129,18 +129,26 @@ export default function MatchCard({
   };
   const team1HasHighlightedPlayer = teamHasHighlightedPlayer(match.team1Ids, match.team1);
   const team2HasHighlightedPlayer = teamHasHighlightedPlayer(match.team2Ids, match.team2);
+  const hasHighlight = team1HasHighlightedPlayer || team2HasHighlightedPlayer;
+  const highlightedWon = hasHighlight && (
+    (team1HasHighlightedPlayer && match.team1Won) || (team2HasHighlightedPlayer && match.team2Won)
+  );
 
   return (
-    <div className={`bg-white dark:bg-slate-900 rounded-xl border hover:shadow-md transition-shadow ${
+    <div className={`rounded-xl border overflow-hidden hover:shadow-md transition-shadow ${
       isNowPlaying
-        ? 'border-sky-200 dark:border-sky-800/70'
-        : 'border-slate-100 dark:border-slate-800'
+        ? 'border-sky-200 dark:border-sky-800/70 bg-white dark:bg-slate-900'
+        : highlightedWon
+          ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 border-l-[3px] border-l-emerald-500'
+          : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
     }`}>
       <div
         className={`px-4 py-2 rounded-t-xl ${
           isNowPlaying
             ? 'bg-sky-100 dark:bg-sky-900/30'
-            : 'bg-slate-200/70 dark:bg-slate-800/60'
+            : highlightedWon
+              ? 'bg-emerald-100/60 dark:bg-emerald-900/30'
+              : 'bg-slate-200/70 dark:bg-slate-800/60'
         }`}
       >
         <div className="flex items-center justify-between gap-2">
