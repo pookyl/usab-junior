@@ -104,15 +104,23 @@ function sendError(res, err, label) {
   res.end(JSON.stringify({ error: err.message }));
 }
 
+function isRefreshRequest(req) {
+  const urlObj = new URL(req.url, 'http://localhost');
+  return req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
+}
+
 // ── Action handlers ─────────────────────────────────────────────────────────
 
 async function handleDetail(tswId, _req, res) {
+  const refresh = isRefreshRequest(_req);
   const cacheKey = `tournament-detail:${tswId}`;
-  const cached = getCached(cacheKey);
-  if (cached) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-    res.end(JSON.stringify(cached));
-    return;
+  if (!refresh) {
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
   }
 
   try {
@@ -141,12 +149,15 @@ async function handleDetail(tswId, _req, res) {
 }
 
 async function handleWinners(tswId, _req, res) {
+  const refresh = isRefreshRequest(_req);
   const cacheKey = `tournament-winners:${tswId}`;
-  const cached = getCached(cacheKey);
-  if (cached) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-    res.end(JSON.stringify(cached));
-    return;
+  if (!refresh) {
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
   }
 
   try {
@@ -170,12 +181,15 @@ async function handleWinners(tswId, _req, res) {
 }
 
 async function handleMedals(tswId, _req, res) {
+  const refresh = isRefreshRequest(_req);
   const cacheKey = `tournament-medals:${tswId}`;
-  const cached = getCached(cacheKey);
-  if (cached) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-    res.end(JSON.stringify(cached));
-    return;
+  if (!refresh) {
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
   }
 
   try {
@@ -246,11 +260,13 @@ async function handleMatches(tswId, req, res) {
 
   if (!dateParam) {
     const datesCacheKey = `tournament-match-dates:${tswId}`;
-    const cached = getCached(datesCacheKey);
-    if (cached) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-      res.end(JSON.stringify({ tswId, dates: cached }));
-      return;
+    if (!refresh) {
+      const cached = getCached(datesCacheKey);
+      if (cached) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+        res.end(JSON.stringify({ tswId, dates: cached }));
+        return;
+      }
     }
 
     try {
@@ -296,12 +312,15 @@ async function handleMatches(tswId, req, res) {
 
 async function handlePlayers(tswId, _req, res) {
   try {
+    const refresh = isRefreshRequest(_req);
     const cacheKey = `tournament-players:${tswId}`;
-    const cached = getCached(cacheKey);
-    if (cached) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
-      return;
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+        res.end(JSON.stringify(cached));
+        return;
+      }
     }
 
     const playersUrl = `/tournament/${tswId.toLowerCase()}/Players/GetPlayersContent`;
@@ -327,12 +346,15 @@ async function handlePlayers(tswId, _req, res) {
 
 async function handleDraws(tswId, _req, res) {
   try {
+    const refresh = isRefreshRequest(_req);
     const cacheKey = `tournament-draws:${tswId}`;
-    const cached = getCached(cacheKey);
-    if (cached) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
-      return;
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+        res.end(JSON.stringify(cached));
+        return;
+      }
     }
 
     const drawsPath = `/sport/draws.aspx?id=${encodeURIComponent(tswId)}`;
@@ -351,12 +373,15 @@ async function handleDraws(tswId, _req, res) {
 
 async function handleEvents(tswId, _req, res) {
   try {
+    const refresh = isRefreshRequest(_req);
     const cacheKey = `tournament-events:${tswId}`;
-    const cached = getCached(cacheKey);
-    if (cached) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
-      return;
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+        res.end(JSON.stringify(cached));
+        return;
+      }
     }
 
     const eventsPath = `/sport/events.aspx?id=${encodeURIComponent(tswId)}`;
@@ -375,12 +400,15 @@ async function handleEvents(tswId, _req, res) {
 
 async function handleSeeds(tswId, _req, res) {
   try {
+    const refresh = isRefreshRequest(_req);
     const cacheKey = `tournament-seeds:${tswId}`;
-    const cached = getCached(cacheKey);
-    if (cached) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
-      return;
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+        res.end(JSON.stringify(cached));
+        return;
+      }
     }
 
     const seedsPath = `/sport/seeds.aspx?id=${encodeURIComponent(tswId)}`;
@@ -400,6 +428,7 @@ async function handleSeeds(tswId, _req, res) {
 async function handleEventDetail(tswId, req, res) {
   const urlObj = new URL(req.url, 'http://localhost');
   const eventId = req.query?.eventId || urlObj.searchParams.get('eventId');
+  const refresh = req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
   if (!eventId || !/^\d+$/.test(eventId)) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'eventId query parameter required (numeric)' }));
@@ -407,11 +436,13 @@ async function handleEventDetail(tswId, req, res) {
   }
 
   const cacheKey = `tournament-event-detail:${tswId}:${eventId}`;
-  const cached = getCached(cacheKey);
-  if (cached) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-    res.end(JSON.stringify(cached));
-    return;
+  if (!refresh) {
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
   }
 
   try {
@@ -441,6 +472,7 @@ async function handleEventDetail(tswId, req, res) {
 async function handlePlayerDetail(tswId, req, res) {
   const urlObj = new URL(req.url, 'http://localhost');
   const playerId = req.query?.playerId || urlObj.searchParams.get('playerId');
+  const refresh = req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
   if (!playerId || !/^\d+$/.test(playerId)) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'playerId query parameter required (numeric)' }));
@@ -448,11 +480,13 @@ async function handlePlayerDetail(tswId, req, res) {
   }
 
   const cacheKey = `tournament-player-detail:${tswId}:${playerId}`;
-  const cached = getCached(cacheKey);
-  if (cached) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-    res.end(JSON.stringify(cached));
-    return;
+  if (!refresh) {
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
   }
 
   try {
@@ -487,6 +521,7 @@ async function handlePlayerDetail(tswId, req, res) {
 async function handleDrawBracket(tswId, req, res) {
   const urlObj = new URL(req.url, 'http://localhost');
   const drawId = req.query?.drawId || urlObj.searchParams.get('drawId');
+  const refresh = req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
   if (!drawId || !/^\d+$/.test(drawId)) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'drawId query parameter required (numeric)' }));
@@ -494,11 +529,13 @@ async function handleDrawBracket(tswId, req, res) {
   }
 
   const cacheKey = `tournament-draw-bracket:v7:${tswId}:${drawId}`;
-  const cached = getCached(cacheKey);
-  if (cached) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-    res.end(JSON.stringify(cached));
-    return;
+  if (!refresh) {
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
   }
 
   try {

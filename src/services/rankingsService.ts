@@ -266,7 +266,8 @@ export async function fetchTournamentDetail(
 ): Promise<TournamentDetail> {
   if (!refresh && tournamentDetailCache.has(tswId)) return tournamentDetailCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/detail`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/detail`;
+  if (refresh) url += '?refresh=1';
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) await throwApiError(res, 'Tournament detail API');
 
@@ -287,7 +288,8 @@ export async function fetchTournamentEvents(
 ): Promise<TournamentEventsResponse> {
   if (!refresh && tournamentEventsCache.has(tswId)) return tournamentEventsCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/events`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/events`;
+  if (refresh) url += '?refresh=1';
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) await throwApiError(res, 'Tournament events API');
 
@@ -304,7 +306,8 @@ export async function fetchTournamentEventDetail(
   const key = `${tswId}:${eventId}`;
   if (!refresh && tournamentEventDetailCache.has(key)) return tournamentEventDetailCache.get(key)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/event-detail?eventId=${encodeURIComponent(eventId)}`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/event-detail?eventId=${encodeURIComponent(eventId)}`;
+  if (refresh) url += '&refresh=1';
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) await throwApiError(res, 'Tournament event detail API');
 
@@ -319,7 +322,8 @@ export async function fetchTournamentSeeding(
 ): Promise<TournamentSeedingResponse> {
   if (!refresh && tournamentSeedingCache.has(tswId)) return tournamentSeedingCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/seeds`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/seeds`;
+  if (refresh) url += '?refresh=1';
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) await throwApiError(res, 'Tournament seeds API');
 
@@ -338,7 +342,8 @@ export async function fetchTournamentWinners(
 ): Promise<TournamentWinnersResponse> {
   if (!refresh && tournamentWinnersCache.has(tswId)) return tournamentWinnersCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/winners`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/winners`;
+  if (refresh) url += '?refresh=1';
   const res = await fetchWithRetry(url, 60_000);
   if (!res.ok) await throwApiError(res, 'Tournament winners API');
 
@@ -357,7 +362,8 @@ export async function fetchTournamentMedals(
 ): Promise<TournamentMedals> {
   if (!refresh && tournamentMedalsCache.has(tswId)) return tournamentMedalsCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/medals`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/medals`;
+  if (refresh) url += '?refresh=1';
   const res = await fetchWithRetry(url, 120_000);
   if (!res.ok) await throwApiError(res, 'Tournament medals API');
 
@@ -376,7 +382,8 @@ export async function fetchTournamentPlayers(
 ): Promise<TournamentPlayersResponse> {
   if (!refresh && tournamentPlayersCache.has(tswId)) return tournamentPlayersCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/players`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/players`;
+  if (refresh) url += '?refresh=1';
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) await throwApiError(res, 'Tournament players API');
 
@@ -397,7 +404,8 @@ export async function fetchTournamentPlayerDetail(
   const key = `${tswId}:${playerId}`;
   if (!refresh && tournamentPlayerDetailCache.has(key)) return tournamentPlayerDetailCache.get(key)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/player-detail?playerId=${encodeURIComponent(playerId)}`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/player-detail?playerId=${encodeURIComponent(playerId)}`;
+  if (refresh) url += '&refresh=1';
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) await throwApiError(res, 'Tournament player detail API');
 
@@ -417,7 +425,8 @@ export async function fetchTournamentMatchDates(
 ): Promise<TournamentMatchDatesResponse> {
   if (!refresh && tournamentMatchDatesCache.has(tswId)) return tournamentMatchDatesCache.get(tswId)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/matches`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/matches`;
+  if (refresh) url += '?refresh=1';
   const res = await fetchWithRetry(url, 30_000);
   if (!res.ok) await throwApiError(res, 'Tournament match dates API');
 
@@ -440,7 +449,8 @@ export async function fetchDrawBracket(
   const key = `${tswId}:${drawId}`;
   if (!refresh && drawBracketCache.has(key)) return drawBracketCache.get(key)!;
 
-  const url = `/api/tournaments/${encodeURIComponent(tswId)}/draw-bracket?drawId=${drawId}`;
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/draw-bracket?drawId=${drawId}`;
+  if (refresh) url += '&refresh=1';
   const res = await fetchWithRetry(url, 60_000);
   if (!res.ok) await throwApiError(res, 'Draw bracket API');
 

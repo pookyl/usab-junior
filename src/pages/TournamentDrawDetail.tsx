@@ -33,7 +33,7 @@ export default function TournamentDrawDetail() {
     const needsName = !routeState?.drawName && !drawName;
 
     const fetches: [Promise<unknown>, Promise<DrawResponse>] = [
-      needsName ? fetchTournamentDetail(tswId) : Promise.resolve(null),
+      needsName ? fetchTournamentDetail(tswId, isRefresh) : Promise.resolve(null),
       fetchDrawBracket(tswId, numericDrawId, isRefresh),
     ];
 

@@ -112,7 +112,19 @@ export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: s
     loadMatches(dateParam);
   }
 
-  useEffect(() => { if (refreshTrigger && selectedDate) loadMatches(selectedDate, true); }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!refreshTrigger) return;
+    let cancelled = false;
+    fetchTournamentMatchDates(tswId, true)
+      .then(d => {
+        if (cancelled) return;
+        setDates(d.dates);
+        setDatesFetched(true);
+      })
+      .catch(e => { if (!cancelled) setDatesError(e.message); });
+    if (selectedDate) loadMatches(selectedDate, true);
+    return () => { cancelled = true; };
+  }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const events = useMemo(() => {
     const set = new Set(matches.map(m => m.event).filter(Boolean));

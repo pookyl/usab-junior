@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin } from 'lucide-react';
+import { Calendar, MapPin, Play } from 'lucide-react';
 import type { TournamentMatch, RoundRobinPlayer } from '../../types/junior';
 
 // ── TeamRow (shared between MatchCard and RoundRobinMatchCard) ──────────────
@@ -108,6 +108,19 @@ export default function MatchCard({
   const t1Scores = match.scores.map(g => g[0]);
   const t2Scores = match.scores.map(g => g[1]);
   const ongoing = !match.team1Won && !match.team2Won && !match.walkover && !match.bye;
+  const fallbackHeader = [match.round, match.event].filter(Boolean).join(' \u00b7 ');
+  const rawHeader = match.header || fallbackHeader;
+  let headerLabel = rawHeader;
+  let matchStatus = (match.status || '').trim();
+  if (!matchStatus) {
+    const nowPlayingSuffix = rawHeader.match(/^(.*)\s+\u00b7\s+(Now\s*playing)\s*$/i);
+    if (nowPlayingSuffix) {
+      headerLabel = nowPlayingSuffix[1].trim();
+      matchStatus = nowPlayingSuffix[2].trim();
+    }
+  }
+  const isNowPlaying = /^now\s*playing$/i.test(matchStatus);
+  const liveStatusLabel = isNowPlaying ? 'Now playing' : matchStatus;
   const normalizedHighlightName = highlightPlayerName?.trim().toLowerCase();
   const teamHasHighlightedPlayer = (teamIds?: (number | null)[], teamNames?: string[]) => {
     if (highlightPlayerId && teamIds?.some(pid => pid === highlightPlayerId)) return true;
@@ -118,11 +131,33 @@ export default function MatchCard({
   const team2HasHighlightedPlayer = teamHasHighlightedPlayer(match.team2Ids, match.team2);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
-      <div className="px-4 py-2 bg-slate-200/70 dark:bg-slate-800/60 rounded-t-xl">
-        <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
-          {match.header || [match.round, match.event].filter(Boolean).join(' \u00b7 ')}
-        </p>
+    <div className={`bg-white dark:bg-slate-900 rounded-xl border hover:shadow-md transition-shadow ${
+      isNowPlaying
+        ? 'border-sky-200 dark:border-sky-800/70'
+        : 'border-slate-100 dark:border-slate-800'
+    }`}>
+      <div
+        className={`px-4 py-2 rounded-t-xl ${
+          isNowPlaying
+            ? 'bg-sky-100 dark:bg-sky-900/30'
+            : 'bg-slate-200/70 dark:bg-slate-800/60'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <p className={`text-xs font-medium min-w-0 truncate ${
+            isNowPlaying
+              ? 'text-sky-800 dark:text-sky-200'
+              : 'text-slate-600 dark:text-slate-300'
+          }`}>
+            {headerLabel}
+          </p>
+          {isNowPlaying && (
+            <span className="inline-flex items-center gap-1 shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-500 text-white">
+              <Play className="w-2.5 h-2.5" />
+              {liveStatusLabel}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="px-4 divide-y divide-slate-100 dark:divide-slate-800">

@@ -1025,6 +1025,37 @@ export function formatMatchDate(yyyymmdd) {
   return `${days[dt.getDay()]} ${m}/${d}/${y}`;
 }
 
+function parseMatchHeaderStatus(blockHtml) {
+  const asideMatch = blockHtml.match(/<div class="match__header-aside">([\s\S]*?)<\/div>/);
+  if (!asideMatch) return '';
+
+  const asideHtml = asideMatch[1];
+  const statuses = [];
+  const seen = new Set();
+  const pushStatus = (value) => {
+    const text = decodeHtmlEntities((value || '').trim());
+    if (!text) return;
+    const key = text.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    statuses.push(text);
+  };
+
+  // Primary block tooltip often contains the status text (e.g. "Now playing")
+  const primaryTitleMatch = asideHtml.match(/match__header-aside-block--primary[^>]*title="([^"]+)"/i)
+    || asideHtml.match(/title="([^"]+)"[^>]*match__header-aside-block--primary/i);
+  if (primaryTitleMatch) pushStatus(primaryTitleMatch[1]);
+
+  // nav-link__value spans may also contain status labels.
+  const valueRegex = /<span[^>]*class="[^"]*nav-link__value[^"]*"[^>]*>([^<]*)<\/span>/g;
+  let vm;
+  while ((vm = valueRegex.exec(asideHtml)) !== null) {
+    pushStatus(vm[1]);
+  }
+
+  return statuses[0] || '';
+}
+
 export function parseTswMatches(html) {
   const matches = [];
 
@@ -1061,21 +1092,7 @@ export function parseTswMatches(html) {
       const event = headerItems[0] ?? '';
       const round = headerItems[1] ?? '';
 
-      // Extract status tags from header-aside (e.g. "Now Playing", "Upcoming")
-      const asideMatch = block.match(/<div class="match__header-aside">([\s\S]*?)<\/div>/);
-      let headerStatus = '';
-      if (asideMatch) {
-        const tagRegex = /<span[^>]*class="[^"]*tag[^"]*"[^>]*>([^<]+)<\/span>/g;
-        let tm;
-        while ((tm = tagRegex.exec(asideMatch[1])) !== null) {
-          const txt = tm[1].trim();
-          if (txt) headerStatus = txt;
-        }
-        if (!headerStatus) {
-          const valMatch = asideMatch[1].match(/nav-link__value">([^<]+)<\/span>/);
-          if (valMatch && valMatch[1].trim()) headerStatus = valMatch[1].trim();
-        }
-      }
+      const headerStatus = parseMatchHeaderStatus(block);
 
       if (block.includes('>Bye<')) continue;
 
@@ -1139,10 +1156,7 @@ export function parseTswMatches(html) {
       if (footerMatch) location = footerMatch[1].trim();
       if (!location && court) location = court;
 
-      const headerParts = headerItems.join(' \u00b7 ');
-      const header = headerStatus
-        ? `${headerParts} \u00b7 ${headerStatus}`
-        : headerParts;
+      const header = headerItems.join(' \u00b7 ');
 
       matches.push({
         event,
@@ -1161,6 +1175,7 @@ export function parseTswMatches(html) {
         court,
         duration,
         location,
+        status: headerStatus || undefined,
       });
     }
   }
@@ -1227,9 +1242,7 @@ export function parseTswPlayerMatches(html) {
     const round = headerItems[0] ?? '';
     const event = headerItems[1] ?? '';
 
-    // Win/Loss status tag
-    const statusMatch = block.match(/<span[^>]*class="[^"]*match__status[^"]*"[^>]*>([^<]+)<\/span>/);
-    const status = statusMatch ? statusMatch[1].trim() : '';
+    const headerStatus = parseMatchHeaderStatus(block);
 
     const isBye = block.includes('>Bye<');
 
@@ -1305,7 +1318,7 @@ export function parseTswPlayerMatches(html) {
       }
     }
 
-    const header = [round, event, status].filter(Boolean).join(' · ');
+    const header = [round, event].filter(Boolean).join(' · ');
 
     matches.push({
       event,
@@ -1325,7 +1338,7 @@ export function parseTswPlayerMatches(html) {
       court,
       duration,
       location,
-      status,
+      status: headerStatus || undefined,
     });
   }
 
