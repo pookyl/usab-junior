@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
-import { usePlayers } from '../contexts/PlayersContext';
+
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
 import MatchCard from '../components/tournament/MatchCard';
 import type { TournamentPlayerDetailResponse } from '../types/junior';
@@ -10,7 +10,7 @@ import type { TournamentPlayerDetailResponse } from '../types/junior';
 export default function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
   const location = useLocation();
-  const { playerNameMap, playerIdSet } = usePlayers();
+
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,12 +40,7 @@ export default function TournamentPlayerDetail() {
     setFetchTrigger(n => n + 1);
   }, []);
 
-  const resolvedUsabId = useMemo(() => {
-    if (data?.memberId && playerIdSet.has(data.memberId)) return data.memberId;
-    if (!data?.playerName) return null;
-    const ids = playerNameMap.get(data.playerName.toLowerCase());
-    return ids?.length === 1 ? ids[0] : null;
-  }, [data?.memberId, data?.playerName, playerNameMap, playerIdSet]);
+  const resolvedUsabId = data?.memberId ?? null;
 
   const events = useMemo(() => {
     if (!data) return [];
@@ -75,7 +70,7 @@ export default function TournamentPlayerDetail() {
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
-        <RefreshButton onClick={handleRefresh} loading={loading} />
+        <RefreshButton onClick={handleRefresh} loading={loading} tswId={tswId} />
       </div>
 
       {loading ? (

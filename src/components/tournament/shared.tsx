@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
+import { isTournamentCached } from '../../services/rankingsService';
 
 // ── Tab definitions ─────────────────────────────────────────────────────────
 
@@ -114,7 +115,8 @@ export function useTabData<T>(tswId: string | undefined, active: boolean, fetche
 
 // ── Refresh button ──────────────────────────────────────────────────────────
 
-export function RefreshButton({ onClick, loading }: { onClick: () => void; loading: boolean }) {
+export function RefreshButton({ onClick, loading, tswId }: { onClick: () => void; loading: boolean; tswId?: string }) {
+  if (tswId && isTournamentCached(tswId)) return null;
   return (
     <button
       onClick={onClick}

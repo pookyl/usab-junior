@@ -28,12 +28,24 @@ async function fetchWithRetry(url: string, timeoutMs: number, retries = 2): Prom
   for (let attempt = 0; ; attempt++) {
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-      if (res.ok || attempt >= retries) return res;
+      if (res.ok) {
+        detectTournamentCache(url, res);
+        return res;
+      }
+      if (attempt >= retries) return res;
     } catch (err) {
       if (attempt >= retries) throw err;
     }
     await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
   }
+}
+
+const TOURNAMENT_API_RE = /\/api\/tournaments\/([0-9A-Fa-f-]+)\//;
+
+function detectTournamentCache(url: string, res: Response) {
+  if (res.headers.get('X-Source') !== 'cache') return;
+  const m = url.match(TOURNAMENT_API_RE);
+  if (m) _cachedTournaments.add(m[1].toUpperCase());
 }
 
 async function throwApiError(res: Response, fallback: string): Promise<never> {
@@ -62,6 +74,13 @@ function cappedSet<K, V>(map: Map<K, V>, key: K, value: V) {
     if (oldest !== undefined) map.delete(oldest);
   }
   map.set(key, value);
+}
+
+// ── Tournament cache detection ──────────────────────────────────────────────
+const _cachedTournaments = new Set<string>();
+
+export function isTournamentCached(tswId: string): boolean {
+  return _cachedTournaments.has(tswId.toUpperCase());
 }
 
 // ── Module-level caches ─────────────────────────────────────────────────────

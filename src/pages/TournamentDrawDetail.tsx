@@ -91,7 +91,7 @@ export default function TournamentDrawDetail() {
           <ArrowLeft className="w-4 h-4" />
           Back
         </Link>
-        <RefreshButton onClick={handleRefresh} loading={loading} />
+        <RefreshButton onClick={handleRefresh} loading={loading} tswId={tswId} />
       </div>
 
       {loading ? (

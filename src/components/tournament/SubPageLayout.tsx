@@ -27,7 +27,7 @@ export default function SubPageLayout({ title, icon: TitleIcon, children, onRefr
           <ArrowLeft className="w-4 h-4" />
           {meta.name || 'Tournament Home'}
         </Link>
-        {onRefresh && <RefreshButton onClick={onRefresh} loading={false} />}
+        {onRefresh && <RefreshButton onClick={onRefresh} loading={false} tswId={tswId} />}
       </div>
 
       <div className="flex items-center gap-2">

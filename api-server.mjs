@@ -47,6 +47,133 @@ async function getDefaultDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// ── Tournament cache (serves pre-scraped data from tournament-cache/) ────────
+
+const TOURNAMENT_CACHE_DIR = join(__dirname, 'tournament-cache');
+
+const CACHE_ACTION_MAP = {
+  detail: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'detail.json'),
+  draws: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'draws.json'),
+  events: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'events.json'),
+  seeds: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'seeds.json'),
+  players: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'players.json'),
+  winners: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'winners.json'),
+  medals: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'medals.json'),
+  matches: (tswId, url) => {
+    const d = url.searchParams.get('d') || '';
+    return d ? join(TOURNAMENT_CACHE_DIR, tswId, 'matches', `${d}.json`) : null;
+  },
+  'draw-bracket': (tswId, url) => {
+    const drawId = url.searchParams.get('drawId') || '';
+    return drawId ? join(TOURNAMENT_CACHE_DIR, tswId, 'draw-brackets', `${drawId}.json`) : null;
+  },
+  'event-detail': (tswId, url) => {
+    const eventId = url.searchParams.get('eventId') || '';
+    return eventId ? join(TOURNAMENT_CACHE_DIR, tswId, 'event-details', `${eventId}.json`) : null;
+  },
+};
+
+async function serveTournamentCache(tswId, action, url) {
+  if (action === 'player-detail') {
+    return synthesizePlayerDetail(tswId, url);
+  }
+
+  const resolver = CACHE_ACTION_MAP[action];
+  if (!resolver) return null;
+
+  const filePath = resolver(tswId, url);
+  if (!filePath) return null;
+
+  try {
+    const data = await readFile(filePath, 'utf-8');
+    console.log(`[tournament-cache] serving ${action} for ${tswId} from disk`);
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+async function synthesizePlayerDetail(tswId, url) {
+  const playerId = parseInt(url.searchParams.get('playerId') || '', 10);
+  if (!playerId) return null;
+
+  const cacheDir = join(TOURNAMENT_CACHE_DIR, tswId);
+
+  let playersData;
+  try {
+    playersData = JSON.parse(await readFile(join(cacheDir, 'players.json'), 'utf-8'));
+  } catch {
+    return null;
+  }
+
+  const player = (playersData.players || []).find(p => p.playerId === playerId);
+  if (!player) return null;
+
+  // Collect matches across all days
+  const allMatches = [];
+  try {
+    const matchFiles = await readdir(join(cacheDir, 'matches'));
+    for (const f of matchFiles) {
+      if (!f.endsWith('.json')) continue;
+      const dayData = JSON.parse(await readFile(join(cacheDir, 'matches', f), 'utf-8'));
+      for (const m of dayData.matches || []) {
+        const inTeam1 = (m.team1Ids || []).includes(playerId);
+        const inTeam2 = (m.team2Ids || []).includes(playerId);
+        if (inTeam1 || inTeam2) allMatches.push(m);
+      }
+    }
+  } catch { /* no matches dir */ }
+
+  // Compute win/loss
+  let wins = 0;
+  let losses = 0;
+  for (const m of allMatches) {
+    const inTeam1 = (m.team1Ids || []).includes(playerId);
+    if (m.bye) continue;
+    if (inTeam1 && m.team1Won) wins++;
+    else if (inTeam1 && m.team2Won) losses++;
+    else if (!inTeam1 && m.team2Won) wins++;
+    else if (!inTeam1 && m.team1Won) losses++;
+  }
+  const total = wins + losses;
+  const winPct = total > 0 ? Math.round((wins / total) * 100) : 0;
+
+  // Find events from event-details
+  const events = [];
+  try {
+    const eventFiles = await readdir(join(cacheDir, 'event-details'));
+    for (const f of eventFiles) {
+      if (!f.endsWith('.json')) continue;
+      const evData = JSON.parse(await readFile(join(cacheDir, 'event-details', f), 'utf-8'));
+      for (const entry of evData.entries || []) {
+        const playerInEntry = (entry.players || []).some(p => p.playerId === playerId);
+        if (!playerInEntry) continue;
+        const partners = (entry.players || [])
+          .filter(p => p.playerId !== playerId)
+          .map(p => p.name);
+        const label = partners.length > 0
+          ? `${evData.eventName} with ${partners.join(' / ')}`
+          : evData.eventName;
+        if (!events.includes(label)) events.push(label);
+      }
+    }
+  } catch { /* no event-details dir */ }
+
+  const result = {
+    tswId,
+    playerId,
+    playerName: player.name,
+    memberId: undefined,
+    club: player.club || '',
+    events,
+    winLoss: total > 0 ? { wins, losses, total, winPct } : null,
+    matches: allMatches,
+  };
+
+  console.log(`[tournament-cache] synthesized player-detail for ${player.name} (${playerId}): ${allMatches.length} matches, ${events.length} events`);
+  return JSON.stringify(result);
+}
+
 // ── HTTP server ───────────────────────────────────────────────────────────────
 const server = createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -484,10 +611,20 @@ const server = createServer(async (req, res) => {
   // GET /api/tournaments/:tswId/:action — unified tournament action dispatcher
   const tournamentActionMatch = reqUrl.pathname.match(/^\/api\/tournaments\/([0-9A-Fa-f-]+)\/([a-z][-a-z]*)$/);
   if (tournamentActionMatch) {
+    const tswId = tournamentActionMatch[1];
+    const action = tournamentActionMatch[2];
+
+    const cachedResponse = await serveTournamentCache(tswId, action, reqUrl);
+    if (cachedResponse) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Source': 'cache' });
+      res.end(cachedResponse);
+      return;
+    }
+
     const { default: actionHandler } = await import('./api/tournaments/[tswId]/[action].js');
     req.query = {
-      tswId: tournamentActionMatch[1],
-      action: tournamentActionMatch[2],
+      tswId,
+      action,
       d: reqUrl.searchParams.get('d') || '',
       refresh: reqUrl.searchParams.get('refresh') || '',
       playerId: reqUrl.searchParams.get('playerId') || '',

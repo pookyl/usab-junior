@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Usage: node scripts/scrape-tournament-fixtures.mjs <tswId> [--date YYYY-MM-DD]
+// Usage: node scripts/scrape-tournament-fixtures.mjs <tswId>
 //
 // Scrapes all tournament API endpoints from the local API server and saves
-// JSON responses as offline test fixtures.
+// JSON responses into tournament-cache/{tswId}/ for offline serving.
 //
 // Requires the dev server running on localhost:3001 (npm run dev).
 
@@ -16,32 +16,17 @@ const API_BASE = 'http://localhost:3001';
 
 // ── CLI args ─────────────────────────────────────────────────────────────────
 
-const args = process.argv.slice(2);
-const dateIdx = args.indexOf('--date');
-let dateArg = null;
-if (dateIdx !== -1) {
-  dateArg = args[dateIdx + 1];
-  args.splice(dateIdx, 2);
-}
-
-const tswId = args[0];
+const tswId = process.argv[2];
 if (!tswId) {
-  console.error(`Usage: node scripts/scrape-tournament-fixtures.mjs <tswId> [--date YYYY-MM-DD]
+  console.error(`Usage: node scripts/scrape-tournament-fixtures.mjs <tswId>
 
 Examples:
   node scripts/scrape-tournament-fixtures.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852
-  node scripts/scrape-tournament-fixtures.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852 --date 2026-03-22
 `);
   process.exit(1);
 }
 
-const folderDate = dateArg || new Date().toISOString().slice(0, 10);
-if (!/^\d{4}-\d{2}-\d{2}$/.test(folderDate)) {
-  console.error(`Invalid date format: ${folderDate} (expected YYYY-MM-DD)`);
-  process.exit(1);
-}
-
-const outDir = join(PROJECT_ROOT, 'test-fixtures', folderDate, tswId);
+const outDir = join(PROJECT_ROOT, 'tournament-cache', tswId);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -54,8 +39,9 @@ async function apiFetch(path) {
   return resp.json();
 }
 
-async function saveJson(filename, data) {
-  const filePath = join(outDir, filename);
+async function saveJson(relPath, data) {
+  const filePath = join(outDir, relPath);
+  await mkdir(dirname(filePath), { recursive: true });
   await writeFile(filePath, JSON.stringify(data, null, 2) + '\n');
   return filePath;
 }
@@ -96,13 +82,10 @@ async function main() {
   const drawIds = (detail.draws || []).map(d => d.drawId);
   const eventIds = (eventsData.events || []).map(e => e.eventId);
 
-  // Derive date range from the dates string (e.g. "20 - 22 March 2026") or
-  // fall back to tournament list data via the tournaments API.
   let dateParams = [];
   let startDate = '';
   let endDate = '';
 
-  // Try to get dates from the tournaments list (more reliable for date range)
   try {
     const tournamentsResp = await apiFetch('/api/tournaments');
     const allTournaments = tournamentsResp.tournaments
@@ -114,7 +97,7 @@ async function main() {
       startDate = match.startDate || '';
       endDate = match.endDate || match.startDate || '';
     }
-  } catch { /* ignore, will have empty date params */ }
+  } catch { /* ignore */ }
 
   dateParams = generateDateParams(startDate, endDate);
 
@@ -131,7 +114,7 @@ async function main() {
   ]);
   console.log('  Saved: detail.json, events.json');
 
-  // Phase 3: fetch remaining static endpoints in parallel
+  // Phase 3: fetch remaining static endpoints
   console.log('Phase 2: Fetching static endpoints...');
   const staticEndpoints = ['draws', 'seeds', 'players', 'winners', 'medals'];
   const staticResults = await Promise.allSettled(
@@ -157,14 +140,13 @@ async function main() {
         const data = await apiFetch(
           `/api/tournaments/${encodeURIComponent(tswId)}/matches?d=${dp}`,
         );
-        const filename = `matches-${dp}.json`;
-        await saveJson(filename, data);
-        return { filename, matchCount: data.matches?.length ?? 0 };
+        await saveJson(`matches/${dp}.json`, data);
+        return { dp, matchCount: data.matches?.length ?? 0 };
       }),
     );
     for (const r of matchResults) {
       if (r.status === 'fulfilled') {
-        console.log(`  Saved: ${r.value.filename} (${r.value.matchCount} matches)`);
+        console.log(`  Saved: matches/${r.value.dp}.json (${r.value.matchCount} matches)`);
       } else {
         console.warn(`  FAILED: ${r.reason.message}`);
       }
@@ -182,14 +164,13 @@ async function main() {
           const data = await apiFetch(
             `/api/tournaments/${encodeURIComponent(tswId)}/draw-bracket?drawId=${drawId}`,
           );
-          const filename = `draw-bracket-${drawId}.json`;
-          await saveJson(filename, data);
-          return filename;
+          await saveJson(`draw-brackets/${drawId}.json`, data);
+          return drawId;
         }),
       );
       for (const r of bracketResults) {
         if (r.status === 'fulfilled') {
-          console.log(`  Saved: ${r.value}`);
+          console.log(`  Saved: draw-brackets/${r.value}.json`);
         } else {
           console.warn(`  FAILED: ${r.reason.message}`);
         }
@@ -208,14 +189,13 @@ async function main() {
           const data = await apiFetch(
             `/api/tournaments/${encodeURIComponent(tswId)}/event-detail?eventId=${eventId}`,
           );
-          const filename = `event-detail-${eventId}.json`;
-          await saveJson(filename, data);
-          return filename;
+          await saveJson(`event-details/${eventId}.json`, data);
+          return eventId;
         }),
       );
       for (const r of eventResults) {
         if (r.status === 'fulfilled') {
-          console.log(`  Saved: ${r.value}`);
+          console.log(`  Saved: event-details/${r.value}.json`);
         } else {
           console.warn(`  FAILED: ${r.reason.message}`);
         }
@@ -228,7 +208,6 @@ async function main() {
     tswId,
     tournamentName,
     scrapedAt: new Date().toISOString(),
-    folderDate,
     startDate,
     endDate,
     dateParams,
@@ -236,9 +215,9 @@ async function main() {
     eventIds,
     files: {
       static: ['detail.json', 'draws.json', 'events.json', 'seeds.json', 'players.json', 'winners.json', 'medals.json'],
-      matches: dateParams.map(dp => `matches-${dp}.json`),
-      drawBrackets: drawIds.map(id => `draw-bracket-${id}.json`),
-      eventDetails: eventIds.map(id => `event-detail-${id}.json`),
+      matches: dateParams.map(dp => `matches/${dp}.json`),
+      drawBrackets: drawIds.map(id => `draw-brackets/${id}.json`),
+      eventDetails: eventIds.map(id => `event-details/${id}.json`),
     },
   };
   await saveJson('_manifest.json', manifest);
@@ -248,7 +227,7 @@ async function main() {
     + manifest.files.matches.length
     + manifest.files.drawBrackets.length
     + manifest.files.eventDetails.length
-    + 1; // manifest itself
+    + 1;
   console.log(`\nDone! ${totalFiles} files written to ${outDir}\n`);
 }
 
