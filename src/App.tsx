@@ -1,6 +1,7 @@
 import { Component, useEffect } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, matchPath } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import useScrollRestore from './hooks/useScrollRestore';
 import Navbar from './components/Navbar';
 import { PlayersProvider } from './contexts/PlayersContext';
@@ -121,6 +122,33 @@ function PlayerRedirect() {
   return <Navigate to={`/directory/${id}`} replace />;
 }
 
+const ROUTE_PATTERNS = [
+  '/tournaments/:tswId/event/:eventId',
+  '/tournaments/:tswId/draw/:drawId',
+  '/tournaments/:tswId/player/:playerId',
+  '/tournaments/:tswId/matches',
+  '/tournaments/:tswId/players',
+  '/tournaments/:tswId/draws',
+  '/tournaments/:tswId/events',
+  '/tournaments/:tswId/seeds',
+  '/tournaments/:tswId/winners',
+  '/tournaments/:tswId/medals',
+  '/tournaments/:tswId',
+  '/directory/:id',
+  '/players/:id',
+  '/players',
+  '/directory',
+  '/head-to-head',
+  '/tournaments',
+  '/',
+];
+
+function AnalyticsWithRoutes() {
+  const { pathname } = useLocation();
+  const route = ROUTE_PATTERNS.find(pattern => matchPath(pattern, pathname)) ?? pathname;
+  return <Analytics route={route} />;
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -129,6 +157,7 @@ export default function App() {
           <PlayersProvider>
             <TournamentFocusProvider>
               <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
+                <AnalyticsWithRoutes />
                 <ScrollManager />
                 <TournamentRouteTracker />
                 <TournamentFocusAutoExit />
