@@ -27,3 +27,6 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Pre-scraped tournament data (local dev cache)
+tournament-cache/
