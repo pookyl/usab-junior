@@ -11,7 +11,6 @@ import type {
   TournamentsResponse,
   TournamentDetail,
   TournamentMedals,
-  TournamentMatchDatesResponse,
   TournamentMatchDayResponse,
   TournamentPlayersResponse,
   TournamentEventsResponse,
@@ -39,7 +38,19 @@ async function fetchWithRetry(url: string, timeoutMs: number, retries = 2): Prom
 
 async function throwApiError(res: Response, fallback: string): Promise<never> {
   const body = await res.json().catch(() => ({}));
-  throw new Error((body as Record<string, string>).error || `${fallback} ${res.status}`);
+  const maybeError = (body as { error?: unknown }).error;
+  if (typeof maybeError === 'string' && maybeError) {
+    throw new Error(maybeError);
+  }
+  if (
+    maybeError
+    && typeof maybeError === 'object'
+    && 'message' in maybeError
+    && typeof (maybeError as { message?: unknown }).message === 'string'
+  ) {
+    throw new Error((maybeError as { message: string }).message);
+  }
+  throw new Error(`${fallback} ${res.status}`);
 }
 
 // ── Cache helpers ────────────────────────────────────────────────────────────
@@ -89,8 +100,8 @@ export async function fetchPlayerDirectory(): Promise<DirectoryPlayer[]> {
       directoryCache = data;
       return data;
     }
-  } catch {
-    // fall through
+  } catch (err) {
+    console.warn('[rankingsService] player-directory unavailable:', err);
   }
   return [];
 }
@@ -108,8 +119,8 @@ export async function fetchCachedDates(): Promise<string[]> {
       cachedDatesCache = data.dates;
       return data.dates;
     }
-  } catch {
-    // Fall back to current date only
+  } catch (err) {
+    console.warn('[rankingsService] cached-dates unavailable:', err);
   }
   return [RANKINGS_DATE];
 }
@@ -157,8 +168,8 @@ export async function fetchH2H(
   usabId2: string,
 ): Promise<H2HResult> {
   const url = `/api/h2h?player1=${usabId1}&player2=${usabId2}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-  if (!res.ok) throw new Error(`H2H API ${res.status}: ${await res.text()}`);
+  const res = await fetchWithRetry(url, 30_000, 1);
+  if (!res.ok) await throwApiError(res, 'H2H API');
   return await res.json();
 }
 
@@ -198,8 +209,8 @@ export async function fetchPlayerTswStats(
   if (tswStatsCache.has(usabId)) return tswStatsCache.get(usabId)!;
 
   const url = `/api/player/${usabId}/tsw-stats?name=${encodeURIComponent(playerName)}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
-  if (!res.ok) throw new Error(`TSW stats API ${res.status}`);
+  const res = await fetchWithRetry(url, 60_000, 1);
+  if (!res.ok) await throwApiError(res, 'TSW stats API');
 
   const stats: TswPlayerStats = await res.json();
   cappedSet(tswStatsCache, usabId, stats);
@@ -220,8 +231,8 @@ export async function fetchPlayerRankingTrend(
   if (trendCache.has(usabId)) return trendCache.get(usabId)!;
 
   const url = `/api/player/${usabId}/ranking-trend`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-  if (!res.ok) throw new Error(`Trend API ${res.status}`);
+  const res = await fetchWithRetry(url, 30_000, 1);
+  if (!res.ok) await throwApiError(res, 'Trend API');
 
   const data: PlayerRankingTrend = await res.json();
   cappedSet(trendCache, usabId, data);
@@ -416,24 +427,7 @@ export async function fetchTournamentPlayerDetail(
 
 // ── Tournament Tab Fetchers ──────────────────────────────────────────────────
 
-const tournamentMatchDatesCache = new Map<string, TournamentMatchDatesResponse>();
 const tournamentMatchDayCache = new Map<string, TournamentMatchDayResponse>();
-
-export async function fetchTournamentMatchDates(
-  tswId: string,
-  refresh = false,
-): Promise<TournamentMatchDatesResponse> {
-  if (!refresh && tournamentMatchDatesCache.has(tswId)) return tournamentMatchDatesCache.get(tswId)!;
-
-  let url = `/api/tournaments/${encodeURIComponent(tswId)}/matches`;
-  if (refresh) url += '?refresh=1';
-  const res = await fetchWithRetry(url, 30_000);
-  if (!res.ok) await throwApiError(res, 'Tournament match dates API');
-
-  const data: TournamentMatchDatesResponse = await res.json();
-  cappedSet(tournamentMatchDatesCache, tswId, data);
-  return data;
-}
 
 // ── Draw Bracket ──────────────────────────────────────────────────────────────
 

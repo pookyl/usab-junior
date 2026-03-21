@@ -1,5 +1,13 @@
-import { readFile, readdir, writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import {
+  listCachedDates,
+  loadDiskCacheForDate,
+  loadDiskCache,
+  getDiskCachedRankings,
+  getDiskCachedAllPlayers,
+  getDiskCachedDate,
+} from './rankingsDiskCache.js';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 export const USAB_BASE = 'https://usabjrrankings.org';
@@ -41,83 +49,15 @@ export function setCache(key, data) {
 }
 
 // ── Disk cache (bundled read-only fallback for Vercel) ───────────────────────
+export {
+  listCachedDates,
+  loadDiskCacheForDate,
+  loadDiskCache,
+  getDiskCachedRankings,
+  getDiskCachedAllPlayers,
+  getDiskCachedDate,
+};
 const DISK_CACHE_DIR = join(process.cwd(), 'data');
-const DISK_CACHE_FILE = join(DISK_CACHE_DIR, 'rankings-cache.json');
-
-function diskCachePath(date) {
-  return join(DISK_CACHE_DIR, `rankings-${date}.json`);
-}
-
-export async function listCachedDates() {
-  try {
-    const files = await readdir(DISK_CACHE_DIR);
-    const dates = [];
-    for (const f of files) {
-      const m = f.match(/^rankings-(\d{4}-\d{2}-\d{2})\.json$/);
-      if (m) dates.push(m[1]);
-    }
-    return dates.sort().reverse();
-  } catch {
-    return [];
-  }
-}
-
-function rebuildRankingsFromPlayers(allPlayers) {
-  const rankings = {};
-  for (const player of allPlayers) {
-    for (const e of player.entries) {
-      const key = `${e.ageGroup}-${e.eventType}`;
-      if (!rankings[key]) rankings[key] = [];
-      rankings[key].push({
-        usabId: player.usabId, name: player.name,
-        rank: e.rank, rankingPoints: e.rankingPoints,
-        ageGroup: e.ageGroup, eventType: e.eventType,
-      });
-    }
-  }
-  for (const key of Object.keys(rankings)) {
-    rankings[key].sort((a, b) => a.rank - b.rank);
-  }
-  return rankings;
-}
-
-export async function loadDiskCacheForDate(date) {
-  try {
-    const filePath = diskCachePath(date);
-    const raw = await readFile(filePath, 'utf-8');
-    const data = JSON.parse(raw);
-    if (!data.rankings && data.allPlayers) {
-      data.rankings = rebuildRankingsFromPlayers(data.allPlayers);
-    }
-    return data;
-  } catch { /* ignore — file may not exist */ }
-  return null;
-}
-
-export async function loadDiskCache() {
-  try {
-    const raw = await readFile(DISK_CACHE_FILE, 'utf-8');
-    return JSON.parse(raw);
-  } catch { /* ignore — file may not exist */ }
-  return null;
-}
-
-export async function getDiskCachedRankings(key, date) {
-  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
-  if (disk?.rankings?.[key]) return disk.rankings[key];
-  return null;
-}
-
-export async function getDiskCachedAllPlayers(date) {
-  const disk = date ? await loadDiskCacheForDate(date) : await loadDiskCache();
-  if (disk?.allPlayers) return { players: disk.allPlayers, date: disk.date };
-  return null;
-}
-
-export async function getDiskCachedDate() {
-  const disk = await loadDiskCache();
-  return disk?.date ?? null;
-}
 
 // ── Medals disk cache ────────────────────────────────────────────────────────
 
@@ -150,6 +90,7 @@ const AGE_GROUP_RE = /^U\d{1,2}$/;
 const EVENT_TYPE_RE = /^[A-Z]{2}$/;
 const TSW_ID_RE = /^[0-9A-Fa-f-]+$/;
 const SEASON_RE = /^\d{4}-\d{4}$/;
+const TSW_DAY_RE = /^\d{8}$/;
 
 export function isValidDate(v) { return typeof v === 'string' && DATE_RE.test(v); }
 export function isValidUsabId(v) { return typeof v === 'string' && USAB_ID_RE.test(v); }
@@ -157,6 +98,37 @@ export function isValidAgeGroup(v) { return typeof v === 'string' && AGE_GROUP_R
 export function isValidEventType(v) { return typeof v === 'string' && EVENT_TYPE_RE.test(v); }
 export function isValidTswId(v) { return typeof v === 'string' && TSW_ID_RE.test(v); }
 export function isValidSeason(v) { return typeof v === 'string' && SEASON_RE.test(v); }
+export function isValidTswDayParam(v) { return typeof v === 'string' && TSW_DAY_RE.test(v); }
+
+// ── Shared fetch helpers (timeouts + retry) ─────────────────────────────────
+const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504]);
+
+export async function fetchWithTimeout(url, options = {}, timeoutMs = 30_000) {
+  return fetch(url, {
+    ...options,
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+}
+
+export async function fetchWithRetry(url, options = {}, config = {}) {
+  const retries = config.retries ?? 1;
+  const timeoutMs = config.timeoutMs ?? 30_000;
+  const baseDelayMs = config.baseDelayMs ?? 400;
+  const retryableStatuses = config.retryableStatuses ?? RETRYABLE_STATUS;
+
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(url, options, timeoutMs);
+      const shouldRetry = !response.ok
+        && attempt < retries
+        && retryableStatuses.has(response.status);
+      if (!shouldRetry) return response;
+    } catch (err) {
+      if (attempt >= retries) throw err;
+    }
+    await new Promise((resolve) => setTimeout(resolve, baseDelayMs * 2 ** attempt));
+  }
+}
 
 // ── HTML entity decoder ──────────────────────────────────────────────────────
 const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'" };
@@ -338,7 +310,7 @@ function parseCookieMap(cookieStr) {
 
 async function fetchTswCookies() {
   try {
-    const resp = await fetch(`${TSW_BASE}/cookiewall/Save`, {
+    const resp = await fetchWithRetry(`${TSW_BASE}/cookiewall/Save`, {
       method: 'POST',
       headers: {
         ...BROWSER_HEADERS,
@@ -347,12 +319,13 @@ async function fetchTswCookies() {
       },
       body: 'ReturnUrl=%2F&CookiePurposes=1&CookiePurposes=2&SettingsOpen=false',
       redirect: 'manual',
-    });
+    }, { timeoutMs: 20_000, retries: 1 });
     const setCookies = resp.headers.getSetCookie?.() ?? [];
     tswCookies = setCookies.map((c) => c.split(';')[0]).join('; ');
-    const sportResp = await fetch(
+    const sportResp = await fetchWithRetry(
       `${TSW_BASE}/sportselection/setsportselection/2?returnUrl=%2F`,
       { headers: { ...BROWSER_HEADERS, Cookie: tswCookies }, redirect: 'manual' },
+      { timeoutMs: 20_000, retries: 1 },
     );
     const sportCookies = sportResp.headers.getSetCookie?.() ?? [];
     if (sportCookies.length) {
@@ -382,10 +355,13 @@ export async function ensureTswCookies() {
 export async function tswFetch(path, opts = {}) {
   await ensureTswCookies();
   const url = `${TSW_BASE}${path}`;
-  return fetch(url, {
+  return fetchWithRetry(url, {
     method: opts.method || 'GET',
     headers: { ...BROWSER_HEADERS, Cookie: tswCookies, 'X-Requested-With': 'XMLHttpRequest', ...opts.extraHeaders },
     body: opts.body !== undefined ? opts.body : undefined,
+  }, {
+    timeoutMs: opts.timeoutMs ?? 30_000,
+    retries: opts.retries ?? 1,
   });
 }
 
@@ -975,44 +951,8 @@ export function parseTswSeeding_legacy(html) {
 }
 
 // ── TSW Matches page parser ─────────────────────────────────────────────────
-// The matches page at /sport/matches.aspx loads match content via AJAX:
+// Match content is loaded via AJAX:
 //   /tournament/{tswId}/Matches/MatchesInDay?date=YYYYMMDD
-// The parent page contains date tabs as data-href attributes.
-
-export function parseTswMatchDates(html) {
-  const dates = [];
-  const tabRegex = /data-href="[^"]*MatchesInDay\?date=(\d+)"[^>]*>([\s\S]*?)<\/(?:a|button)/gi;
-  let m;
-  while ((m = tabRegex.exec(html)) !== null) {
-    const param = m[1];
-    let label = m[2].replace(/<[^>]*>/g, '').trim();
-    // TSW labels like "Sat17Jan" → "Sat 17 Jan"
-    label = label.replace(/^(\w{3})(\d{1,2})(\w{3})$/, '$1 $2 $3');
-    if (param && !dates.some(d => d.param === param)) {
-      dates.push({ param, label });
-    }
-  }
-  // Fallback: look in init JSON for current date
-  if (dates.length === 0) {
-    const initMatch = html.match(/"date"\s*:\s*"(\d{8})"/);
-    if (initMatch) {
-      const d = initMatch[1];
-      const formatted = formatDateLabel(d);
-      dates.push({ param: d, label: formatted });
-    }
-  }
-  return dates;
-}
-
-function formatDateLabel(yyyymmdd) {
-  const y = yyyymmdd.slice(0, 4);
-  const m = parseInt(yyyymmdd.slice(4, 6), 10);
-  const d = parseInt(yyyymmdd.slice(6, 8), 10);
-  const dt = new Date(+y, m - 1, d);
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${days[dt.getDay()]} ${d} ${months[m - 1]}`;
-}
 
 export function formatMatchDate(yyyymmdd) {
   if (!yyyymmdd || yyyymmdd.length !== 8) return '';
@@ -1021,7 +961,6 @@ export function formatMatchDate(yyyymmdd) {
   const d = parseInt(yyyymmdd.slice(6, 8), 10);
   const dt = new Date(+y, m - 1, d);
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${days[dt.getDay()]} ${m}/${d}/${y}`;
 }
 

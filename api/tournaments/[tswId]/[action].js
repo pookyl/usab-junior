@@ -4,14 +4,19 @@ import {
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
   parseTswSeeding,
   parseTswEvents, parseTswEventDetail,
-  parseTswMatches, parseTswPlayerMatches, parseTswMatchDates, formatMatchDate,
+  parseTswMatches, parseTswPlayerMatches, formatMatchDate,
   parseTswEliminationDraw, parseTswDrawType,
   parseTswRoundRobinGroups, parseTswRoundRobinGroupName,
   parseTswRoundRobinStandings, parseTswRoundRobinMatches,
   parseTswPlayerInfo, parseTswPlayerEvents, parseTswPlayerWinLoss,
-  isValidTswId,
+  isValidTswId, isValidTswDayParam,
   TSW_BASE,
 } from '../../_lib/shared.js';
+import {
+  sendApiError,
+  UpstreamError,
+  ValidationError,
+} from '../../_lib/http.js';
 
 // ── Medals helpers ──────────────────────────────────────────────────────────
 
@@ -85,23 +90,13 @@ async function fetchTournamentPlayers(tswId) {
   return parseTswTournamentPlayers(html);
 }
 
-class UpstreamError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'UpstreamError';
-  }
-}
-
 function tswOk(resp, label) {
   if (!resp.ok) throw new UpstreamError(`${label} HTTP ${resp.status}`);
   return resp;
 }
 
 function sendError(res, err, label) {
-  const status = err instanceof UpstreamError ? 502 : 500;
-  console.error(`[${label}] error:`, err.message);
-  res.writeHead(status, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ error: err.message }));
+  sendApiError(res, err, { logLabel: label });
 }
 
 function isRefreshRequest(req) {
@@ -259,28 +254,11 @@ async function handleMatches(tswId, req, res) {
   const refresh = req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
 
   if (!dateParam) {
-    const datesCacheKey = `tournament-match-dates:${tswId}`;
-    if (!refresh) {
-      const cached = getCached(datesCacheKey);
-      if (cached) {
-        res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-        res.end(JSON.stringify({ tswId, dates: cached }));
-        return;
-      }
-    }
+    return sendApiError(res, new ValidationError('d query parameter required (YYYYMMDD)', { field: 'd' }));
+  }
 
-    try {
-      const parentResp = tswOk(await tswFetch(`/sport/matches.aspx?id=${encodeURIComponent(tswId)}`), 'TSW matches page');
-      const parentHtml = await parentResp.text();
-      const dates = parseTswMatchDates(parentHtml);
-      setCache(datesCacheKey, dates);
-
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
-      res.end(JSON.stringify({ tswId, dates }));
-    } catch (err) {
-      sendError(res, err, 'tournament-matches-dates');
-    }
-    return;
+  if (!isValidTswDayParam(dateParam)) {
+    return sendApiError(res, new ValidationError('d query parameter must be YYYYMMDD', { field: 'd' }));
   }
 
   const cacheKey = `tournament-matches-day:${tswId}:${dateParam}`;
@@ -430,9 +408,7 @@ async function handleEventDetail(tswId, req, res) {
   const eventId = req.query?.eventId || urlObj.searchParams.get('eventId');
   const refresh = req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
   if (!eventId || !/^\d+$/.test(eventId)) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'eventId query parameter required (numeric)' }));
-    return;
+    return sendApiError(res, new ValidationError('eventId query parameter required (numeric)', { field: 'eventId' }));
   }
 
   const cacheKey = `tournament-event-detail:${tswId}:${eventId}`;
@@ -474,9 +450,7 @@ async function handlePlayerDetail(tswId, req, res) {
   const playerId = req.query?.playerId || urlObj.searchParams.get('playerId');
   const refresh = req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
   if (!playerId || !/^\d+$/.test(playerId)) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'playerId query parameter required (numeric)' }));
-    return;
+    return sendApiError(res, new ValidationError('playerId query parameter required (numeric)', { field: 'playerId' }));
   }
 
   const cacheKey = `tournament-player-detail:${tswId}:${playerId}`;
@@ -523,9 +497,7 @@ async function handleDrawBracket(tswId, req, res) {
   const drawId = req.query?.drawId || urlObj.searchParams.get('drawId');
   const refresh = req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
   if (!drawId || !/^\d+$/.test(drawId)) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'drawId query parameter required (numeric)' }));
-    return;
+    return sendApiError(res, new ValidationError('drawId query parameter required (numeric)', { field: 'drawId' }));
   }
 
   const cacheKey = `tournament-draw-bracket:v7:${tswId}:${drawId}`;
@@ -559,8 +531,10 @@ async function handleDrawBracket(tswId, req, res) {
         tswFetch(`/tournament/${tswIdLower}/Draw/${drawId}/GetMatchesContent?tabindex=1`),
       ]);
 
-      const standingsHtml = standingsResp.ok ? await standingsResp.text() : '';
-      const matchesHtml = matchesResp.ok ? await matchesResp.text() : '';
+      tswOk(standingsResp, 'Round robin standings');
+      tswOk(matchesResp, 'Round robin matches');
+      const standingsHtml = await standingsResp.text();
+      const matchesHtml = await matchesResp.text();
 
       const standings = parseTswRoundRobinStandings(standingsHtml);
       const matches = parseTswRoundRobinMatches(matchesHtml);
@@ -604,17 +578,16 @@ export default async function handler(req, res) {
 
   const tswId = req.query?.tswId || req.url?.match(/\/tournaments\/([^/?]+)/)?.[1];
   if (!tswId || !isValidTswId(tswId)) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'tswId parameter required' }));
-    return;
+    return sendApiError(res, new ValidationError('tswId parameter required', { field: 'tswId' }));
   }
 
   const action = req.query?.action || req.url?.match(/\/tournaments\/[^/?]+\/([^/?]+)/)?.[1] || 'detail';
   const actionHandler = ACTIONS[action];
   if (!actionHandler) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: `Unknown action: ${action}`, validActions: Object.keys(ACTIONS) }));
-    return;
+    return sendApiError(
+      res,
+      new ValidationError(`Unknown action: ${action}`, { validActions: Object.keys(ACTIONS) }),
+    );
   }
 
   await actionHandler(tswId, req, res);

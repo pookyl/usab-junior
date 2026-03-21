@@ -11,7 +11,7 @@ export default function TournamentMatchesPage() {
 
   return (
     <SubPageLayout title="Matches" icon={Swords} onRefresh={() => setRefreshTrigger(n => n + 1)}>
-      <MatchesTab key={tswId} tswId={tswId} active refreshTrigger={refreshTrigger} />
+      <MatchesTab key={tswId} tswId={tswId} refreshTrigger={refreshTrigger} />
     </SubPageLayout>
   );
 }

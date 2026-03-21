@@ -367,11 +367,6 @@ export interface MatchDateTab {
   label: string;
 }
 
-export interface TournamentMatchDatesResponse {
-  tswId: string;
-  dates: MatchDateTab[];
-}
-
 export interface TournamentMatchDayResponse {
   tswId: string;
   date: string;

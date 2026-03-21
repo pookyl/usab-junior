@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Calendar, Swords } from 'lucide-react';
 import { TabLoading, TabError, TabEmpty, cappedMapSet } from '../shared';
 import MatchCard from '../MatchCard';
-import { fetchTournamentMatchDates, fetchTournamentMatchDay } from '../../../services/rankingsService';
+import { fetchTournamentMatchDay } from '../../../services/rankingsService';
 import { useTournamentMeta } from '../../../hooks/useTournamentMeta';
 import type { MatchDateTab, TournamentMatch } from '../../../types/junior';
 
@@ -27,7 +27,6 @@ function generateDateTabs(startDate: string, endDate: string): MatchDateTab[] {
 }
 
 interface MatchesTabSnapshot {
-  dates: MatchDateTab[];
   selectedDate: string;
   matchDate: string;
   matches: TournamentMatch[];
@@ -35,7 +34,7 @@ interface MatchesTabSnapshot {
 
 const matchesTabCache = new Map<string, MatchesTabSnapshot>();
 
-export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: string; active: boolean; refreshTrigger?: number }) {
+export default function MatchesTab({ tswId, refreshTrigger }: { tswId: string; refreshTrigger?: number }) {
   const { pathname } = useLocation();
   const snap = matchesTabCache.get(tswId);
   const meta = useTournamentMeta(tswId);
@@ -43,11 +42,6 @@ export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: s
     () => generateDateTabs(meta.startDate, meta.endDate),
     [meta.startDate, meta.endDate],
   );
-
-  const [dates, setDates] = useState<MatchDateTab[]>(snap?.dates ?? []);
-  const [datesLoading, setDatesLoading] = useState(false);
-  const [datesError, setDatesError] = useState<string | null>(null);
-  const [datesFetched, setDatesFetched] = useState(!!snap?.dates.length);
 
   const [matches, setMatches] = useState<TournamentMatch[]>(snap?.matches ?? []);
   const [matchDate, setMatchDate] = useState(snap?.matchDate ?? '');
@@ -65,8 +59,8 @@ export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: s
   }, []);
 
   useEffect(() => {
-    cappedMapSet(matchesTabCache, tswId, { dates, selectedDate, matchDate, matches });
-  }, [tswId, dates, selectedDate, matchDate, matches]);
+    cappedMapSet(matchesTabCache, tswId, { selectedDate, matchDate, matches });
+  }, [tswId, selectedDate, matchDate, matches]);
 
   function loadMatches(dateParam: string, refresh = false) {
     const reqId = ++matchRequestId.current;
@@ -90,23 +84,6 @@ export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: s
       });
   }
 
-  useEffect(() => {
-    if (!active || !tswId || datesFetched) return;
-    let cancelled = false;
-    setDatesLoading(true);
-    setDatesError(null);
-    fetchTournamentMatchDates(tswId)
-      .then(d => {
-        if (cancelled) return;
-        setDates(d.dates);
-        setDatesFetched(true);
-      })
-      .catch(e => { if (!cancelled) setDatesError(e.message); })
-      .finally(() => { if (!cancelled) setDatesLoading(false); });
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tswId, active, datesFetched]);
-
   function handleDateChange(dateParam: string) {
     if (dateParam === selectedDate && matches.length > 0) return;
     loadMatches(dateParam);
@@ -114,16 +91,7 @@ export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: s
 
   useEffect(() => {
     if (!refreshTrigger) return;
-    let cancelled = false;
-    fetchTournamentMatchDates(tswId, true)
-      .then(d => {
-        if (cancelled) return;
-        setDates(d.dates);
-        setDatesFetched(true);
-      })
-      .catch(e => { if (!cancelled) setDatesError(e.message); });
     if (selectedDate) loadMatches(selectedDate, true);
-    return () => { cancelled = true; };
   }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const events = useMemo(() => {
@@ -150,14 +118,9 @@ export default function MatchesTab({ tswId, active, refreshTrigger }: { tswId: s
     return groups;
   }, [filtered]);
 
-  const retryDates = useCallback(() => { setDatesError(null); setDatesFetched(false); }, []);
-
-  const displayDates = datesFetched ? dates : metaDates;
-
-  if (datesLoading && displayDates.length === 0) return <TabLoading label="matches" />;
-  if (datesError) return <TabError error={datesError} onRetry={retryDates} />;
-  if (datesFetched && dates.length === 0) {
-    return <TabEmpty icon={Swords} message="No match data available for this tournament." />;
+  const displayDates = metaDates;
+  if (displayDates.length === 0) {
+    return <TabEmpty icon={Calendar} message="No scheduled dates available for this tournament." />;
   }
 
   return (
