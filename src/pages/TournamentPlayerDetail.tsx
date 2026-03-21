@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Swords, Users } from 'lucide-react';
+import { ArrowLeft, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
@@ -65,8 +65,6 @@ export default function TournamentPlayerDetail() {
   const parsedPlayerId = Number(playerId);
   const highlightPlayerId = Number.isFinite(parsedPlayerId) ? parsedPlayerId : undefined;
   const originFromPath = (location.state as { fromPath?: string } | null)?.fromPath ?? location.pathname;
-  const tswPlayerUrl = `https://www.tournamentsoftware.com/tournament/${tswId}/player/${playerId}`;
-
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-6">
       <div className="flex items-center justify-between">
@@ -130,15 +128,6 @@ export default function TournamentPlayerDetail() {
             )}
 
             <div className="flex items-center gap-2 flex-wrap">
-              <a
-                href={tswPlayerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
-              >
-                <ExternalLink className="w-3 h-3" />
-                TSW
-              </a>
               {resolvedUsabId && (
                 <Link
                   to={`/directory/${resolvedUsabId}`}

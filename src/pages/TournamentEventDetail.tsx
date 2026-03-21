@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Users } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
 import { fetchTournamentEventDetail } from '../services/rankingsService';
 import { TabLoading, TabError, TabEmpty, RefreshButton, getEventColor } from '../components/tournament/shared';
 import type { TournamentEventDetailEntry, TournamentEventDetailResponse } from '../types/junior';
@@ -63,7 +63,6 @@ export default function TournamentEventDetail() {
       !fromPath.includes('/player/'),
   );
   const backTarget = isTournamentSubpage ? fromPath! : `/tournaments/${tswId}/events`;
-  const tswEventUrl = `https://www.tournamentsoftware.com/sport/event.aspx?id=${tswId}&event=${eventId}`;
   const color = eventName ? getEventColor(eventName) : null;
 
   return (
@@ -97,15 +96,6 @@ export default function TournamentEventDetail() {
                   Entries
                 </h1>
               </div>
-              <a
-                href={tswEventUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors shrink-0"
-              >
-                <ExternalLink className="w-3 h-3" />
-                TSW
-              </a>
             </div>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Draws: <span className="font-semibold text-slate-700 dark:text-slate-200">{data.draws.length}</span>

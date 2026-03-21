@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, List } from 'lucide-react';
+import { ArrowLeft, List } from 'lucide-react';
 import { fetchTournamentDetail, fetchDrawBracket, type DrawResponse } from '../services/rankingsService';
 import { TabLoading, TabError, TabEmpty, getEventColor, RefreshButton } from '../components/tournament/shared';
 import BracketView from '../components/tournament/BracketView';
@@ -77,7 +77,6 @@ export default function TournamentDrawDetail() {
       !fromPath.includes('/player/'),
   );
   const backTarget = isTournamentSubpage ? fromPath! : `/tournaments/${tswId}/draws`;
-  const tswDrawUrl = `https://www.tournamentsoftware.com/sport/draw.aspx?id=${tswId}&draw=${drawId}`;
   const color = drawName ? getEventColor(drawName) : null;
   const isRoundRobin = drawData?.drawType === 'round-robin';
   const headingLabel = isRoundRobin ? 'Round Robin' : 'Elimination Draw';
@@ -113,15 +112,6 @@ export default function TournamentDrawDetail() {
                   {headingLabel}
                 </h1>
               </div>
-              <a
-                href={tswDrawUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors shrink-0"
-              >
-                <ExternalLink className="w-3 h-3" />
-                TSW
-              </a>
             </div>
           </div>
 
