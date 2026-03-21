@@ -159,11 +159,17 @@ async function synthesizePlayerDetail(tswId, url) {
     }
   } catch { /* no event-details dir */ }
 
+  let memberId;
+  try {
+    const idMap = JSON.parse(await readFile(join(cacheDir, 'player-id-map.json'), 'utf-8'));
+    memberId = idMap[String(playerId)] || undefined;
+  } catch { /* no map file */ }
+
   const result = {
     tswId,
     playerId,
     playerName: player.name,
-    memberId: undefined,
+    memberId,
     club: player.club || '',
     events,
     winLoss: total > 0 ? { wins, losses, total, winPct } : null,
@@ -614,11 +620,14 @@ const server = createServer(async (req, res) => {
     const tswId = tournamentActionMatch[1];
     const action = tournamentActionMatch[2];
 
-    const cachedResponse = await serveTournamentCache(tswId, action, reqUrl);
-    if (cachedResponse) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Source': 'cache' });
-      res.end(cachedResponse);
-      return;
+    const refresh = reqUrl.searchParams.get('refresh') === '1';
+    if (!refresh) {
+      const cachedResponse = await serveTournamentCache(tswId, action, reqUrl);
+      if (cachedResponse) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'X-Source': 'cache' });
+        res.end(cachedResponse);
+        return;
+      }
     }
 
     const { default: actionHandler } = await import('./api/tournaments/[tswId]/[action].js');
