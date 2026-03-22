@@ -120,12 +120,13 @@ export default function TournamentDrawDetail() {
           ) : (
             (() => {
               const elim = drawData as EliminationDrawResponse;
-              return elim.sections.length === 0 ? (
+              const sections = elim.sections ?? [];
+              return sections.length === 0 ? (
                 <TabEmpty icon={List} message="No bracket data available for this draw." />
               ) : (
-                elim.sections.map((section, si) => (
+                sections.map((section, si) => (
                   <div key={si} className="space-y-3">
-                    <BracketView section={section} tswId={tswId} showTitle={elim.sections.length > 1} />
+                    <BracketView section={section} tswId={tswId} showTitle={sections.length > 1} />
                   </div>
                 ))
               );

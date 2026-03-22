@@ -46,8 +46,12 @@ function appendSeed(name: string, seed?: string): string {
 // ── buildDisplayRounds ──────────────────────────────────────────────────────
 
 export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRound[]; hasFeedIn: boolean } {
+  const sectionMatches = section.matches ?? [];
+  const sectionEntries = section.entries ?? [];
+  const sectionRounds = section.rounds ?? [];
+
   const matchesByLevel = new Map<number, BracketMatchData[]>();
-  for (const m of section.matches) {
+  for (const m of sectionMatches) {
     if (!matchesByLevel.has(m.roundLevel)) matchesByLevel.set(m.roundLevel, []);
     matchesByLevel.get(m.roundLevel)!.push(m);
   }
@@ -57,10 +61,10 @@ export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRo
 
   // TSW headers include "Winner" as a column name, but we generate the winner
   // column automatically from the finals result. Strip it to avoid duplication.
-  const roundNames = section.rounds.filter(r => r.toLowerCase() !== 'winner');
+  const roundNames = sectionRounds.filter(r => r.toLowerCase() !== 'winner');
   if (levels.length === 0) return { rounds: [], hasFeedIn: false };
 
-  let sortedEntries = [...section.entries].sort((a, b) => a.position - b.position);
+  let sortedEntries = [...sectionEntries].sort((a, b) => a.position - b.position);
 
   // Play-off sections (e.g., 3/4 playoff) use class="match" instead of
   // class="entry" for players, so the parser finds no entries. The highest-level

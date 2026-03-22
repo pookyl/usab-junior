@@ -12,7 +12,7 @@ export default function DrawsTab({ tswId, active, refreshTrigger }: { tswId: str
 
   if (loading) return <TabLoading label="draws" />;
   if (error) return <TabError error={error} onRetry={retry} />;
-  if (!data || data.draws.length === 0) return <TabEmpty icon={List} message="No draws available for this tournament." />;
+  if (!data || !data.draws?.length) return <TabEmpty icon={List} message="No draws available for this tournament." />;
 
   const getFeedInInfo = (stage: string | null, consolation: string | null): string | null => {
     const candidates = [stage, consolation].filter((v): v is string => Boolean(v));

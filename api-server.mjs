@@ -266,6 +266,23 @@ async function synthesizePlayerSchedule(tswId, url) {
     } catch { /* no file for this date */ }
   }
 
+  // The rounds array from the parser is in column order (left-to-right in the
+  // HTML table) and may include non-match columns like "" or "Club" at the start
+  // and "Winner" at the end. RoundLevel counts down: highest = first round,
+  // 1 = final. Map level → round name by indexing backwards from the finals column.
+  function getRoundName(section, level) {
+    const rounds = section.rounds || [];
+    if (rounds.length === 0) return `Round ${level}`;
+    const hasWinner = rounds[rounds.length - 1].toLowerCase() === 'winner';
+    const finalIdx = hasWinner ? rounds.length - 2 : rounds.length - 1;
+    const idx = finalIdx - (level - 1);
+    if (idx >= 0 && idx < rounds.length) {
+      const name = rounds[idx];
+      if (name && !/^(club|state)$/i.test(name)) return name;
+    }
+    return `Round ${level}`;
+  }
+
   // Walk the elimination bracket to find all potential next matches if the player
   // keeps winning. Returns an array of matches with published schedule times,
   // stopping at the first round without a scheduledTime.
@@ -321,7 +338,7 @@ async function synthesizePlayerSchedule(tswId, url) {
 
         if (!bracketMatch?.scheduledTime) break;
 
-        const roundName = (section.rounds || [])[level] || `Round ${level}`;
+        const roundName = getRoundName(section, level);
 
         let opponent = null;
         const otherNum = prevNum % 2 === 0 ? prevNum - 1 : prevNum + 1;
@@ -389,7 +406,7 @@ async function synthesizePlayerSchedule(tswId, url) {
       const bm = (consSection.matches || []).find(m => m.matchId === matchId);
       if (!bm?.scheduledTime) { prevNum = levelNum; continue; }
 
-      const roundName = (consSection.rounds || [])[level] || `Round ${level}`;
+      const roundName = getRoundName(consSection, level);
 
       let opponent = null;
       if (level < consEntryRL) {
@@ -414,6 +431,96 @@ async function synthesizePlayerSchedule(tswId, url) {
         opponent,
       });
       prevNum = levelNum;
+    }
+
+    return { section: sectionLabel, matches };
+  }
+
+  // Consolation semi-final losers: look for a consolation-specific 3/4 play-off section.
+  function findConsolationPlayoffPath(bracket, playerId) {
+    if (!bracket || bracket.drawType !== 'elimination') return null;
+
+    const consSection = (bracket.sections || []).find(s => s.name && /consolation/i.test(s.name) && !/play-?off/i.test(s.name));
+    if (!consSection) return null;
+
+    let deepestWinLevel = Infinity, deepestWinNum = 0;
+    for (const bm of consSection.matches || []) {
+      if (!bm.winner) continue;
+      if (bm.winner.playerId !== playerId && bm.winner.partnerPlayerId !== playerId) continue;
+      if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
+    }
+    if (deepestWinLevel === Infinity) return null;
+    const currentLevel = deepestWinLevel - 1;
+    if (currentLevel !== 2) return null;
+
+    const currentNum = Math.ceil(deepestWinNum / 2);
+    const consPlayoffSection = (bracket.sections || []).find(
+      s => s.name && /consolation/i.test(s.name) && /play-?off\s*3\/?4/i.test(s.name),
+    );
+    if (!consPlayoffSection || !(consPlayoffSection.matches || []).length) return null;
+
+    const sectionLabel = consPlayoffSection.name.replace(/^[^-]*-\s*/, '') || 'Consolation Play-off 3/4';
+    const finalMatch = (consPlayoffSection.matches || []).find(m => m.matchId === '1001');
+    const roundName = getRoundName(consPlayoffSection, 1);
+
+    let opponent = null;
+    const otherSlotNum = currentNum === 1 ? 2 : 1;
+    const otherSlotId = `2${String(otherSlotNum).padStart(3, '0')}`;
+    const otherSlot = (consPlayoffSection.matches || []).find(m => m.matchId === otherSlotId);
+    if (otherSlot?.winner) {
+      const w = otherSlot.winner;
+      const names = [w.name]; const ids = [w.playerId];
+      if (w.partner) { names.push(w.partner); ids.push(w.partnerPlayerId ?? null); }
+      opponent = { names, playerIds: ids };
+    }
+
+    const matches = [];
+    if (finalMatch) {
+      matches.push({
+        round: roundName,
+        time: finalMatch.scheduledTime || '',
+        court: '', date: '', dateLabel: '',
+        opponent,
+      });
+    }
+    return { section: sectionLabel, matches };
+  }
+
+  // Semi-final losers go to the 3/4 play-off bracket instead of consolation.
+  function findPlayoffPath(bracket, playerId, mainCurrentLevel, mainCurrentNum) {
+    if (!bracket || bracket.drawType !== 'elimination') return null;
+    if (mainCurrentLevel !== 2) return null;
+
+    const playoffSection = (bracket.sections || []).find(
+      s => s.name && /play-?off\s*3\/?4/i.test(s.name),
+    );
+    if (!playoffSection || !(playoffSection.matches || []).length) return null;
+
+    const sectionLabel = playoffSection.name.replace(/^[^-]*-\s*/, '') || 'Play-off 3/4';
+    const finalMatch = (playoffSection.matches || []).find(m => m.matchId === '1001');
+    const roundName = getRoundName(playoffSection, 1);
+
+    let opponent = null;
+    const otherSlotNum = mainCurrentNum === 1 ? 2 : 1;
+    const otherSlotId = `2${String(otherSlotNum).padStart(3, '0')}`;
+    const otherSlot = (playoffSection.matches || []).find(m => m.matchId === otherSlotId);
+    if (otherSlot?.winner) {
+      const w = otherSlot.winner;
+      const names = [w.name]; const ids = [w.playerId];
+      if (w.partner) { names.push(w.partner); ids.push(w.partnerPlayerId ?? null); }
+      opponent = { names, playerIds: ids };
+    }
+
+    const matches = [];
+    if (finalMatch) {
+      matches.push({
+        round: roundName,
+        time: finalMatch.scheduledTime || '',
+        court: '',
+        date: '',
+        dateLabel: '',
+        opponent,
+      });
     }
 
     return { section: sectionLabel, matches };
@@ -481,7 +588,7 @@ async function synthesizePlayerSchedule(tswId, url) {
           else if (rr) drawType = 'round-robin';
         }
 
-        // For upcoming elimination matches: show chain of potential next matches + consolation path
+        // For upcoming elimination matches: show chain of potential next matches + consolation/playoff path
         let nextMatches = [];
         let consolation = null;
         let consolationMatches = [];
@@ -492,31 +599,52 @@ async function synthesizePlayerSchedule(tswId, url) {
             if (bracket) {
               nextMatches = findPotentialNextMatches(bracket, pid);
 
-              // Determine player's current main draw position for consolation check
-              const mainSection = (bracket.sections || [])[0];
-              if (mainSection) {
-                let deepestWinLevel = Infinity, deepestWinNum = 0;
-                for (const bm of mainSection.matches || []) {
-                  if (!bm.winner) continue;
-                  if (bm.winner.playerId !== pid && bm.winner.partnerPlayerId !== pid) continue;
-                  if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
-                }
-                if (deepestWinLevel === Infinity) {
-                  const entry = (mainSection.entries || []).find(e => e.playerId === pid || e.partnerPlayerId === pid);
-                  if (entry) {
-                    const maxRL = Math.max(...mainSection.matches.map(mm => mm.roundLevel), 0);
-                    deepestWinLevel = maxRL + 1;
-                    deepestWinNum = Math.ceil(entry.position / 2);
+              const isConsMatch = /consolation/i.test(m.round || '');
+
+              if (isConsMatch) {
+                // Player is in the consolation bracket — look for consolation-specific play-off
+                if (/semi/i.test(m.round || '')) {
+                  const consPath = findConsolationPlayoffPath(bracket, pid);
+                  if (consPath) {
+                    consolation = consPath.section;
+                    consolationMatches = consPath.matches;
                   }
                 }
-                if (deepestWinLevel !== Infinity) {
-                  const currentLevel = deepestWinLevel - 1;
-                  const currentNum = Math.ceil(deepestWinNum / 2);
-                  if (currentLevel >= 1) {
-                    const consPath = findConsolationPath(bracket, pid, currentLevel, currentNum);
-                    if (consPath) {
-                      consolation = consPath.section;
-                      consolationMatches = consPath.matches;
+              } else {
+                // Player is in the main draw — compute consolation or main play-off path
+                const mainSection = (bracket.sections || [])[0];
+                if (mainSection) {
+                  let deepestWinLevel = Infinity, deepestWinNum = 0;
+                  for (const bm of mainSection.matches || []) {
+                    if (!bm.winner) continue;
+                    if (bm.winner.playerId !== pid && bm.winner.partnerPlayerId !== pid) continue;
+                    if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
+                  }
+                  if (deepestWinLevel === Infinity) {
+                    const entry = (mainSection.entries || []).find(e => e.playerId === pid || e.partnerPlayerId === pid);
+                    if (entry) {
+                      const maxRL = Math.max(...mainSection.matches.map(mm => mm.roundLevel), 0);
+                      deepestWinLevel = maxRL + 1;
+                      deepestWinNum = Math.ceil(entry.position / 2);
+                    }
+                  }
+                  if (deepestWinLevel !== Infinity) {
+                    const currentLevel = deepestWinLevel - 1;
+                    const currentNum = Math.ceil(deepestWinNum / 2);
+                    if (currentLevel >= 1) {
+                      let consPath = findConsolationPath(bracket, pid, currentLevel, currentNum)
+                        || findPlayoffPath(bracket, pid, currentLevel, currentNum);
+
+                      // Bracket cache may be stale; if the match-day data says "semi",
+                      // try the playoff path even if bracket-derived level isn't 2 yet.
+                      if (!consPath && /semi/i.test(m.round || '')) {
+                        consPath = findPlayoffPath(bracket, pid, 2, currentNum);
+                      }
+
+                      if (consPath) {
+                        consolation = consPath.section;
+                        consolationMatches = consPath.matches;
+                      }
                     }
                   }
                 }

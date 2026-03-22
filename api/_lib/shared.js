@@ -1604,7 +1604,7 @@ export function parseTswEliminationDraw(html) {
       for (let mi = 0; mi < matchSpans.length; mi++) {
         const ms = matchSpans[mi];
         if (ms.col !== ts.col && ms.col + 1 !== ts.col) continue;
-        const dist = Math.abs(ts.row - ms.row) + (ts.col !== ms.col ? 0.5 : 0);
+        const dist = Math.abs(ts.row - ms.row) + (ts.col !== ms.col ? 1.5 : 0);
         if (dist < bestDist && dist <= 6) {
           bestDist = dist;
           bestIdx = mi;

@@ -63,12 +63,15 @@ function RoundRobinMatchCard({ match, tswId, fromPath }: { match: RoundRobinDraw
 export default function RoundRobinView({ data, tswId }: { data: RoundRobinDrawResponse; tswId: string }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const groups = data.groups ?? [];
+  const standings = data.standings ?? [];
+  const matches = data.matches ?? [];
 
   return (
     <div className="space-y-6">
-      {data.groups.length > 1 && (
+      {groups.length > 1 && (
         <div className="flex flex-wrap gap-2">
-          {data.groups.map(g => (
+          {groups.map(g => (
             <button
               key={g.drawId || g.name}
               onClick={() => !g.active && navigate(`/tournaments/${tswId}/draw/${g.drawId}`)}
@@ -84,7 +87,7 @@ export default function RoundRobinView({ data, tswId }: { data: RoundRobinDrawRe
         </div>
       )}
 
-      {data.standings.length > 0 && (
+      {standings.length > 0 && (
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Standings</h3>
@@ -107,7 +110,7 @@ export default function RoundRobinView({ data, tswId }: { data: RoundRobinDrawRe
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {data.standings.map((s) => (
+                {standings.map((s) => (
                   <tr
                     key={s.position}
                     className={s.position === 1 ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''}
@@ -164,11 +167,11 @@ export default function RoundRobinView({ data, tswId }: { data: RoundRobinDrawRe
         </div>
       )}
 
-      {data.matches.length > 0 && (
+      {matches.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Matches</h3>
           <div className="grid gap-3 sm:grid-cols-2">
-            {data.matches.map((m) => (
+            {matches.map((m) => (
               <RoundRobinMatchCard key={m.matchId} match={m} tswId={tswId} fromPath={pathname} />
             ))}
           </div>
