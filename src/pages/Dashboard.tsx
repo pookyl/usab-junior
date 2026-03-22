@@ -9,6 +9,9 @@ import { usePlayers } from '../contexts/PlayersContext';
 import { fetchTournaments } from '../services/rankingsService';
 import type { ScheduledTournament } from '../types/junior';
 
+declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
+declare const __BUILD_DATE__: string | null;
+
 interface Feature {
   title: string;
   description: string;
@@ -275,7 +278,13 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="pt-6 border-t border-slate-200 dark:border-slate-700 text-center text-xs text-slate-400 dark:text-slate-500 space-y-1">
-        <p>USAB Junior Badminton Hub &middot; v0.1.0</p>
+        <p>
+          USAB Junior Badminton Hub &middot;{' '}
+          {__VERCEL_GIT_COMMIT_SHA__ ? __VERCEL_GIT_COMMIT_SHA__.slice(0, 7) : 'dev'}
+          {__BUILD_DATE__ && (
+            <> &middot; Built {new Date(__BUILD_DATE__).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</>
+          )}
+        </p>
         <p>
           A hobby project &mdash; not affiliated with USA Badminton. Data sourced from{' '}
           <a
