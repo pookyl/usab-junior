@@ -168,6 +168,7 @@ async function synthesizePlayerDetail(tswId, url) {
     memberId = idMap[String(playerId)] || undefined;
   } catch { /* no map file */ }
 
+  const hasUpcomingMatches = allMatches.some(m => !m.team1Won && !m.team2Won && !m.bye && !m.walkover && m.time);
   const result = {
     tswId,
     playerId,
@@ -177,6 +178,7 @@ async function synthesizePlayerDetail(tswId, url) {
     events,
     winLoss: total > 0 ? { wins, losses, total, winPct } : null,
     matches: allMatches,
+    hasUpcomingMatches,
   };
 
   console.log(`[tournament-cache] synthesized player-detail for ${player.name} (${playerId}): ${allMatches.length} matches, ${events.length} events`);
@@ -190,86 +192,86 @@ async function synthesizePlayerSchedule(tswId, url) {
 
   const cacheDir = join(TOURNAMENT_CACHE_DIR, tswId);
 
-  // Read manifest for metadata
-  let manifest;
+  // Phase 1: Read detail.json for draws list + tournament info, and players for name resolution
+  let detailData;
   try {
-    manifest = JSON.parse(await readFile(join(cacheDir, '_manifest.json'), 'utf-8'));
+    detailData = JSON.parse(await readFile(join(cacheDir, 'detail.json'), 'utf-8'));
   } catch {
-    return null;
+    try {
+      const manifest = JSON.parse(await readFile(join(cacheDir, '_manifest.json'), 'utf-8'));
+      detailData = { name: manifest.tournamentName || '', dates: manifest.dates || '', draws: [] };
+    } catch { return null; }
   }
 
-  const startDate = manifest.startDate || '';
-  const endDate = manifest.endDate || '';
-  const tournamentName = (manifest.tournamentName || '').replace(/^Tournamentsoftware\.com\s*-\s*/i, '');
-  const dateParams = manifest.dateParams || [];
-
-  // Read players for name resolution
   let playersData;
   try {
     playersData = JSON.parse(await readFile(join(cacheDir, 'players.json'), 'utf-8'));
-  } catch {
-    return null;
-  }
+  } catch { return null; }
+
   const playerMap = new Map((playersData.players || []).map(p => [p.playerId, p]));
-  const playerIdSet = new Set(playerIds);
   const players = playerIds
-    .map(id => ({ playerId: id, playerName: playerMap.get(id)?.name || `Player ${id}` }))
-    .filter(p => playerMap.has(p.playerId));
+    .filter(id => playerMap.has(id))
+    .map(id => ({ playerId: id, playerName: playerMap.get(id).name }));
   if (players.length === 0) return null;
 
-  // Determine today's YYYYMMDD
+  const drawsList = detailData.draws || [];
+  const tournamentName = (detailData.name || '').replace(/^Tournamentsoftware\.com\s*-\s*/i, '');
+
+  const dateRangeMatch = (detailData.dates || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  let startDate = '', endDate = '';
+  if (dateRangeMatch) {
+    const [, sM, sD, sY, eM, eD, eY] = dateRangeMatch;
+    startDate = `${sY}-${sM.padStart(2, '0')}-${sD.padStart(2, '0')}`;
+    endDate = `${eY}-${eM.padStart(2, '0')}-${eD.padStart(2, '0')}`;
+  }
+
+  // Phase 2: Read future-date match files, filter to upcoming player matches
   const now = new Date();
-  const todayParam = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  const todayStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
 
-  // Only include today and future dates
-  const futureDateParams = dateParams.filter(d => d >= todayParam);
-
-  // Build event -> draw type map from event-details
-  // eventDrawMap: eventName -> { drawId, drawType }[]
-  const eventDrawMap = new Map();
+  const allUpcoming = [];
   try {
-    const eventFiles = await readdir(join(cacheDir, 'event-details'));
-    for (const f of eventFiles) {
+    const matchFiles = await readdir(join(cacheDir, 'matches'));
+    for (const f of matchFiles.sort()) {
       if (!f.endsWith('.json')) continue;
-      const evData = JSON.parse(await readFile(join(cacheDir, 'event-details', f), 'utf-8'));
-      const draws = (evData.draws || []).map(d => ({
-        drawId: d.drawId,
-        drawType: (d.type || '').toLowerCase().includes('elimination') ? 'elimination'
-          : (d.type || '').toLowerCase().includes('round') ? 'round-robin'
-          : 'unknown',
-        drawName: d.name || '',
-      }));
-      if (evData.eventName) eventDrawMap.set(evData.eventName, draws);
+      const dp = f.replace('.json', '');
+      if (dp < todayStr) continue;
+      const dayData = JSON.parse(await readFile(join(cacheDir, 'matches', f), 'utf-8'));
+      for (const m of dayData.matches || []) {
+        for (const pid of playerIds) {
+          const inTeam1 = (m.team1Ids || []).includes(pid);
+          const inTeam2 = (m.team2Ids || []).includes(pid);
+          if (!inTeam1 && !inTeam2) continue;
+          if (m.team1Won || m.team2Won || m.bye || m.walkover) continue;
+          allUpcoming.push({ ...m, _playerId: pid, _dateParam: dp });
+        }
+      }
     }
-  } catch { /* no event-details */ }
+  } catch { /* no matches dir */ }
 
-  // Load draw brackets for elimination draws (lazy, keyed by drawId)
+  // Map upcoming event names to draws from the draws list (no event-detail files needed)
+  const upcomingEventNames = new Set(allUpcoming.map(m => m.event).filter(Boolean));
+  const eventToDrawObj = new Map();
+  for (const eventName of upcomingEventNames) {
+    const exact = drawsList.find(d => d.name === eventName);
+    if (exact) { eventToDrawObj.set(eventName, exact); continue; }
+    const prefixed = drawsList.find(d =>
+      d.name.startsWith(eventName) && !/consolation/i.test(d.name) && !/play-?off/i.test(d.name),
+    );
+    if (prefixed) eventToDrawObj.set(eventName, prefixed);
+  }
+
+  // Phase 3: Load brackets only for elimination draws with upcoming matches
   const bracketCache = new Map();
-  async function loadBracket(drawId) {
-    if (bracketCache.has(drawId)) return bracketCache.get(drawId);
+  for (const [, drawObj] of eventToDrawObj) {
+    const t = (drawObj.type || '').toLowerCase();
+    if (!t.includes('elimination')) continue;
+    if (bracketCache.has(drawObj.drawId)) continue;
     try {
-      const data = JSON.parse(await readFile(join(cacheDir, 'draw-brackets', `${drawId}.json`), 'utf-8'));
-      bracketCache.set(drawId, data);
-      return data;
-    } catch {
-      bracketCache.set(drawId, null);
-      return null;
-    }
+      bracketCache.set(drawObj.drawId, JSON.parse(await readFile(join(cacheDir, 'draw-brackets', `${drawObj.drawId}.json`), 'utf-8')));
+    } catch { bracketCache.set(drawObj.drawId, null); }
   }
 
-  // Read match files for future dates and collect all matches (keyed by dateParam)
-  const matchesByDate = new Map();
-  for (const dp of futureDateParams) {
-    try {
-      const dayData = JSON.parse(await readFile(join(cacheDir, 'matches', `${dp}.json`), 'utf-8'));
-      matchesByDate.set(dp, dayData);
-    } catch { /* no file for this date */ }
-  }
-
-  // The rounds array from the parser is in column order (left-to-right in the
-  // HTML table) and may include non-match columns like "" or "Club" at the start
-  // and "Winner" at the end. RoundLevel counts down: highest = first round,
-  // 1 = final. Map level → round name by indexing backwards from the finals column.
   function getRoundName(section, level) {
     const rounds = section.rounds || [];
     if (rounds.length === 0) return `Round ${level}`;
@@ -283,84 +285,51 @@ async function synthesizePlayerSchedule(tswId, url) {
     return `Round ${level}`;
   }
 
-  // Walk the elimination bracket to find all potential next matches if the player
-  // keeps winning. Returns an array of matches with published schedule times,
-  // stopping at the first round without a scheduledTime.
-  // Handles consolation: if the player was eliminated from a section (main draw),
-  // skips it and checks subsequent sections (consolation).
   function findPotentialNextMatches(bracket, playerId) {
     if (!bracket || bracket.drawType !== 'elimination') return [];
-
     for (const section of bracket.sections || []) {
-      let deepestWinLevel = Infinity;
-      let deepestWinNum = 0;
+      let deepestWinLevel = Infinity, deepestWinNum = 0;
       for (const bm of section.matches || []) {
         if (!bm.winner) continue;
         if (bm.winner.playerId !== playerId && bm.winner.partnerPlayerId !== playerId) continue;
-        if (bm.roundLevel < deepestWinLevel) {
-          deepestWinLevel = bm.roundLevel;
-          deepestWinNum = bm.matchNum;
-        }
+        if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
       }
       if (deepestWinLevel === Infinity) {
-        const entry = (section.entries || []).find(
-          e => e.playerId === playerId || e.partnerPlayerId === playerId,
-        );
+        const entry = (section.entries || []).find(e => e.playerId === playerId || e.partnerPlayerId === playerId);
         if (!entry) continue;
         const maxRL = Math.max(...(section.matches || []).map(m => m.roundLevel), 0);
         if (maxRL === 0) continue;
         deepestWinLevel = maxRL + 1;
         deepestWinNum = Math.ceil(entry.position / 2);
       }
-
       const currentLevel = deepestWinLevel - 1;
       if (currentLevel < 1) continue;
-
       const currentNum = Math.ceil(deepestWinNum / 2);
-
-      // Check if player was eliminated from this section:
-      // if the match at currentLevel already has a winner who is NOT the player
       const currentMatchId = `${currentLevel}${String(currentNum).padStart(3, '0')}`;
       const currentMatch = (section.matches || []).find(m => m.matchId === currentMatchId);
       if (currentMatch?.winner) {
-        const isPlayer = currentMatch.winner.playerId === playerId
-          || currentMatch.winner.partnerPlayerId === playerId;
-        if (!isPlayer) continue; // eliminated from this section, try next (consolation)
+        const isPlayer = currentMatch.winner.playerId === playerId || currentMatch.winner.partnerPlayerId === playerId;
+        if (!isPlayer) continue;
       }
-
-      // Walk from currentLevel-1 toward the final (level 1), collecting scheduled matches
       const results = [];
       let prevNum = currentNum;
       for (let level = currentLevel - 1; level >= 1; level--) {
         const levelNum = Math.ceil(prevNum / 2);
         const matchId = `${level}${String(levelNum).padStart(3, '0')}`;
         const bracketMatch = (section.matches || []).find(m => m.matchId === matchId);
-
         if (!bracketMatch?.scheduledTime) break;
-
         const roundName = getRoundName(section, level);
-
         let opponent = null;
         const otherNum = prevNum % 2 === 0 ? prevNum - 1 : prevNum + 1;
-        const otherId = `${level + 1 === currentLevel ? currentLevel : level + 1}${String(otherNum).padStart(3, '0')}`;
+        const otherId = `${level + 1}${String(otherNum).padStart(3, '0')}`;
         const otherFeeder = (section.matches || []).find(m => m.matchId === otherId);
         if (otherFeeder?.winner) {
           const w = otherFeeder.winner;
-          const names = [w.name];
-          const ids = [w.playerId];
+          const names = [w.name]; const ids = [w.playerId];
           if (w.partner) { names.push(w.partner); ids.push(w.partnerPlayerId ?? null); }
           opponent = { names, playerIds: ids };
         }
-
-        results.push({
-          round: roundName,
-          time: bracketMatch.scheduledTime || '',
-          court: '',
-          date: '',
-          dateLabel: '',
-          opponent,
-        });
-
+        results.push({ round: roundName, time: bracketMatch.scheduledTime || '', court: '', date: '', dateLabel: '', opponent });
         prevNum = levelNum;
       }
       return results;
@@ -368,35 +337,22 @@ async function synthesizePlayerSchedule(tswId, url) {
     return [];
   }
 
-  // For a player still in the main draw, determine if they'd enter consolation
-  // upon losing their current match, and trace the consolation bracket chain.
   function findConsolationPath(bracket, playerId, mainCurrentLevel, mainCurrentNum) {
     if (!bracket || bracket.drawType !== 'elimination') return null;
-
     const mainSection = (bracket.sections || [])[0];
     if (!mainSection) return null;
-
-    const consSection = (bracket.sections || []).find(
-      s => s.name && s.name.toLowerCase().includes('consolation'),
-    );
+    const consSection = (bracket.sections || []).find(s => s.name && s.name.toLowerCase().includes('consolation'));
     if (!consSection || !(consSection.matches || []).length) return null;
-
     const mainMaxRL = Math.max(...mainSection.matches.map(m => m.roundLevel));
     const consMaxRL = Math.max(...consSection.matches.map(m => m.roundLevel));
-
     const consEntryRL = consMaxRL - (mainMaxRL - mainCurrentLevel);
     if (consEntryRL < 1 || consEntryRL > consMaxRL) return null;
-
-    // Check if consEntryRL is a feed-in level
     const countAtEntry = (consSection.matches || []).filter(m => m.roundLevel === consEntryRL).length;
     const countAbove = (consSection.matches || []).filter(m => m.roundLevel === consEntryRL + 1).length;
     const isFeedIn = consEntryRL === consMaxRL || countAtEntry > Math.ceil(countAbove / 2);
     if (!isFeedIn) return null;
-
     const isHighest = consEntryRL === consMaxRL;
     const consEntryMN = isHighest ? mainCurrentNum : mainCurrentNum * 2;
-
-    // Walk from consEntryRL toward 1, collecting matches with scheduledTime
     const sectionLabel = consSection.name.replace(/^[^-]*-\s*/, '') || 'Consolation';
     const matches = [];
     let prevNum = consEntryMN;
@@ -405,14 +361,11 @@ async function synthesizePlayerSchedule(tswId, url) {
       const matchId = `${level}${String(levelNum).padStart(3, '0')}`;
       const bm = (consSection.matches || []).find(m => m.matchId === matchId);
       if (!bm?.scheduledTime) { prevNum = levelNum; continue; }
-
       const roundName = getRoundName(consSection, level);
-
       let opponent = null;
       if (level < consEntryRL) {
         const otherNum = prevNum % 2 === 0 ? prevNum - 1 : prevNum + 1;
-        const otherFeedLevel = level + 1;
-        const otherId = `${otherFeedLevel}${String(otherNum).padStart(3, '0')}`;
+        const otherId = `${level + 1}${String(otherNum).padStart(3, '0')}`;
         const otherFeeder = (consSection.matches || []).find(m => m.matchId === otherId);
         if (otherFeeder?.winner) {
           const w = otherFeeder.winner;
@@ -421,28 +374,16 @@ async function synthesizePlayerSchedule(tswId, url) {
           opponent = { names, playerIds: ids };
         }
       }
-
-      matches.push({
-        round: `Consolation ${roundName}`,
-        time: bm.scheduledTime || '',
-        court: '',
-        date: '',
-        dateLabel: '',
-        opponent,
-      });
+      matches.push({ round: `Consolation ${roundName}`, time: bm.scheduledTime || '', court: '', date: '', dateLabel: '', opponent });
       prevNum = levelNum;
     }
-
     return { section: sectionLabel, matches };
   }
 
-  // Consolation semi-final losers: look for a consolation-specific 3/4 play-off section.
   function findConsolationPlayoffPath(bracket, playerId) {
     if (!bracket || bracket.drawType !== 'elimination') return null;
-
     const consSection = (bracket.sections || []).find(s => s.name && /consolation/i.test(s.name) && !/play-?off/i.test(s.name));
     if (!consSection) return null;
-
     let deepestWinLevel = Infinity, deepestWinNum = 0;
     for (const bm of consSection.matches || []) {
       if (!bm.winner) continue;
@@ -450,22 +391,15 @@ async function synthesizePlayerSchedule(tswId, url) {
       if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
     }
     if (deepestWinLevel === Infinity) return null;
-    const currentLevel = deepestWinLevel - 1;
-    if (currentLevel !== 2) return null;
-
+    if (deepestWinLevel - 1 !== 2) return null;
     const currentNum = Math.ceil(deepestWinNum / 2);
-    const consPlayoffSection = (bracket.sections || []).find(
-      s => s.name && /consolation/i.test(s.name) && /play-?off\s*3\/?4/i.test(s.name),
-    );
+    const consPlayoffSection = (bracket.sections || []).find(s => s.name && /consolation/i.test(s.name) && /play-?off\s*3\/?4/i.test(s.name));
     if (!consPlayoffSection || !(consPlayoffSection.matches || []).length) return null;
-
     const sectionLabel = consPlayoffSection.name.replace(/^[^-]*-\s*/, '') || 'Consolation Play-off 3/4';
     const finalMatch = (consPlayoffSection.matches || []).find(m => m.matchId === '1001');
     const roundName = getRoundName(consPlayoffSection, 1);
-
     let opponent = null;
-    const otherSlotNum = currentNum === 1 ? 2 : 1;
-    const otherSlotId = `2${String(otherSlotNum).padStart(3, '0')}`;
+    const otherSlotId = `2${String(currentNum === 1 ? 2 : 1).padStart(3, '0')}`;
     const otherSlot = (consPlayoffSection.matches || []).find(m => m.matchId === otherSlotId);
     if (otherSlot?.winner) {
       const w = otherSlot.winner;
@@ -473,36 +407,21 @@ async function synthesizePlayerSchedule(tswId, url) {
       if (w.partner) { names.push(w.partner); ids.push(w.partnerPlayerId ?? null); }
       opponent = { names, playerIds: ids };
     }
-
     const matches = [];
-    if (finalMatch) {
-      matches.push({
-        round: roundName,
-        time: finalMatch.scheduledTime || '',
-        court: '', date: '', dateLabel: '',
-        opponent,
-      });
-    }
+    if (finalMatch) matches.push({ round: roundName, time: finalMatch.scheduledTime || '', court: '', date: '', dateLabel: '', opponent });
     return { section: sectionLabel, matches };
   }
 
-  // Semi-final losers go to the 3/4 play-off bracket instead of consolation.
   function findPlayoffPath(bracket, playerId, mainCurrentLevel, mainCurrentNum) {
     if (!bracket || bracket.drawType !== 'elimination') return null;
     if (mainCurrentLevel !== 2) return null;
-
-    const playoffSection = (bracket.sections || []).find(
-      s => s.name && /play-?off\s*3\/?4/i.test(s.name),
-    );
+    const playoffSection = (bracket.sections || []).find(s => s.name && /play-?off\s*3\/?4/i.test(s.name));
     if (!playoffSection || !(playoffSection.matches || []).length) return null;
-
     const sectionLabel = playoffSection.name.replace(/^[^-]*-\s*/, '') || 'Play-off 3/4';
     const finalMatch = (playoffSection.matches || []).find(m => m.matchId === '1001');
     const roundName = getRoundName(playoffSection, 1);
-
     let opponent = null;
-    const otherSlotNum = mainCurrentNum === 1 ? 2 : 1;
-    const otherSlotId = `2${String(otherSlotNum).padStart(3, '0')}`;
+    const otherSlotId = `2${String(mainCurrentNum === 1 ? 2 : 1).padStart(3, '0')}`;
     const otherSlot = (playoffSection.matches || []).find(m => m.matchId === otherSlotId);
     if (otherSlot?.winner) {
       const w = otherSlot.winner;
@@ -510,187 +429,123 @@ async function synthesizePlayerSchedule(tswId, url) {
       if (w.partner) { names.push(w.partner); ids.push(w.partnerPlayerId ?? null); }
       opponent = { names, playerIds: ids };
     }
-
     const matches = [];
-    if (finalMatch) {
-      matches.push({
-        round: roundName,
-        time: finalMatch.scheduledTime || '',
-        court: '',
-        date: '',
-        dateLabel: '',
-        opponent,
-      });
-    }
-
+    if (finalMatch) matches.push({ round: roundName, time: finalMatch.scheduledTime || '', court: '', date: '', dateLabel: '', opponent });
     return { section: sectionLabel, matches };
+  }
+
+  function computeConsolationInfo(bracket, playerId, roundName) {
+    let consolation = null, consolationMatches = [];
+    const isConsMatch = /consolation/i.test(roundName || '');
+    if (isConsMatch) {
+      if (/semi/i.test(roundName || '')) {
+        const consPath = findConsolationPlayoffPath(bracket, playerId);
+        if (consPath) { consolation = consPath.section; consolationMatches = consPath.matches; }
+      }
+    } else {
+      const mainSection = (bracket.sections || [])[0];
+      if (mainSection) {
+        let deepestWinLevel = Infinity, deepestWinNum = 0;
+        for (const bm of mainSection.matches || []) {
+          if (!bm.winner) continue;
+          if (bm.winner.playerId !== playerId && bm.winner.partnerPlayerId !== playerId) continue;
+          if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
+        }
+        if (deepestWinLevel === Infinity) {
+          const entry = (mainSection.entries || []).find(e => e.playerId === playerId || e.partnerPlayerId === playerId);
+          if (entry) { const maxRL = Math.max(...mainSection.matches.map(mm => mm.roundLevel), 0); deepestWinLevel = maxRL + 1; deepestWinNum = Math.ceil(entry.position / 2); }
+        }
+        if (deepestWinLevel !== Infinity) {
+          const currentLevel = deepestWinLevel - 1, currentNum = Math.ceil(deepestWinNum / 2);
+          if (currentLevel >= 1) {
+            let consPath = findConsolationPath(bracket, playerId, currentLevel, currentNum) || findPlayoffPath(bracket, playerId, currentLevel, currentNum);
+            if (!consPath && /semi/i.test(roundName || '')) consPath = findPlayoffPath(bracket, playerId, 2, currentNum);
+            if (consPath) { consolation = consPath.section; consolationMatches = consPath.matches; }
+          }
+        }
+      }
+    }
+    return { consolation, consolationMatches };
   }
 
   function formatDateLabel(dp) {
     if (!dp || dp.length !== 8) return '';
     const d = new Date(`${dp.slice(0, 4)}-${dp.slice(4, 6)}-${dp.slice(6, 8)}T00:00:00`);
-    if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   }
 
   function formatDateIso(dp) {
-    if (!dp || dp.length !== 8) return '';
-    return `${dp.slice(0, 4)}-${dp.slice(4, 6)}-${dp.slice(6, 8)}`;
+    return dp?.length === 8 ? `${dp.slice(0, 4)}-${dp.slice(4, 6)}-${dp.slice(6, 8)}` : '';
   }
 
-  // Build schedule days
-  const days = [];
-  for (const dp of futureDateParams) {
-    const dayData = matchesByDate.get(dp);
-    if (!dayData) continue;
+  // Phase 4: Build schedule grouped by date
+  const dayMap = new Map();
+  for (const m of allUpcoming) {
+    const pid = m._playerId;
+    const dp = m._dateParam;
+    const dateKey = formatDateIso(dp);
 
-    const dayMatches = [];
-    for (const m of dayData.matches || []) {
-      for (const pid of playerIds) {
-        const inTeam1 = (m.team1Ids || []).includes(pid);
-        const inTeam2 = (m.team2Ids || []).includes(pid);
-        if (!inTeam1 && !inTeam2) continue;
+    const inTeam1 = (m.team1Ids || []).includes(pid);
+    const opponentNames = inTeam1 ? m.team2 : m.team1;
+    const opponentIds = inTeam1 ? (m.team2Ids || []) : (m.team1Ids || []);
+    const playerTeamNames = inTeam1 ? m.team1 : m.team2;
+    const playerTeamIds = inTeam1 ? (m.team1Ids || []) : (m.team2Ids || []);
 
-        const playerTeamNames = inTeam1 ? m.team1 : m.team2;
-        const playerTeamIds = inTeam1 ? (m.team1Ids || []) : (m.team2Ids || []);
-        const opponentNames = inTeam1 ? m.team2 : m.team1;
-        const opponentIds = inTeam1 ? (m.team2Ids || []) : (m.team1Ids || []);
-
-        // Separate partner from player in the player's team
-        const partnerNames = [];
-        const partnerPlayerIds = [];
-        for (let i = 0; i < playerTeamNames.length; i++) {
-          if ((playerTeamIds[i] || null) !== pid) {
-            partnerNames.push(playerTeamNames[i]);
-            partnerPlayerIds.push(playerTeamIds[i] ?? null);
-          }
-        }
-
-        const playerWon = inTeam1 ? m.team1Won : m.team2Won;
-        const opponentWon = inTeam1 ? m.team2Won : m.team1Won;
-        const isCompleted = playerWon || opponentWon;
-
-        // Skip completed matches -- only show upcoming/in-progress
-        if (isCompleted) continue;
-
-        let status = 'upcoming';
-        if (m.bye) status = 'bye';
-        else if (m.walkover) status = 'walkover';
-        else if ((m.status || '').toLowerCase().includes('now')) status = 'in-progress';
-
-        // Determine draw type
-        let drawType = 'unknown';
-        const eventDraws = eventDrawMap.get(m.event);
-        if (eventDraws) {
-          const elim = eventDraws.find(d => d.drawType === 'elimination');
-          const rr = eventDraws.find(d => d.drawType === 'round-robin');
-          if (elim) drawType = 'elimination';
-          else if (rr) drawType = 'round-robin';
-        }
-
-        // For upcoming elimination matches: show chain of potential next matches + consolation/playoff path
-        let nextMatches = [];
-        let consolation = null;
-        let consolationMatches = [];
-        if (drawType === 'elimination') {
-          const elimDraw = eventDraws?.find(d => d.drawType === 'elimination');
-          if (elimDraw) {
-            const bracket = await loadBracket(elimDraw.drawId);
-            if (bracket) {
-              nextMatches = findPotentialNextMatches(bracket, pid);
-
-              const isConsMatch = /consolation/i.test(m.round || '');
-
-              if (isConsMatch) {
-                // Player is in the consolation bracket — look for consolation-specific play-off
-                if (/semi/i.test(m.round || '')) {
-                  const consPath = findConsolationPlayoffPath(bracket, pid);
-                  if (consPath) {
-                    consolation = consPath.section;
-                    consolationMatches = consPath.matches;
-                  }
-                }
-              } else {
-                // Player is in the main draw — compute consolation or main play-off path
-                const mainSection = (bracket.sections || [])[0];
-                if (mainSection) {
-                  let deepestWinLevel = Infinity, deepestWinNum = 0;
-                  for (const bm of mainSection.matches || []) {
-                    if (!bm.winner) continue;
-                    if (bm.winner.playerId !== pid && bm.winner.partnerPlayerId !== pid) continue;
-                    if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
-                  }
-                  if (deepestWinLevel === Infinity) {
-                    const entry = (mainSection.entries || []).find(e => e.playerId === pid || e.partnerPlayerId === pid);
-                    if (entry) {
-                      const maxRL = Math.max(...mainSection.matches.map(mm => mm.roundLevel), 0);
-                      deepestWinLevel = maxRL + 1;
-                      deepestWinNum = Math.ceil(entry.position / 2);
-                    }
-                  }
-                  if (deepestWinLevel !== Infinity) {
-                    const currentLevel = deepestWinLevel - 1;
-                    const currentNum = Math.ceil(deepestWinNum / 2);
-                    if (currentLevel >= 1) {
-                      let consPath = findConsolationPath(bracket, pid, currentLevel, currentNum)
-                        || findPlayoffPath(bracket, pid, currentLevel, currentNum);
-
-                      // Bracket cache may be stale; if the match-day data says "semi",
-                      // try the playoff path even if bracket-derived level isn't 2 yet.
-                      if (!consPath && /semi/i.test(m.round || '')) {
-                        consPath = findPlayoffPath(bracket, pid, 2, currentNum);
-                      }
-
-                      if (consPath) {
-                        consolation = consPath.section;
-                        consolationMatches = consPath.matches;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        dayMatches.push({
-          playerId: pid,
-          event: m.event || '',
-          round: m.round || '',
-          time: m.time || '',
-          court: m.court || '',
-          drawType,
-          status,
-          opponent: { names: opponentNames, playerIds: opponentIds },
-          partner: partnerNames.length > 0
-            ? { names: partnerNames, playerIds: partnerPlayerIds }
-            : null,
-          result: null,
-          nextMatches,
-          consolation,
-          consolationMatches,
-        });
+    const partnerNames = [];
+    const partnerPlayerIds = [];
+    for (let i = 0; i < playerTeamNames.length; i++) {
+      if ((playerTeamIds[i] || null) !== pid) {
+        partnerNames.push(playerTeamNames[i]);
+        partnerPlayerIds.push(playerTeamIds[i] ?? null);
       }
     }
 
-    if (dayMatches.length > 0) {
-      days.push({
-        date: formatDateIso(dp),
-        dateLabel: dayData.date || formatDateLabel(dp),
-        matches: dayMatches,
-      });
+    let status = 'upcoming';
+    if ((m.status || '').toLowerCase().includes('now')) status = 'in-progress';
+
+    const drawObj = eventToDrawObj.get(m.event);
+    const drawType = drawObj
+      ? ((drawObj.type || '').toLowerCase().includes('elimination') ? 'elimination'
+        : (drawObj.type || '').toLowerCase().includes('round') ? 'round-robin' : 'unknown')
+      : 'unknown';
+
+    let nextMatches = [];
+    let consolation = null;
+    let consolationMatches = [];
+
+    if (drawType === 'elimination' && drawObj) {
+      const bracket = bracketCache.get(drawObj.drawId);
+      if (bracket) {
+        nextMatches = findPotentialNextMatches(bracket, pid);
+        const consInfo = computeConsolationInfo(bracket, pid, m.round);
+        consolation = consInfo.consolation;
+        consolationMatches = consInfo.consolationMatches;
+      }
     }
+
+    if (!dayMap.has(dateKey)) {
+      dayMap.set(dateKey, { date: dateKey, dateLabel: formatDateLabel(dp), matches: [] });
+    }
+    dayMap.get(dateKey).matches.push({
+      playerId: pid,
+      event: m.event || '',
+      round: m.round || '',
+      time: m.time || '',
+      court: m.court || '',
+      drawType,
+      status,
+      opponent: { names: opponentNames, playerIds: opponentIds },
+      partner: partnerNames.length > 0 ? { names: partnerNames, playerIds: partnerPlayerIds } : null,
+      result: null,
+      nextMatches,
+      consolation,
+      consolationMatches,
+    });
   }
 
-  const result = {
-    tswId,
-    tournamentName,
-    startDate,
-    endDate,
-    players,
-    days,
-  };
+  const days = [...dayMap.values()].sort((a, b) => a.date.localeCompare(b.date));
 
+  const result = { tswId, tournamentName, startDate, endDate, players, days };
   const matchCount = days.reduce((sum, d) => sum + d.matches.length, 0);
   console.log(`[tournament-cache] synthesized player-schedule for ${players.map(p => p.playerName).join(', ')}: ${matchCount} matches across ${days.length} days`);
   return JSON.stringify(result);

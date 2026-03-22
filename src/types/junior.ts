@@ -314,6 +314,7 @@ export interface TournamentPlayerDetailResponse {
   events: string[];
   winLoss: TournamentPlayerWinLoss | null;
   matches: TournamentMatch[];
+  hasUpcomingMatches?: boolean;
 }
 
 export interface SeedEntry {

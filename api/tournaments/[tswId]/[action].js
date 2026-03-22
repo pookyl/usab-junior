@@ -453,39 +453,9 @@ async function handlePlayerDetail(tswId, req, res) {
     return sendApiError(res, new ValidationError('playerId query parameter required (numeric)', { field: 'playerId' }));
   }
 
-  const cacheKey = `tournament-player-detail:${tswId}:${playerId}`;
-  if (!refresh) {
-    const cached = getCached(cacheKey);
-    if (cached) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
-      res.end(JSON.stringify(cached));
-      return;
-    }
-  }
-
   try {
-    const playerPath = `/tournament/${tswId.toLowerCase()}/player/${playerId}`;
-    const resp = tswOk(await tswFetch(playerPath), 'TSW player page');
-    const html = await resp.text();
-
-    const { playerName, memberId } = parseTswPlayerInfo(html);
-    const events = parseTswPlayerEvents(html);
-    const winLoss = parseTswPlayerWinLoss(html);
-    const matches = parseTswPlayerMatches(html);
-
-    const result = {
-      tswId,
-      playerId: parseInt(playerId, 10),
-      playerName,
-      memberId: memberId || undefined,
-      club: '',
-      events,
-      winLoss,
-      matches,
-    };
-
-    setCache(cacheKey, result);
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
+    const result = await fetchPlayerDetailInternal(tswId, parseInt(playerId, 10), refresh);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(result));
   } catch (err) {
     sendError(res, err, 'tournament-player-detail');
@@ -558,52 +528,35 @@ async function handleDrawBracket(tswId, req, res) {
 
 // ── Player schedule ─────────────────────────────────────────────────────────
 
-async function fetchMatchesForDate(tswId, dateParam, refresh) {
-  const cacheKey = `tournament-matches-day:${tswId}:${dateParam}`;
+async function fetchPlayerDetailInternal(tswId, playerId, refresh) {
+  const cacheKey = `tournament-player-detail:${tswId}:${playerId}`;
   if (!refresh) {
     const cached = getCached(cacheKey);
     if (cached) return cached;
   }
-  const resp = tswOk(
-    await tswFetch(`/tournament/${tswId.toLowerCase()}/Matches/MatchesInDay?date=${encodeURIComponent(dateParam)}`),
-    'TSW matches AJAX',
-  );
+  const resp = tswOk(await tswFetch(`/tournament/${tswId.toLowerCase()}/player/${playerId}`), 'TSW player page');
   const html = await resp.text();
-  const matches = parseTswMatches(html);
-  setCache(cacheKey, matches);
-  return matches;
-}
-
-async function fetchEventDetailInternal(tswId, eventId, refresh) {
-  const cacheKey = `tournament-event-detail:${tswId}:${eventId}`;
-  if (!refresh) {
-    const cached = getCached(cacheKey);
-    if (cached) return cached;
-  }
-  const resp = tswOk(
-    await tswFetch(`/sport/event.aspx?id=${encodeURIComponent(tswId)}&event=${encodeURIComponent(eventId)}`),
-    'TSW event page',
-  );
-  const html = await resp.text();
-  const parsed = parseTswEventDetail(html);
-  const result = { tswId, eventId, eventName: parsed.eventName, entriesCount: parsed.entriesCount, draws: parsed.draws, entries: parsed.entries };
+  const { playerName, memberId } = parseTswPlayerInfo(html);
+  const events = parseTswPlayerEvents(html);
+  const winLoss = parseTswPlayerWinLoss(html);
+  const matches = parseTswPlayerMatches(html);
+  const hasUpcomingMatches = matches.some(m => !m.team1Won && !m.team2Won && !m.bye && !m.walkover && m.time);
+  const result = { tswId, playerId, playerName, memberId: memberId || undefined, club: '', events, winLoss, matches, hasUpcomingMatches };
   setCache(cacheKey, result);
   return result;
 }
 
-async function fetchPlayersInternal(tswId, refresh) {
-  const cacheKey = `tournament-players:${tswId}`;
+async function fetchTournamentDetailInternal(tswId, refresh) {
+  const cacheKey = `tournament-detail:${tswId}`;
   if (!refresh) {
     const cached = getCached(cacheKey);
     if (cached) return cached;
   }
-  const resp = tswOk(await tswFetch(`/tournament/${tswId.toLowerCase()}/Players/GetPlayersContent`, {
-    method: 'POST',
-    extraHeaders: { 'Content-Type': 'application/x-www-form-urlencoded', Referer: `${TSW_BASE}/tournament/${tswId}/players` },
-    body: '',
-  }), 'Players content');
-  const players = parseTswTournamentPlayersArray(await resp.text());
-  const result = { tswId, playerCount: players.length, players };
+  const resp = tswOk(await tswFetch(`/sport/draws.aspx?id=${encodeURIComponent(tswId)}`), 'TSW draws page');
+  const html = await resp.text();
+  const info = parseTswTournamentInfo(html);
+  const draws = parseTswDrawsList(html);
+  const result = { tswId, name: info.name, dates: info.dates, location: info.location, draws, tswUrl: `https://www.tournamentsoftware.com/tournament/${tswId}` };
   setCache(cacheKey, result);
   return result;
 }
@@ -858,6 +811,80 @@ function findPlayoffPath(bracket, playerId, mainCurrentLevel, mainCurrentNum) {
   return { section: sectionLabel, matches };
 }
 
+function parseScheduledTime(timeStr) {
+  if (!timeStr) return { date: '', time: '', dateLabel: '' };
+  const m = timeStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+  if (m) {
+    const month = m[1].padStart(2, '0');
+    const day = m[2].padStart(2, '0');
+    const year = m[3];
+    const date = `${year}-${month}-${day}`;
+    const time = m[4].trim();
+    const d = new Date(`${date}T00:00:00`);
+    const dateLabel = isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    return { date, time, dateLabel };
+  }
+  return { date: '', time: timeStr, dateLabel: '' };
+}
+
+function matchEventToDraws(eventNames, drawsList) {
+  const result = new Map();
+  for (const eventName of eventNames) {
+    const exact = drawsList.find(d => d.name === eventName);
+    if (exact) { result.set(eventName, exact); continue; }
+    const prefixed = drawsList.find(d =>
+      d.name.startsWith(eventName) && !/consolation/i.test(d.name) && !/play-?off/i.test(d.name),
+    );
+    if (prefixed) result.set(eventName, prefixed);
+  }
+  return result;
+}
+
+function computeConsolationInfo(bracket, playerId, roundName) {
+  let consolation = null;
+  let consolationMatches = [];
+
+  const isConsMatch = /consolation/i.test(roundName || '');
+  if (isConsMatch) {
+    if (/semi/i.test(roundName || '')) {
+      const consPath = findConsolationPlayoffPath(bracket, playerId);
+      if (consPath) { consolation = consPath.section; consolationMatches = consPath.matches; }
+    }
+  } else {
+    const mainSection = (bracket.sections || [])[0];
+    if (mainSection) {
+      let deepestWinLevel = Infinity, deepestWinNum = 0;
+      for (const bm of mainSection.matches || []) {
+        if (!bm.winner) continue;
+        if (bm.winner.playerId !== playerId && bm.winner.partnerPlayerId !== playerId) continue;
+        if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
+      }
+      if (deepestWinLevel === Infinity) {
+        const entry = (mainSection.entries || []).find(e => e.playerId === playerId || e.partnerPlayerId === playerId);
+        if (entry) {
+          const maxRL = Math.max(...mainSection.matches.map(mm => mm.roundLevel), 0);
+          deepestWinLevel = maxRL + 1;
+          deepestWinNum = Math.ceil(entry.position / 2);
+        }
+      }
+      if (deepestWinLevel !== Infinity) {
+        const currentLevel = deepestWinLevel - 1;
+        const currentNum = Math.ceil(deepestWinNum / 2);
+        if (currentLevel >= 1) {
+          let consPath = findConsolationPath(bracket, playerId, currentLevel, currentNum)
+            || findPlayoffPath(bracket, playerId, currentLevel, currentNum);
+          if (!consPath && /semi/i.test(roundName || '')) {
+            consPath = findPlayoffPath(bracket, playerId, 2, currentNum);
+          }
+          if (consPath) { consolation = consPath.section; consolationMatches = consPath.matches; }
+        }
+      }
+    }
+  }
+
+  return { consolation, consolationMatches };
+}
+
 async function handlePlayerSchedule(tswId, req, res) {
   const urlObj = new URL(req.url, 'http://localhost');
   const rawIds = req.query?.playerIds || urlObj.searchParams.get('playerIds') || '';
@@ -868,7 +895,7 @@ async function handlePlayerSchedule(tswId, req, res) {
     return sendApiError(res, new ValidationError('playerIds query parameter required (comma-separated numeric)', { field: 'playerIds' }));
   }
 
-  const cacheKey = `tournament-player-schedule:${tswId}:${playerIds.sort().join(',')}`;
+  const cacheKey = `tournament-player-schedule:v2:${tswId}:${playerIds.sort().join(',')}`;
   if (!refresh) {
     const cached = getCached(cacheKey);
     if (cached) {
@@ -879,242 +906,126 @@ async function handlePlayerSchedule(tswId, req, res) {
   }
 
   try {
-    // Fetch tournament detail for dates and name
-    const detailCacheKey = `tournament-detail:${tswId}`;
-    let detail = !refresh && getCached(detailCacheKey);
-    if (!detail) {
-      const detailResp = tswOk(await tswFetch(`/sport/draws.aspx?id=${encodeURIComponent(tswId)}`), 'TSW detail');
-      detail = parseTswTournamentInfo(await detailResp.text());
-      setCache(detailCacheKey, detail);
-    }
+    // Phase 1: Parallel fetch player detail(s) + tournament detail
+    const [playerDetails, detail] = await Promise.all([
+      Promise.all(playerIds.map(pid => fetchPlayerDetailInternal(tswId, pid, refresh).catch(() => null))),
+      fetchTournamentDetailInternal(tswId, refresh),
+    ]);
 
-    // Parse date range from detail
-    const dateRangeMatch = (detail.dates || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-    let startDate = '', endDate = '';
-    const dateParams = [];
-    if (dateRangeMatch) {
-      const sM = dateRangeMatch[1], sD = dateRangeMatch[2], sY = dateRangeMatch[3];
-      const eM = dateRangeMatch[4], eD = dateRangeMatch[5], eY = dateRangeMatch[6];
-      startDate = `${sY}-${sM.padStart(2, '0')}-${sD.padStart(2, '0')}`;
-      endDate = `${eY}-${eM.padStart(2, '0')}-${eD.padStart(2, '0')}`;
-      const cur = new Date(startDate + 'T00:00:00');
-      const endD = new Date(endDate + 'T00:00:00');
-      while (cur <= endD) {
-        const y = cur.getFullYear();
-        const m = String(cur.getMonth() + 1).padStart(2, '0');
-        const d = String(cur.getDate()).padStart(2, '0');
-        dateParams.push(`${y}${m}${d}`);
-        cur.setDate(cur.getDate() + 1);
+    const validDetails = playerDetails.filter(Boolean);
+    const players = validDetails.map(pd => ({ playerId: pd.playerId, playerName: pd.playerName }));
+
+    // Phase 2: Filter upcoming matches from player match cards
+    const allUpcoming = [];
+    for (const pd of validDetails) {
+      for (const m of pd.matches || []) {
+        if (m.team1Won || m.team2Won || m.bye || m.walkover) continue;
+        if (!m.time) continue;
+        allUpcoming.push({ ...m, _playerId: pd.playerId });
       }
     }
 
-    const now = new Date();
-    const todayParam = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-    const futureDateParams = dateParams.filter(d => d >= todayParam);
+    const upcomingEventNames = new Set(allUpcoming.map(m => m.event).filter(Boolean));
+    const eventToDrawObj = matchEventToDraws(upcomingEventNames, detail.draws || []);
 
-    // Fetch players for name resolution
-    const playersResult = await fetchPlayersInternal(tswId, refresh);
-    const playerMap = new Map((playersResult?.players || []).map(p => [p.playerId, p]));
-    const players = playerIds
-      .filter(id => playerMap.has(id))
-      .map(id => ({ playerId: id, playerName: playerMap.get(id).name }));
-
-    // Fetch events to build event -> draw type map
-    const eventsCacheKey = `tournament-events:${tswId}`;
-    let eventsResult = !refresh && getCached(eventsCacheKey);
-    if (!eventsResult) {
-      const evResp = tswOk(await tswFetch(`/sport/events.aspx?id=${encodeURIComponent(tswId)}`), 'TSW events');
-      const events = parseTswEvents(await evResp.text());
-      eventsResult = { tswId, eventCount: events.length, events };
-      setCache(eventsCacheKey, eventsResult);
-    }
-
-    // For each event, fetch event detail to get draw types
-    const eventDrawMap = new Map();
-    const eventDetailPromises = (eventsResult.events || []).map(async (ev) => {
-      try {
-        const evDetail = await fetchEventDetailInternal(tswId, ev.eventId, refresh);
-        const draws = (evDetail.draws || []).map(d => ({
-          drawId: d.drawId,
-          drawType: (d.type || '').toLowerCase().includes('elimination') ? 'elimination'
-            : (d.type || '').toLowerCase().includes('round') ? 'round-robin' : 'unknown',
-        }));
-        eventDrawMap.set(evDetail.eventName, draws);
-      } catch { /* skip */ }
-    });
-    await Promise.all(eventDetailPromises);
-
-    // Fetch match days for future dates
-    const matchesByDate = new Map();
-    const matchPromises = futureDateParams.map(async (dp) => {
-      try {
-        const matches = await fetchMatchesForDate(tswId, dp, refresh);
-        matchesByDate.set(dp, { date: formatMatchDate(dp), matches });
-      } catch { /* skip */ }
-    });
-    await Promise.all(matchPromises);
-
-    // Lazy bracket cache
+    // Phase 3: Fetch brackets only for elimination draws with upcoming matches
     const bracketCache = new Map();
-    async function loadBracket(drawId) {
-      if (bracketCache.has(drawId)) return bracketCache.get(drawId);
+    const drawIdsToFetch = new Set();
+    for (const [, drawObj] of eventToDrawObj) {
+      const t = (drawObj.type || '').toLowerCase();
+      if (t.includes('elimination')) drawIdsToFetch.add(drawObj.drawId);
+    }
+
+    await Promise.all([...drawIdsToFetch].map(async (drawId) => {
       try {
-        const data = await fetchDrawBracketInternal(tswId, drawId, refresh);
-        bracketCache.set(drawId, data);
-        return data;
-      } catch {
-        bracketCache.set(drawId, null);
-        return null;
-      }
-    }
+        bracketCache.set(drawId, await fetchDrawBracketInternal(tswId, drawId, refresh));
+      } catch { bracketCache.set(drawId, null); }
+    }));
 
+    // Phase 4: Build schedule from match cards + bracket chain data
+    const matchesByDate = new Map();
 
-    function fmtDateLabel(dp) {
-      if (!dp || dp.length !== 8) return '';
-      const d = new Date(`${dp.slice(0, 4)}-${dp.slice(4, 6)}-${dp.slice(6, 8)}T00:00:00`);
-      return isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    }
-    function fmtDateIso(dp) {
-      return dp?.length === 8 ? `${dp.slice(0, 4)}-${dp.slice(4, 6)}-${dp.slice(6, 8)}` : '';
-    }
+    for (const m of allUpcoming) {
+      const pid = m._playerId;
+      const parsed = parseScheduledTime(m.time);
+      const dateKey = parsed.date || 'unknown';
 
+      const inTeam1 = (m.team1Ids || []).includes(pid);
+      const inTeam2 = (m.team2Ids || []).includes(pid);
+      if (!inTeam1 && !inTeam2) continue;
 
-    // Build schedule days
-    const days = [];
-    for (const dp of futureDateParams) {
-      const dayData = matchesByDate.get(dp);
-      if (!dayData) continue;
+      const opponentNames = inTeam1 ? m.team2 : m.team1;
+      const opponentIds = inTeam1 ? (m.team2Ids || []) : (m.team1Ids || []);
+      const playerTeamNames = inTeam1 ? m.team1 : m.team2;
+      const playerTeamIds = inTeam1 ? (m.team1Ids || []) : (m.team2Ids || []);
 
-      const dayMatches = [];
-      for (const m of dayData.matches || []) {
-        for (const pid of playerIds) {
-          const inTeam1 = (m.team1Ids || []).includes(pid);
-          const inTeam2 = (m.team2Ids || []).includes(pid);
-          if (!inTeam1 && !inTeam2) continue;
-
-          const playerTeamNames = inTeam1 ? m.team1 : m.team2;
-          const playerTeamIds = inTeam1 ? (m.team1Ids || []) : (m.team2Ids || []);
-          const opponentNames = inTeam1 ? m.team2 : m.team1;
-          const opponentIds = inTeam1 ? (m.team2Ids || []) : (m.team1Ids || []);
-
-          const partnerNames = [];
-          const partnerPlayerIds = [];
-          for (let i = 0; i < playerTeamNames.length; i++) {
-            if ((playerTeamIds[i] || null) !== pid) {
-              partnerNames.push(playerTeamNames[i]);
-              partnerPlayerIds.push(playerTeamIds[i] ?? null);
-            }
-          }
-
-          const playerWon = inTeam1 ? m.team1Won : m.team2Won;
-          const opponentWon = inTeam1 ? m.team2Won : m.team1Won;
-          const isCompleted = playerWon || opponentWon;
-
-          // Skip completed matches -- only show upcoming/in-progress
-          if (isCompleted) continue;
-
-          let status = 'upcoming';
-          if (m.bye) status = 'bye';
-          else if (m.walkover) status = 'walkover';
-          else if ((m.status || '').toLowerCase().includes('now')) status = 'in-progress';
-
-          let drawType = 'unknown';
-          const eventDraws = eventDrawMap.get(m.event);
-          if (eventDraws) {
-            if (eventDraws.some(d => d.drawType === 'elimination')) drawType = 'elimination';
-            else if (eventDraws.some(d => d.drawType === 'round-robin')) drawType = 'round-robin';
-          }
-
-          // For upcoming elimination matches: show chain of potential next matches + consolation/playoff path
-          let nextMatches = [];
-          let consolation = null;
-          let consolationMatches = [];
-          if (drawType === 'elimination') {
-            const elimDraw = eventDraws?.find(d => d.drawType === 'elimination');
-            if (elimDraw) {
-              const bracket = await loadBracket(elimDraw.drawId);
-              if (bracket) {
-                nextMatches = findPotentialNextMatches(bracket, pid);
-
-                const isConsMatch = /consolation/i.test(m.round || '');
-
-                if (isConsMatch) {
-                  // Player is in the consolation bracket — look for consolation-specific play-off
-                  if (/semi/i.test(m.round || '')) {
-                    const consPath = findConsolationPlayoffPath(bracket, pid);
-                    if (consPath) {
-                      consolation = consPath.section;
-                      consolationMatches = consPath.matches;
-                    }
-                  }
-                } else {
-                  // Player is in the main draw — compute consolation or main play-off path
-                  const mainSection = (bracket.sections || [])[0];
-                  if (mainSection) {
-                    let deepestWinLevel = Infinity, deepestWinNum = 0;
-                    for (const bm of mainSection.matches || []) {
-                      if (!bm.winner) continue;
-                      if (bm.winner.playerId !== pid && bm.winner.partnerPlayerId !== pid) continue;
-                      if (bm.roundLevel < deepestWinLevel) { deepestWinLevel = bm.roundLevel; deepestWinNum = bm.matchNum; }
-                    }
-                    if (deepestWinLevel === Infinity) {
-                      const entry = (mainSection.entries || []).find(e => e.playerId === pid || e.partnerPlayerId === pid);
-                      if (entry) {
-                        const maxRL = Math.max(...mainSection.matches.map(mm => mm.roundLevel), 0);
-                        deepestWinLevel = maxRL + 1;
-                        deepestWinNum = Math.ceil(entry.position / 2);
-                      }
-                    }
-                    if (deepestWinLevel !== Infinity) {
-                      const currentLevel = deepestWinLevel - 1;
-                      const currentNum = Math.ceil(deepestWinNum / 2);
-                      if (currentLevel >= 1) {
-                        let consPath = findConsolationPath(bracket, pid, currentLevel, currentNum)
-                          || findPlayoffPath(bracket, pid, currentLevel, currentNum);
-
-                        // Bracket cache may be stale; if the match-day data says "semi",
-                        // try the playoff path even if bracket-derived level isn't 2 yet.
-                        if (!consPath && /semi/i.test(m.round || '')) {
-                          consPath = findPlayoffPath(bracket, pid, 2, currentNum);
-                        }
-
-                        if (consPath) {
-                          consolation = consPath.section;
-                          consolationMatches = consPath.matches;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          dayMatches.push({
-            playerId: pid,
-            event: m.event || '',
-            round: m.round || '',
-            time: m.time || '',
-            court: m.court || '',
-            drawType,
-            status,
-            opponent: { names: opponentNames, playerIds: opponentIds },
-            partner: partnerNames.length > 0 ? { names: partnerNames, playerIds: partnerPlayerIds } : null,
-            result: null,
-            nextMatches,
-            consolation,
-            consolationMatches,
-          });
+      const partnerNames = [];
+      const partnerPlayerIds = [];
+      for (let i = 0; i < playerTeamNames.length; i++) {
+        if ((playerTeamIds[i] || null) !== pid) {
+          partnerNames.push(playerTeamNames[i]);
+          partnerPlayerIds.push(playerTeamIds[i] ?? null);
         }
       }
 
-      if (dayMatches.length > 0) {
-        days.push({
-          date: fmtDateIso(dp),
-          dateLabel: dayData.date || fmtDateLabel(dp),
-          matches: dayMatches,
-        });
+      let status = 'upcoming';
+      if ((m.status || '').toLowerCase().includes('now')) status = 'in-progress';
+
+      const drawObj = eventToDrawObj.get(m.event);
+      const drawType = drawObj
+        ? ((drawObj.type || '').toLowerCase().includes('elimination') ? 'elimination'
+          : (drawObj.type || '').toLowerCase().includes('round') ? 'round-robin' : 'unknown')
+        : 'unknown';
+
+      let nextMatches = [];
+      let consolation = null;
+      let consolationMatches = [];
+
+      if (drawType === 'elimination' && drawObj) {
+        const bracket = bracketCache.get(drawObj.drawId);
+        if (bracket) {
+          nextMatches = findPotentialNextMatches(bracket, pid);
+          const consInfo = computeConsolationInfo(bracket, pid, m.round);
+          consolation = consInfo.consolation;
+          consolationMatches = consInfo.consolationMatches;
+        }
       }
+
+      if (!matchesByDate.has(dateKey)) {
+        matchesByDate.set(dateKey, { dateLabel: parsed.dateLabel || '', matches: [] });
+      }
+      matchesByDate.get(dateKey).matches.push({
+        playerId: pid,
+        event: m.event || '',
+        round: m.round || '',
+        time: parsed.time || m.time || '',
+        court: m.court || '',
+        drawType,
+        status,
+        opponent: { names: opponentNames, playerIds: opponentIds },
+        partner: partnerNames.length > 0 ? { names: partnerNames, playerIds: partnerPlayerIds } : null,
+        result: null,
+        nextMatches,
+        consolation,
+        consolationMatches,
+      });
+    }
+
+    const dateRangeMatch = (detail.dates || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    let startDate = '', endDate = '';
+    if (dateRangeMatch) {
+      const [, sM, sD, sY, eM, eD, eY] = dateRangeMatch;
+      startDate = `${sY}-${sM.padStart(2, '0')}-${sD.padStart(2, '0')}`;
+      endDate = `${eY}-${eM.padStart(2, '0')}-${eD.padStart(2, '0')}`;
+    }
+
+    const days = [...matchesByDate.entries()]
+      .filter(([date]) => date !== 'unknown')
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, data]) => ({ date, dateLabel: data.dateLabel, matches: data.matches }));
+    const unknownDay = matchesByDate.get('unknown');
+    if (unknownDay?.matches.length) {
+      days.push({ date: '', dateLabel: '', matches: unknownDay.matches });
     }
 
     const tournamentName = (detail.name || '').replace(/^Tournamentsoftware\.com\s*-\s*/i, '');

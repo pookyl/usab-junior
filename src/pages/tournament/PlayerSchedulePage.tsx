@@ -56,7 +56,7 @@ function ScheduleMatchCard({ match, tswId, fromPath }: {
   const isBye = match.status === 'bye' || match.status === 'walkover';
   const hasWinPath = match.nextMatches.length > 0;
   const hasLosePath = !!match.consolation;
-  const potentialMatches = 1 + match.nextMatches.length + (hasLosePath ? 1 + match.consolationMatches.length : 0);
+  const potentialMatches = 1 + Math.max(match.nextMatches.length, match.consolationMatches.length);
 
   return (
     <div className={`rounded-xl border overflow-hidden transition-shadow hover:shadow-md ${

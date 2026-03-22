@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Calendar, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
-import { useTournamentMeta } from '../hooks/useTournamentMeta';
 
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
 import MatchCard from '../components/tournament/MatchCard';
@@ -40,16 +39,6 @@ export default function TournamentPlayerDetail() {
     refreshFlag.current = true;
     setFetchTrigger(n => n + 1);
   }, []);
-
-  const meta = useTournamentMeta(tswId);
-  const isTournamentActive = useMemo(() => {
-    if (!meta.startDate) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const start = new Date(meta.startDate + 'T00:00:00');
-    const end = meta.endDate ? new Date(meta.endDate + 'T00:00:00') : start;
-    return today >= start && today <= end;
-  }, [meta.startDate, meta.endDate]);
 
   const resolvedUsabId = data?.memberId ?? null;
 
@@ -143,10 +132,10 @@ export default function TournamentPlayerDetail() {
                   Player Profile
                 </Link>
               )}
-              {isTournamentActive && (
+              {data.hasUpcomingMatches && (
                 <Link
                   to={`/tournaments/${tswId}/player/${playerId}/schedule`}
-                  state={{ playerName: data.playerName, startDate: meta.startDate, endDate: meta.endDate }}
+                  state={{ playerName: data.playerName }}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900/40 transition-colors"
                 >
                   <Calendar className="w-3 h-3" />
