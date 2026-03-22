@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Calendar, Swords, Users } from 'lucide-react';
+import { ArrowLeft, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
@@ -132,6 +132,7 @@ export default function TournamentPlayerDetail() {
                   Player Profile
                 </Link>
               )}
+              {/* Schedule link — temporarily disabled for production
               {data.hasUpcomingMatches && (
                 <Link
                   to={`/tournaments/${tswId}/player/${playerId}/schedule`}
@@ -142,6 +143,7 @@ export default function TournamentPlayerDetail() {
                   Schedule
                 </Link>
               )}
+              */}
             </div>
           </div>
 

@@ -2,7 +2,7 @@ import { useParams, useSearchParams, Link, Navigate, useNavigate } from 'react-r
 import { track } from '@vercel/analytics';
 import {
   ArrowLeft, ExternalLink,
-  Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal, Eye,
+  Calendar, MapPin, Swords, Users, List, CalendarDays, Bookmark, Trophy, Medal,
 } from 'lucide-react';
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
@@ -134,7 +134,7 @@ export default function TournamentHub() {
         </div>
       </div>
 
-      {/* Watchlist — only in tournament mode, above section grid */}
+      {/* Watchlist — temporarily disabled for production
       {isFocusedTournament && (
         <Link
           to={`/tournaments/${tswId}/watchlist`}
@@ -157,6 +157,7 @@ export default function TournamentHub() {
           </div>
         </Link>
       )}
+      */}
 
       {/* Section pills grid */}
       <div className="grid grid-cols-3 sm:grid-cols-7 gap-3">
