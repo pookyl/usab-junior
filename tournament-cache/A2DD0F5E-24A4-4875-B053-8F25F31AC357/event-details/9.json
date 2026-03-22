@@ -1,0 +1,948 @@
+{
+  "tswId": "A2DD0F5E-24A4-4875-B053-8F25F31AC357",
+  "eventId": 9,
+  "eventName": "BS U15",
+  "entriesCount": 93,
+  "draws": [
+    {
+      "drawId": 11,
+      "name": "BS U15",
+      "size": 128,
+      "type": "Elimination",
+      "qualification": "No",
+      "consolation": "Full Feed-in"
+    }
+  ],
+  "entries": [
+    {
+      "entryType": "Maindraw",
+      "seed": "1",
+      "players": [
+        {
+          "name": "Terence Cai",
+          "playerId": 4
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "2",
+      "players": [
+        {
+          "name": "Srineet Atluri",
+          "playerId": 428
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "3/4",
+      "players": [
+        {
+          "name": "William Geng",
+          "playerId": 27
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "3/4",
+      "players": [
+        {
+          "name": "Jacob Ma",
+          "playerId": 64
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "5/8",
+      "players": [
+        {
+          "name": "Zisheng (GaoGao) Fan",
+          "playerId": 138
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "5/8",
+      "players": [
+        {
+          "name": "Aarav Gupta",
+          "playerId": 141
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "5/8",
+      "players": [
+        {
+          "name": "Seth Li",
+          "playerId": 594
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "5/8",
+      "players": [
+        {
+          "name": "Abhiram Tripuraneni",
+          "playerId": 480
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Zaph J-Din Bayona",
+          "playerId": 225
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Xi Cao",
+          "playerId": 249
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Mikael Chang",
+          "playerId": 6
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Jason Gu",
+          "playerId": 30
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Nathaniel Volfbeyn",
+          "playerId": 276
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Cayden Wang",
+          "playerId": 290
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Anthony Cheng Xu",
+          "playerId": 179
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "9/16",
+      "players": [
+        {
+          "name": "Yifei Zhang",
+          "playerId": 188
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vishnu Anand",
+          "playerId": 344
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Ayaaz Muhammed Baig",
+          "playerId": 224
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Enming Cao",
+          "playerId": 627
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vivaan Chada",
+          "playerId": 628
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Elisha Gian Chang",
+          "playerId": 5
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Charlie Chen",
+          "playerId": 7
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Wayne Chien",
+          "playerId": 13
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Sriyansh Chigullapally",
+          "playerId": 14
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Thomas Cui",
+          "playerId": 298
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Ojas Nikhil Damle",
+          "playerId": 19
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Justin Dong",
+          "playerId": 352
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Bavish Reddi Dornala",
+          "playerId": 434
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jimmy Qinmo Fan",
+          "playerId": 192
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Daniel Bicheng Fong",
+          "playerId": 564
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Charlie W Gao",
+          "playerId": 230
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Arnav Godbole",
+          "playerId": 517
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Hardik Gowrish",
+          "playerId": 29
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Patrick Guo",
+          "playerId": 567
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Luke Han",
+          "playerId": 31
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Arjun Aditya Hariharan",
+          "playerId": 32
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Kayden Hossain",
+          "playerId": 374
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Edwin Huang",
+          "playerId": 302
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Max Jin Han Huang",
+          "playerId": 283
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Alex Jiang",
+          "playerId": 305
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vivaan Jinwala",
+          "playerId": 442
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jason Jung",
+          "playerId": 633
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Agastya Kalal",
+          "playerId": 256
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Dhruvan Karthik",
+          "playerId": 410
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vivaan Khullar",
+          "playerId": 257
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Andy Korlann",
+          "playerId": 285
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Carsten Lam",
+          "playerId": 411
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Aiden Kunwoo Lee",
+          "playerId": 575
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Steven Li",
+          "playerId": 49
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Yuancheng Li",
+          "playerId": 262
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Calum Lim",
+          "playerId": 149
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Justin Lim",
+          "playerId": 52
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Landon Ling",
+          "playerId": 266
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Alvin Liu",
+          "playerId": 390
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Joey Liu",
+          "playerId": 363
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Lucas Liu",
+          "playerId": 449
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Logan Lu",
+          "playerId": 61
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jason Yiheng Luo",
+          "playerId": 378
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Matthew Luo",
+          "playerId": 531
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Ethan Yip Ly",
+          "playerId": 414
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Alan Ma",
+          "playerId": 63
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Shaurya Maddela",
+          "playerId": 313
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Aarush Mali",
+          "playerId": 451
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Michael Moi",
+          "playerId": 636
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Prathik Nemani",
+          "playerId": 349
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Brandon Minh Nguyen",
+          "playerId": 208
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vallabh Nukala",
+          "playerId": 457
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Tao Peng",
+          "playerId": 75
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Seiji Phan",
+          "playerId": 380
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Ishaan A Pillutla",
+          "playerId": 76
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Gagan Polineni",
+          "playerId": 353
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Rishabh Praveen",
+          "playerId": 211
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Advik Rai",
+          "playerId": 638
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Neel J Reddy",
+          "playerId": 464
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Siddhanth Selvanathan",
+          "playerId": 467
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Ryan Shih",
+          "playerId": 468
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jayden Solo",
+          "playerId": 418
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Eddie Sun",
+          "playerId": 93
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Adhip Sundar",
+          "playerId": 545
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Bhavesh Sai Varma Tammu",
+          "playerId": 621
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Henry Tan",
+          "playerId": 94
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vihaan Vinod",
+          "playerId": 275
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Pranav Vivek",
+          "playerId": 511
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Devon Wong",
+          "playerId": 100
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jonah Chenfei Wong",
+          "playerId": 103
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jonathan Wu",
+          "playerId": 218
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Kenneth Wu",
+          "playerId": 486
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Daniel Yan",
+          "playerId": 500
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Yeewei Yap",
+          "playerId": 220
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Harshith Yoganand",
+          "playerId": 615
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Henry Hongxu Zhang",
+          "playerId": 425
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Sunny Zheng",
+          "playerId": 248
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Darren Zhong",
+          "playerId": 128
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "tswId": "A2DD0F5E-24A4-4875-B053-8F25F31AC357",
+  "drawCount": 25,
+  "draws": [
+    {
+      "drawId": 1,
+      "name": "BS U11",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 2,
+      "name": "GS U11",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 3,
+      "name": "XD U11",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 4,
+      "name": "BD U11",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 5,
+      "name": "GD U11",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 6,
+      "name": "BS U13",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 7,
+      "name": "GS U13",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 8,
+      "name": "XD U13",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 9,
+      "name": "BD U13",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 10,
+      "name": "GD U13",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 11,
+      "name": "BS U15",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 12,
+      "name": "GS U15",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 13,
+      "name": "XD U15",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 14,
+      "name": "BD U15",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 15,
+      "name": "GD U15",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 16,
+      "name": "BS U17",
+      "size": 128,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 17,
+      "name": "GS U17",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 18,
+      "name": "XD U17",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 19,
+      "name": "BD U17",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 20,
+      "name": "GD U17",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 21,
+      "name": "BS U19",
+      "size": 64,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 22,
+      "name": "GS U19",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 23,
+      "name": "XD U19",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 24,
+      "name": "BD U19",
+      "size": 32,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    },
+    {
+      "drawId": 25,
+      "name": "GD U19",
+      "size": 16,
+      "type": "Elimination",
+      "stage": "Main Draw",
+      "consolation": "Full Feed-in"
+    }
+  ]
+}
