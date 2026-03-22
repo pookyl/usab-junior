@@ -7,7 +7,7 @@ import { fetchTournamentMatchDay } from '../../../services/rankingsService';
 import { useTournamentMeta } from '../../../hooks/useTournamentMeta';
 import type { MatchDateTab, TournamentMatch } from '../../../types/junior';
 
-function generateDateTabs(startDate: string, endDate: string): MatchDateTab[] {
+export function generateDateTabs(startDate: string, endDate: string): MatchDateTab[] {
   if (!startDate) return [];
   const tabs: MatchDateTab[] = [];
   const start = new Date(startDate + 'T00:00:00');

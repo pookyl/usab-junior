@@ -20,6 +20,7 @@ import type {
   TournamentWinnersResponse,
   EliminationDrawResponse,
   RoundRobinDrawResponse,
+  PlayerScheduleResponse,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -487,5 +488,28 @@ export async function fetchTournamentMatchDay(
 
   const data: TournamentMatchDayResponse = await res.json();
   cappedSet(tournamentMatchDayCache, cacheKey, data);
+  return data;
+}
+
+// ── Player Schedule ──────────────────────────────────────────────────────────
+
+const playerScheduleCache = new Map<string, PlayerScheduleResponse>();
+
+export async function fetchPlayerSchedule(
+  tswId: string,
+  playerIds: (number | string)[],
+  refresh = false,
+): Promise<PlayerScheduleResponse> {
+  const ids = playerIds.map(String).sort().join(',');
+  const key = `${tswId}:${ids}`;
+  if (!refresh && playerScheduleCache.has(key)) return playerScheduleCache.get(key)!;
+
+  let url = `/api/tournaments/${encodeURIComponent(tswId)}/player-schedule?playerIds=${encodeURIComponent(ids)}`;
+  if (refresh) url += '&refresh=1';
+  const res = await fetchWithRetry(url, 30_000);
+  if (!res.ok) await throwApiError(res, 'Player schedule API');
+
+  const data: PlayerScheduleResponse = await res.json();
+  cappedSet(playerScheduleCache, key, data);
   return data;
 }

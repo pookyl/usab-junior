@@ -490,3 +490,50 @@ export interface RoundRobinDrawResponse {
   standings: RoundRobinStanding[];
   matches: RoundRobinMatch[];
 }
+
+// ── Player Schedule types ─────────────────────────────────────────────────────
+
+export interface ScheduleTeam {
+  names: string[];
+  playerIds: (number | null)[];
+}
+
+export interface ScheduleNextMatch {
+  round: string;
+  time: string;
+  court: string;
+  date: string;
+  dateLabel: string;
+  opponent: ScheduleTeam | null;
+}
+
+export interface ScheduleMatch {
+  playerId: number;
+  event: string;
+  round: string;
+  time: string;
+  court: string;
+  drawType: 'elimination' | 'round-robin' | 'unknown';
+  status: 'upcoming' | 'in-progress' | 'completed' | 'bye' | 'walkover';
+  opponent: ScheduleTeam;
+  partner: ScheduleTeam | null;
+  result: { won: boolean; scores: number[][] } | null;
+  nextMatches: ScheduleNextMatch[];
+  consolation: string | null;
+  consolationMatches: ScheduleNextMatch[];
+}
+
+export interface ScheduleDay {
+  date: string;
+  dateLabel: string;
+  matches: ScheduleMatch[];
+}
+
+export interface PlayerScheduleResponse {
+  tswId: string;
+  tournamentName: string;
+  startDate: string;
+  endDate: string;
+  players: { playerId: number; playerName: string }[];
+  days: ScheduleDay[];
+}

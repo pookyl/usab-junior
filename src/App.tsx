@@ -26,6 +26,7 @@ import TournamentWinnersPage from './pages/tournament/TournamentWinnersPage';
 import TournamentMedalsPage from './pages/tournament/TournamentMedalsPage';
 import TournamentWatchlistPage from './pages/tournament/TournamentWatchlistPage';
 import TournamentEventDetail from './pages/TournamentEventDetail';
+import PlayerSchedulePage from './pages/tournament/PlayerSchedulePage';
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -133,6 +134,7 @@ function PlayerRedirect() {
 const ROUTE_PATTERNS = [
   '/tournaments/:tswId/event/:eventId',
   '/tournaments/:tswId/draw/:drawId',
+  '/tournaments/:tswId/player/:playerId/schedule',
   '/tournaments/:tswId/player/:playerId',
   '/tournaments/:tswId/matches',
   '/tournaments/:tswId/players',
@@ -194,6 +196,7 @@ export default function App() {
                     <Route path="/tournaments/:tswId/watchlist" element={<TournamentWatchlistPage />} />
                     <Route path="/tournaments/:tswId/event/:eventId" element={<TournamentEventDetail />} />
                     <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
+                    <Route path="/tournaments/:tswId/player/:playerId/schedule" element={<PlayerSchedulePage />} />
                     <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
