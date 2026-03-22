@@ -46,7 +46,13 @@ const TOURNAMENT_API_RE = /\/api\/tournaments\/([0-9A-Fa-f-]+)\//;
 function detectTournamentCache(url: string, res: Response) {
   if (res.headers.get('X-Source') !== 'cache') return;
   const m = url.match(TOURNAMENT_API_RE);
-  if (m) _cachedTournaments.add(m[1].toUpperCase());
+  if (m) {
+    const key = m[1].toUpperCase();
+    if (!_cachedTournaments.has(key)) {
+      _cachedTournaments.add(key);
+      _cacheListeners.forEach(fn => fn());
+    }
+  }
 }
 
 async function throwApiError(res: Response, fallback: string): Promise<never> {
@@ -79,9 +85,15 @@ function cappedSet<K, V>(map: Map<K, V>, key: K, value: V) {
 
 // ── Tournament cache detection ──────────────────────────────────────────────
 const _cachedTournaments = new Set<string>();
+const _cacheListeners = new Set<() => void>();
 
 export function isTournamentCached(tswId: string): boolean {
   return _cachedTournaments.has(tswId.toUpperCase());
+}
+
+export function subscribeTournamentCache(listener: () => void): () => void {
+  _cacheListeners.add(listener);
+  return () => _cacheListeners.delete(listener);
 }
 
 // ── Module-level caches ─────────────────────────────────────────────────────
