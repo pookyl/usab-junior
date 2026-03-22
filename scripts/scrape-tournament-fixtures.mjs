@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Usage: node scripts/scrape-tournament-fixtures.mjs <tswId>
+// Usage: node scripts/scrape-tournament-fixtures.mjs <tswId> [--all]
 //
 // Scrapes all tournament data directly from TournamentSoftware.com using
 // tswFetch (handles cookie wall) and saves parsed JSON into
@@ -9,6 +9,7 @@
 
 import { readFileSync, mkdirSync, writeFileSync, readdirSync } from 'fs';
 import { readFile } from 'fs/promises';
+import { execSync } from 'child_process';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -40,12 +41,20 @@ const {
 
 // ── CLI args ─────────────────────────────────────────────────────────────────
 
-const tswId = process.argv[2];
+const args = process.argv.slice(2);
+const flagAll = args.includes('--all');
+const positional = args.filter(a => !a.startsWith('--'));
+const tswId = positional[0];
+
 if (!tswId) {
-  console.error(`Usage: node scripts/scrape-tournament-fixtures.mjs <tswId>
+  console.error(`Usage: node scripts/scrape-tournament-fixtures.mjs <tswId> [--all]
+
+Options:
+  --all   Include player-id-map scraping (slow, scrapes each player page)
 
 Examples:
   node scripts/scrape-tournament-fixtures.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852
+  node scripts/scrape-tournament-fixtures.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852 --all
 `);
   process.exit(1);
 }
@@ -252,6 +261,7 @@ async function main() {
   }
 
   // Phase 4: fetch matches for each day
+  let totalMatchCount = 0;
   if (dateParams.length > 0) {
     console.log('Phase 3: Fetching matches per day from TSW...');
     const matchResults = await Promise.allSettled(
@@ -267,8 +277,12 @@ async function main() {
       }),
     );
     for (const r of matchResults) {
-      if (r.status === 'fulfilled') console.log(`  Saved: matches/${r.value.dp}.json (${r.value.matchCount} matches)`);
-      else console.warn(`  FAILED: ${r.reason.message}`);
+      if (r.status === 'fulfilled') {
+        totalMatchCount += r.value.matchCount;
+        console.log(`  Saved: matches/${r.value.dp}.json (${r.value.matchCount} matches)`);
+      } else {
+        console.warn(`  FAILED: ${r.reason.message}`);
+      }
     }
   }
 
@@ -342,40 +356,59 @@ async function main() {
   }
 
   // Phase 7: scrape TSW player pages to build playerId→memberId (USAB ID) map
+  // Skipped by default (slow). Pass --all to include.
   let playersData;
+  const playerIdMap = {};
+  const unmappedPlayers = [];
+  let totalPlayerCount = 0;
+
   try {
     playersData = JSON.parse(await readFile(join(outDir, 'players.json'), 'utf-8'));
   } catch { /* ignore */ }
 
-  const playerIds = (playersData?.players || []).map(p => p.playerId).filter(Boolean);
-  const playerIdMap = {};
+  const allPlayers = playersData?.players || [];
+  totalPlayerCount = allPlayers.length;
+  const playerIds = allPlayers.map(p => p.playerId).filter(Boolean);
+  const playerLookup = new Map(allPlayers.map(p => [p.playerId, p]));
 
-  if (playerIds.length > 0) {
-    console.log(`Phase 6: Scraping TSW player pages (${playerIds.length} players)...`);
-    const PLAYER_CONCURRENCY = 5;
-    let resolved = 0;
-    for (let i = 0; i < playerIds.length; i += PLAYER_CONCURRENCY) {
-      const batch = playerIds.slice(i, i + PLAYER_CONCURRENCY);
-      const results = await Promise.allSettled(
-        batch.map(async (pid) => {
-          const resp = await tswFetch(`/tournament/${tswIdLower}/player/${pid}`);
-          if (!resp.ok) throw new Error(`HTTP ${resp.status} for player ${pid}`);
-          const html = await resp.text();
-          const { memberId } = parseTswPlayerInfo(html);
-          if (memberId) playerIdMap[pid] = memberId;
-          return { pid, memberId: memberId || null };
-        }),
-      );
-      resolved += batch.length;
-      const failed = results.filter(r => r.status === 'rejected').length;
-      process.stdout.write(`\r  Progress: ${resolved}/${playerIds.length} players (${Object.keys(playerIdMap).length} mapped)${failed ? `, ${failed} failed` : ''}`);
+  if (flagAll) {
+    if (playerIds.length > 0) {
+      console.log(`Phase 6: Scraping TSW player pages (${playerIds.length} players)...`);
+      const PLAYER_CONCURRENCY = 5;
+      let resolved = 0;
+      for (let i = 0; i < playerIds.length; i += PLAYER_CONCURRENCY) {
+        const batch = playerIds.slice(i, i + PLAYER_CONCURRENCY);
+        const results = await Promise.allSettled(
+          batch.map(async (pid) => {
+            const resp = await tswFetch(`/tournament/${tswIdLower}/player/${pid}`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status} for player ${pid}`);
+            const html = await resp.text();
+            const { memberId } = parseTswPlayerInfo(html);
+            if (memberId) {
+              playerIdMap[pid] = memberId;
+            } else {
+              const info = playerLookup.get(pid);
+              unmappedPlayers.push({ playerId: pid, name: info?.name || 'Unknown', club: info?.club || '' });
+            }
+            return { pid, memberId: memberId || null };
+          }),
+        );
+        resolved += batch.length;
+        const failed = results.filter(r => r.status === 'rejected').length;
+        process.stdout.write(`\r  Progress: ${resolved}/${playerIds.length} players (${Object.keys(playerIdMap).length} mapped)${failed ? `, ${failed} failed` : ''}`);
+      }
+      console.log('');
+      saveJson('player-id-map.json', playerIdMap);
+      console.log(`  Saved: player-id-map.json (${Object.keys(playerIdMap).length} of ${playerIds.length} players have USAB IDs)`);
     }
-    console.log('');
-    saveJson('player-id-map.json', playerIdMap);
-    console.log(`  Saved: player-id-map.json (${Object.keys(playerIdMap).length} of ${playerIds.length} players have USAB IDs)`);
+  } else {
+    console.log('Phase 6: Skipping player-id-map (pass --all to include)');
   }
 
   // Phase 8: write manifest
+  const staticFiles = ['detail.json', 'draws.json', 'events.json', 'seeds.json', 'players.json', 'winners.json', 'medals.json'];
+  if (flagAll) staticFiles.push('player-id-map.json');
+
   const manifest = {
     tswId,
     tournamentName,
@@ -385,10 +418,10 @@ async function main() {
     dateParams,
     drawIds,
     eventIds,
-    playerCount: playerIds.length,
+    playerIdMapIncluded: flagAll,
     mappedPlayerCount: Object.keys(playerIdMap).length,
     files: {
-      static: ['detail.json', 'draws.json', 'events.json', 'seeds.json', 'players.json', 'winners.json', 'medals.json', 'player-id-map.json'],
+      static: staticFiles,
       matches: dateParams.map(dp => `matches/${dp}.json`),
       drawBrackets: drawIds.map(id => `draw-brackets/${id}.json`),
       eventDetails: eventIds.map(id => `event-details/${id}.json`),
@@ -402,7 +435,39 @@ async function main() {
     + manifest.files.drawBrackets.length
     + manifest.files.eventDetails.length
     + 1;
-  console.log(`\nDone! ${totalFiles} files written to ${outDir}\n`);
+
+  // Folder size
+  let folderSize = 'unknown';
+  try {
+    folderSize = execSync(`du -sh "${outDir}"`, { encoding: 'utf-8' }).split('\t')[0].trim();
+  } catch { /* ignore */ }
+
+  // Summary
+  console.log('\n════════════════════════════════════════════════════════');
+  console.log('  SCRAPE SUMMARY');
+  console.log('════════════════════════════════════════════════════════');
+  console.log(`  Tournament : ${tournamentName}`);
+  console.log(`  TSW ID     : ${tswId}`);
+  console.log(`  Dates      : ${startDate || '?'} to ${endDate || '?'}`);
+  console.log(`  Draws      : ${drawIds.length}`);
+  console.log(`  Events     : ${eventIds.length}`);
+  console.log(`  Match days : ${dateParams.length} (${totalMatchCount} total matches)`);
+  console.log(`  Players    : ${totalPlayerCount}`);
+  if (flagAll) {
+    console.log(`  USAB mapped: ${Object.keys(playerIdMap).length} of ${playerIds.length}`);
+    if (unmappedPlayers.length > 0) {
+      console.log(`  Unmapped players (${unmappedPlayers.length}):`);
+      for (const p of unmappedPlayers) {
+        console.log(`    - ${p.name}${p.club ? ` (${p.club})` : ''} [playerId: ${p.playerId}]`);
+      }
+    }
+  } else {
+    console.log('  USAB mapped: skipped (use --all to include)');
+  }
+  console.log(`  Total files: ${totalFiles}`);
+  console.log(`  Folder size: ${folderSize}`);
+  console.log(`  Output     : ${outDir}`);
+  console.log('════════════════════════════════════════════════════════\n');
 }
 
 // ── Medals helpers (mirrored from action handler) ────────────────────────────
