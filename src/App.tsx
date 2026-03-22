@@ -157,7 +157,7 @@ const ROUTE_PATTERNS = [
 function AnalyticsWithRoutes() {
   const { pathname } = useLocation();
   const route = ROUTE_PATTERNS.find(pattern => matchPath(pattern, pathname)) ?? pathname;
-  return <Analytics route={route} />;
+  return <Analytics route={route} scriptSrc="/a/script.js" endpoint="/a" />;
 }
 
 export default function App() {
