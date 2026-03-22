@@ -7,7 +7,6 @@
   },
   "rewrites": [
     { "source": "/a/script.js", "destination": "/_vercel/insights/script.js" },
-    { "source": "/a/:path*", "destination": "/_vercel/insights/:path*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
