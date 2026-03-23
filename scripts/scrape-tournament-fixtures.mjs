@@ -60,7 +60,7 @@ Examples:
 }
 
 const tswIdLower = tswId.toLowerCase();
-const outDir = join(PROJECT_ROOT, 'tournament-cache', tswId);
+const outDir = join(PROJECT_ROOT, 'public', 'tournament-cache', tswId);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
