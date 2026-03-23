@@ -157,7 +157,12 @@ const ROUTE_PATTERNS = [
 function AnalyticsWithRoutes() {
   const { pathname } = useLocation();
   const route = ROUTE_PATTERNS.find(pattern => matchPath(pattern, pathname)) ?? pathname;
-  return <Analytics route={route} scriptSrc="/a/script.js" endpoint="/api/a" />;
+  return <Analytics route={route} scriptSrc="/a/script.js" beforeSend={(event) => {
+    if (new URLSearchParams(window.location.search).has('debug_analytics')) {
+      console.log('[Analytics]', event);
+    }
+    return event;
+  }} />;
 }
 
 export default function App() {
