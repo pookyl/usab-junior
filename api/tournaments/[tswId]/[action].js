@@ -732,7 +732,6 @@ function findConsolationPlayoffPath(bracket, playerId) {
   if (currentLevel !== 2) return null; // Only applies to consolation semi-final
 
   const currentNum = Math.ceil(deepestWinNum / 2);
-  const consName = consSection.name || '';
 
   // Look for a consolation play-off section (e.g. "BS U13 - Consolation - Play-off 3/4")
   const consPlayoffSection = (bracket.sections || []).find(
