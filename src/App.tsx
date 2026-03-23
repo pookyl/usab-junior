@@ -24,9 +24,9 @@ import TournamentEventsPage from './pages/tournament/TournamentEventsPage';
 import TournamentSeedsPage from './pages/tournament/TournamentSeedsPage';
 import TournamentWinnersPage from './pages/tournament/TournamentWinnersPage';
 import TournamentMedalsPage from './pages/tournament/TournamentMedalsPage';
-// import TournamentWatchlistPage from './pages/tournament/TournamentWatchlistPage';
+import TournamentWatchlistPage from './pages/tournament/TournamentWatchlistPage';
 import TournamentEventDetail from './pages/TournamentEventDetail';
-// import PlayerSchedulePage from './pages/tournament/PlayerSchedulePage';
+import PlayerSchedulePage from './pages/tournament/PlayerSchedulePage';
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -198,11 +198,10 @@ export default function App() {
                     <Route path="/tournaments/:tswId/seeds" element={<TournamentSeedsPage />} />
                     <Route path="/tournaments/:tswId/winners" element={<TournamentWinnersPage />} />
                     <Route path="/tournaments/:tswId/medals" element={<TournamentMedalsPage />} />
-                    {/* Watchlist and Schedule routes — temporarily disabled for production */}
-                    {/* <Route path="/tournaments/:tswId/watchlist" element={<TournamentWatchlistPage />} /> */}
-                    {/* <Route path="/tournaments/:tswId/player/:playerId/schedule" element={<PlayerSchedulePage />} /> */}
+                    <Route path="/tournaments/:tswId/watchlist" element={<TournamentWatchlistPage />} />
                     <Route path="/tournaments/:tswId/event/:eventId" element={<TournamentEventDetail />} />
                     <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
+                    <Route path="/tournaments/:tswId/player/:playerId/schedule" element={<PlayerSchedulePage />} />
                     <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
