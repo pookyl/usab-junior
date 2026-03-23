@@ -349,6 +349,20 @@ function getSeasonKey(t: TswTournament, yearHint: number): string {
   return `${year - 1}-${year}`;
 }
 
+function sortMatchesByDate<T extends { date: string }>(matches: T[]): T[] {
+  const indexed = matches.map((m, i) => ({ m, i, ts: m.date ? new Date(m.date).getTime() : NaN }));
+  const hasDate = indexed.some((x) => !isNaN(x.ts));
+  if (!hasDate) return matches;
+  indexed.sort((a, b) => {
+    const aValid = !isNaN(a.ts);
+    const bValid = !isNaN(b.ts);
+    if (aValid && bValid) return a.ts - b.ts;
+    if (aValid !== bValid) return aValid ? -1 : 1;
+    return a.i - b.i;
+  });
+  return indexed.map((x) => x.m);
+}
+
 function parseTournamentStartDate(t: TswTournament): number {
   if (t.startDate) {
     const ts = new Date(t.startDate + 'T00:00:00').getTime();
@@ -1249,8 +1263,10 @@ export default function PlayerProfile() {
                       <div className="px-3 md:px-4 py-2.5 md:py-3 space-y-2.5 md:space-y-3">
                         {filtered.map((t, ti) => {
                           const tournKey = `${season}-${ti}`;
-                          const matchesForTournament = (t.matches ?? []).filter(
-                            (m) => statsTab === 'total' || m.category === statsTab,
+                          const matchesForTournament = sortMatchesByDate(
+                            (t.matches ?? []).filter(
+                              (m) => statsTab === 'total' || m.category === statsTab,
+                            ),
                           );
                           const isCollapsed = collapsedTournaments.has(tournKey);
                           const showMatches = !isCollapsed && matchesForTournament.length > 0;
