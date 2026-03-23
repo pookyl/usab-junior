@@ -29,7 +29,10 @@ async function fetchWithRetry(url: string, timeoutMs: number, retries = 2): Prom
   for (let attempt = 0; ; attempt++) {
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-      if (res.ok) return res;
+      if (res.ok) {
+        detectTournamentCache(url, res);
+        return res;
+      }
       if (attempt >= retries) return res;
     } catch (err) {
       if (attempt >= retries) throw err;
@@ -70,6 +73,19 @@ function cappedSet<K, V>(map: Map<K, V>, key: K, value: V) {
 // Populated reactively via X-Source: cache headers on API responses.
 const _cachedTournaments = new Set<string>();
 const _cacheListeners = new Set<() => void>();
+const TOURNAMENT_API_RE = /\/api\/tournaments\/([0-9A-Fa-f-]+)\//;
+
+function detectTournamentCache(url: string, res: Response) {
+  if (res.headers.get('X-Source') !== 'cache') return;
+  const m = url.match(TOURNAMENT_API_RE);
+  if (m) {
+    const key = m[1].toUpperCase();
+    if (!_cachedTournaments.has(key)) {
+      _cachedTournaments.add(key);
+      _cacheListeners.forEach(fn => fn());
+    }
+  }
+}
 
 export function isTournamentCached(tswId: string): boolean {
   return _cachedTournaments.has(tswId.toUpperCase());
@@ -80,26 +96,11 @@ export function subscribeTournamentCache(listener: () => void): () => void {
   return () => _cacheListeners.delete(listener);
 }
 
-function staticCacheUrl(tswId: string, file: string): string | null {
-  if (!isTournamentCached(tswId)) return null;
-  return `/tournament-cache/${tswId}/${file}`;
-}
-
-async function fetchStaticOrApi<T>(
-  tswId: string,
-  cacheFile: string,
+async function fetchTournamentApi<T>(
   apiUrl: string,
-  refresh: boolean,
   timeoutMs: number,
   errorLabel: string,
 ): Promise<T> {
-  if (!refresh) {
-    const url = staticCacheUrl(tswId, cacheFile);
-    if (url) {
-      const res = await fetch(url);
-      if (res.ok) return res.json();
-    }
-  }
   const res = await fetchWithRetry(apiUrl, timeoutMs);
   if (!res.ok) await throwApiError(res, errorLabel);
   return res.json();
@@ -320,7 +321,7 @@ export async function fetchTournamentDetail(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/detail`;
   if (refresh) url += '?refresh=1';
-  const data = await fetchStaticOrApi<TournamentDetail>(tswId, 'detail.json', url, refresh, 30_000, 'Tournament detail API');
+  const data = await fetchTournamentApi<TournamentDetail>(url, 30_000, 'Tournament detail API');
   cappedSet(tournamentDetailCache, tswId, data);
   return data;
 }
@@ -339,7 +340,7 @@ export async function fetchTournamentEvents(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/events`;
   if (refresh) url += '?refresh=1';
-  const data = await fetchStaticOrApi<TournamentEventsResponse>(tswId, 'events.json', url, refresh, 30_000, 'Tournament events API');
+  const data = await fetchTournamentApi<TournamentEventsResponse>(url, 30_000, 'Tournament events API');
   cappedSet(tournamentEventsCache, tswId, data);
   return data;
 }
@@ -354,7 +355,7 @@ export async function fetchTournamentEventDetail(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/event-detail?eventId=${encodeURIComponent(eventId)}`;
   if (refresh) url += '&refresh=1';
-  const data = await fetchStaticOrApi<TournamentEventDetailResponse>(tswId, `event-details/${eventId}.json`, url, refresh, 30_000, 'Tournament event detail API');
+  const data = await fetchTournamentApi<TournamentEventDetailResponse>(url, 30_000, 'Tournament event detail API');
   cappedSet(tournamentEventDetailCache, key, data);
   return data;
 }
@@ -367,7 +368,7 @@ export async function fetchTournamentSeeding(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/seeds`;
   if (refresh) url += '?refresh=1';
-  const data = await fetchStaticOrApi<TournamentSeedingResponse>(tswId, 'seeds.json', url, refresh, 30_000, 'Tournament seeds API');
+  const data = await fetchTournamentApi<TournamentSeedingResponse>(url, 30_000, 'Tournament seeds API');
   cappedSet(tournamentSeedingCache, tswId, data);
   return data;
 }
@@ -384,7 +385,7 @@ export async function fetchTournamentWinners(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/winners`;
   if (refresh) url += '?refresh=1';
-  const data = await fetchStaticOrApi<TournamentWinnersResponse>(tswId, 'winners.json', url, refresh, 60_000, 'Tournament winners API');
+  const data = await fetchTournamentApi<TournamentWinnersResponse>(url, 60_000, 'Tournament winners API');
   cappedSet(tournamentWinnersCache, tswId, data);
   return data;
 }
@@ -401,7 +402,7 @@ export async function fetchTournamentMedals(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/medals`;
   if (refresh) url += '?refresh=1';
-  const data = await fetchStaticOrApi<TournamentMedals>(tswId, 'medals.json', url, refresh, 120_000, 'Tournament medals API');
+  const data = await fetchTournamentApi<TournamentMedals>(url, 120_000, 'Tournament medals API');
   cappedSet(tournamentMedalsCache, tswId, data);
   return data;
 }
@@ -418,7 +419,7 @@ export async function fetchTournamentPlayers(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/players`;
   if (refresh) url += '?refresh=1';
-  const data = await fetchStaticOrApi<TournamentPlayersResponse>(tswId, 'players.json', url, refresh, 30_000, 'Tournament players API');
+  const data = await fetchTournamentApi<TournamentPlayersResponse>(url, 30_000, 'Tournament players API');
   cappedSet(tournamentPlayersCache, tswId, data);
   return data;
 }
@@ -465,7 +466,7 @@ export async function fetchDrawBracket(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/draw-bracket?drawId=${drawId}`;
   if (refresh) url += '&refresh=1';
-  const data = await fetchStaticOrApi<DrawResponse>(tswId, `draw-brackets/${drawId}.json`, url, refresh, 60_000, 'Draw bracket API');
+  const data = await fetchTournamentApi<DrawResponse>(url, 60_000, 'Draw bracket API');
   cappedSet(drawBracketCache, key, data);
   return data;
 }
@@ -480,7 +481,7 @@ export async function fetchTournamentMatchDay(
 
   let url = `/api/tournaments/${encodeURIComponent(tswId)}/matches?d=${encodeURIComponent(dateParam)}`;
   if (refresh) url += '&refresh=1';
-  const data = await fetchStaticOrApi<TournamentMatchDayResponse>(tswId, `matches/${dateParam}.json`, url, refresh, 60_000, 'Tournament matches API');
+  const data = await fetchTournamentApi<TournamentMatchDayResponse>(url, 60_000, 'Tournament matches API');
   cappedSet(tournamentMatchDayCache, cacheKey, data);
   return data;
 }
