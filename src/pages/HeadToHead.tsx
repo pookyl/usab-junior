@@ -132,6 +132,8 @@ function matchResultToH2HMatch(
     scores: parseScoreString(mr.score),
     date: mr.date,
     venue: '',
+    walkover: mr.walkover,
+    retired: mr.retired,
   };
 }
 
@@ -355,7 +357,8 @@ function MatchCard({
   const headerLabel = [match.round, match.event].filter(Boolean).join(' · ');
   const team1Scores = match.scores.map(([a]) => a);
   const team2Scores = match.scores.map(([, b]) => b);
-  const isWalkover = match.scores.length === 0 && (match.team1Won || match.team2Won);
+  const isRetired = !!match.retired;
+  const isWalkover = match.walkover || (!isRetired && match.scores.length === 0 && (match.team1Won || match.team2Won));
 
   return (
     <div className={`rounded-xl border overflow-hidden hover:shadow-md transition-shadow ${
@@ -410,6 +413,9 @@ function MatchCard({
             {isWalkover && !match.team1Won && (
               <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold">Walkover</span>
             )}
+            {isRetired && !match.team1Won && (
+              <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold mr-1">Retired</span>
+            )}
             {match.team1Won && (
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
             )}
@@ -439,6 +445,9 @@ function MatchCard({
           <div className="flex items-center gap-1 shrink-0 font-mono text-sm pt-0.5">
             {isWalkover && !match.team2Won && (
               <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold">Walkover</span>
+            )}
+            {isRetired && !match.team2Won && (
+              <span className="text-amber-500 dark:text-amber-400 text-xs font-semibold mr-1">Retired</span>
             )}
             {match.team2Won && (
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />

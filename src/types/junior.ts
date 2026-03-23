@@ -76,6 +76,7 @@ export interface TswMatchResult {
   won: boolean;
   date: string;
   walkover?: boolean;
+  retired?: boolean;
 }
 
 export interface WinLossRecord {
@@ -148,6 +149,8 @@ export interface H2HMatch {
   scores: number[][];
   date: string;
   venue: string;
+  walkover?: boolean;
+  retired?: boolean;
 }
 
 export interface H2HResult {

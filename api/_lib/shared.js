@@ -298,6 +298,11 @@ export function parseH2HContent(html, headers) {
       if (pts.length === 2) scores.push(pts);
     }
 
+    const isWalkover = block.includes('>Walkover<');
+    const isRetired = /match__message">\s*Retired?\s*</i.test(block)
+      || />\s*Retired?\s*</i.test(block)
+      || />\s*Ret\.?\s*</i.test(block);
+
     const dateMatch = block.match(/icon-clock[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/);
     const venueMatch = block.match(/icon-marker[\s\S]*?<span class="nav-link__value">([^<]+)<\/span>/);
 
@@ -313,6 +318,8 @@ export function parseH2HContent(html, headers) {
       team2Ids: team2Ids.some((id) => id !== null) ? team2Ids : undefined,
       date: dateMatch ? dateMatch[1].trim() : '',
       venue: venueMatch ? venueMatch[1].trim() : '',
+      walkover: isWalkover || undefined,
+      retired: isRetired || undefined,
     });
   }
 
@@ -604,6 +611,9 @@ export function parseTswTournaments(html, playerName) {
         const status1 = rowBlocks[0].match(/match__status">([WL])</);
         const status2 = rowBlocks[1].match(/match__status">([WL])</);
         const isWalkover = block.includes('>Walkover<');
+        const isRetired = /match__message">\s*Retired?\s*</i.test(block)
+          || />\s*Retired?\s*</i.test(block)
+          || />\s*Ret\.?\s*</i.test(block);
         if (!status1 && !status2 && !isWalkover) continue;
 
         function extractTeam(rowHtml) {
@@ -702,10 +712,11 @@ export function parseTswTournaments(html, playerName) {
           playerTeam,
           opponentTeam,
           category,
-          score: isWalkover ? 'Walkover' : scores.map((s) => s.join('-')).join(', '),
+          score: isWalkover ? 'Walkover' : isRetired ? scores.map((s) => s.join('-')).join(', ') + ' Ret.' : scores.map((s) => s.join('-')).join(', '),
           won: playerWon,
           date: dateM ? dateM[1].trim() : '',
           walkover: isWalkover || undefined,
+          retired: isRetired || undefined,
         });
       }
     }
