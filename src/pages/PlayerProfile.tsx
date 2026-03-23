@@ -349,6 +349,15 @@ function getSeasonKey(t: TswTournament, yearHint: number): string {
   return `${year - 1}-${year}`;
 }
 
+function parseTournamentStartDate(t: TswTournament): number {
+  if (t.startDate) {
+    const ts = new Date(t.startDate + 'T00:00:00').getTime();
+    if (!isNaN(ts)) return ts;
+  }
+  const d = new Date(t.dates.split(' - ')[0]);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
 function groupBySeason(tournamentsByYear: Record<string, TswTournament[]>): Record<string, TswTournament[]> {
   const bySeason: Record<string, TswTournament[]> = {};
   for (const [yearStr, tournaments] of Object.entries(tournamentsByYear)) {
@@ -358,6 +367,9 @@ function groupBySeason(tournamentsByYear: Record<string, TswTournament[]>): Reco
       if (!bySeason[key]) bySeason[key] = [];
       bySeason[key].push(t);
     }
+  }
+  for (const key of Object.keys(bySeason)) {
+    bySeason[key].sort((a, b) => parseTournamentStartDate(b) - parseTournamentStartDate(a));
   }
   return bySeason;
 }
@@ -920,7 +932,7 @@ export default function PlayerProfile() {
               </div>
               <div>
                 <p className="text-2xl md:text-3xl font-black">{bestEntry.rankingPoints.toLocaleString()}</p>
-                <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Top Points</p>
+                <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Points</p>
               </div>
             </div>
           )}
