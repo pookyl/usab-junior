@@ -3,7 +3,7 @@
 //
 // Scrapes all tournament data directly from TournamentSoftware.com using
 // tswFetch (handles cookie wall) and saves parsed JSON into
-// tournament-cache/{tswId}/ for offline serving.
+// data/tournament-cache/{tswId}/ for offline serving.
 //
 // Fully standalone — does NOT require the dev API server to be running.
 
@@ -60,7 +60,7 @@ Examples:
 }
 
 const tswIdLower = tswId.toLowerCase();
-const outDir = join(PROJECT_ROOT, 'public', 'tournament-cache', tswId);
+const outDir = join(PROJECT_ROOT, 'data', 'tournament-cache', tswId);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -429,18 +429,6 @@ async function main() {
   };
   saveJson('_manifest.json', manifest);
   console.log('\n  Saved: _manifest.json');
-
-  // Update public/cached-tournaments.json so the frontend knows this tournament is cached
-  const publicManifestPath = join(PROJECT_ROOT, 'public', 'cached-tournaments.json');
-  let cachedIds = [];
-  try { cachedIds = JSON.parse(readFileSync(publicManifestPath, 'utf-8')); } catch { /* first run */ }
-  const upperTswId = tswId.toUpperCase();
-  if (!cachedIds.includes(upperTswId)) {
-    cachedIds.push(upperTswId);
-    cachedIds.sort();
-    writeFileSync(publicManifestPath, JSON.stringify(cachedIds, null, 2) + '\n');
-    console.log('  Updated: public/cached-tournaments.json');
-  }
 
   const totalFiles = manifest.files.static.length
     + manifest.files.matches.length

@@ -101,11 +101,13 @@ All endpoints are served by `api-server.mjs` on port 3001.
 │       ├── [id].js                # Player detail
 │       └── [id]/[action].js       # Player actions (tsw-stats, ranking-trend)
 ├── scripts/
-│   └── refresh-rankings-cache.mjs  # Fetch latest rankings into disk cache
+│   ├── refresh-rankings-cache.mjs  # Fetch latest rankings into disk cache
+│   └── scrape-tournament-fixtures.mjs  # Scrape tournament data from TSW
 ├── .github/workflows/
 │   └── refresh-rankings-cache.yml  # Daily GitHub Action to refresh cache
 ├── data/
-│   └── rankings-cache.json   # Pre-built rankings cache (committed for Vercel fallback)
+│   ├── rankings-cache.json         # Pre-built rankings cache (committed for Vercel fallback)
+│   └── tournament-cache/{tswId}/   # Pre-scraped tournament data (served by API server)
 ├── index.html                # HTML entry point
 ├── vite.config.ts            # Vite config (React, Tailwind, API proxy)
 ├── vercel.json               # Vercel deployment config

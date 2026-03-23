@@ -66,22 +66,10 @@ function cappedSet<K, V>(map: Map<K, V>, key: K, value: V) {
   map.set(key, value);
 }
 
-// ── Tournament cache manifest ────────────────────────────────────────────────
+// ── Tournament cache detection ──────────────────────────────────────────────
+// Populated reactively via X-Source: cache headers on API responses.
 const _cachedTournaments = new Set<string>();
 const _cacheListeners = new Set<() => void>();
-
-fetch('/cached-tournaments.json')
-  .then(r => r.ok ? r.json() : [])
-  .then((ids: string[]) => {
-    if (!Array.isArray(ids) || ids.length === 0) return;
-    let changed = false;
-    for (const id of ids) {
-      const key = id.toUpperCase();
-      if (!_cachedTournaments.has(key)) { _cachedTournaments.add(key); changed = true; }
-    }
-    if (changed) _cacheListeners.forEach(fn => fn());
-  })
-  .catch(() => {});
 
 export function isTournamentCached(tswId: string): boolean {
   return _cachedTournaments.has(tswId.toUpperCase());

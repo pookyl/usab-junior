@@ -58,8 +58,8 @@ flowchart LR
     S2["refresh-tournaments-cache.mjs"] -->|scrape| USAB2["usabadminton.org<br/>schedule page"]
     S2 -->|write| T["data/tournaments-YYYY-YYYY.json"]
 
-    S3["scrape-tournament-fixtures.mjs"] -->|scrape| TSW["tournamentsoftware.com"]
-    S3 -->|write| TC["tournament-cache/{tswId}/<br/>detail, draws, matches..."]
+    S3["scrape-tournament-fixtures.mjs &lt;tswId&gt; [--all]"] -->|scrape| TSW["tournamentsoftware.com"]
+    S3 -->|write| TC["data/tournament-cache/{tswId}/<br/>detail, draws, matches..."]
 
     S4["patch-tournaments-tsw.mjs"] -->|search TSW| TSW
     S4 -->|patch tswId into| T
@@ -176,7 +176,7 @@ TournamentSoftware.com requires cookie acceptance before serving content. `share
 
 ### Tournament Cache (Offline-First)
 
-`api-server.mjs` implements `serveTournamentCache()` which attempts to serve pre-scraped JSON from `tournament-cache/{tswId}/` before falling back to live TSW scraping. Responses served from cache include the `X-Source: cache` header, which the client detects to update a `Set` of known-cached tournaments.
+`api-server.mjs` implements `serveTournamentCache()` which attempts to serve pre-scraped JSON from `data/tournament-cache/{tswId}/` before falling back to live TSW scraping. Responses served from cache include the `X-Source: cache` header, which the client detects reactively (via `useSyncExternalStore`) to hide Refresh buttons for cached tournaments.
 
 ## Key Source Files
 

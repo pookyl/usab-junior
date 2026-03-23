@@ -49,7 +49,7 @@ async function getDefaultDate() {
 
 // ── Tournament cache (serves pre-scraped data from tournament-cache/) ────────
 
-const TOURNAMENT_CACHE_DIR = join(__dirname, 'public', 'tournament-cache');
+const TOURNAMENT_CACHE_DIR = join(__dirname, 'data', 'tournament-cache');
 
 const CACHE_ACTION_MAP = {
   detail: (tswId) => join(TOURNAMENT_CACHE_DIR, tswId, 'detail.json'),

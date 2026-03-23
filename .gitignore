@@ -28,5 +28,5 @@ dist-ssr
 *.sw?
 .vercel
 
-# Pre-scraped tournament data (committed caches served as static assets)
-public/tournament-cache/
+# Pre-scraped tournament data (served by api-server from data/)
+data/tournament-cache/

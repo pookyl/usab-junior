@@ -38,6 +38,15 @@ node scripts/tsw-fetch.mjs <full-tsw-url> | grep "keyword"
 
 Use this to inspect raw HTML before writing parsers.
 
+### Bulk scraping a tournament
+
+```bash
+node scripts/scrape-tournament-fixtures.mjs <tswId>          # without player-id-map
+node scripts/scrape-tournament-fixtures.mjs <tswId> --all    # includes player-id-map (slow)
+```
+
+Outputs to `data/tournament-cache/{tswId}/`. The API server (`api-server.mjs`) serves this cache automatically and sets `X-Source: cache` on responses.
+
 ## Parsing Conventions
 
 All TSW HTML parsers live in `api/_lib/shared.js` and follow this pattern:
