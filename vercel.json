@@ -6,7 +6,6 @@
     }
   },
   "rewrites": [
-    { "source": "/a/script.js", "destination": "/_vercel/insights/script.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
