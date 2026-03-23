@@ -115,10 +115,13 @@ export function useTabData<T>(tswId: string | undefined, active: boolean, fetche
 
 // ── Refresh button ──────────────────────────────────────────────────────────
 
+const _debugMode = new URLSearchParams(window.location.search).has('debug');
+
 function useIsCached(tswId?: string): boolean {
   const snap = useSyncExternalStore(subscribeTournamentCache, () =>
     tswId ? isTournamentCached(tswId) : false,
   );
+  if (_debugMode) return false;
   return snap;
 }
 

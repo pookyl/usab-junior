@@ -29,29 +29,12 @@ async function fetchWithRetry(url: string, timeoutMs: number, retries = 2): Prom
   for (let attempt = 0; ; attempt++) {
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-      if (res.ok) {
-        detectTournamentCache(url, res);
-        return res;
-      }
+      if (res.ok) return res;
       if (attempt >= retries) return res;
     } catch (err) {
       if (attempt >= retries) throw err;
     }
     await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
-  }
-}
-
-const TOURNAMENT_API_RE = /\/api\/tournaments\/([0-9A-Fa-f-]+)\//;
-
-function detectTournamentCache(url: string, res: Response) {
-  if (res.headers.get('X-Source') !== 'cache') return;
-  const m = url.match(TOURNAMENT_API_RE);
-  if (m) {
-    const key = m[1].toUpperCase();
-    if (!_cachedTournaments.has(key)) {
-      _cachedTournaments.add(key);
-      _cacheListeners.forEach(fn => fn());
-    }
   }
 }
 
@@ -83,9 +66,22 @@ function cappedSet<K, V>(map: Map<K, V>, key: K, value: V) {
   map.set(key, value);
 }
 
-// ── Tournament cache detection ──────────────────────────────────────────────
+// ── Tournament cache manifest ────────────────────────────────────────────────
 const _cachedTournaments = new Set<string>();
 const _cacheListeners = new Set<() => void>();
+
+fetch('/cached-tournaments.json')
+  .then(r => r.ok ? r.json() : [])
+  .then((ids: string[]) => {
+    if (!Array.isArray(ids) || ids.length === 0) return;
+    let changed = false;
+    for (const id of ids) {
+      const key = id.toUpperCase();
+      if (!_cachedTournaments.has(key)) { _cachedTournaments.add(key); changed = true; }
+    }
+    if (changed) _cacheListeners.forEach(fn => fn());
+  })
+  .catch(() => {});
 
 export function isTournamentCached(tswId: string): boolean {
   return _cachedTournaments.has(tswId.toUpperCase());

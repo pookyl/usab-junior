@@ -430,6 +430,18 @@ async function main() {
   saveJson('_manifest.json', manifest);
   console.log('\n  Saved: _manifest.json');
 
+  // Update public/cached-tournaments.json so the frontend knows this tournament is cached
+  const publicManifestPath = join(PROJECT_ROOT, 'public', 'cached-tournaments.json');
+  let cachedIds = [];
+  try { cachedIds = JSON.parse(readFileSync(publicManifestPath, 'utf-8')); } catch { /* first run */ }
+  const upperTswId = tswId.toUpperCase();
+  if (!cachedIds.includes(upperTswId)) {
+    cachedIds.push(upperTswId);
+    cachedIds.sort();
+    writeFileSync(publicManifestPath, JSON.stringify(cachedIds, null, 2) + '\n');
+    console.log('  Updated: public/cached-tournaments.json');
+  }
+
   const totalFiles = manifest.files.static.length
     + manifest.files.matches.length
     + manifest.files.drawBrackets.length
