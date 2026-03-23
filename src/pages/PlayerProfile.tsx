@@ -602,6 +602,32 @@ function PlayerNameLinkGroup({
   );
 }
 
+function useVisibleOnScroll() {
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
+  const [visible, setVisible] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const ref = useCallback((node: HTMLDivElement | null) => { setEl(node); }, []);
+
+  useEffect(() => {
+    if (scrolled) return;
+    const handler = () => setScrolled(true);
+    window.addEventListener('scroll', handler, { once: true, passive: true });
+    return () => window.removeEventListener('scroll', handler);
+  }, [scrolled]);
+
+  useEffect(() => {
+    if (!el || visible || !scrolled) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { rootMargin: '100px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [el, visible, scrolled]);
+
+  return [ref, visible] as const;
+}
+
 export default function PlayerProfile() {
   const { id: usabId } = useParams<{ id: string }>();
   const location = useLocation();
@@ -619,10 +645,16 @@ export default function PlayerProfile() {
 
   const [gender, setGender] = useState<string | null>(null);
   const [tswStats, setTswStats] = useState<TswPlayerStats | null>(null);
-  const [loadingTsw, setLoadingTsw] = useState(true);
+  const [loadingTsw, setLoadingTsw] = useState(() => {
+    if (!usabId) return false;
+    try {
+      const raw = sessionStorage.getItem(`player-profile:view:${usabId}`);
+      return raw ? JSON.parse(raw)?.restorePending === true : false;
+    } catch { return false; }
+  });
   const [tswError, setTswError] = useState<string | null>(null);
   const [trendData, setTrendData] = useState<PlayerRankingTrend | null>(null);
-  const [loadingTrend, setLoadingTrend] = useState(true);
+  const [loadingTrend, setLoadingTrend] = useState(false);
   const [trendError, setTrendError] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [statsTab, setStatsTab] = useState<StatsCategory>('total');
@@ -638,6 +670,19 @@ export default function PlayerProfile() {
     () => (usabId ? `player-profile:view:${usabId}` : ''),
     [usabId],
   );
+
+  const hasScrollRestore = useMemo(() => {
+    if (!viewStateStorageKey) return false;
+    try {
+      const raw = sessionStorage.getItem(viewStateStorageKey);
+      return raw ? JSON.parse(raw)?.restorePending === true : false;
+    } catch { return false; }
+  }, [viewStateStorageKey]);
+
+  const [trendSentinelRef, trendVisible] = useVisibleOnScroll();
+  const [tswSentinelRef, tswVisible] = useVisibleOnScroll();
+  const trendTriggered = trendVisible || hasScrollRestore;
+  const tswTriggered = tswVisible || hasScrollRestore;
 
   useEffect(() => {
     expandedYearsRef.current = expandedYears;
@@ -744,15 +789,30 @@ export default function PlayerProfile() {
     yearsInitializedRef.current = true;
   }, [loadingTsw, tswStats]);
 
+  // Player detail fetch (eager — needed for hero card)
   useEffect(() => {
+    if (!usabId || !playerName) return;
+    if (!rankedPlayer || rankedPlayer.entries.length === 0) return;
+    let cancelled = false;
+    const best = rankedPlayer.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
+    setDetailError(null);
+    fetchPlayerDetail(usabId, best.ageGroup, best.eventType)
+      .then((d) => { if (!cancelled) setGender(d?.gender ?? null); })
+      .catch((err) => {
+        if (cancelled) return;
+        setDetailError(err instanceof Error ? err.message : 'Could not load player details');
+      });
+    return () => { cancelled = true; };
+  }, [usabId, playerName, rankedPlayer]);
+
+  // TSW stats fetch (lazy — triggered by scroll or scroll-restore)
+  useEffect(() => {
+    if (!tswTriggered) return;
     if (!usabId || !playerName) {
-      setLoadingTsw(false);
-      setLoadingTrend(false);
+      if (!loadingAllPlayers && !directoryLoading) setLoadingTsw(false);
       return;
     }
-
     let cancelled = false;
-
     setLoadingTsw(true);
     setTswError(null);
     fetchPlayerTswStats(usabId, playerName)
@@ -767,7 +827,17 @@ export default function PlayerProfile() {
         setTswError(err instanceof Error ? err.message : 'Could not load TSW stats');
       })
       .finally(() => { if (!cancelled) setLoadingTsw(false); });
+    return () => { cancelled = true; };
+  }, [tswTriggered, usabId, playerName, loadingAllPlayers, directoryLoading]);
 
+  // Ranking trend fetch (lazy — triggered by scroll or scroll-restore)
+  useEffect(() => {
+    if (!trendTriggered) return;
+    if (!usabId || !playerName) {
+      if (!loadingAllPlayers && !directoryLoading) setLoadingTrend(false);
+      return;
+    }
+    let cancelled = false;
     setLoadingTrend(true);
     setTrendError(null);
     fetchPlayerRankingTrend(usabId)
@@ -782,20 +852,8 @@ export default function PlayerProfile() {
         setTrendError(err instanceof Error ? err.message : 'Could not load ranking trend');
       })
       .finally(() => { if (!cancelled) setLoadingTrend(false); });
-
-    if (rankedPlayer && rankedPlayer.entries.length > 0) {
-      const best = rankedPlayer.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
-      setDetailError(null);
-      fetchPlayerDetail(usabId, best.ageGroup, best.eventType)
-        .then((d) => { if (!cancelled) setGender(d?.gender ?? null); })
-        .catch((err) => {
-          if (cancelled) return;
-          setDetailError(err instanceof Error ? err.message : 'Could not load player details');
-        });
-    }
-
     return () => { cancelled = true; };
-  }, [usabId, playerName, rankedPlayer]);
+  }, [trendTriggered, usabId, playerName, loadingAllPlayers, directoryLoading]);
 
   if (!usabId) {
     return (
@@ -974,14 +1032,14 @@ export default function PlayerProfile() {
       )}
 
       {/* Ranking Trend */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+      <div ref={trendSentinelRef} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
         <div className="flex items-center gap-2 mb-3 md:mb-4">
           <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-violet-500" />
           <h2 className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-100">
             {isRanked ? 'Ranking Trend' : 'Historical Ranking Trend'}
           </h2>
         </div>
-        {loadingTrend ? (
+        {!trendTriggered ? null : loadingTrend ? (
           <div className="py-8 text-center">
             <RefreshCw className="w-7 h-7 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
             <p className="text-slate-400 dark:text-slate-500 text-sm">Loading ranking history…</p>
@@ -999,7 +1057,7 @@ export default function PlayerProfile() {
       </div>
 
       {/* Match Statistics from TSW */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+      <div ref={tswSentinelRef} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
         <div className="flex items-center justify-between mb-3 md:mb-4">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
@@ -1015,7 +1073,7 @@ export default function PlayerProfile() {
           </a>
         </div>
 
-        {loadingTsw ? (
+        {!tswTriggered ? null : loadingTsw ? (
           <div className="py-8 md:py-10 text-center">
             <RefreshCw className="w-7 h-7 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
             <p className="text-slate-400 dark:text-slate-500 text-sm">Fetching match statistics…</p>
@@ -1101,7 +1159,7 @@ export default function PlayerProfile() {
           </a>
         </div>
 
-        {loadingTsw ? (
+        {!tswTriggered ? null : loadingTsw ? (
           <div className="py-8 md:py-10 text-center">
             <RefreshCw className="w-7 h-7 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
             <p className="text-slate-400 dark:text-slate-500 text-sm">Loading tournament history…</p>
