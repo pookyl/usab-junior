@@ -24,3 +24,4 @@ This directory contains design documentation for the USAB Junior Badminton appli
   - [Events Page](tournaments-events.md) -- event list and event detail
   - [Seeds, Winners, Medals](tournaments-seeds-winners-medals.md) -- seedings, results, medal tally
   - [Player Detail](tournaments-player-detail.md) -- player matches within a tournament
+  - [Watchlist](tournaments-watchlist.md) -- track players, aggregated match feed, win/loss summary

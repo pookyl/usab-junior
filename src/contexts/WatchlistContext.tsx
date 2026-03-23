@@ -2,9 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { TournamentPlayer } from '../types/junior';
 import { useTournamentFocus } from './TournamentFocusContext';
 
+const _parsedMax = parseInt(new URLSearchParams(window.location.search).get('watchlist_max') ?? '', 10);
+export const WATCHLIST_MAX = Number.isFinite(_parsedMax) && _parsedMax > 0 ? _parsedMax : 7;
+
 interface WatchlistContextValue {
   players: TournamentPlayer[];
   playerIds: Set<number>;
+  maxPlayers: number;
   addPlayer: (player: TournamentPlayer) => void;
   removePlayer: (playerId: number) => void;
   clearAll: () => void;
@@ -30,6 +34,7 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
   const addPlayer = useCallback((player: TournamentPlayer) => {
     setPlayerMap(prev => {
       if (prev.has(player.playerId)) return prev;
+      if (prev.size >= WATCHLIST_MAX) return prev;
       if (activeTswIdRef.current) {
         boundTswId.current = activeTswIdRef.current;
       }
@@ -60,6 +65,7 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
   const value = useMemo(() => ({
     players,
     playerIds,
+    maxPlayers: WATCHLIST_MAX,
     addPlayer,
     removePlayer,
     clearAll,

@@ -14,6 +14,7 @@ graph TD
     Hub --> Seeds["/tournaments/:tswId/seeds<br/>Seedings"]
     Hub --> Winners["/tournaments/:tswId/winners<br/>Results"]
     Hub --> Medals["/tournaments/:tswId/medals<br/>Medal Tally"]
+    Hub --> Watchlist["/tournaments/:tswId/watchlist<br/>Watchlist"]
     Draws --> DrawDetail["/tournaments/:tswId/draw/:drawId<br/>Bracket / Round Robin"]
     Events --> EventDetail["/tournaments/:tswId/event/:eventId<br/>Event Entries & Draws"]
     Players --> PlayerDetail["/tournaments/:tswId/player/:playerId<br/>Player Matches"]
@@ -27,6 +28,7 @@ graph TD
 - [Events Page](tournaments-events.md) -- event list and event detail
 - [Seeds, Winners, Medals Pages](tournaments-seeds-winners-medals.md) -- seedings, results, medal tally
 - [Tournament Player Detail](tournaments-player-detail.md) -- individual player matches within a tournament
+- [Watchlist](tournaments-watchlist.md) -- track players, aggregated match feed, win/loss summary
 
 ---
 

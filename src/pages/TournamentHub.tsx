@@ -7,7 +7,20 @@ import {
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
 
+const _debugMode = new URLSearchParams(window.location.search).has('debug');
+
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
+
+function isWatchlistEligible(startDate: string, endDate: string): boolean {
+  if (!startDate) return false;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const twoDaysFromNow = new Date(today.getTime() + 2 * 86_400_000);
+  const start = new Date(startDate + 'T00:00:00');
+  const end = endDate ? new Date(endDate + 'T00:00:00') : start;
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return false;
+  return start <= twoDaysFromNow && end >= today;
+}
 
 // Re-export for backward compatibility
 export { default as TournamentPlayerDetail } from './TournamentPlayerDetail';
@@ -49,6 +62,7 @@ export default function TournamentHub() {
 
   const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
   const isFocusedTournament = isActive && activeTswId === tswId;
+  const showWatchlist = isFocusedTournament && (_debugMode || isWatchlistEligible(meta.startDate, meta.endDate));
   const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
   const handleTournamentModeToggle = () => {
     track('mode_toggle', {
@@ -134,8 +148,8 @@ export default function TournamentHub() {
         </div>
       </div>
 
-      {/* Watchlist — only in tournament mode, above section grid */}
-      {isFocusedTournament && (
+      {/* Watchlist — tournament mode + upcoming/ongoing (or ?debug override) */}
+      {showWatchlist && (
         <Link
           to={`/tournaments/${tswId}/watchlist`}
           state={{ name: meta.name, hostClub: meta.hostClub, startDate: meta.startDate, endDate: meta.endDate }}

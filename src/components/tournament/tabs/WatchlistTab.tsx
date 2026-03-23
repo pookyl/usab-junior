@@ -114,7 +114,8 @@ function saveWatchlistUI(tswId: string, state: WatchlistUIState): void {
 
 export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string; refreshTrigger?: number }) {
   const { pathname } = useLocation();
-  const { players: watchedPlayers, playerIds: watchedIds, addPlayer, removePlayer, clearAll } = useWatchlist();
+  const { players: watchedPlayers, playerIds: watchedIds, maxPlayers, addPlayer, removePlayer, clearAll } = useWatchlist();
+  const atCapacity = Number.isFinite(maxPlayers) && watchedPlayers.length >= maxPlayers;
   const meta = useTournamentMeta(tswId);
   const showTodayPill = useMemo(() => isTodayInRange(meta.startDate, meta.endDate), [meta.startDate, meta.endDate]);
 
@@ -294,14 +295,17 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
     return pool;
   }, [tournamentPlayers, searchQuery, watchedIds, clubFilter]);
 
-  // Add all visible players in dropdown at once
+  const remaining = Number.isFinite(maxPlayers) ? maxPlayers - watchedPlayers.length : Infinity;
+
+  // Add all visible players in dropdown at once (capped to remaining capacity)
   const handleAddAllVisible = useCallback(() => {
-    for (const p of dropdownPlayers) {
+    const toAdd = Number.isFinite(remaining) ? dropdownPlayers.slice(0, remaining) : dropdownPlayers;
+    for (const p of toAdd) {
       addPlayer(p);
     }
     setSearchQuery('');
     setClubFilter('');
-  }, [dropdownPlayers, addPlayer]);
+  }, [dropdownPlayers, addPlayer, remaining]);
 
   // Aggregate summary
   const summary = useMemo(() => {
@@ -511,8 +515,8 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
               Manage Players
             </span>
-            <span className="text-xs text-slate-400 dark:text-slate-500">
-              ({watchedPlayers.length} watched)
+            <span className={`text-xs ${atCapacity ? 'text-amber-500 dark:text-amber-400 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
+              ({watchedPlayers.length}{Number.isFinite(maxPlayers) ? `/${maxPlayers}` : ''}{atCapacity ? ' full' : ' watched'})
             </span>
           </div>
           {pickerOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
@@ -525,11 +529,11 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 z-10" />
               <input
                 type="text"
-                placeholder={playersLoading ? 'Loading players...' : 'Search players to add...'}
+                placeholder={playersLoading ? 'Loading players...' : atCapacity ? `Watchlist full (${maxPlayers} max)` : 'Search players to add...'}
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setDropdownOpen(true); }}
-                onFocus={() => setDropdownOpen(true)}
-                disabled={playersLoading}
+                onFocus={() => { if (!atCapacity) setDropdownOpen(true); }}
+                disabled={playersLoading || atCapacity}
                 className="w-full pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-600 bg-white dark:bg-slate-900 disabled:opacity-50"
               />
 
@@ -571,7 +575,7 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
                   )}
 
                   {/* Add all visible button */}
-                  {dropdownPlayers.length > 0 && (
+                  {dropdownPlayers.length > 0 && remaining > 0 && (
                     <button
                       type="button"
                       onClick={handleAddAllVisible}
@@ -580,7 +584,9 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
                       <div className="flex items-center gap-2">
                         <UsersRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                          Add all {dropdownPlayers.length} player{dropdownPlayers.length !== 1 ? 's' : ''}
+                          {dropdownPlayers.length <= remaining
+                            ? `Add all ${dropdownPlayers.length} player${dropdownPlayers.length !== 1 ? 's' : ''}`
+                            : `Add ${remaining} more player${remaining !== 1 ? 's' : ''}`}
                           {clubFilter && ` from ${clubFilter}`}
                         </span>
                       </div>
@@ -597,13 +603,18 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
                         key={p.playerId}
                         type="button"
                         onClick={() => { addPlayer(p); }}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0"
+                        disabled={atCapacity}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0 ${
+                          atCapacity ? 'opacity-50 cursor-not-allowed' : 'hover:bg-violet-50 dark:hover:bg-violet-900/20'
+                        }`}
                       >
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{p.name}</p>
                           <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">{p.club || '\u2014'}</p>
                         </div>
-                        <span className="shrink-0 text-xs font-medium text-violet-600 dark:text-violet-400">+ Add</span>
+                        <span className={`shrink-0 text-xs font-medium ${atCapacity ? 'text-slate-400 dark:text-slate-500' : 'text-violet-600 dark:text-violet-400'}`}>
+                          {atCapacity ? 'Full' : '+ Add'}
+                        </span>
                       </button>
                     ))
                   )}
