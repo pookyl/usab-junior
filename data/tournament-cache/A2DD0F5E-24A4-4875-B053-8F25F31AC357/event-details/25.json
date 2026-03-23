@@ -1,0 +1,270 @@
+{
+  "tswId": "A2DD0F5E-24A4-4875-B053-8F25F31AC357",
+  "eventId": 25,
+  "eventName": "XD U19",
+  "entriesCount": 20,
+  "draws": [
+    {
+      "drawId": 23,
+      "name": "XD U19",
+      "size": 16,
+      "type": "Elimination",
+      "qualification": "No",
+      "consolation": "Full Feed-in"
+    }
+  ],
+  "entries": [
+    {
+      "entryType": "Maindraw",
+      "seed": "1",
+      "players": [
+        {
+          "name": "Ansen Liu",
+          "playerId": 506
+        },
+        {
+          "name": "Charity Lam",
+          "playerId": 412
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": "2",
+      "players": [
+        {
+          "name": "Evan Liu",
+          "playerId": 56
+        },
+        {
+          "name": "Sophia Wu",
+          "playerId": 106
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Ethan Ao",
+          "playerId": 501
+        },
+        {
+          "name": "Callie Chen",
+          "playerId": 400
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Adhyaan Balaji",
+          "playerId": 293
+        },
+        {
+          "name": "Riya Suresh",
+          "playerId": 358
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Jaden Ke Hong Chen",
+          "playerId": 296
+        },
+        {
+          "name": "Sydney Li",
+          "playerId": 635
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Mitchell Purnomo",
+          "playerId": 637
+        },
+        {
+          "name": "Anvita Jamsandekar",
+          "playerId": 631
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Alex Anlai Song",
+          "playerId": 86
+        },
+        {
+          "name": "Zimeng Zhou",
+          "playerId": 131
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Oliver Lien Strayer",
+          "playerId": 611
+        },
+        {
+          "name": "Manaskriti Sista",
+          "playerId": 608
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Caden Wang",
+          "playerId": 332
+        },
+        {
+          "name": "Yuxuan Zeng",
+          "playerId": 221
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Justin Xia",
+          "playerId": 177
+        },
+        {
+          "name": "Coco Cenke Tao",
+          "playerId": 289
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Zhengyue Xiong",
+          "playerId": 242
+        },
+        {
+          "name": "Jennifer Xu",
+          "playerId": 180
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "Zicheng Xu",
+          "playerId": 421
+        },
+        {
+          "name": "Cassidy Yeh",
+          "playerId": 423
+        }
+      ]
+    },
+    {
+      "entryType": "Maindraw",
+      "seed": null,
+      "players": [
+        {
+          "name": "William Zeng",
+          "playerId": 244
+        },
+        {
+          "name": "Kamalini Packiyaraj",
+          "playerId": 495
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Pratham Bansal",
+          "playerId": 626
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Toshan Goswami",
+          "playerId": 566
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Shu Chen He",
+          "playerId": 568
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Avyukt Iyer",
+          "playerId": 407
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Nihanth Kadikatla",
+          "playerId": 643
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Vedaant Sreedharan",
+          "playerId": 470
+        }
+      ]
+    },
+    {
+      "entryType": "Reserve list",
+      "seed": null,
+      "players": [
+        {
+          "name": "Lohith Raj Vuppala",
+          "playerId": 625
+        }
+      ]
+    }
+  ]
+}

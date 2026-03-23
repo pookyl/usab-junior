@@ -1,0 +1,7494 @@
+{
+  "tswId": "A2DD0F5E-24A4-4875-B053-8F25F31AC357",
+  "drawId": 16,
+  "drawType": "elimination",
+  "sections": [
+    {
+      "name": "BS U17",
+      "rounds": [
+        "Round 1",
+        "Round 2",
+        "Round 3",
+        "Round 4",
+        "Quarter Finals",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [
+        {
+          "position": 1,
+          "name": "Abhi Mandanapu",
+          "seed": "1",
+          "club": "CA",
+          "playerId": 597,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 2,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 3,
+          "name": "Isaac Wong",
+          "seed": "",
+          "club": "CA",
+          "playerId": 102,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 4,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 5,
+          "name": "Andy W Gao",
+          "seed": "",
+          "club": "CA",
+          "playerId": 229,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 6,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 7,
+          "name": "Gowshik Manogar Sudhagar",
+          "seed": "",
+          "club": "GA",
+          "playerId": 624,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 8,
+          "name": "Eric Zhun Hu",
+          "seed": "",
+          "club": "IL",
+          "playerId": 142,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 9,
+          "name": "Brendan Chen",
+          "seed": "9/16",
+          "club": "IL",
+          "playerId": 361,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 10,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 11,
+          "name": "Ethan Chan",
+          "seed": "",
+          "club": "CA",
+          "playerId": 587,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 12,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 13,
+          "name": "Shishir Bokka",
+          "seed": "",
+          "club": "Nc",
+          "playerId": 559,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 14,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 15,
+          "name": "Andrew Poh",
+          "seed": "",
+          "club": "CA",
+          "playerId": 318,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 16,
+          "name": "Alex Wen",
+          "seed": "",
+          "club": "CA",
+          "playerId": 216,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 17,
+          "name": "Uddhav Kasarabada",
+          "seed": "5/8",
+          "club": "CA",
+          "playerId": 362,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 18,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 19,
+          "name": "Leheng Xu",
+          "seed": "",
+          "club": "CA",
+          "playerId": 395,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 20,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 21,
+          "name": "Stanley Jiaye Song",
+          "seed": "",
+          "club": "WA",
+          "playerId": 89,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 22,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 23,
+          "name": "Krish Raja",
+          "seed": "",
+          "club": "CA",
+          "playerId": 78,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 24,
+          "name": "Vishanth Vijay",
+          "seed": "",
+          "club": "GA",
+          "playerId": 622,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 25,
+          "name": "Kevin Zhang",
+          "seed": "9/16",
+          "club": "CA",
+          "playerId": 556,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 26,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 27,
+          "name": "Vignesh Jami",
+          "seed": "",
+          "club": "CA",
+          "playerId": 232,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 28,
+          "name": "Venkata Shashank Kondaveeti",
+          "seed": "",
+          "club": "VA",
+          "playerId": 309,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 29,
+          "name": "Aidan Wong [WDN]",
+          "seed": "",
+          "club": "CA",
+          "playerId": 175,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 30,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 31,
+          "name": "Nikhil Peechara",
+          "seed": "",
+          "club": "NC",
+          "playerId": 459,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 32,
+          "name": "Ethan Wu",
+          "seed": "",
+          "club": "CA",
+          "playerId": 278,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 33,
+          "name": "Prajwal Avadhani",
+          "seed": "3/4",
+          "club": "CA",
+          "playerId": 359,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 34,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 35,
+          "name": "Christopher Lu",
+          "seed": "",
+          "club": "OR",
+          "playerId": 595,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 36,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 37,
+          "name": "Vedanth Menon",
+          "seed": "",
+          "club": "IL",
+          "playerId": 365,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 38,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 39,
+          "name": "Manas Chintala",
+          "seed": "",
+          "club": "CA",
+          "playerId": 516,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 40,
+          "name": "Felix Zhang",
+          "seed": "",
+          "club": "MO",
+          "playerId": 351,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 41,
+          "name": "Hanyi Zhang",
+          "seed": "9/16",
+          "club": "TX",
+          "playerId": 119,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 42,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 43,
+          "name": "Prithvi Roopa Pradeep",
+          "seed": "",
+          "club": "CA",
+          "playerId": 81,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 44,
+          "name": "Adithya S Burisetty",
+          "seed": "",
+          "club": "NC",
+          "playerId": 430,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 45,
+          "name": "Mihir Thaha",
+          "seed": "",
+          "club": "CA",
+          "playerId": 477,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 46,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 47,
+          "name": "Sashanth Senthil",
+          "seed": "",
+          "club": "TX",
+          "playerId": 639,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 48,
+          "name": "Ridhiman Krishna Patwari",
+          "seed": "",
+          "club": "CA",
+          "playerId": 74,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 49,
+          "name": "Mark w Wu",
+          "seed": "5/8",
+          "club": "TX",
+          "playerId": 551,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 50,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 51,
+          "name": "Ethan Biren Fong",
+          "seed": "",
+          "club": "WA",
+          "playerId": 565,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 52,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 53,
+          "name": "Aaron Liao",
+          "seed": "",
+          "club": "CA",
+          "playerId": 50,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 54,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 55,
+          "name": "Trilochan Janakiraman",
+          "seed": "",
+          "club": "NJ",
+          "playerId": 143,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 56,
+          "name": "Edison Chen Lin",
+          "seed": "",
+          "club": "IL",
+          "playerId": 53,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 57,
+          "name": "Nithesh Haribabu",
+          "seed": "9/16",
+          "club": "NC",
+          "playerId": 439,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 58,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 59,
+          "name": "Aditya Agarwal",
+          "seed": "",
+          "club": "VA",
+          "playerId": 292,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 60,
+          "name": "Xiyan Hao",
+          "seed": "",
+          "club": "CA",
+          "playerId": 438,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 61,
+          "name": "Aaron Fu",
+          "seed": "",
+          "club": "IL",
+          "playerId": 345,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 62,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 63,
+          "name": "Pradyun Gowda",
+          "seed": "",
+          "club": "CA",
+          "playerId": 618,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 64,
+          "name": "Dylan Yang",
+          "seed": "",
+          "club": "CA",
+          "playerId": 614,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 65,
+          "name": "Aagnaey Gulla Pulijal",
+          "seed": "",
+          "club": "CA",
+          "playerId": 536,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 66,
+          "name": "Shriariman Karthigayan",
+          "seed": "",
+          "club": "CA",
+          "playerId": 409,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 67,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 68,
+          "name": "Ishan Kanchi",
+          "seed": "",
+          "club": "NC",
+          "playerId": 524,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 69,
+          "name": "Sriharsha Lakkapragada",
+          "seed": "",
+          "club": "MA",
+          "playerId": 200,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 70,
+          "name": "Dwijesh Makireddi",
+          "seed": "",
+          "club": "MA",
+          "playerId": 153,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 71,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 72,
+          "name": "Micah Wei",
+          "seed": "9/16",
+          "club": "TX",
+          "playerId": 277,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 73,
+          "name": "Dyutith Avathi Ranjan",
+          "seed": "",
+          "club": "CA",
+          "playerId": 463,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 74,
+          "name": "Prabhat Mandava",
+          "seed": "",
+          "club": "TX",
+          "playerId": 620,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 75,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 76,
+          "name": "Noah Chien",
+          "seed": "",
+          "club": "MD",
+          "playerId": 562,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 77,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 78,
+          "name": "Kehong Ng [WDN]",
+          "seed": "",
+          "club": "CA",
+          "playerId": 456,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 79,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 80,
+          "name": "Raymond Haiwen Song",
+          "seed": "5/8",
+          "club": "TX",
+          "playerId": 88,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 81,
+          "name": "Marzuq Mathani",
+          "seed": "",
+          "club": "TX",
+          "playerId": 453,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 82,
+          "name": "Aryan Mohan",
+          "seed": "",
+          "club": "CA",
+          "playerId": 348,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 83,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 84,
+          "name": "Anish Koppula",
+          "seed": "",
+          "club": "CA",
+          "playerId": 528,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 85,
+          "name": "Kyson Tu",
+          "seed": "",
+          "club": "TX",
+          "playerId": 481,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 86,
+          "name": "Aryan Dayaram",
+          "seed": "",
+          "club": "CA",
+          "playerId": 433,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 87,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 88,
+          "name": "Vincent Chen",
+          "seed": "9/16",
+          "club": "IL",
+          "playerId": 403,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 89,
+          "name": "Akshit Sharma",
+          "seed": "",
+          "club": "GA",
+          "playerId": 607,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 90,
+          "name": "Sourish Yanamandra",
+          "seed": "",
+          "club": "MA",
+          "playerId": 338,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 91,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 92,
+          "name": "Vihaan S Vinay",
+          "seed": "",
+          "club": "GA",
+          "playerId": 170,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 93,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 94,
+          "name": "Shlok J Rao",
+          "seed": "",
+          "club": "MA",
+          "playerId": 235,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 95,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 96,
+          "name": "Saatvik Shetty",
+          "seed": "3/4",
+          "club": "CA",
+          "playerId": 323,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 97,
+          "name": "Akshith P Arava",
+          "seed": "",
+          "club": "VA",
+          "playerId": 558,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 98,
+          "name": "Vedanth Gundarapu",
+          "seed": "",
+          "club": "NC",
+          "playerId": 642,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 99,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 100,
+          "name": "Aarush Gaddai",
+          "seed": "",
+          "club": "CA",
+          "playerId": 436,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 101,
+          "name": "Naresh Sriram",
+          "seed": "",
+          "club": "MA",
+          "playerId": 355,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 102,
+          "name": "Soumik Saravanan",
+          "seed": "",
+          "club": "OR",
+          "playerId": 82,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 103,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 104,
+          "name": "Aarya Vijay",
+          "seed": "9/16",
+          "club": "TX",
+          "playerId": 550,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 105,
+          "name": "Jayden Mar",
+          "seed": "",
+          "club": "CA",
+          "playerId": 65,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 106,
+          "name": "Krishna Kuchi",
+          "seed": "",
+          "club": "MA",
+          "playerId": 146,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 107,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 108,
+          "name": "Niranjan Manjith",
+          "seed": "",
+          "club": "TX",
+          "playerId": 598,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 109,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 110,
+          "name": "Tsun Him Lam",
+          "seed": "",
+          "club": "CA",
+          "playerId": 201,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 111,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 112,
+          "name": "Allen Yang",
+          "seed": "5/8",
+          "club": "CA",
+          "playerId": 580,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 113,
+          "name": "Shanmukh Ayyalasomayajula",
+          "seed": "",
+          "club": "IL",
+          "playerId": 429,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 114,
+          "name": "Jeffrey Wang",
+          "seed": "",
+          "club": "IL",
+          "playerId": 393,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 115,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 116,
+          "name": "Sanjay Chittella",
+          "seed": "",
+          "club": "WA",
+          "playerId": 491,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 117,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 118,
+          "name": "Krish Ashok",
+          "seed": "",
+          "club": "CA",
+          "playerId": 502,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 119,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 120,
+          "name": "Anirud Veldanda",
+          "seed": "9/16",
+          "club": "TX",
+          "playerId": 482,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 121,
+          "name": "Matthew H Ponta",
+          "seed": "",
+          "club": "IL",
+          "playerId": 460,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 122,
+          "name": "Benson Liang",
+          "seed": "",
+          "club": "MI",
+          "playerId": 494,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 123,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 124,
+          "name": "Varin Karri",
+          "seed": "",
+          "club": "TX",
+          "playerId": 443,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 125,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 126,
+          "name": "Kido Phan",
+          "seed": "",
+          "club": "CA",
+          "playerId": 379,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 127,
+          "name": "Bye",
+          "seed": "",
+          "club": "",
+          "playerId": null,
+          "bye": true,
+          "partner": "",
+          "partnerPlayerId": null
+        },
+        {
+          "position": 128,
+          "name": "Daniel Seungchan Park",
+          "seed": "2",
+          "club": "WA",
+          "playerId": 316,
+          "bye": false,
+          "partner": "",
+          "partnerPlayerId": null
+        }
+      ],
+      "matches": [
+        {
+          "matchId": "7001",
+          "roundLevel": 7,
+          "matchNum": 1,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6001",
+          "roundLevel": 6,
+          "matchNum": 1,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-5",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7002",
+          "roundLevel": 7,
+          "matchNum": 2,
+          "winner": {
+            "name": "Isaac Wong",
+            "playerId": 102,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5001",
+          "roundLevel": 5,
+          "matchNum": 1,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7003",
+          "roundLevel": 7,
+          "matchNum": 3,
+          "winner": {
+            "name": "Andy W Gao",
+            "playerId": 229,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6002",
+          "roundLevel": 6,
+          "matchNum": 2,
+          "winner": {
+            "name": "Andy W Gao",
+            "playerId": 229,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-8",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7004",
+          "roundLevel": 7,
+          "matchNum": 4,
+          "winner": {
+            "name": "Eric Zhun Hu",
+            "playerId": 142,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4001",
+          "roundLevel": 4,
+          "matchNum": 1,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "23-21"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7005",
+          "roundLevel": 7,
+          "matchNum": 5,
+          "winner": {
+            "name": "Brendan Chen",
+            "playerId": 361,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6003",
+          "roundLevel": 6,
+          "matchNum": 3,
+          "winner": {
+            "name": "Brendan Chen",
+            "playerId": 361,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7006",
+          "roundLevel": 7,
+          "matchNum": 6,
+          "winner": {
+            "name": "Ethan Chan",
+            "playerId": 587,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5002",
+          "roundLevel": 5,
+          "matchNum": 2,
+          "winner": {
+            "name": "Brendan Chen",
+            "playerId": 361,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "18-21",
+            "21-18",
+            "21-17"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7007",
+          "roundLevel": 7,
+          "matchNum": 7,
+          "winner": {
+            "name": "Shishir Bokka",
+            "playerId": 559,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6004",
+          "roundLevel": 6,
+          "matchNum": 4,
+          "winner": {
+            "name": "Alex Wen",
+            "playerId": 216,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-8",
+            "21-5"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7008",
+          "roundLevel": 7,
+          "matchNum": 8,
+          "winner": {
+            "name": "Alex Wen",
+            "playerId": 216,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3001",
+          "roundLevel": 3,
+          "matchNum": 1,
+          "winner": {
+            "name": "Kevin Zhang",
+            "playerId": 556,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7009",
+          "roundLevel": 7,
+          "matchNum": 9,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6005",
+          "roundLevel": 6,
+          "matchNum": 5,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "19-21",
+            "21-16",
+            "21-5"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7010",
+          "roundLevel": 7,
+          "matchNum": 10,
+          "winner": {
+            "name": "Leheng Xu",
+            "playerId": 395,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5003",
+          "roundLevel": 5,
+          "matchNum": 3,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7011",
+          "roundLevel": 7,
+          "matchNum": 11,
+          "winner": {
+            "name": "Stanley Jiaye Song",
+            "playerId": 89,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6006",
+          "roundLevel": 6,
+          "matchNum": 6,
+          "winner": {
+            "name": "Krish Raja",
+            "playerId": 78,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-7",
+            "21-7"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7012",
+          "roundLevel": 7,
+          "matchNum": 12,
+          "winner": {
+            "name": "Krish Raja",
+            "playerId": 78,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4002",
+          "roundLevel": 4,
+          "matchNum": 2,
+          "winner": {
+            "name": "Kevin Zhang",
+            "playerId": 556,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7013",
+          "roundLevel": 7,
+          "matchNum": 13,
+          "winner": {
+            "name": "Kevin Zhang",
+            "playerId": 556,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6007",
+          "roundLevel": 6,
+          "matchNum": 7,
+          "winner": {
+            "name": "Kevin Zhang",
+            "playerId": 556,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7014",
+          "roundLevel": 7,
+          "matchNum": 14,
+          "winner": {
+            "name": "Venkata Shashank Kondaveeti",
+            "playerId": 309,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "19-21",
+            "23-21",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5004",
+          "roundLevel": 5,
+          "matchNum": 4,
+          "winner": {
+            "name": "Kevin Zhang",
+            "playerId": 556,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7015",
+          "roundLevel": 7,
+          "matchNum": 15,
+          "winner": {
+            "name": "Aidan Wong [WDN]",
+            "playerId": 175,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6008",
+          "roundLevel": 6,
+          "matchNum": 8,
+          "winner": {
+            "name": "Ethan Wu",
+            "playerId": 278,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": true
+        },
+        {
+          "matchId": "7016",
+          "roundLevel": 7,
+          "matchNum": 16,
+          "winner": {
+            "name": "Ethan Wu",
+            "playerId": 278,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": {
+            "name": "Kevin Zhang",
+            "playerId": 556,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7017",
+          "roundLevel": 7,
+          "matchNum": 17,
+          "winner": {
+            "name": "Prajwal Avadhani",
+            "playerId": 359,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6009",
+          "roundLevel": 6,
+          "matchNum": 9,
+          "winner": {
+            "name": "Prajwal Avadhani",
+            "playerId": 359,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-5"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7018",
+          "roundLevel": 7,
+          "matchNum": 18,
+          "winner": {
+            "name": "Christopher Lu",
+            "playerId": 595,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5005",
+          "roundLevel": 5,
+          "matchNum": 5,
+          "winner": {
+            "name": "Prajwal Avadhani",
+            "playerId": 359,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "19-21",
+            "21-9",
+            "24-22"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7019",
+          "roundLevel": 7,
+          "matchNum": 19,
+          "winner": {
+            "name": "Vedanth Menon",
+            "playerId": 365,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6010",
+          "roundLevel": 6,
+          "matchNum": 10,
+          "winner": {
+            "name": "Manas Chintala",
+            "playerId": 516,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-8"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7020",
+          "roundLevel": 7,
+          "matchNum": 20,
+          "winner": {
+            "name": "Manas Chintala",
+            "playerId": 516,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4003",
+          "roundLevel": 4,
+          "matchNum": 3,
+          "winner": {
+            "name": "Prajwal Avadhani",
+            "playerId": 359,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "23-21",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7021",
+          "roundLevel": 7,
+          "matchNum": 21,
+          "winner": {
+            "name": "Hanyi Zhang",
+            "playerId": 119,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6011",
+          "roundLevel": 6,
+          "matchNum": 11,
+          "winner": {
+            "name": "Hanyi Zhang",
+            "playerId": 119,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7022",
+          "roundLevel": 7,
+          "matchNum": 22,
+          "winner": {
+            "name": "Adithya S Burisetty",
+            "playerId": 430,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5006",
+          "roundLevel": 5,
+          "matchNum": 6,
+          "winner": {
+            "name": "Mihir Thaha",
+            "playerId": 477,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-8"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7023",
+          "roundLevel": 7,
+          "matchNum": 23,
+          "winner": {
+            "name": "Mihir Thaha",
+            "playerId": 477,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6012",
+          "roundLevel": 6,
+          "matchNum": 12,
+          "winner": {
+            "name": "Mihir Thaha",
+            "playerId": 477,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-6",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7024",
+          "roundLevel": 7,
+          "matchNum": 24,
+          "winner": {
+            "name": "Sashanth Senthil",
+            "playerId": 639,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-4"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3002",
+          "roundLevel": 3,
+          "matchNum": 2,
+          "winner": {
+            "name": "Nithesh Haribabu",
+            "playerId": 439,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7025",
+          "roundLevel": 7,
+          "matchNum": 25,
+          "winner": {
+            "name": "Mark w Wu",
+            "playerId": 551,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6013",
+          "roundLevel": 6,
+          "matchNum": 13,
+          "winner": {
+            "name": "Mark w Wu",
+            "playerId": 551,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-7",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7026",
+          "roundLevel": 7,
+          "matchNum": 26,
+          "winner": {
+            "name": "Ethan Biren Fong",
+            "playerId": 565,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5007",
+          "roundLevel": 5,
+          "matchNum": 7,
+          "winner": {
+            "name": "Mark w Wu",
+            "playerId": 551,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7027",
+          "roundLevel": 7,
+          "matchNum": 27,
+          "winner": {
+            "name": "Aaron Liao",
+            "playerId": 50,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6014",
+          "roundLevel": 6,
+          "matchNum": 14,
+          "winner": {
+            "name": "Trilochan Janakiraman",
+            "playerId": 143,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7028",
+          "roundLevel": 7,
+          "matchNum": 28,
+          "winner": {
+            "name": "Trilochan Janakiraman",
+            "playerId": 143,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4004",
+          "roundLevel": 4,
+          "matchNum": 4,
+          "winner": {
+            "name": "Nithesh Haribabu",
+            "playerId": 439,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "18-21",
+            "21-13",
+            "21-17"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7029",
+          "roundLevel": 7,
+          "matchNum": 29,
+          "winner": {
+            "name": "Nithesh Haribabu",
+            "playerId": 439,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6015",
+          "roundLevel": 6,
+          "matchNum": 15,
+          "winner": {
+            "name": "Nithesh Haribabu",
+            "playerId": 439,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7030",
+          "roundLevel": 7,
+          "matchNum": 30,
+          "winner": {
+            "name": "Aditya Agarwal",
+            "playerId": 292,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5008",
+          "roundLevel": 5,
+          "matchNum": 8,
+          "winner": {
+            "name": "Nithesh Haribabu",
+            "playerId": 439,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7031",
+          "roundLevel": 7,
+          "matchNum": 31,
+          "winner": {
+            "name": "Aaron Fu",
+            "playerId": 345,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6016",
+          "roundLevel": 6,
+          "matchNum": 16,
+          "winner": {
+            "name": "Pradyun Gowda",
+            "playerId": 618,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-17"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7032",
+          "roundLevel": 7,
+          "matchNum": 32,
+          "winner": {
+            "name": "Pradyun Gowda",
+            "playerId": 618,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": {
+            "name": "Saatvik Shetty",
+            "playerId": 323,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-8",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7033",
+          "roundLevel": 7,
+          "matchNum": 33,
+          "winner": {
+            "name": "Aagnaey Gulla Pulijal",
+            "playerId": 536,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6017",
+          "roundLevel": 6,
+          "matchNum": 17,
+          "winner": {
+            "name": "Aagnaey Gulla Pulijal",
+            "playerId": 536,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7034",
+          "roundLevel": 7,
+          "matchNum": 34,
+          "winner": {
+            "name": "Ishan Kanchi",
+            "playerId": 524,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5009",
+          "roundLevel": 5,
+          "matchNum": 9,
+          "winner": {
+            "name": "Aagnaey Gulla Pulijal",
+            "playerId": 536,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "12-21",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7035",
+          "roundLevel": 7,
+          "matchNum": 35,
+          "winner": {
+            "name": "Dwijesh Makireddi",
+            "playerId": 153,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-4",
+            "21-4"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6018",
+          "roundLevel": 6,
+          "matchNum": 18,
+          "winner": {
+            "name": "Micah Wei",
+            "playerId": 277,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-17",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7036",
+          "roundLevel": 7,
+          "matchNum": 36,
+          "winner": {
+            "name": "Micah Wei",
+            "playerId": 277,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4005",
+          "roundLevel": 4,
+          "matchNum": 5,
+          "winner": {
+            "name": "Aagnaey Gulla Pulijal",
+            "playerId": 536,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7037",
+          "roundLevel": 7,
+          "matchNum": 37,
+          "winner": {
+            "name": "Prabhat Mandava",
+            "playerId": 620,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-4",
+            "21-8"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6019",
+          "roundLevel": 6,
+          "matchNum": 19,
+          "winner": {
+            "name": "Prabhat Mandava",
+            "playerId": 620,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7038",
+          "roundLevel": 7,
+          "matchNum": 38,
+          "winner": {
+            "name": "Noah Chien",
+            "playerId": 562,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5010",
+          "roundLevel": 5,
+          "matchNum": 10,
+          "winner": {
+            "name": "Prabhat Mandava",
+            "playerId": 620,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "15-21",
+            "23-21"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7039",
+          "roundLevel": 7,
+          "matchNum": 39,
+          "winner": {
+            "name": "Kehong Ng [WDN]",
+            "playerId": 456,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6020",
+          "roundLevel": 6,
+          "matchNum": 20,
+          "winner": {
+            "name": "Raymond Haiwen Song",
+            "playerId": 88,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": true
+        },
+        {
+          "matchId": "7040",
+          "roundLevel": 7,
+          "matchNum": 40,
+          "winner": {
+            "name": "Raymond Haiwen Song",
+            "playerId": 88,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3003",
+          "roundLevel": 3,
+          "matchNum": 3,
+          "winner": {
+            "name": "Saatvik Shetty",
+            "playerId": 323,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7041",
+          "roundLevel": 7,
+          "matchNum": 41,
+          "winner": {
+            "name": "Marzuq Mathani",
+            "playerId": 453,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "22-20",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6021",
+          "roundLevel": 6,
+          "matchNum": 21,
+          "winner": {
+            "name": "Marzuq Mathani",
+            "playerId": 453,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7042",
+          "roundLevel": 7,
+          "matchNum": 42,
+          "winner": {
+            "name": "Anish Koppula",
+            "playerId": 528,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5011",
+          "roundLevel": 5,
+          "matchNum": 11,
+          "winner": {
+            "name": "Vincent Chen",
+            "playerId": 403,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7043",
+          "roundLevel": 7,
+          "matchNum": 43,
+          "winner": {
+            "name": "Kyson Tu",
+            "playerId": 481,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6022",
+          "roundLevel": 6,
+          "matchNum": 22,
+          "winner": {
+            "name": "Vincent Chen",
+            "playerId": 403,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7044",
+          "roundLevel": 7,
+          "matchNum": 44,
+          "winner": {
+            "name": "Vincent Chen",
+            "playerId": 403,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4006",
+          "roundLevel": 4,
+          "matchNum": 6,
+          "winner": {
+            "name": "Saatvik Shetty",
+            "playerId": 323,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-23",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7045",
+          "roundLevel": 7,
+          "matchNum": 45,
+          "winner": {
+            "name": "Sourish Yanamandra",
+            "playerId": 338,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "20-22",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6023",
+          "roundLevel": 6,
+          "matchNum": 23,
+          "winner": {
+            "name": "Sourish Yanamandra",
+            "playerId": 338,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7046",
+          "roundLevel": 7,
+          "matchNum": 46,
+          "winner": {
+            "name": "Vihaan S Vinay",
+            "playerId": 170,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5012",
+          "roundLevel": 5,
+          "matchNum": 12,
+          "winner": {
+            "name": "Saatvik Shetty",
+            "playerId": 323,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7047",
+          "roundLevel": 7,
+          "matchNum": 47,
+          "winner": {
+            "name": "Shlok J Rao",
+            "playerId": 235,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6024",
+          "roundLevel": 6,
+          "matchNum": 24,
+          "winner": {
+            "name": "Saatvik Shetty",
+            "playerId": 323,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-2",
+            "21-4"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7048",
+          "roundLevel": 7,
+          "matchNum": 48,
+          "winner": {
+            "name": "Saatvik Shetty",
+            "playerId": 323,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": {
+            "name": "Saatvik Shetty",
+            "playerId": 323,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "22-20",
+            "19-21",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7049",
+          "roundLevel": 7,
+          "matchNum": 49,
+          "winner": {
+            "name": "Akshith P Arava",
+            "playerId": 558,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "18-21",
+            "21-11",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6025",
+          "roundLevel": 6,
+          "matchNum": 25,
+          "winner": {
+            "name": "Akshith P Arava",
+            "playerId": 558,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-6",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7050",
+          "roundLevel": 7,
+          "matchNum": 50,
+          "winner": {
+            "name": "Aarush Gaddai",
+            "playerId": 436,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5013",
+          "roundLevel": 5,
+          "matchNum": 13,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 550,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-8"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7051",
+          "roundLevel": 7,
+          "matchNum": 51,
+          "winner": {
+            "name": "Naresh Sriram",
+            "playerId": 355,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-5"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6026",
+          "roundLevel": 6,
+          "matchNum": 26,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 550,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-6",
+            "23-21"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7052",
+          "roundLevel": 7,
+          "matchNum": 52,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 550,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4007",
+          "roundLevel": 4,
+          "matchNum": 7,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 550,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "9-21",
+            "21-11",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7053",
+          "roundLevel": 7,
+          "matchNum": 53,
+          "winner": {
+            "name": "Jayden Mar",
+            "playerId": 65,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6027",
+          "roundLevel": 6,
+          "matchNum": 27,
+          "winner": {
+            "name": "Jayden Mar",
+            "playerId": 65,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7054",
+          "roundLevel": 7,
+          "matchNum": 54,
+          "winner": {
+            "name": "Niranjan Manjith",
+            "playerId": 598,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5014",
+          "roundLevel": 5,
+          "matchNum": 14,
+          "winner": {
+            "name": "Tsun Him Lam",
+            "playerId": 201,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7055",
+          "roundLevel": 7,
+          "matchNum": 55,
+          "winner": {
+            "name": "Tsun Him Lam",
+            "playerId": 201,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6028",
+          "roundLevel": 6,
+          "matchNum": 28,
+          "winner": {
+            "name": "Tsun Him Lam",
+            "playerId": 201,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7056",
+          "roundLevel": 7,
+          "matchNum": 56,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3004",
+          "roundLevel": 3,
+          "matchNum": 4,
+          "winner": {
+            "name": "Anirud Veldanda",
+            "playerId": 482,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7057",
+          "roundLevel": 7,
+          "matchNum": 57,
+          "winner": {
+            "name": "Shanmukh Ayyalasomayajula",
+            "playerId": 429,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6029",
+          "roundLevel": 6,
+          "matchNum": 29,
+          "winner": {
+            "name": "Sanjay Chittella",
+            "playerId": 491,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7058",
+          "roundLevel": 7,
+          "matchNum": 58,
+          "winner": {
+            "name": "Sanjay Chittella",
+            "playerId": 491,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5015",
+          "roundLevel": 5,
+          "matchNum": 15,
+          "winner": {
+            "name": "Anirud Veldanda",
+            "playerId": 482,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-5"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7059",
+          "roundLevel": 7,
+          "matchNum": 59,
+          "winner": {
+            "name": "Krish Ashok",
+            "playerId": 502,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6030",
+          "roundLevel": 6,
+          "matchNum": 30,
+          "winner": {
+            "name": "Anirud Veldanda",
+            "playerId": 482,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7060",
+          "roundLevel": 7,
+          "matchNum": 60,
+          "winner": {
+            "name": "Anirud Veldanda",
+            "playerId": 482,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4008",
+          "roundLevel": 4,
+          "matchNum": 8,
+          "winner": {
+            "name": "Anirud Veldanda",
+            "playerId": 482,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "18-21",
+            "21-12",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7061",
+          "roundLevel": 7,
+          "matchNum": 61,
+          "winner": {
+            "name": "Matthew H Ponta",
+            "playerId": 460,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "23-21",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6031",
+          "roundLevel": 6,
+          "matchNum": 31,
+          "winner": {
+            "name": "Matthew H Ponta",
+            "playerId": 460,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7062",
+          "roundLevel": 7,
+          "matchNum": 62,
+          "winner": {
+            "name": "Varin Karri",
+            "playerId": 443,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5016",
+          "roundLevel": 5,
+          "matchNum": 16,
+          "winner": {
+            "name": "Daniel Seungchan Park",
+            "playerId": 316,
+            "seed": "2",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7063",
+          "roundLevel": 7,
+          "matchNum": 63,
+          "winner": {
+            "name": "Kido Phan",
+            "playerId": 379,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6032",
+          "roundLevel": 6,
+          "matchNum": 32,
+          "winner": {
+            "name": "Daniel Seungchan Park",
+            "playerId": 316,
+            "seed": "2",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7064",
+          "roundLevel": 7,
+          "matchNum": 64,
+          "winner": {
+            "name": "Daniel Seungchan Park",
+            "playerId": 316,
+            "seed": "2",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    },
+    {
+      "name": "BS U17 - Play-off 3/4",
+      "rounds": [
+        "",
+        ""
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": {
+            "name": "Nithesh Haribabu",
+            "playerId": 439,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": {
+            "name": "Nithesh Haribabu",
+            "playerId": 439,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": {
+            "name": "Anirud Veldanda",
+            "playerId": 482,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    },
+    {
+      "name": "BS U17 - Consolation",
+      "rounds": [
+        "Round 1",
+        "Round 2",
+        "Round 3",
+        "Round 4",
+        "Round 5",
+        "Round 6",
+        "Round 7",
+        "Quarter Finals",
+        "Semi Finals",
+        "Finals",
+        "Winner"
+      ],
+      "entries": [],
+      "matches": [
+        {
+          "matchId": "11001",
+          "roundLevel": 11,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10001",
+          "roundLevel": 10,
+          "matchNum": 1,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11002",
+          "roundLevel": 11,
+          "matchNum": 2,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9001",
+          "roundLevel": 9,
+          "matchNum": 1,
+          "winner": {
+            "name": "Kido Phan",
+            "playerId": 379,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10002",
+          "roundLevel": 10,
+          "matchNum": 2,
+          "winner": {
+            "name": "Kido Phan",
+            "playerId": 379,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11003",
+          "roundLevel": 11,
+          "matchNum": 3,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8001",
+          "roundLevel": 8,
+          "matchNum": 1,
+          "winner": {
+            "name": "Varin Karri",
+            "playerId": 443,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10003",
+          "roundLevel": 10,
+          "matchNum": 3,
+          "winner": {
+            "name": "Gowshik Manogar Sudhagar",
+            "playerId": 624,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11004",
+          "roundLevel": 11,
+          "matchNum": 4,
+          "winner": {
+            "name": "Gowshik Manogar Sudhagar",
+            "playerId": 624,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9002",
+          "roundLevel": 9,
+          "matchNum": 2,
+          "winner": {
+            "name": "Varin Karri",
+            "playerId": 443,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7001",
+          "roundLevel": 7,
+          "matchNum": 1,
+          "winner": {
+            "name": "Pradyun Gowda",
+            "playerId": 618,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-7"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10004",
+          "roundLevel": 10,
+          "matchNum": 4,
+          "winner": {
+            "name": "Varin Karri",
+            "playerId": 443,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11005",
+          "roundLevel": 11,
+          "matchNum": 5,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8002",
+          "roundLevel": 8,
+          "matchNum": 2,
+          "winner": {
+            "name": "Pradyun Gowda",
+            "playerId": 618,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10005",
+          "roundLevel": 10,
+          "matchNum": 5,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11006",
+          "roundLevel": 11,
+          "matchNum": 6,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9003",
+          "roundLevel": 9,
+          "matchNum": 3,
+          "winner": {
+            "name": "Krish Ashok",
+            "playerId": 502,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6001",
+          "roundLevel": 6,
+          "matchNum": 1,
+          "winner": {
+            "name": "Krish Ashok",
+            "playerId": 502,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "17-21",
+            "21-10",
+            "21-17"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10006",
+          "roundLevel": 10,
+          "matchNum": 6,
+          "winner": {
+            "name": "Krish Ashok",
+            "playerId": 502,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11007",
+          "roundLevel": 11,
+          "matchNum": 7,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8003",
+          "roundLevel": 8,
+          "matchNum": 3,
+          "winner": {
+            "name": "Krish Ashok",
+            "playerId": 502,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10007",
+          "roundLevel": 10,
+          "matchNum": 7,
+          "winner": {
+            "name": "Andrew Poh",
+            "playerId": 318,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11008",
+          "roundLevel": 11,
+          "matchNum": 8,
+          "winner": {
+            "name": "Andrew Poh",
+            "playerId": 318,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9004",
+          "roundLevel": 9,
+          "matchNum": 4,
+          "winner": {
+            "name": "Andrew Poh",
+            "playerId": 318,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7002",
+          "roundLevel": 7,
+          "matchNum": 2,
+          "winner": {
+            "name": "Krish Ashok",
+            "playerId": 502,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5001",
+          "roundLevel": 5,
+          "matchNum": 1,
+          "winner": {
+            "name": "Prabhat Mandava",
+            "playerId": 620,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "17-21",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10008",
+          "roundLevel": 10,
+          "matchNum": 8,
+          "winner": {
+            "name": "Shanmukh Ayyalasomayajula",
+            "playerId": 429,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11009",
+          "roundLevel": 11,
+          "matchNum": 9,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8004",
+          "roundLevel": 8,
+          "matchNum": 4,
+          "winner": {
+            "name": "Trilochan Janakiraman",
+            "playerId": 143,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10009",
+          "roundLevel": 10,
+          "matchNum": 9,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11010",
+          "roundLevel": 11,
+          "matchNum": 10,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9005",
+          "roundLevel": 9,
+          "matchNum": 5,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6002",
+          "roundLevel": 6,
+          "matchNum": 2,
+          "winner": {
+            "name": "Prabhat Mandava",
+            "playerId": 620,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10010",
+          "roundLevel": 10,
+          "matchNum": 10,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11011",
+          "roundLevel": 11,
+          "matchNum": 11,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8005",
+          "roundLevel": 8,
+          "matchNum": 5,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "17-21",
+            "21-18",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10011",
+          "roundLevel": 10,
+          "matchNum": 11,
+          "winner": {
+            "name": "Vishanth Vijay",
+            "playerId": 622,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11012",
+          "roundLevel": 11,
+          "matchNum": 12,
+          "winner": {
+            "name": "Vishanth Vijay",
+            "playerId": 622,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9006",
+          "roundLevel": 9,
+          "matchNum": 6,
+          "winner": {
+            "name": "Niranjan Manjith",
+            "playerId": 598,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7003",
+          "roundLevel": 7,
+          "matchNum": 3,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "17-21",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4001",
+          "roundLevel": 4,
+          "matchNum": 1,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "18-21",
+            "21-19",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10012",
+          "roundLevel": 10,
+          "matchNum": 12,
+          "winner": {
+            "name": "Niranjan Manjith",
+            "playerId": 598,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11013",
+          "roundLevel": 11,
+          "matchNum": 13,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8006",
+          "roundLevel": 8,
+          "matchNum": 6,
+          "winner": {
+            "name": "Hanyi Zhang",
+            "playerId": 119,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10013",
+          "roundLevel": 10,
+          "matchNum": 13,
+          "winner": {
+            "name": "Vignesh Jami",
+            "playerId": 232,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11014",
+          "roundLevel": 11,
+          "matchNum": 14,
+          "winner": {
+            "name": "Vignesh Jami",
+            "playerId": 232,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9007",
+          "roundLevel": 9,
+          "matchNum": 7,
+          "winner": {
+            "name": "Naresh Sriram",
+            "playerId": 355,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "3-21",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6003",
+          "roundLevel": 6,
+          "matchNum": 3,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-8",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10014",
+          "roundLevel": 10,
+          "matchNum": 14,
+          "winner": {
+            "name": "Naresh Sriram",
+            "playerId": 355,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11015",
+          "roundLevel": 11,
+          "matchNum": 15,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8007",
+          "roundLevel": 8,
+          "matchNum": 7,
+          "winner": {
+            "name": "Naresh Sriram",
+            "playerId": 355,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10015",
+          "roundLevel": 10,
+          "matchNum": 15,
+          "winner": {
+            "name": "Nikhil Peechara",
+            "playerId": 459,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11016",
+          "roundLevel": 11,
+          "matchNum": 16,
+          "winner": {
+            "name": "Nikhil Peechara",
+            "playerId": 459,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9008",
+          "roundLevel": 9,
+          "matchNum": 8,
+          "winner": {
+            "name": "Nikhil Peechara",
+            "playerId": 459,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7004",
+          "roundLevel": 7,
+          "matchNum": 4,
+          "winner": {
+            "name": "Naresh Sriram",
+            "playerId": 355,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "11-21",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5002",
+          "roundLevel": 5,
+          "matchNum": 2,
+          "winner": {
+            "name": "Allen Yang",
+            "playerId": 580,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "23-21",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3001",
+          "roundLevel": 3,
+          "matchNum": 1,
+          "winner": {
+            "name": "Prajwal Avadhani",
+            "playerId": 359,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "19-21",
+            "21-15",
+            "21-17"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10016",
+          "roundLevel": 10,
+          "matchNum": 16,
+          "winner": {
+            "name": "Aarush Gaddai",
+            "playerId": 436,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11017",
+          "roundLevel": 11,
+          "matchNum": 17,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8008",
+          "roundLevel": 8,
+          "matchNum": 8,
+          "winner": {
+            "name": "Manas Chintala",
+            "playerId": 516,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10017",
+          "roundLevel": 10,
+          "matchNum": 17,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11018",
+          "roundLevel": 11,
+          "matchNum": 18,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9009",
+          "roundLevel": 9,
+          "matchNum": 9,
+          "winner": {
+            "name": "Shlok J Rao",
+            "playerId": 235,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6004",
+          "roundLevel": 6,
+          "matchNum": 4,
+          "winner": {
+            "name": "Vincent Chen",
+            "playerId": 403,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10018",
+          "roundLevel": 10,
+          "matchNum": 18,
+          "winner": {
+            "name": "Shlok J Rao",
+            "playerId": 235,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11019",
+          "roundLevel": 11,
+          "matchNum": 19,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8009",
+          "roundLevel": 8,
+          "matchNum": 9,
+          "winner": {
+            "name": "Felix Zhang",
+            "playerId": 351,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-8"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10019",
+          "roundLevel": 10,
+          "matchNum": 19,
+          "winner": {
+            "name": "Felix Zhang",
+            "playerId": 351,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11020",
+          "roundLevel": 11,
+          "matchNum": 20,
+          "winner": {
+            "name": "Felix Zhang",
+            "playerId": 351,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9010",
+          "roundLevel": 9,
+          "matchNum": 10,
+          "winner": {
+            "name": "Felix Zhang",
+            "playerId": 351,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-17",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7005",
+          "roundLevel": 7,
+          "matchNum": 5,
+          "winner": {
+            "name": "Ethan Wu",
+            "playerId": 278,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-6",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4002",
+          "roundLevel": 4,
+          "matchNum": 2,
+          "winner": {
+            "name": "Prajwal Avadhani",
+            "playerId": 359,
+            "seed": "3/4",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10020",
+          "roundLevel": 10,
+          "matchNum": 20,
+          "winner": {
+            "name": "Vihaan S Vinay",
+            "playerId": 170,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11021",
+          "roundLevel": 11,
+          "matchNum": 21,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8010",
+          "roundLevel": 8,
+          "matchNum": 10,
+          "winner": {
+            "name": "Ethan Wu",
+            "playerId": 278,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10021",
+          "roundLevel": 10,
+          "matchNum": 21,
+          "winner": {
+            "name": "Prithvi Roopa Pradeep",
+            "playerId": 81,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11022",
+          "roundLevel": 11,
+          "matchNum": 22,
+          "winner": {
+            "name": "Prithvi Roopa Pradeep",
+            "playerId": 81,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9011",
+          "roundLevel": 9,
+          "matchNum": 11,
+          "winner": {
+            "name": "Kyson Tu",
+            "playerId": 481,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-4",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6005",
+          "roundLevel": 6,
+          "matchNum": 5,
+          "winner": {
+            "name": "Ethan Wu",
+            "playerId": 278,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": true
+        },
+        {
+          "matchId": "10022",
+          "roundLevel": 10,
+          "matchNum": 22,
+          "winner": {
+            "name": "Kyson Tu",
+            "playerId": 481,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11023",
+          "roundLevel": 11,
+          "matchNum": 23,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8011",
+          "roundLevel": 8,
+          "matchNum": 11,
+          "winner": {
+            "name": "Anish Koppula",
+            "playerId": 528,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "18-21",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10023",
+          "roundLevel": 10,
+          "matchNum": 23,
+          "winner": {
+            "name": "Ridhiman Krishna Patwari",
+            "playerId": 74,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11024",
+          "roundLevel": 11,
+          "matchNum": 24,
+          "winner": {
+            "name": "Ridhiman Krishna Patwari",
+            "playerId": 74,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9012",
+          "roundLevel": 9,
+          "matchNum": 12,
+          "winner": {
+            "name": "Anish Koppula",
+            "playerId": 528,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7006",
+          "roundLevel": 7,
+          "matchNum": 6,
+          "winner": {
+            "name": "Anish Koppula",
+            "playerId": 528,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "17-21",
+            "23-21",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5003",
+          "roundLevel": 5,
+          "matchNum": 3,
+          "winner": {
+            "name": "Ethan Wu",
+            "playerId": 278,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-6",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2001",
+          "roundLevel": 2,
+          "matchNum": 1,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10024",
+          "roundLevel": 10,
+          "matchNum": 24,
+          "winner": {
+            "name": "Anish Koppula",
+            "playerId": 528,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11025",
+          "roundLevel": 11,
+          "matchNum": 25,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8012",
+          "roundLevel": 8,
+          "matchNum": 12,
+          "winner": {
+            "name": "Krish Raja",
+            "playerId": 78,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10025",
+          "roundLevel": 10,
+          "matchNum": 25,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11026",
+          "roundLevel": 11,
+          "matchNum": 26,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9013",
+          "roundLevel": 9,
+          "matchNum": 13,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6006",
+          "roundLevel": 6,
+          "matchNum": 6,
+          "winner": {
+            "name": "Tsun Him Lam",
+            "playerId": 201,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10026",
+          "roundLevel": 10,
+          "matchNum": 26,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11027",
+          "roundLevel": 11,
+          "matchNum": 27,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8013",
+          "roundLevel": 8,
+          "matchNum": 13,
+          "winner": {
+            "name": "Noah Chien",
+            "playerId": 562,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10027",
+          "roundLevel": 10,
+          "matchNum": 27,
+          "winner": {
+            "name": "Edison Chen Lin",
+            "playerId": 53,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11028",
+          "roundLevel": 11,
+          "matchNum": 28,
+          "winner": {
+            "name": "Edison Chen Lin",
+            "playerId": 53,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9014",
+          "roundLevel": 9,
+          "matchNum": 14,
+          "winner": {
+            "name": "Noah Chien",
+            "playerId": 562,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-7",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7007",
+          "roundLevel": 7,
+          "matchNum": 7,
+          "winner": {
+            "name": "Noah Chien",
+            "playerId": 562,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4003",
+          "roundLevel": 4,
+          "matchNum": 3,
+          "winner": {
+            "name": "Ethan Wu",
+            "playerId": 278,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "22-20",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10028",
+          "roundLevel": 10,
+          "matchNum": 28,
+          "winner": {
+            "name": "Noah Chien",
+            "playerId": 562,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11029",
+          "roundLevel": 11,
+          "matchNum": 29,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8014",
+          "roundLevel": 8,
+          "matchNum": 14,
+          "winner": {
+            "name": "Alex Wen",
+            "playerId": 216,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10029",
+          "roundLevel": 10,
+          "matchNum": 29,
+          "winner": {
+            "name": "Xiyan Hao",
+            "playerId": 438,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11030",
+          "roundLevel": 11,
+          "matchNum": 30,
+          "winner": {
+            "name": "Xiyan Hao",
+            "playerId": 438,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9015",
+          "roundLevel": 9,
+          "matchNum": 15,
+          "winner": {
+            "name": "Dwijesh Makireddi",
+            "playerId": 153,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-5",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6007",
+          "roundLevel": 6,
+          "matchNum": 7,
+          "winner": {
+            "name": "Noah Chien",
+            "playerId": 562,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10030",
+          "roundLevel": 10,
+          "matchNum": 30,
+          "winner": {
+            "name": "Dwijesh Makireddi",
+            "playerId": 153,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11031",
+          "roundLevel": 11,
+          "matchNum": 31,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8015",
+          "roundLevel": 8,
+          "matchNum": 15,
+          "winner": {
+            "name": "Dwijesh Makireddi",
+            "playerId": 153,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "22-20",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10031",
+          "roundLevel": 10,
+          "matchNum": 31,
+          "winner": {
+            "name": "Dylan Yang",
+            "playerId": 614,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11032",
+          "roundLevel": 11,
+          "matchNum": 32,
+          "winner": {
+            "name": "Dylan Yang",
+            "playerId": 614,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9016",
+          "roundLevel": 9,
+          "matchNum": 16,
+          "winner": {
+            "name": "Ishan Kanchi",
+            "playerId": 524,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-17",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7008",
+          "roundLevel": 7,
+          "matchNum": 8,
+          "winner": {
+            "name": "Dwijesh Makireddi",
+            "playerId": 153,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5004",
+          "roundLevel": 5,
+          "matchNum": 4,
+          "winner": {
+            "name": "Noah Chien",
+            "playerId": 562,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": true
+        },
+        {
+          "matchId": "3002",
+          "roundLevel": 3,
+          "matchNum": 2,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10032",
+          "roundLevel": 10,
+          "matchNum": 32,
+          "winner": {
+            "name": "Ishan Kanchi",
+            "playerId": 524,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11033",
+          "roundLevel": 11,
+          "matchNum": 33,
+          "winner": {
+            "name": "Shriariman Karthigayan",
+            "playerId": 409,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8016",
+          "roundLevel": 8,
+          "matchNum": 16,
+          "winner": {
+            "name": "Andy W Gao",
+            "playerId": 229,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10033",
+          "roundLevel": 10,
+          "matchNum": 33,
+          "winner": {
+            "name": "Shriariman Karthigayan",
+            "playerId": 409,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11034",
+          "roundLevel": 11,
+          "matchNum": 34,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9017",
+          "roundLevel": 9,
+          "matchNum": 17,
+          "winner": {
+            "name": "Shriariman Karthigayan",
+            "playerId": 409,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-10",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6008",
+          "roundLevel": 6,
+          "matchNum": 8,
+          "winner": {
+            "name": "Daniel Seungchan Park",
+            "playerId": 316,
+            "seed": "2",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10034",
+          "roundLevel": 10,
+          "matchNum": 34,
+          "winner": {
+            "name": "Aaron Fu",
+            "playerId": 345,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11035",
+          "roundLevel": 11,
+          "matchNum": 35,
+          "winner": {
+            "name": "Sriharsha Lakkapragada",
+            "playerId": 200,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8017",
+          "roundLevel": 8,
+          "matchNum": 17,
+          "winner": {
+            "name": "Shriariman Karthigayan",
+            "playerId": 409,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-12",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10035",
+          "roundLevel": 10,
+          "matchNum": 35,
+          "winner": {
+            "name": "Sriharsha Lakkapragada",
+            "playerId": 200,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11036",
+          "roundLevel": 11,
+          "matchNum": 36,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9018",
+          "roundLevel": 9,
+          "matchNum": 18,
+          "winner": {
+            "name": "Aditya Agarwal",
+            "playerId": 292,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-8",
+            "21-8"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7009",
+          "roundLevel": 7,
+          "matchNum": 9,
+          "winner": {
+            "name": "Matthew H Ponta",
+            "playerId": 460,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-17",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4004",
+          "roundLevel": 4,
+          "matchNum": 4,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10036",
+          "roundLevel": 10,
+          "matchNum": 36,
+          "winner": {
+            "name": "Aditya Agarwal",
+            "playerId": 292,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11037",
+          "roundLevel": 11,
+          "matchNum": 37,
+          "winner": {
+            "name": "Dyutith Avathi Ranjan",
+            "playerId": 463,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8018",
+          "roundLevel": 8,
+          "matchNum": 18,
+          "winner": {
+            "name": "Matthew H Ponta",
+            "playerId": 460,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10037",
+          "roundLevel": 10,
+          "matchNum": 37,
+          "winner": {
+            "name": "Dyutith Avathi Ranjan",
+            "playerId": 463,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11038",
+          "roundLevel": 11,
+          "matchNum": 38,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9019",
+          "roundLevel": 9,
+          "matchNum": 19,
+          "winner": {
+            "name": "Dyutith Avathi Ranjan",
+            "playerId": 463,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "22-20",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6009",
+          "roundLevel": 6,
+          "matchNum": 9,
+          "winner": {
+            "name": "Matthew H Ponta",
+            "playerId": 460,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "22-20",
+            "21-15"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10038",
+          "roundLevel": 10,
+          "matchNum": 38,
+          "winner": {
+            "name": "Aaron Liao",
+            "playerId": 50,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11039",
+          "roundLevel": 11,
+          "matchNum": 39,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8019",
+          "roundLevel": 8,
+          "matchNum": 19,
+          "winner": {
+            "name": "Ethan Biren Fong",
+            "playerId": 565,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "24-22",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10039",
+          "roundLevel": 10,
+          "matchNum": 39,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11040",
+          "roundLevel": 11,
+          "matchNum": 40,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9020",
+          "roundLevel": 9,
+          "matchNum": 20,
+          "winner": {
+            "name": "Ethan Biren Fong",
+            "playerId": 565,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7010",
+          "roundLevel": 7,
+          "matchNum": 10,
+          "winner": {
+            "name": "Ethan Biren Fong",
+            "playerId": 565,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5005",
+          "roundLevel": 5,
+          "matchNum": 5,
+          "winner": {
+            "name": "Brendan Chen",
+            "playerId": 361,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-19",
+            "21-13"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "1001",
+          "roundLevel": 1,
+          "matchNum": 1,
+          "winner": {
+            "name": "Abhi Mandanapu",
+            "playerId": 597,
+            "seed": "1",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "18-21",
+            "23-21"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10040",
+          "roundLevel": 10,
+          "matchNum": 40,
+          "winner": {
+            "name": "Ethan Biren Fong",
+            "playerId": 565,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11041",
+          "roundLevel": 11,
+          "matchNum": 41,
+          "winner": {
+            "name": "Aryan Mohan",
+            "playerId": 348,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8020",
+          "roundLevel": 8,
+          "matchNum": 20,
+          "winner": {
+            "name": "Sanjay Chittella",
+            "playerId": 491,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10041",
+          "roundLevel": 10,
+          "matchNum": 41,
+          "winner": {
+            "name": "Aryan Mohan",
+            "playerId": 348,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11042",
+          "roundLevel": 11,
+          "matchNum": 42,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9021",
+          "roundLevel": 9,
+          "matchNum": 21,
+          "winner": {
+            "name": "Sashanth Senthil",
+            "playerId": 639,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "15-21",
+            "21-17",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6010",
+          "roundLevel": 6,
+          "matchNum": 10,
+          "winner": {
+            "name": "Brendan Chen",
+            "playerId": 361,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10042",
+          "roundLevel": 10,
+          "matchNum": 42,
+          "winner": {
+            "name": "Sashanth Senthil",
+            "playerId": 639,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11043",
+          "roundLevel": 11,
+          "matchNum": 43,
+          "winner": {
+            "name": "Aryan Dayaram",
+            "playerId": 433,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8021",
+          "roundLevel": 8,
+          "matchNum": 21,
+          "winner": {
+            "name": "Sashanth Senthil",
+            "playerId": 639,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": true
+        },
+        {
+          "matchId": "10043",
+          "roundLevel": 10,
+          "matchNum": 43,
+          "winner": {
+            "name": "Aryan Dayaram",
+            "playerId": 433,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11044",
+          "roundLevel": 11,
+          "matchNum": 44,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9022",
+          "roundLevel": 9,
+          "matchNum": 22,
+          "winner": {
+            "name": "Adithya S Burisetty",
+            "playerId": 430,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-16"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7011",
+          "roundLevel": 7,
+          "matchNum": 11,
+          "winner": {
+            "name": "Jayden Mar",
+            "playerId": 65,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-11",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4005",
+          "roundLevel": 4,
+          "matchNum": 5,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-23",
+            "23-21",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10044",
+          "roundLevel": 10,
+          "matchNum": 44,
+          "winner": {
+            "name": "Adithya S Burisetty",
+            "playerId": 430,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11045",
+          "roundLevel": 11,
+          "matchNum": 45,
+          "winner": {
+            "name": "Akshit Sharma",
+            "playerId": 607,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8022",
+          "roundLevel": 8,
+          "matchNum": 22,
+          "winner": {
+            "name": "Jayden Mar",
+            "playerId": 65,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10045",
+          "roundLevel": 10,
+          "matchNum": 45,
+          "winner": {
+            "name": "Akshit Sharma",
+            "playerId": 607,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11046",
+          "roundLevel": 11,
+          "matchNum": 46,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9023",
+          "roundLevel": 9,
+          "matchNum": 23,
+          "winner": {
+            "name": "Akshit Sharma",
+            "playerId": 607,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6011",
+          "roundLevel": 6,
+          "matchNum": 11,
+          "winner": {
+            "name": "Jayden Mar",
+            "playerId": 65,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10046",
+          "roundLevel": 10,
+          "matchNum": 46,
+          "winner": {
+            "name": "Vedanth Menon",
+            "playerId": 365,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11047",
+          "roundLevel": 11,
+          "matchNum": 47,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8023",
+          "roundLevel": 8,
+          "matchNum": 23,
+          "winner": {
+            "name": "Akshit Sharma",
+            "playerId": 607,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10047",
+          "roundLevel": 10,
+          "matchNum": 47,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11048",
+          "roundLevel": 11,
+          "matchNum": 48,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9024",
+          "roundLevel": 9,
+          "matchNum": 24,
+          "winner": {
+            "name": "Christopher Lu",
+            "playerId": 595,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7012",
+          "roundLevel": 7,
+          "matchNum": 12,
+          "winner": {
+            "name": "Akshith P Arava",
+            "playerId": 558,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "15-21",
+            "21-10",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5006",
+          "roundLevel": 5,
+          "matchNum": 6,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3003",
+          "roundLevel": 3,
+          "matchNum": 3,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "14-21",
+            "21-16",
+            "21-19"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10048",
+          "roundLevel": 10,
+          "matchNum": 48,
+          "winner": {
+            "name": "Christopher Lu",
+            "playerId": 595,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11049",
+          "roundLevel": 11,
+          "matchNum": 49,
+          "winner": {
+            "name": "Vedanth Gundarapu",
+            "playerId": 642,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8024",
+          "roundLevel": 8,
+          "matchNum": 24,
+          "winner": {
+            "name": "Akshith P Arava",
+            "playerId": 558,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10049",
+          "roundLevel": 10,
+          "matchNum": 49,
+          "winner": {
+            "name": "Vedanth Gundarapu",
+            "playerId": 642,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11050",
+          "roundLevel": 11,
+          "matchNum": 50,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9025",
+          "roundLevel": 9,
+          "matchNum": 25,
+          "winner": {
+            "name": "Vedanth Gundarapu",
+            "playerId": 642,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6012",
+          "roundLevel": 6,
+          "matchNum": 12,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10050",
+          "roundLevel": 10,
+          "matchNum": 50,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11051",
+          "roundLevel": 11,
+          "matchNum": 51,
+          "winner": {
+            "name": "Soumik Saravanan",
+            "playerId": 82,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8025",
+          "roundLevel": 8,
+          "matchNum": 25,
+          "winner": {
+            "name": "Venkata Shashank Kondaveeti",
+            "playerId": 309,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-5",
+            "21-7"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10051",
+          "roundLevel": 10,
+          "matchNum": 51,
+          "winner": {
+            "name": "Soumik Saravanan",
+            "playerId": 82,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11052",
+          "roundLevel": 11,
+          "matchNum": 52,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9026",
+          "roundLevel": 9,
+          "matchNum": 26,
+          "winner": {
+            "name": "Venkata Shashank Kondaveeti",
+            "playerId": 309,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-3",
+            "21-6"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7013",
+          "roundLevel": 7,
+          "matchNum": 13,
+          "winner": {
+            "name": "Venkata Shashank Kondaveeti",
+            "playerId": 309,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-7"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4006",
+          "roundLevel": 4,
+          "matchNum": 6,
+          "winner": {
+            "name": "Aarya Vijay",
+            "playerId": 550,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10052",
+          "roundLevel": 10,
+          "matchNum": 52,
+          "winner": {
+            "name": "Venkata Shashank Kondaveeti",
+            "playerId": 309,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11053",
+          "roundLevel": 11,
+          "matchNum": 53,
+          "winner": {
+            "name": "Krishna Kuchi",
+            "playerId": 146,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8026",
+          "roundLevel": 8,
+          "matchNum": 26,
+          "winner": {
+            "name": "Sourish Yanamandra",
+            "playerId": 338,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10053",
+          "roundLevel": 10,
+          "matchNum": 53,
+          "winner": {
+            "name": "Krishna Kuchi",
+            "playerId": 146,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11054",
+          "roundLevel": 11,
+          "matchNum": 54,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9027",
+          "roundLevel": 9,
+          "matchNum": 27,
+          "winner": {
+            "name": "Stanley Jiaye Song",
+            "playerId": 89,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "18-21",
+            "21-16",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6013",
+          "roundLevel": 6,
+          "matchNum": 13,
+          "winner": {
+            "name": "Leheng Xu",
+            "playerId": 395,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-18",
+            "18-21",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10054",
+          "roundLevel": 10,
+          "matchNum": 54,
+          "winner": {
+            "name": "Stanley Jiaye Song",
+            "playerId": 89,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11055",
+          "roundLevel": 11,
+          "matchNum": 55,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8027",
+          "roundLevel": 8,
+          "matchNum": 27,
+          "winner": {
+            "name": "Leheng Xu",
+            "playerId": 395,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-13",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10055",
+          "roundLevel": 10,
+          "matchNum": 55,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11056",
+          "roundLevel": 11,
+          "matchNum": 56,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9028",
+          "roundLevel": 9,
+          "matchNum": 28,
+          "winner": {
+            "name": "Leheng Xu",
+            "playerId": 395,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7014",
+          "roundLevel": 7,
+          "matchNum": 14,
+          "winner": {
+            "name": "Leheng Xu",
+            "playerId": 395,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "24-22",
+            "21-10"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5007",
+          "roundLevel": 5,
+          "matchNum": 7,
+          "winner": {
+            "name": "Mihir Thaha",
+            "playerId": 477,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "19-21",
+            "21-14",
+            "22-20"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "2002",
+          "roundLevel": 2,
+          "matchNum": 2,
+          "winner": {
+            "name": "Uddhav Kasarabada",
+            "playerId": 362,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-15",
+            "17-21",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10056",
+          "roundLevel": 10,
+          "matchNum": 56,
+          "winner": {
+            "name": "Leheng Xu",
+            "playerId": 395,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11057",
+          "roundLevel": 11,
+          "matchNum": 57,
+          "winner": {
+            "name": "Jeffrey Wang",
+            "playerId": 393,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8028",
+          "roundLevel": 8,
+          "matchNum": 28,
+          "winner": {
+            "name": "Marzuq Mathani",
+            "playerId": 453,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10057",
+          "roundLevel": 10,
+          "matchNum": 57,
+          "winner": {
+            "name": "Jeffrey Wang",
+            "playerId": 393,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11058",
+          "roundLevel": 11,
+          "matchNum": 58,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9029",
+          "roundLevel": 9,
+          "matchNum": 29,
+          "winner": {
+            "name": "Shishir Bokka",
+            "playerId": 559,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-11"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6014",
+          "roundLevel": 6,
+          "matchNum": 14,
+          "winner": {
+            "name": "Mihir Thaha",
+            "playerId": 477,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10058",
+          "roundLevel": 10,
+          "matchNum": 58,
+          "winner": {
+            "name": "Shishir Bokka",
+            "playerId": 559,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11059",
+          "roundLevel": 11,
+          "matchNum": 59,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8029",
+          "roundLevel": 8,
+          "matchNum": 29,
+          "winner": {
+            "name": "Ethan Chan",
+            "playerId": 587,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "16-21",
+            "26-24",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10059",
+          "roundLevel": 10,
+          "matchNum": 59,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11060",
+          "roundLevel": 11,
+          "matchNum": 60,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9030",
+          "roundLevel": 9,
+          "matchNum": 30,
+          "winner": {
+            "name": "Ethan Chan",
+            "playerId": 587,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7015",
+          "roundLevel": 7,
+          "matchNum": 15,
+          "winner": {
+            "name": "Raymond Haiwen Song",
+            "playerId": 88,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-7",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4007",
+          "roundLevel": 4,
+          "matchNum": 7,
+          "winner": {
+            "name": "Mihir Thaha",
+            "playerId": 477,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10060",
+          "roundLevel": 10,
+          "matchNum": 60,
+          "winner": {
+            "name": "Ethan Chan",
+            "playerId": 587,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11061",
+          "roundLevel": 11,
+          "matchNum": 61,
+          "winner": {
+            "name": "Benson Liang",
+            "playerId": 494,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8030",
+          "roundLevel": 8,
+          "matchNum": 30,
+          "winner": {
+            "name": "Raymond Haiwen Song",
+            "playerId": 88,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10061",
+          "roundLevel": 10,
+          "matchNum": 61,
+          "winner": {
+            "name": "Benson Liang",
+            "playerId": 494,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11062",
+          "roundLevel": 11,
+          "matchNum": 62,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9031",
+          "roundLevel": 9,
+          "matchNum": 31,
+          "winner": {
+            "name": "Benson Liang",
+            "playerId": 494,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-8"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6015",
+          "roundLevel": 6,
+          "matchNum": 15,
+          "winner": {
+            "name": "Raymond Haiwen Song",
+            "playerId": 88,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-7",
+            "20-22",
+            "21-14"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10062",
+          "roundLevel": 10,
+          "matchNum": 62,
+          "winner": {
+            "name": "Eric Zhun Hu",
+            "playerId": 142,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11063",
+          "roundLevel": 11,
+          "matchNum": 63,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8031",
+          "roundLevel": 8,
+          "matchNum": 31,
+          "winner": {
+            "name": "Benson Liang",
+            "playerId": 494,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-9",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10063",
+          "roundLevel": 10,
+          "matchNum": 63,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "11064",
+          "roundLevel": 11,
+          "matchNum": 64,
+          "winner": null,
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "9032",
+          "roundLevel": 9,
+          "matchNum": 32,
+          "winner": {
+            "name": "Isaac Wong",
+            "playerId": 102,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "7016",
+          "roundLevel": 7,
+          "matchNum": 16,
+          "winner": {
+            "name": "Micah Wei",
+            "playerId": 277,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-14",
+            "21-12"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "5008",
+          "roundLevel": 5,
+          "matchNum": 8,
+          "winner": {
+            "name": "Mark w Wu",
+            "playerId": 551,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "21-16",
+            "21-9"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "3004",
+          "roundLevel": 3,
+          "matchNum": 4,
+          "winner": {
+            "name": "Aagnaey Gulla Pulijal",
+            "playerId": 536,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [
+            "22-20",
+            "21-18"
+          ],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "10064",
+          "roundLevel": 10,
+          "matchNum": 64,
+          "winner": {
+            "name": "Isaac Wong",
+            "playerId": 102,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "8032",
+          "roundLevel": 8,
+          "matchNum": 32,
+          "winner": {
+            "name": "Micah Wei",
+            "playerId": 277,
+            "seed": "9/16",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "6016",
+          "roundLevel": 6,
+          "matchNum": 16,
+          "winner": {
+            "name": "Mark w Wu",
+            "playerId": 551,
+            "seed": "5/8",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        },
+        {
+          "matchId": "4008",
+          "roundLevel": 4,
+          "matchNum": 8,
+          "winner": {
+            "name": "Aagnaey Gulla Pulijal",
+            "playerId": 536,
+            "seed": "",
+            "club": "",
+            "partner": "",
+            "partnerPlayerId": null
+          },
+          "score": [],
+          "retired": false,
+          "walkover": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1271 @@
+{
+  "tswId": "A2DD0F5E-24A4-4875-B053-8F25F31AC357",
+  "tournamentName": "2025 YONEX U.S. JUNIOR NATIONAL CHAMPIONSHIPS",
+  "events": [
+    {
+      "eventName": "BS U11",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Naksh Shetty [3/4]",
+              "playerId": 417
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Mingyuan Zang [5/8]",
+              "playerId": 489
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Shrihayagrivan Karthigayan [5/8]",
+              "playerId": 375
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Boqian Zheng [3/4]",
+              "playerId": 127
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BS U13",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Yian Yang [1]",
+              "playerId": 114
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Varish Karri [2]",
+              "playerId": 444
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Kevin Xie [5/8]",
+              "playerId": 394
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Michael Yufu Sun [3/4]",
+              "playerId": 473
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BS U15",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Ayaaz Muhammed Baig",
+              "playerId": 224
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Aarav Gupta [5/8]",
+              "playerId": 141
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Jason Gu [9/16]",
+              "playerId": 30
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Zaph J-Din Bayona [9/16]",
+              "playerId": 225
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BS U17",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Saatvik Shetty [3/4]",
+              "playerId": 323
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Kevin Zhang [9/16]",
+              "playerId": 556
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Nithesh Haribabu [9/16]",
+              "playerId": 439
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Anirud Veldanda [9/16]",
+              "playerId": 482
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BS U19",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Jaden Ke Hong Chen [5/8]",
+              "playerId": 296
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Ansen Liu [3/4]",
+              "playerId": 506
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Evan Liu [1]",
+              "playerId": 56
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Zicheng Xu [2]",
+              "playerId": 421
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GS U11",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Sophia Z Liu [3/4]",
+              "playerId": 364
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Kavya Balaji [2]",
+              "playerId": 294
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Laasya Polineni [1]",
+              "playerId": 354
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Xiner Hu [3/4]",
+              "playerId": 505
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GS U13",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Mizuki Ikeuchi [5/8]",
+              "playerId": 35
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Daisy Xu [2]",
+              "playerId": 219
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Keira Winarto [3/4]",
+              "playerId": 174
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Krishnavi Kasu [3/4]",
+              "playerId": 199
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GS U15",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Shraddha Prakash [3/4]",
+              "playerId": 319
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Lexuan Wen [2]",
+              "playerId": 217
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Michelle Yourong Zhang [1]",
+              "playerId": 341
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Sophia Sun [3/4]",
+              "playerId": 474
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GS U17",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Clarinda Jin [1]",
+              "playerId": 441
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Adonia Anny Chandran",
+              "playerId": 226
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Aadya Pitani [3/4]",
+              "playerId": 77
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Katie Wong",
+              "playerId": 420
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GS U19",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Charity Lam [3/4]",
+              "playerId": 412
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Lydia Chao",
+              "playerId": 399
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Anvita Jamsandekar [3/4]",
+              "playerId": 631
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Suneri Krishna Chinthalapati [1]",
+              "playerId": 563
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "XD U11",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Virat Satish [1]",
+              "playerId": 322
+            },
+            {
+              "name": "Laasya Polineni",
+              "playerId": 354
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Magadheesan Velu [2]",
+              "playerId": 169
+            },
+            {
+              "name": "Riana Soprala",
+              "playerId": 238
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Boqian Zheng [5/8]",
+              "playerId": 127
+            },
+            {
+              "name": "Aadya Yanamandra",
+              "playerId": 111
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Shubhan Sarikonda",
+              "playerId": 606
+            },
+            {
+              "name": "Samyutha Aluri",
+              "playerId": 397
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "XD U13",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Varish Karri [2]",
+              "playerId": 444
+            },
+            {
+              "name": "Keira Winarto",
+              "playerId": 174
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Aditya Namboodiripad [1]",
+              "playerId": 70
+            },
+            {
+              "name": "Bella Liu",
+              "playerId": 203
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Arnav Satish [5/8]",
+              "playerId": 321
+            },
+            {
+              "name": "Alaina Benjamin",
+              "playerId": 360
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Melvin Cui [5/8]",
+              "playerId": 18
+            },
+            {
+              "name": "Rachel Yao",
+              "playerId": 115
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "XD U15",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "William Geng [5/8]",
+              "playerId": 27
+            },
+            {
+              "name": "Erica Chen Lin",
+              "playerId": 54
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Joey Liu [9/16]",
+              "playerId": 363
+            },
+            {
+              "name": "Selena Wei",
+              "playerId": 383
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Abhiram Tripuraneni [3/4]",
+              "playerId": 480
+            },
+            {
+              "name": "Shraddha Prakash",
+              "playerId": 319
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Mikael Chang [3/4]",
+              "playerId": 6
+            },
+            {
+              "name": "Janice Chen",
+              "playerId": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "XD U17",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Vivek Rai [5/8]",
+              "playerId": 288
+            },
+            {
+              "name": "Sasha Suman",
+              "playerId": 356
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Vincent Chen [5/8]",
+              "playerId": 403
+            },
+            {
+              "name": "Jennifer Bangcaya",
+              "playerId": 398
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Mihir Thaha [5/8]",
+              "playerId": 477
+            },
+            {
+              "name": "Meghana Nishant",
+              "playerId": 416
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Darsh Jain [3/4]",
+              "playerId": 521
+            },
+            {
+              "name": "Lydia Chao",
+              "playerId": 399
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "XD U19",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Zicheng Xu",
+              "playerId": 421
+            },
+            {
+              "name": "Cassidy Yeh",
+              "playerId": 423
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Justin Xia",
+              "playerId": 177
+            },
+            {
+              "name": "Coco Cenke Tao",
+              "playerId": 289
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Jaden Ke Hong Chen",
+              "playerId": 296
+            },
+            {
+              "name": "Sydney Li",
+              "playerId": 635
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Mitchell Purnomo",
+              "playerId": 637
+            },
+            {
+              "name": "Anvita Jamsandekar",
+              "playerId": 631
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BD U11",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Magadheesan Velu [1]",
+              "playerId": 169
+            },
+            {
+              "name": "Boqian Zheng",
+              "playerId": 127
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Virat Satish [2]",
+              "playerId": 322
+            },
+            {
+              "name": "Srihari Shyam",
+              "playerId": 469
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Fonghong Lin [3/4]",
+              "playerId": 389
+            },
+            {
+              "name": "Naksh Shetty",
+              "playerId": 417
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Mingyuan Zang [5/8]",
+              "playerId": 489
+            },
+            {
+              "name": "Adrian Zhang",
+              "playerId": 424
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BD U13",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Varish Karri [1]",
+              "playerId": 444
+            },
+            {
+              "name": "Taneesh Musunuru",
+              "playerId": 532
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Leon Luo [3/4]",
+              "playerId": 413
+            },
+            {
+              "name": "Ethan Qiu",
+              "playerId": 212
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Melvin Cui [2]",
+              "playerId": 18
+            },
+            {
+              "name": "Aditya Namboodiripad",
+              "playerId": 70
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Chiranjeev Deepak [5/8]",
+              "playerId": 250
+            },
+            {
+              "name": "Anshu Gowda",
+              "playerId": 28
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BD U15",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "William Geng [2]",
+              "playerId": 27
+            },
+            {
+              "name": "Joey Liu",
+              "playerId": 363
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Terence Cai [1]",
+              "playerId": 4
+            },
+            {
+              "name": "Seth Li",
+              "playerId": 594
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Srineet Atluri [3/4]",
+              "playerId": 428
+            },
+            {
+              "name": "Mikael Chang",
+              "playerId": 6
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Carsten Lam [3/4]",
+              "playerId": 411
+            },
+            {
+              "name": "Jacob Ma",
+              "playerId": 64
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BD U17",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Adhyaan Balaji [1]",
+              "playerId": 293
+            },
+            {
+              "name": "Daniel Seungchan Park",
+              "playerId": 316
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Pradyun Gowda",
+              "playerId": 618
+            },
+            {
+              "name": "Mihir Thaha",
+              "playerId": 477
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Raymond Haiwen Song",
+              "playerId": 88
+            },
+            {
+              "name": "Micah Wei",
+              "playerId": 277
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Akshay Jalwadi [3/4]",
+              "playerId": 304
+            },
+            {
+              "name": "Vivek Rai",
+              "playerId": 288
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "BD U19",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Jaden Ke Hong Chen [3/4]",
+              "playerId": 296
+            },
+            {
+              "name": "Zicheng Xu",
+              "playerId": 421
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Nathan Chien [1]",
+              "playerId": 561
+            },
+            {
+              "name": "Matthew Lei",
+              "playerId": 576
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Evan Liu [3/4]",
+              "playerId": 56
+            },
+            {
+              "name": "Justin Xia",
+              "playerId": 177
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Darsh Jain [2]",
+              "playerId": 521
+            },
+            {
+              "name": "Ansen Liu",
+              "playerId": 506
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GD U11",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Xiner Hu [2]",
+              "playerId": 505
+            },
+            {
+              "name": "Sophia Z Liu",
+              "playerId": 364
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Kavya Balaji [1]",
+              "playerId": 294
+            },
+            {
+              "name": "Laasya Polineni",
+              "playerId": 354
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Riana Soprala [3/4]",
+              "playerId": 238
+            },
+            {
+              "name": "Aadya Yanamandra",
+              "playerId": 111
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Samyutha Aluri [3/4]",
+              "playerId": 397
+            },
+            {
+              "name": "Eesha Vikram",
+              "playerId": 291
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GD U13",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Bella Liu [3/4]",
+              "playerId": 203
+            },
+            {
+              "name": "Sophia Liu",
+              "playerId": 205
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Hanyi (Sissi) Lei [3/4]",
+              "playerId": 46
+            },
+            {
+              "name": "Daisy Xu",
+              "playerId": 219
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Lilian Feng [1]",
+              "playerId": 252
+            },
+            {
+              "name": "Keira Winarto",
+              "playerId": 174
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Alaina Benjamin",
+              "playerId": 360
+            },
+            {
+              "name": "Mizuki Ikeuchi",
+              "playerId": 35
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GD U15",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Shraddha Prakash [3/4]",
+              "playerId": 319
+            },
+            {
+              "name": "Lexuan Wen",
+              "playerId": 217
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Adriel Ammy Chandran [5/8]",
+              "playerId": 227
+            },
+            {
+              "name": "Zi Yang",
+              "playerId": 243
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Alice Meng [2]",
+              "playerId": 287
+            },
+            {
+              "name": "Selena Wei",
+              "playerId": 383
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Janice Chen [1]",
+              "playerId": 8
+            },
+            {
+              "name": "Stephanie Jiayi Song",
+              "playerId": 90
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GD U17",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Sasha Suman [1]",
+              "playerId": 356
+            },
+            {
+              "name": "Yalan Zhu",
+              "playerId": 342
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Kimaya Krishna [3/4]",
+              "playerId": 591
+            },
+            {
+              "name": "Joanne Li",
+              "playerId": 260
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Vivian Feng",
+              "playerId": 253
+            },
+            {
+              "name": "Michelle Yourong Zhang",
+              "playerId": 341
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Jennifer Bangcaya [3/4]",
+              "playerId": 398
+            },
+            {
+              "name": "Aadya Pitani",
+              "playerId": 77
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "GD U19",
+      "results": [
+        {
+          "place": "1",
+          "players": [
+            {
+              "name": "Lydia Chao [2]",
+              "playerId": 399
+            },
+            {
+              "name": "Charity Lam",
+              "playerId": 412
+            }
+          ]
+        },
+        {
+          "place": "2",
+          "players": [
+            {
+              "name": "Sydney Li",
+              "playerId": 635
+            },
+            {
+              "name": "Cassidy Yeh",
+              "playerId": 423
+            }
+          ]
+        },
+        {
+          "place": "3",
+          "players": [
+            {
+              "name": "Sophia Wu [1]",
+              "playerId": 106
+            },
+            {
+              "name": "Jennifer Xu",
+              "playerId": 180
+            }
+          ]
+        },
+        {
+          "place": "4",
+          "players": [
+            {
+              "name": "Kamalini Packiyaraj",
+              "playerId": 495
+            },
+            {
+              "name": "Coco Cenke Tao",
+              "playerId": 289
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

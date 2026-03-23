@@ -1,0 +1,1240 @@
+{
+  "tswId": "A2DD0F5E-24A4-4875-B053-8F25F31AC357",
+  "tournamentName": "2025 YONEX U.S. JUNIOR NATIONAL CHAMPIONSHIPS",
+  "clubs": [
+    {
+      "club": "U.S.A.",
+      "gold": 40,
+      "silver": 40,
+      "bronze": 80,
+      "total": 160
+    }
+  ],
+  "medals": [
+    {
+      "drawName": "BS U11",
+      "ageGroup": "U11",
+      "eventType": "BS",
+      "gold": [
+        {
+          "name": "Naksh Shetty [3/4]",
+          "club": "U.S.A.",
+          "playerId": 417
+        }
+      ],
+      "silver": [
+        {
+          "name": "Mingyuan Zang [5/8]",
+          "club": "U.S.A.",
+          "playerId": 489
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Shrihayagrivan Karthigayan [5/8]",
+            "club": "U.S.A.",
+            "playerId": 375
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Boqian Zheng [3/4]",
+            "club": "U.S.A.",
+            "playerId": 127
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BS U13",
+      "ageGroup": "U13",
+      "eventType": "BS",
+      "gold": [
+        {
+          "name": "Yian Yang [1]",
+          "club": "U.S.A.",
+          "playerId": 114
+        }
+      ],
+      "silver": [
+        {
+          "name": "Varish Karri [2]",
+          "club": "U.S.A.",
+          "playerId": 444
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Kevin Xie [5/8]",
+            "club": "U.S.A.",
+            "playerId": 394
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Michael Yufu Sun [3/4]",
+            "club": "U.S.A.",
+            "playerId": 473
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BS U15",
+      "ageGroup": "U15",
+      "eventType": "BS",
+      "gold": [
+        {
+          "name": "Ayaaz Muhammed Baig",
+          "club": "U.S.A.",
+          "playerId": 224
+        }
+      ],
+      "silver": [
+        {
+          "name": "Aarav Gupta [5/8]",
+          "club": "U.S.A.",
+          "playerId": 141
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Jason Gu [9/16]",
+            "club": "U.S.A.",
+            "playerId": 30
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Zaph J-Din Bayona [9/16]",
+            "club": "U.S.A.",
+            "playerId": 225
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BS U17",
+      "ageGroup": "U17",
+      "eventType": "BS",
+      "gold": [
+        {
+          "name": "Saatvik Shetty [3/4]",
+          "club": "U.S.A.",
+          "playerId": 323
+        }
+      ],
+      "silver": [
+        {
+          "name": "Kevin Zhang [9/16]",
+          "club": "U.S.A.",
+          "playerId": 556
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Nithesh Haribabu [9/16]",
+            "club": "U.S.A.",
+            "playerId": 439
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Anirud Veldanda [9/16]",
+            "club": "U.S.A.",
+            "playerId": 482
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BS U19",
+      "ageGroup": "U19",
+      "eventType": "BS",
+      "gold": [
+        {
+          "name": "Jaden Ke Hong Chen [5/8]",
+          "club": "U.S.A.",
+          "playerId": 296
+        }
+      ],
+      "silver": [
+        {
+          "name": "Ansen Liu [3/4]",
+          "club": "U.S.A.",
+          "playerId": 506
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Evan Liu [1]",
+            "club": "U.S.A.",
+            "playerId": 56
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Zicheng Xu [2]",
+            "club": "U.S.A.",
+            "playerId": 421
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GS U11",
+      "ageGroup": "U11",
+      "eventType": "GS",
+      "gold": [
+        {
+          "name": "Sophia Z Liu [3/4]",
+          "club": "U.S.A.",
+          "playerId": 364
+        }
+      ],
+      "silver": [
+        {
+          "name": "Kavya Balaji [2]",
+          "club": "U.S.A.",
+          "playerId": 294
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Laasya Polineni [1]",
+            "club": "U.S.A.",
+            "playerId": 354
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Xiner Hu [3/4]",
+            "club": "U.S.A.",
+            "playerId": 505
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GS U13",
+      "ageGroup": "U13",
+      "eventType": "GS",
+      "gold": [
+        {
+          "name": "Mizuki Ikeuchi [5/8]",
+          "club": "U.S.A.",
+          "playerId": 35
+        }
+      ],
+      "silver": [
+        {
+          "name": "Daisy Xu [2]",
+          "club": "U.S.A.",
+          "playerId": 219
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Keira Winarto [3/4]",
+            "club": "U.S.A.",
+            "playerId": 174
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Krishnavi Kasu [3/4]",
+            "club": "U.S.A.",
+            "playerId": 199
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GS U15",
+      "ageGroup": "U15",
+      "eventType": "GS",
+      "gold": [
+        {
+          "name": "Shraddha Prakash [3/4]",
+          "club": "U.S.A.",
+          "playerId": 319
+        }
+      ],
+      "silver": [
+        {
+          "name": "Lexuan Wen [2]",
+          "club": "U.S.A.",
+          "playerId": 217
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Michelle Yourong Zhang [1]",
+            "club": "U.S.A.",
+            "playerId": 341
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Sophia Sun [3/4]",
+            "club": "U.S.A.",
+            "playerId": 474
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GS U17",
+      "ageGroup": "U17",
+      "eventType": "GS",
+      "gold": [
+        {
+          "name": "Clarinda Jin [1]",
+          "club": "U.S.A.",
+          "playerId": 441
+        }
+      ],
+      "silver": [
+        {
+          "name": "Adonia Anny Chandran",
+          "club": "U.S.A.",
+          "playerId": 226
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Aadya Pitani [3/4]",
+            "club": "U.S.A.",
+            "playerId": 77
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Katie Wong",
+            "club": "U.S.A.",
+            "playerId": 420
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GS U19",
+      "ageGroup": "U19",
+      "eventType": "GS",
+      "gold": [
+        {
+          "name": "Charity Lam [3/4]",
+          "club": "U.S.A.",
+          "playerId": 412
+        }
+      ],
+      "silver": [
+        {
+          "name": "Lydia Chao",
+          "club": "U.S.A.",
+          "playerId": 399
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Anvita Jamsandekar [3/4]",
+            "club": "U.S.A.",
+            "playerId": 631
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Suneri Krishna Chinthalapati [1]",
+            "club": "U.S.A.",
+            "playerId": 563
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "XD U11",
+      "ageGroup": "U11",
+      "eventType": "XD",
+      "gold": [
+        {
+          "name": "Virat Satish [1]",
+          "club": "U.S.A.",
+          "playerId": 322
+        },
+        {
+          "name": "Laasya Polineni",
+          "club": "U.S.A.",
+          "playerId": 354
+        }
+      ],
+      "silver": [
+        {
+          "name": "Magadheesan Velu [2]",
+          "club": "U.S.A.",
+          "playerId": 169
+        },
+        {
+          "name": "Riana Soprala",
+          "club": "U.S.A.",
+          "playerId": 238
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Boqian Zheng [5/8]",
+            "club": "U.S.A.",
+            "playerId": 127
+          },
+          {
+            "name": "Aadya Yanamandra",
+            "club": "U.S.A.",
+            "playerId": 111
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Shubhan Sarikonda",
+            "club": "U.S.A.",
+            "playerId": 606
+          },
+          {
+            "name": "Samyutha Aluri",
+            "club": "U.S.A.",
+            "playerId": 397
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "XD U13",
+      "ageGroup": "U13",
+      "eventType": "XD",
+      "gold": [
+        {
+          "name": "Varish Karri [2]",
+          "club": "U.S.A.",
+          "playerId": 444
+        },
+        {
+          "name": "Keira Winarto",
+          "club": "U.S.A.",
+          "playerId": 174
+        }
+      ],
+      "silver": [
+        {
+          "name": "Aditya Namboodiripad [1]",
+          "club": "U.S.A.",
+          "playerId": 70
+        },
+        {
+          "name": "Bella Liu",
+          "club": "U.S.A.",
+          "playerId": 203
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Arnav Satish [5/8]",
+            "club": "U.S.A.",
+            "playerId": 321
+          },
+          {
+            "name": "Alaina Benjamin",
+            "club": "U.S.A.",
+            "playerId": 360
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Melvin Cui [5/8]",
+            "club": "U.S.A.",
+            "playerId": 18
+          },
+          {
+            "name": "Rachel Yao",
+            "club": "U.S.A.",
+            "playerId": 115
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "XD U15",
+      "ageGroup": "U15",
+      "eventType": "XD",
+      "gold": [
+        {
+          "name": "William Geng [5/8]",
+          "club": "U.S.A.",
+          "playerId": 27
+        },
+        {
+          "name": "Erica Chen Lin",
+          "club": "U.S.A.",
+          "playerId": 54
+        }
+      ],
+      "silver": [
+        {
+          "name": "Joey Liu [9/16]",
+          "club": "U.S.A.",
+          "playerId": 363
+        },
+        {
+          "name": "Selena Wei",
+          "club": "U.S.A.",
+          "playerId": 383
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Abhiram Tripuraneni [3/4]",
+            "club": "U.S.A.",
+            "playerId": 480
+          },
+          {
+            "name": "Shraddha Prakash",
+            "club": "U.S.A.",
+            "playerId": 319
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Mikael Chang [3/4]",
+            "club": "U.S.A.",
+            "playerId": 6
+          },
+          {
+            "name": "Janice Chen",
+            "club": "U.S.A.",
+            "playerId": 8
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "XD U17",
+      "ageGroup": "U17",
+      "eventType": "XD",
+      "gold": [
+        {
+          "name": "Vivek Rai [5/8]",
+          "club": "U.S.A.",
+          "playerId": 288
+        },
+        {
+          "name": "Sasha Suman",
+          "club": "U.S.A.",
+          "playerId": 356
+        }
+      ],
+      "silver": [
+        {
+          "name": "Vincent Chen [5/8]",
+          "club": "U.S.A.",
+          "playerId": 403
+        },
+        {
+          "name": "Jennifer Bangcaya",
+          "club": "U.S.A.",
+          "playerId": 398
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Mihir Thaha [5/8]",
+            "club": "U.S.A.",
+            "playerId": 477
+          },
+          {
+            "name": "Meghana Nishant",
+            "club": "U.S.A.",
+            "playerId": 416
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Darsh Jain [3/4]",
+            "club": "U.S.A.",
+            "playerId": 521
+          },
+          {
+            "name": "Lydia Chao",
+            "club": "U.S.A.",
+            "playerId": 399
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "XD U19",
+      "ageGroup": "U19",
+      "eventType": "XD",
+      "gold": [
+        {
+          "name": "Zicheng Xu",
+          "club": "U.S.A.",
+          "playerId": 421
+        },
+        {
+          "name": "Cassidy Yeh",
+          "club": "U.S.A.",
+          "playerId": 423
+        }
+      ],
+      "silver": [
+        {
+          "name": "Justin Xia",
+          "club": "U.S.A.",
+          "playerId": 177
+        },
+        {
+          "name": "Coco Cenke Tao",
+          "club": "U.S.A.",
+          "playerId": 289
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Jaden Ke Hong Chen",
+            "club": "U.S.A.",
+            "playerId": 296
+          },
+          {
+            "name": "Sydney Li",
+            "club": "U.S.A.",
+            "playerId": 635
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Mitchell Purnomo",
+            "club": "U.S.A.",
+            "playerId": 637
+          },
+          {
+            "name": "Anvita Jamsandekar",
+            "club": "U.S.A.",
+            "playerId": 631
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BD U11",
+      "ageGroup": "U11",
+      "eventType": "BD",
+      "gold": [
+        {
+          "name": "Magadheesan Velu [1]",
+          "club": "U.S.A.",
+          "playerId": 169
+        },
+        {
+          "name": "Boqian Zheng",
+          "club": "U.S.A.",
+          "playerId": 127
+        }
+      ],
+      "silver": [
+        {
+          "name": "Virat Satish [2]",
+          "club": "U.S.A.",
+          "playerId": 322
+        },
+        {
+          "name": "Srihari Shyam",
+          "club": "U.S.A.",
+          "playerId": 469
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Fonghong Lin [3/4]",
+            "club": "U.S.A.",
+            "playerId": 389
+          },
+          {
+            "name": "Naksh Shetty",
+            "club": "U.S.A.",
+            "playerId": 417
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Mingyuan Zang [5/8]",
+            "club": "U.S.A.",
+            "playerId": 489
+          },
+          {
+            "name": "Adrian Zhang",
+            "club": "U.S.A.",
+            "playerId": 424
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BD U13",
+      "ageGroup": "U13",
+      "eventType": "BD",
+      "gold": [
+        {
+          "name": "Varish Karri [1]",
+          "club": "U.S.A.",
+          "playerId": 444
+        },
+        {
+          "name": "Taneesh Musunuru",
+          "club": "U.S.A.",
+          "playerId": 532
+        }
+      ],
+      "silver": [
+        {
+          "name": "Leon Luo [3/4]",
+          "club": "U.S.A.",
+          "playerId": 413
+        },
+        {
+          "name": "Ethan Qiu",
+          "club": "U.S.A.",
+          "playerId": 212
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Melvin Cui [2]",
+            "club": "U.S.A.",
+            "playerId": 18
+          },
+          {
+            "name": "Aditya Namboodiripad",
+            "club": "U.S.A.",
+            "playerId": 70
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Chiranjeev Deepak [5/8]",
+            "club": "U.S.A.",
+            "playerId": 250
+          },
+          {
+            "name": "Anshu Gowda",
+            "club": "U.S.A.",
+            "playerId": 28
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BD U15",
+      "ageGroup": "U15",
+      "eventType": "BD",
+      "gold": [
+        {
+          "name": "William Geng [2]",
+          "club": "U.S.A.",
+          "playerId": 27
+        },
+        {
+          "name": "Joey Liu",
+          "club": "U.S.A.",
+          "playerId": 363
+        }
+      ],
+      "silver": [
+        {
+          "name": "Terence Cai [1]",
+          "club": "U.S.A.",
+          "playerId": 4
+        },
+        {
+          "name": "Seth Li",
+          "club": "U.S.A.",
+          "playerId": 594
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Srineet Atluri [3/4]",
+            "club": "U.S.A.",
+            "playerId": 428
+          },
+          {
+            "name": "Mikael Chang",
+            "club": "U.S.A.",
+            "playerId": 6
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Carsten Lam [3/4]",
+            "club": "U.S.A.",
+            "playerId": 411
+          },
+          {
+            "name": "Jacob Ma",
+            "club": "U.S.A.",
+            "playerId": 64
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BD U17",
+      "ageGroup": "U17",
+      "eventType": "BD",
+      "gold": [
+        {
+          "name": "Adhyaan Balaji [1]",
+          "club": "U.S.A.",
+          "playerId": 293
+        },
+        {
+          "name": "Daniel Seungchan Park",
+          "club": "U.S.A.",
+          "playerId": 316
+        }
+      ],
+      "silver": [
+        {
+          "name": "Pradyun Gowda",
+          "club": "U.S.A.",
+          "playerId": 618
+        },
+        {
+          "name": "Mihir Thaha",
+          "club": "U.S.A.",
+          "playerId": 477
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Raymond Haiwen Song",
+            "club": "U.S.A.",
+            "playerId": 88
+          },
+          {
+            "name": "Micah Wei",
+            "club": "U.S.A.",
+            "playerId": 277
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Akshay Jalwadi [3/4]",
+            "club": "U.S.A.",
+            "playerId": 304
+          },
+          {
+            "name": "Vivek Rai",
+            "club": "U.S.A.",
+            "playerId": 288
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "BD U19",
+      "ageGroup": "U19",
+      "eventType": "BD",
+      "gold": [
+        {
+          "name": "Jaden Ke Hong Chen [3/4]",
+          "club": "U.S.A.",
+          "playerId": 296
+        },
+        {
+          "name": "Zicheng Xu",
+          "club": "U.S.A.",
+          "playerId": 421
+        }
+      ],
+      "silver": [
+        {
+          "name": "Nathan Chien [1]",
+          "club": "U.S.A.",
+          "playerId": 561
+        },
+        {
+          "name": "Matthew Lei",
+          "club": "U.S.A.",
+          "playerId": 576
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Evan Liu [3/4]",
+            "club": "U.S.A.",
+            "playerId": 56
+          },
+          {
+            "name": "Justin Xia",
+            "club": "U.S.A.",
+            "playerId": 177
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Darsh Jain [2]",
+            "club": "U.S.A.",
+            "playerId": 521
+          },
+          {
+            "name": "Ansen Liu",
+            "club": "U.S.A.",
+            "playerId": 506
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GD U11",
+      "ageGroup": "U11",
+      "eventType": "GD",
+      "gold": [
+        {
+          "name": "Xiner Hu [2]",
+          "club": "U.S.A.",
+          "playerId": 505
+        },
+        {
+          "name": "Sophia Z Liu",
+          "club": "U.S.A.",
+          "playerId": 364
+        }
+      ],
+      "silver": [
+        {
+          "name": "Kavya Balaji [1]",
+          "club": "U.S.A.",
+          "playerId": 294
+        },
+        {
+          "name": "Laasya Polineni",
+          "club": "U.S.A.",
+          "playerId": 354
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Riana Soprala [3/4]",
+            "club": "U.S.A.",
+            "playerId": 238
+          },
+          {
+            "name": "Aadya Yanamandra",
+            "club": "U.S.A.",
+            "playerId": 111
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Samyutha Aluri [3/4]",
+            "club": "U.S.A.",
+            "playerId": 397
+          },
+          {
+            "name": "Eesha Vikram",
+            "club": "U.S.A.",
+            "playerId": 291
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GD U13",
+      "ageGroup": "U13",
+      "eventType": "GD",
+      "gold": [
+        {
+          "name": "Bella Liu [3/4]",
+          "club": "U.S.A.",
+          "playerId": 203
+        },
+        {
+          "name": "Sophia Liu",
+          "club": "U.S.A.",
+          "playerId": 205
+        }
+      ],
+      "silver": [
+        {
+          "name": "Hanyi (Sissi) Lei [3/4]",
+          "club": "U.S.A.",
+          "playerId": 46
+        },
+        {
+          "name": "Daisy Xu",
+          "club": "U.S.A.",
+          "playerId": 219
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Lilian Feng [1]",
+            "club": "U.S.A.",
+            "playerId": 252
+          },
+          {
+            "name": "Keira Winarto",
+            "club": "U.S.A.",
+            "playerId": 174
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Alaina Benjamin",
+            "club": "U.S.A.",
+            "playerId": 360
+          },
+          {
+            "name": "Mizuki Ikeuchi",
+            "club": "U.S.A.",
+            "playerId": 35
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GD U15",
+      "ageGroup": "U15",
+      "eventType": "GD",
+      "gold": [
+        {
+          "name": "Shraddha Prakash [3/4]",
+          "club": "U.S.A.",
+          "playerId": 319
+        },
+        {
+          "name": "Lexuan Wen",
+          "club": "U.S.A.",
+          "playerId": 217
+        }
+      ],
+      "silver": [
+        {
+          "name": "Adriel Ammy Chandran [5/8]",
+          "club": "U.S.A.",
+          "playerId": 227
+        },
+        {
+          "name": "Zi Yang",
+          "club": "U.S.A.",
+          "playerId": 243
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Alice Meng [2]",
+            "club": "U.S.A.",
+            "playerId": 287
+          },
+          {
+            "name": "Selena Wei",
+            "club": "U.S.A.",
+            "playerId": 383
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Janice Chen [1]",
+            "club": "U.S.A.",
+            "playerId": 8
+          },
+          {
+            "name": "Stephanie Jiayi Song",
+            "club": "U.S.A.",
+            "playerId": 90
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GD U17",
+      "ageGroup": "U17",
+      "eventType": "GD",
+      "gold": [
+        {
+          "name": "Sasha Suman [1]",
+          "club": "U.S.A.",
+          "playerId": 356
+        },
+        {
+          "name": "Yalan Zhu",
+          "club": "U.S.A.",
+          "playerId": 342
+        }
+      ],
+      "silver": [
+        {
+          "name": "Kimaya Krishna [3/4]",
+          "club": "U.S.A.",
+          "playerId": 591
+        },
+        {
+          "name": "Joanne Li",
+          "club": "U.S.A.",
+          "playerId": 260
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Vivian Feng",
+            "club": "U.S.A.",
+            "playerId": 253
+          },
+          {
+            "name": "Michelle Yourong Zhang",
+            "club": "U.S.A.",
+            "playerId": 341
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Jennifer Bangcaya [3/4]",
+            "club": "U.S.A.",
+            "playerId": 398
+          },
+          {
+            "name": "Aadya Pitani",
+            "club": "U.S.A.",
+            "playerId": 77
+          }
+        ]
+      ]
+    },
+    {
+      "drawName": "GD U19",
+      "ageGroup": "U19",
+      "eventType": "GD",
+      "gold": [
+        {
+          "name": "Lydia Chao [2]",
+          "club": "U.S.A.",
+          "playerId": 399
+        },
+        {
+          "name": "Charity Lam",
+          "club": "U.S.A.",
+          "playerId": 412
+        }
+      ],
+      "silver": [
+        {
+          "name": "Sydney Li",
+          "club": "U.S.A.",
+          "playerId": 635
+        },
+        {
+          "name": "Cassidy Yeh",
+          "club": "U.S.A.",
+          "playerId": 423
+        }
+      ],
+      "bronze": [
+        [
+          {
+            "name": "Sophia Wu [1]",
+            "club": "U.S.A.",
+            "playerId": 106
+          },
+          {
+            "name": "Jennifer Xu",
+            "club": "U.S.A.",
+            "playerId": 180
+          }
+        ]
+      ],
+      "fourth": [
+        [
+          {
+            "name": "Kamalini Packiyaraj",
+            "club": "U.S.A.",
+            "playerId": 495
+          },
+          {
+            "name": "Coco Cenke Tao",
+            "club": "U.S.A.",
+            "playerId": 289
+          }
+        ]
+      ]
+    }
+  ]
+}

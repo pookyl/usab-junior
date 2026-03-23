@@ -1,0 +1,3123 @@
+{
+  "tswId": "A2DD0F5E-24A4-4875-B053-8F25F31AC357",
+  "date": "Mon 7/7/2025",
+  "matches": [
+    {
+      "event": "XD U15",
+      "round": "Consolation semi final",
+      "header": "XD U15 · Consolation semi final",
+      "team1": [
+        "Zaph J-Din Bayona [5/8]",
+        "Lexuan Wen"
+      ],
+      "team2": [
+        "Seth Li [5/8]",
+        "Emily Min Tang"
+      ],
+      "team1Ids": [
+        225,
+        217
+      ],
+      "team2Ids": [
+        594,
+        357
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [],
+      "walkover": true,
+      "time": "8:30 AM",
+      "court": "",
+      "duration": "",
+      "location": "St. Paul RiverCentre"
+    },
+    {
+      "event": "XD U15",
+      "round": "Consolation semi final",
+      "header": "XD U15 · Consolation semi final",
+      "team1": [
+        "Yifei Zhang [9/16]",
+        "Jessica Zhang"
+      ],
+      "team2": [
+        "Srineet Atluri [5/8]",
+        "Stephanie Jiayi Song"
+      ],
+      "team1Ids": [
+        188,
+        121
+      ],
+      "team2Ids": [
+        428,
+        90
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          19
+        ],
+        [
+          11,
+          21
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "8:30 AM",
+      "court": "Main Location - 18",
+      "duration": "33m",
+      "location": "Main Location - 18"
+    },
+    {
+      "event": "XD U17",
+      "round": "Consolation semi final",
+      "header": "XD U17 · Consolation semi final",
+      "team1": [
+        "Noah Chien [5/8]",
+        "Ishi Reddy"
+      ],
+      "team2": [
+        "Aagnaey Gulla Pulijal",
+        "Kriti Vasireddy"
+      ],
+      "team1Ids": [
+        562,
+        237
+      ],
+      "team2Ids": [
+        536,
+        612
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          13
+        ],
+        [
+          26,
+          28
+        ],
+        [
+          21,
+          14
+        ]
+      ],
+      "time": "8:30 AM",
+      "court": "Main Location - 17",
+      "duration": "40m",
+      "location": "Main Location - 17"
+    },
+    {
+      "event": "XD U17",
+      "round": "Consolation semi final",
+      "header": "XD U17 · Consolation semi final",
+      "team1": [
+        "Brendan Chen [1]",
+        "Clarinda Jin"
+      ],
+      "team2": [
+        "Raymond Haiwen Song",
+        "Savannah Kam"
+      ],
+      "team1Ids": [
+        361,
+        441
+      ],
+      "team2Ids": [
+        88,
+        408
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          13,
+          21
+        ],
+        [
+          21,
+          19
+        ],
+        [
+          18,
+          21
+        ]
+      ],
+      "time": "8:30 AM",
+      "court": "Main Location - 15",
+      "duration": "40m",
+      "location": "Main Location - 15"
+    },
+    {
+      "event": "XD U19",
+      "round": "Consolation semi final",
+      "header": "XD U19 · Consolation semi final",
+      "team1": [
+        "Evan Liu [2]",
+        "Sophia Wu"
+      ],
+      "team2": [
+        "Caden Wang",
+        "Yuxuan Zeng"
+      ],
+      "team1Ids": [
+        56,
+        106
+      ],
+      "team2Ids": [
+        332,
+        221
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "8:30 AM",
+      "court": "Main Location - 3",
+      "duration": "32m",
+      "location": "Main Location - 3"
+    },
+    {
+      "event": "XD U19",
+      "round": "Consolation semi final",
+      "header": "XD U19 · Consolation semi final",
+      "team1": [
+        "Adhyaan Balaji",
+        "Riya Suresh"
+      ],
+      "team2": [
+        "Ansen Liu [1]",
+        "Charity Lam"
+      ],
+      "team1Ids": [
+        293,
+        358
+      ],
+      "team2Ids": [
+        506,
+        412
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          11
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          12,
+          21
+        ]
+      ],
+      "time": "8:30 AM",
+      "court": "Main Location - 14",
+      "duration": "38m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "XD U11",
+      "round": "Consolation semi final",
+      "header": "XD U11 · Consolation semi final",
+      "team1": [
+        "Srihari Shyam [3/4]",
+        "Kavya Balaji"
+      ],
+      "team2": [
+        "Kaishi Yang",
+        "Kira Chu"
+      ],
+      "team1Ids": [
+        469,
+        294
+      ],
+      "team2Ids": [
+        113,
+        16
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          19
+        ]
+      ],
+      "time": "9:05 AM",
+      "court": "Main Location - 13",
+      "duration": "31m",
+      "location": "Main Location - 13"
+    },
+    {
+      "event": "XD U11",
+      "round": "Consolation semi final",
+      "header": "XD U11 · Consolation semi final",
+      "team1": [
+        "Naksh Shetty [5/8]",
+        "Xiner Hu"
+      ],
+      "team2": [
+        "Chris Lin",
+        "Eesha Vikram"
+      ],
+      "team1Ids": [
+        417,
+        505
+      ],
+      "team2Ids": [
+        150,
+        291
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          13
+        ],
+        [
+          21,
+          8
+        ]
+      ],
+      "time": "9:05 AM",
+      "court": "Main Location - 10",
+      "duration": "22m",
+      "location": "Main Location - 10"
+    },
+    {
+      "event": "XD U13",
+      "round": "Consolation semi final",
+      "header": "XD U13 · Consolation semi final",
+      "team1": [
+        "Michael Yufu Sun [3/4]",
+        "Sophia Liu"
+      ],
+      "team2": [
+        "Aayush Jaladurgam [9/16]",
+        "Mizuki Ikeuchi"
+      ],
+      "team1Ids": [
+        473,
+        205
+      ],
+      "team2Ids": [
+        36,
+        35
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          11
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "9:05 AM",
+      "court": "Main Location - 9",
+      "duration": "15m",
+      "location": "Main Location - 9"
+    },
+    {
+      "event": "XD U13",
+      "round": "Consolation semi final",
+      "header": "XD U13 · Consolation semi final",
+      "team1": [
+        "Kevin Xie [5/8]",
+        "Claire QiuChen Li"
+      ],
+      "team2": [
+        "Harrison Zhang [9/16]",
+        "Grace Cheng"
+      ],
+      "team1Ids": [
+        394,
+        47
+      ],
+      "team2Ids": [
+        120,
+        11
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          13,
+          21
+        ],
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          17
+        ]
+      ],
+      "time": "9:05 AM",
+      "court": "Main Location - 8",
+      "duration": "40m",
+      "location": "Main Location - 8"
+    },
+    {
+      "event": "BS U17",
+      "round": "Final",
+      "header": "BS U17 · Final",
+      "team1": [
+        "Kevin Zhang [9/16]"
+      ],
+      "team2": [
+        "Saatvik Shetty [3/4]"
+      ],
+      "team1Ids": [
+        556
+      ],
+      "team2Ids": [
+        323
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          8,
+          21
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "9:05 AM",
+      "court": "Main Location - 3",
+      "duration": "28m",
+      "location": "Main Location - 3"
+    },
+    {
+      "event": "BS U15",
+      "round": "3rd/4th place",
+      "header": "BS U15 · 3rd/4th place",
+      "team1": [
+        "Zaph J-Din Bayona [9/16]"
+      ],
+      "team2": [
+        "Jason Gu [9/16]"
+      ],
+      "team1Ids": [
+        225
+      ],
+      "team2Ids": [
+        30
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          18,
+          21
+        ],
+        [
+          21,
+          16
+        ],
+        [
+          18,
+          21
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 15",
+      "duration": "45m",
+      "location": "Main Location - 15"
+    },
+    {
+      "event": "BS U15",
+      "round": "Consolation final",
+      "header": "BS U15 · Consolation final",
+      "team1": [
+        "Abhiram Tripuraneni [5/8]"
+      ],
+      "team2": [
+        "Terence Cai [1]"
+      ],
+      "team1Ids": [
+        480
+      ],
+      "team2Ids": [
+        4
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 17",
+      "duration": "42m",
+      "location": "Main Location - 17"
+    },
+    {
+      "event": "GS U15",
+      "round": "3rd/4th place",
+      "header": "GS U15 · 3rd/4th place",
+      "team1": [
+        "Michelle Yourong Zhang [1]"
+      ],
+      "team2": [
+        "Sophia Sun [3/4]"
+      ],
+      "team1Ids": [
+        341
+      ],
+      "team2Ids": [
+        474
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 2",
+      "duration": "27m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "GS U15",
+      "round": "Consolation final",
+      "header": "GS U15 · Consolation final",
+      "team1": [
+        "Alice Meng [5/8]"
+      ],
+      "team2": [
+        "Jessica Zhang [5/8]"
+      ],
+      "team1Ids": [
+        287
+      ],
+      "team2Ids": [
+        121
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 5",
+      "duration": "30m",
+      "location": "Main Location - 5"
+    },
+    {
+      "event": "BS U17",
+      "round": "3rd/4th place",
+      "header": "BS U17 · 3rd/4th place",
+      "team1": [
+        "Nithesh Haribabu [9/16]"
+      ],
+      "team2": [
+        "Anirud Veldanda [9/16]"
+      ],
+      "team1Ids": [
+        439
+      ],
+      "team2Ids": [
+        482
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          12
+        ],
+        [
+          21,
+          18
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 6",
+      "duration": "35m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "BS U17",
+      "round": "Consolation final",
+      "header": "BS U17 · Consolation final",
+      "team1": [
+        "Abhi Mandanapu [1]"
+      ],
+      "team2": [
+        "Uddhav Kasarabada [5/8]"
+      ],
+      "team1Ids": [
+        597
+      ],
+      "team2Ids": [
+        362
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          18
+        ],
+        [
+          18,
+          21
+        ],
+        [
+          23,
+          21
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 18",
+      "duration": "47m",
+      "location": "Main Location - 18"
+    },
+    {
+      "event": "GS U17",
+      "round": "Consolation final",
+      "header": "GS U17 · Consolation final",
+      "team1": [
+        "Ishi Reddy [2]"
+      ],
+      "team2": [
+        "Vivian Feng [5/8]"
+      ],
+      "team1Ids": [
+        237
+      ],
+      "team2Ids": [
+        253
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          18,
+          21
+        ],
+        [
+          18,
+          21
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 14",
+      "duration": "26m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BS U19",
+      "round": "Consolation final",
+      "header": "BS U19 · Consolation final",
+      "team1": [
+        "Zhengyue Xiong [5/8]"
+      ],
+      "team2": [
+        "Darsh Jain [3/4]"
+      ],
+      "team1Ids": [
+        242
+      ],
+      "team2Ids": [
+        521
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          19,
+          21
+        ],
+        [
+          19,
+          21
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 10",
+      "duration": "29m",
+      "location": "Main Location - 10"
+    },
+    {
+      "event": "GS U19",
+      "round": "Consolation final",
+      "header": "GS U19 · Consolation final",
+      "team1": [
+        "Yuxuan Zeng"
+      ],
+      "team2": [
+        "Sophia Wu [2]"
+      ],
+      "team1Ids": [
+        221
+      ],
+      "team2Ids": [
+        106
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          13,
+          21
+        ],
+        [
+          10,
+          21
+        ]
+      ],
+      "time": "9:40 AM",
+      "court": "Main Location - 13",
+      "duration": "33m",
+      "location": "Main Location - 13"
+    },
+    {
+      "event": "GS U17",
+      "round": "3rd/4th place",
+      "header": "GS U17 · 3rd/4th place",
+      "team1": [
+        "Aadya Pitani [3/4]"
+      ],
+      "team2": [
+        "Katie Wong"
+      ],
+      "team1Ids": [
+        77
+      ],
+      "team2Ids": [
+        420
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          11
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 9",
+      "duration": "24m",
+      "location": "Main Location - 9"
+    },
+    {
+      "event": "BS U19",
+      "round": "Final",
+      "header": "BS U19 · Final",
+      "team1": [
+        "Jaden Ke Hong Chen [5/8]"
+      ],
+      "team2": [
+        "Ansen Liu [3/4]"
+      ],
+      "team1Ids": [
+        296
+      ],
+      "team2Ids": [
+        506
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          4
+        ],
+        [
+          21,
+          18
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 2",
+      "duration": "30m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "BS U19",
+      "round": "3rd/4th place",
+      "header": "BS U19 · 3rd/4th place",
+      "team1": [
+        "Evan Liu [1]"
+      ],
+      "team2": [
+        "Zicheng Xu [2]"
+      ],
+      "team1Ids": [
+        56
+      ],
+      "team2Ids": [
+        421
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [],
+      "walkover": true,
+      "time": "10:15 AM",
+      "court": "",
+      "duration": "",
+      "location": "St. Paul RiverCentre"
+    },
+    {
+      "event": "GS U19",
+      "round": "Final",
+      "header": "GS U19 · Final",
+      "team1": [
+        "Charity Lam [3/4]"
+      ],
+      "team2": [
+        "Lydia Chao"
+      ],
+      "team1Ids": [
+        412
+      ],
+      "team2Ids": [
+        399
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          13,
+          21
+        ],
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 8",
+      "duration": "45m",
+      "location": "Main Location - 8"
+    },
+    {
+      "event": "GS U19",
+      "round": "3rd/4th place",
+      "header": "GS U19 · 3rd/4th place",
+      "team1": [
+        "Suneri Krishna Chinthalapati [1]"
+      ],
+      "team2": [
+        "Anvita Jamsandekar [3/4]"
+      ],
+      "team1Ids": [
+        563
+      ],
+      "team2Ids": [
+        631
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          20,
+          22
+        ],
+        [
+          15,
+          21
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 14",
+      "duration": "22m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BS U11",
+      "round": "3rd/4th place",
+      "header": "BS U11 · 3rd/4th place",
+      "team1": [
+        "Boqian Zheng [3/4]"
+      ],
+      "team2": [
+        "Shrihayagrivan Karthigayan [5/8]"
+      ],
+      "team1Ids": [
+        127
+      ],
+      "team2Ids": [
+        375
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          23
+        ],
+        [
+          21,
+          17
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 10",
+      "duration": "47m",
+      "location": "Main Location - 10"
+    },
+    {
+      "event": "BS U15",
+      "round": "Final",
+      "header": "BS U15 · Final",
+      "team1": [
+        "Aarav Gupta [5/8]"
+      ],
+      "team2": [
+        "Ayaaz Muhammed Baig"
+      ],
+      "team1Ids": [
+        141
+      ],
+      "team2Ids": [
+        224
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          14,
+          21
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 2",
+      "duration": "56m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "GS U15",
+      "round": "Final",
+      "header": "GS U15 · Final",
+      "team1": [
+        "Shraddha Prakash [3/4]"
+      ],
+      "team2": [
+        "Lexuan Wen [2]"
+      ],
+      "team1Ids": [
+        319
+      ],
+      "team2Ids": [
+        217
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          19
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 5",
+      "duration": "24m",
+      "location": "Main Location - 5"
+    },
+    {
+      "event": "GS U17",
+      "round": "Final",
+      "header": "GS U17 · Final",
+      "team1": [
+        "Clarinda Jin [1]"
+      ],
+      "team2": [
+        "Adonia Anny Chandran"
+      ],
+      "team1Ids": [
+        441
+      ],
+      "team2Ids": [
+        226
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          16
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          7
+        ]
+      ],
+      "time": "10:15 AM",
+      "court": "Main Location - 6",
+      "duration": "44m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "BS U11",
+      "round": "Consolation final",
+      "header": "BS U11 · Consolation final",
+      "team1": [
+        "Srihari Shyam [9/16]"
+      ],
+      "team2": [
+        "Virat Satish [2]"
+      ],
+      "team1Ids": [
+        469
+      ],
+      "team2Ids": [
+        322
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          9,
+          21
+        ],
+        [
+          12,
+          21
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 17",
+      "duration": "21m",
+      "location": "Main Location - 17"
+    },
+    {
+      "event": "GS U11",
+      "round": "Final",
+      "header": "GS U11 · Final",
+      "team1": [
+        "Sophia Z Liu [3/4]"
+      ],
+      "team2": [
+        "Kavya Balaji [2]"
+      ],
+      "team1Ids": [
+        364
+      ],
+      "team2Ids": [
+        294
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          14
+        ],
+        [
+          21,
+          17
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 15",
+      "duration": "28m",
+      "location": "Main Location - 15"
+    },
+    {
+      "event": "GS U11",
+      "round": "3rd/4th place",
+      "header": "GS U11 · 3rd/4th place",
+      "team1": [
+        "Laasya Polineni [1]"
+      ],
+      "team2": [
+        "Xiner Hu [3/4]"
+      ],
+      "team1Ids": [
+        354
+      ],
+      "team2Ids": [
+        505
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          15,
+          21
+        ],
+        [
+          21,
+          9
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 2",
+      "duration": "40m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "GS U11",
+      "round": "Consolation final",
+      "header": "GS U11 · Consolation final",
+      "team1": [
+        "Riana Soprala [5/8]"
+      ],
+      "team2": [
+        "Aadya Yanamandra [5/8]"
+      ],
+      "team1Ids": [
+        238
+      ],
+      "team2Ids": [
+        111
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          19,
+          21
+        ],
+        [
+          15,
+          21
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 18",
+      "duration": "28m",
+      "location": "Main Location - 18"
+    },
+    {
+      "event": "BS U13",
+      "round": "Final",
+      "header": "BS U13 · Final",
+      "team1": [
+        "Yian Yang [1]"
+      ],
+      "team2": [
+        "Varish Karri [2]"
+      ],
+      "team1Ids": [
+        114
+      ],
+      "team2Ids": [
+        444
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          14
+        ],
+        [
+          21,
+          17
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 5",
+      "duration": "28m",
+      "location": "Main Location - 5"
+    },
+    {
+      "event": "BS U13",
+      "round": "3rd/4th place",
+      "header": "BS U13 · 3rd/4th place",
+      "team1": [
+        "Kevin Xie [5/8]"
+      ],
+      "team2": [
+        "Michael Yufu Sun [3/4]"
+      ],
+      "team1Ids": [
+        394
+      ],
+      "team2Ids": [
+        473
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 13",
+      "duration": "46m",
+      "location": "Main Location - 13"
+    },
+    {
+      "event": "BS U13",
+      "round": "Consolation final",
+      "header": "BS U13 · Consolation final",
+      "team1": [
+        "Anshu Gowda"
+      ],
+      "team2": [
+        "Arnav Satish"
+      ],
+      "team1Ids": [
+        28
+      ],
+      "team2Ids": [
+        321
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          22,
+          20
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 8",
+      "duration": "27m",
+      "location": "Main Location - 8"
+    },
+    {
+      "event": "GS U13",
+      "round": "Final",
+      "header": "GS U13 · Final",
+      "team1": [
+        "Mizuki Ikeuchi [5/8]"
+      ],
+      "team2": [
+        "Daisy Xu [2]"
+      ],
+      "team1Ids": [
+        35
+      ],
+      "team2Ids": [
+        219
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          10
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 9",
+      "duration": "21m",
+      "location": "Main Location - 9"
+    },
+    {
+      "event": "GS U13",
+      "round": "3rd/4th place",
+      "header": "GS U13 · 3rd/4th place",
+      "team1": [
+        "Keira Winarto [3/4]"
+      ],
+      "team2": [
+        "Krishnavi Kasu [3/4]"
+      ],
+      "team1Ids": [
+        174
+      ],
+      "team2Ids": [
+        199
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          11
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 14",
+      "duration": "24m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "GS U13",
+      "round": "Consolation final",
+      "header": "GS U13 · Consolation final",
+      "team1": [
+        "Lilian Feng [1]"
+      ],
+      "team2": [
+        "Rachel Yao [9/16]"
+      ],
+      "team1Ids": [
+        252
+      ],
+      "team2Ids": [
+        115
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          11
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "10:50 AM",
+      "court": "Main Location - 6",
+      "duration": "21m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "BD U15",
+      "round": "Final",
+      "header": "BD U15 · Final",
+      "team1": [
+        "Terence Cai [1]",
+        "Seth Li"
+      ],
+      "team2": [
+        "William Geng [2]",
+        "Joey Liu"
+      ],
+      "team1Ids": [
+        4,
+        594
+      ],
+      "team2Ids": [
+        27,
+        363
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          17,
+          21
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 3",
+      "duration": "26m",
+      "location": "Main Location - 3"
+    },
+    {
+      "event": "BD U15",
+      "round": "3rd/4th place",
+      "header": "BD U15 · 3rd/4th place",
+      "team1": [
+        "Srineet Atluri [3/4]",
+        "Mikael Chang"
+      ],
+      "team2": [
+        "Carsten Lam [3/4]",
+        "Jacob Ma"
+      ],
+      "team1Ids": [
+        428,
+        6
+      ],
+      "team2Ids": [
+        411,
+        64
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          25,
+          23
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 15",
+      "duration": "30m",
+      "location": "Main Location - 15"
+    },
+    {
+      "event": "GD U15",
+      "round": "3rd/4th place",
+      "header": "GD U15 · 3rd/4th place",
+      "team1": [
+        "Janice Chen [1]",
+        "Stephanie Jiayi Song"
+      ],
+      "team2": [
+        "Alice Meng [2]",
+        "Selena Wei"
+      ],
+      "team1Ids": [
+        8,
+        90
+      ],
+      "team2Ids": [
+        287,
+        383
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          23,
+          21
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          24,
+          26
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 10",
+      "duration": "50m",
+      "location": "Main Location - 10"
+    },
+    {
+      "event": "GD U15",
+      "round": "Consolation final",
+      "header": "GD U15 · Consolation final",
+      "team1": [
+        "Erica Chen Lin [5/8]",
+        "Emily Min Tang"
+      ],
+      "team2": [
+        "Charvi Srivastava [5/8]",
+        "Elena Zhang"
+      ],
+      "team1Ids": [
+        54,
+        357
+      ],
+      "team2Ids": [
+        471,
+        118
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          14,
+          21
+        ],
+        [
+          21,
+          18
+        ],
+        [
+          21,
+          15
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 9",
+      "duration": "46m",
+      "location": "Main Location - 9"
+    },
+    {
+      "event": "BD U17",
+      "round": "3rd/4th place",
+      "header": "BD U17 · 3rd/4th place",
+      "team1": [
+        "Raymond Haiwen Song",
+        "Micah Wei"
+      ],
+      "team2": [
+        "Akshay Jalwadi [3/4]",
+        "Vivek Rai"
+      ],
+      "team1Ids": [
+        88,
+        277
+      ],
+      "team2Ids": [
+        304,
+        288
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          16
+        ],
+        [
+          21,
+          17
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 17",
+      "duration": "22m",
+      "location": "Main Location - 17"
+    },
+    {
+      "event": "BD U17",
+      "round": "Consolation final",
+      "header": "BD U17 · Consolation final",
+      "team1": [
+        "Prajwal Avadhani",
+        "Uddhav Kasarabada"
+      ],
+      "team2": [
+        "Krish Ashok [5/8]",
+        "Abhi Mandanapu"
+      ],
+      "team1Ids": [
+        359,
+        362
+      ],
+      "team2Ids": [
+        502,
+        597
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          16,
+          21
+        ],
+        [
+          21,
+          12
+        ],
+        [
+          21,
+          12
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 18",
+      "duration": "32m",
+      "location": "Main Location - 18"
+    },
+    {
+      "event": "GD U17",
+      "round": "Consolation final",
+      "header": "GD U17 · Consolation final",
+      "team1": [
+        "Kriti Vasireddy",
+        "Angelina Lin Wu"
+      ],
+      "team2": [
+        "Daby Huang",
+        "Katie Wong"
+      ],
+      "team1Ids": [
+        612,
+        485
+      ],
+      "team2Ids": [
+        406,
+        420
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          16,
+          21
+        ],
+        [
+          19,
+          21
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 13",
+      "duration": "35m",
+      "location": "Main Location - 13"
+    },
+    {
+      "event": "BS U11",
+      "round": "Final",
+      "header": "BS U11 · Final",
+      "team1": [
+        "Mingyuan Zang [5/8]"
+      ],
+      "team2": [
+        "Naksh Shetty [3/4]"
+      ],
+      "team1Ids": [
+        489
+      ],
+      "team2Ids": [
+        417
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          11,
+          21
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 6",
+      "duration": "21m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "GD U19",
+      "round": "Consolation final",
+      "header": "GD U19 · Consolation final",
+      "team1": [
+        "Sanjanaa Shyam",
+        "Tanushri Thokala"
+      ],
+      "team2": [
+        "Riya Suresh",
+        "Yuxuan Zeng"
+      ],
+      "team1Ids": [
+        542,
+        547
+      ],
+      "team2Ids": [
+        358,
+        221
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          17,
+          21
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 14",
+      "duration": "31m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "BD U17",
+      "round": "Final",
+      "header": "BD U17 · Final",
+      "team1": [
+        "Adhyaan Balaji [1]",
+        "Daniel Seungchan Park"
+      ],
+      "team2": [
+        "Pradyun Gowda",
+        "Mihir Thaha"
+      ],
+      "team1Ids": [
+        293,
+        316
+      ],
+      "team2Ids": [
+        618,
+        477
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "11:25 AM",
+      "court": "Main Location - 5",
+      "duration": "31m",
+      "location": "Main Location - 5"
+    },
+    {
+      "event": "GD U17",
+      "round": "3rd/4th place",
+      "header": "GD U17 · 3rd/4th place",
+      "team1": [
+        "Jennifer Bangcaya [3/4]",
+        "Aadya Pitani"
+      ],
+      "team2": [
+        "Vivian Feng",
+        "Michelle Yourong Zhang"
+      ],
+      "team1Ids": [
+        398,
+        77
+      ],
+      "team2Ids": [
+        253,
+        341
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          15,
+          21
+        ],
+        [
+          18,
+          21
+        ]
+      ],
+      "time": "12:00 PM",
+      "court": "Main Location - 17",
+      "duration": "26m",
+      "location": "Main Location - 17"
+    },
+    {
+      "event": "BD U19",
+      "round": "Final",
+      "header": "BD U19 · Final",
+      "team1": [
+        "Nathan Chien [1]",
+        "Matthew Lei"
+      ],
+      "team2": [
+        "Jaden Ke Hong Chen [3/4]",
+        "Zicheng Xu"
+      ],
+      "team1Ids": [
+        561,
+        576
+      ],
+      "team2Ids": [
+        296,
+        421
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          15,
+          21
+        ],
+        [
+          11,
+          21
+        ]
+      ],
+      "time": "12:00 PM",
+      "court": "Main Location - 2",
+      "duration": "22m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "BD U19",
+      "round": "3rd/4th place",
+      "header": "BD U19 · 3rd/4th place",
+      "team1": [
+        "Evan Liu [3/4]",
+        "Justin Xia"
+      ],
+      "team2": [
+        "Darsh Jain [2]",
+        "Ansen Liu"
+      ],
+      "team1Ids": [
+        56,
+        177
+      ],
+      "team2Ids": [
+        521,
+        506
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          13
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          19
+        ]
+      ],
+      "time": "12:00 PM",
+      "court": "Main Location - 5",
+      "duration": "40m",
+      "location": "Main Location - 5"
+    },
+    {
+      "event": "GD U19",
+      "round": "Final",
+      "header": "GD U19 · Final",
+      "team1": [
+        "Sydney Li",
+        "Cassidy Yeh"
+      ],
+      "team2": [
+        "Lydia Chao [2]",
+        "Charity Lam"
+      ],
+      "team1Ids": [
+        635,
+        423
+      ],
+      "team2Ids": [
+        399,
+        412
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          17,
+          21
+        ],
+        [
+          11,
+          21
+        ]
+      ],
+      "time": "12:00 PM",
+      "court": "Main Location - 6",
+      "duration": "32m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "GD U19",
+      "round": "3rd/4th place",
+      "header": "GD U19 · 3rd/4th place",
+      "team1": [
+        "Sophia Wu [1]",
+        "Jennifer Xu"
+      ],
+      "team2": [
+        "Kamalini Packiyaraj",
+        "Coco Cenke Tao"
+      ],
+      "team1Ids": [
+        106,
+        180
+      ],
+      "team2Ids": [
+        495,
+        289
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          12
+        ],
+        [
+          21,
+          19
+        ]
+      ],
+      "time": "12:00 PM",
+      "court": "Main Location - 15",
+      "duration": "31m",
+      "location": "Main Location - 15"
+    },
+    {
+      "event": "BD U15",
+      "round": "Consolation final",
+      "header": "BD U15 · Consolation final",
+      "team1": [
+        "Rishabh Praveen [5/8]",
+        "Cayden Wang"
+      ],
+      "team2": [
+        "Aarav Gupta [5/8]",
+        "Abhiram Tripuraneni"
+      ],
+      "team1Ids": [
+        211,
+        290
+      ],
+      "team2Ids": [
+        141,
+        480
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [],
+      "walkover": true,
+      "time": "12:00 PM",
+      "court": "",
+      "duration": "",
+      "location": "St. Paul RiverCentre"
+    },
+    {
+      "event": "GD U17",
+      "round": "Final",
+      "header": "GD U17 · Final",
+      "team1": [
+        "Sasha Suman [1]",
+        "Yalan Zhu"
+      ],
+      "team2": [
+        "Kimaya Krishna [3/4]",
+        "Joanne Li"
+      ],
+      "team1Ids": [
+        356,
+        342
+      ],
+      "team2Ids": [
+        591,
+        260
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          13
+        ],
+        [
+          21,
+          18
+        ]
+      ],
+      "time": "12:00 PM",
+      "court": "Main Location - 8",
+      "duration": "36m",
+      "location": "Main Location - 8"
+    },
+    {
+      "event": "BD U19",
+      "round": "Consolation final",
+      "header": "BD U19 · Consolation final",
+      "team1": [
+        "Muyang Li",
+        "Zhengyue Xiong"
+      ],
+      "team2": [
+        "Ethan Ao",
+        "Alex Anlai Song"
+      ],
+      "team1Ids": [
+        644,
+        242
+      ],
+      "team2Ids": [
+        501,
+        86
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [],
+      "walkover": true,
+      "time": "12:00 PM",
+      "court": "",
+      "duration": "",
+      "location": "St. Paul RiverCentre"
+    },
+    {
+      "event": "GD U15",
+      "round": "Final",
+      "header": "GD U15 · Final",
+      "team1": [
+        "Shraddha Prakash [3/4]",
+        "Lexuan Wen"
+      ],
+      "team2": [
+        "Adriel Ammy Chandran [5/8]",
+        "Zi Yang"
+      ],
+      "team1Ids": [
+        319,
+        217
+      ],
+      "team2Ids": [
+        227,
+        243
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          13,
+          21
+        ],
+        [
+          24,
+          22
+        ],
+        [
+          21,
+          8
+        ]
+      ],
+      "time": "12:00 PM",
+      "court": "Main Location - 3",
+      "duration": "41m",
+      "location": "Main Location - 3"
+    },
+    {
+      "event": "BD U11",
+      "round": "Consolation final",
+      "header": "BD U11 · Consolation final",
+      "team1": [
+        "Ayaan Kale",
+        "Eden Wong"
+      ],
+      "team2": [
+        "Franklin Xu Cheng",
+        "Ishan Om Golen"
+      ],
+      "team1Ids": [
+        144,
+        101
+      ],
+      "team2Ids": [
+        133,
+        140
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          12,
+          21
+        ],
+        [
+          16,
+          21
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 15",
+      "duration": "25m",
+      "location": "Main Location - 15"
+    },
+    {
+      "event": "GD U11",
+      "round": "Final",
+      "header": "GD U11 · Final",
+      "team1": [
+        "Kavya Balaji [1]",
+        "Laasya Polineni"
+      ],
+      "team2": [
+        "Xiner Hu [2]",
+        "Sophia Z Liu"
+      ],
+      "team1Ids": [
+        294,
+        354
+      ],
+      "team2Ids": [
+        505,
+        364
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          15
+        ],
+        [
+          15,
+          21
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 13",
+      "duration": "52m",
+      "location": "Main Location - 13"
+    },
+    {
+      "event": "GD U11",
+      "round": "3rd/4th place",
+      "header": "GD U11 · 3rd/4th place",
+      "team1": [
+        "Samyutha Aluri [3/4]",
+        "Eesha Vikram"
+      ],
+      "team2": [
+        "Riana Soprala [3/4]",
+        "Aadya Yanamandra"
+      ],
+      "team1Ids": [
+        397,
+        291
+      ],
+      "team2Ids": [
+        238,
+        111
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          20,
+          22
+        ],
+        [
+          21,
+          16
+        ],
+        [
+          24,
+          26
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 14",
+      "duration": "59m",
+      "location": "Main Location - 14"
+    },
+    {
+      "event": "GD U11",
+      "round": "Consolation final",
+      "header": "GD U11 · Consolation final",
+      "team1": [
+        "Venba Senkadir",
+        "Samanvi Shetty"
+      ],
+      "team2": [
+        "Emily Feng",
+        "Joanna Zhang"
+      ],
+      "team1Ids": [
+        366,
+        324
+      ],
+      "team2Ids": [
+        404,
+        122
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          12
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 3",
+      "duration": "42m",
+      "location": "Main Location - 3"
+    },
+    {
+      "event": "BD U13",
+      "round": "Final",
+      "header": "BD U13 · Final",
+      "team1": [
+        "Varish Karri [1]",
+        "Taneesh Musunuru"
+      ],
+      "team2": [
+        "Leon Luo [3/4]",
+        "Ethan Qiu"
+      ],
+      "team1Ids": [
+        444,
+        532
+      ],
+      "team2Ids": [
+        413,
+        212
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          10,
+          21
+        ],
+        [
+          21,
+          13
+        ],
+        [
+          21,
+          10
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 10",
+      "duration": "48m",
+      "location": "Main Location - 10"
+    },
+    {
+      "event": "BD U13",
+      "round": "3rd/4th place",
+      "header": "BD U13 · 3rd/4th place",
+      "team1": [
+        "Chiranjeev Deepak [5/8]",
+        "Anshu Gowda"
+      ],
+      "team2": [
+        "Melvin Cui [2]",
+        "Aditya Namboodiripad"
+      ],
+      "team1Ids": [
+        250,
+        28
+      ],
+      "team2Ids": [
+        18,
+        70
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          7,
+          21
+        ],
+        [
+          13,
+          21
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 2",
+      "duration": "22m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "BD U13",
+      "round": "Consolation final",
+      "header": "BD U13 · Consolation final",
+      "team1": [
+        "Michael Yufu Sun [5/8]",
+        "Harrison Zhang"
+      ],
+      "team2": [
+        "Anirudh Rudharraju [3/4]",
+        "Kevin Xie"
+      ],
+      "team1Ids": [
+        473,
+        120
+      ],
+      "team2Ids": [
+        391,
+        394
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          14
+        ],
+        [
+          18,
+          21
+        ],
+        [
+          21,
+          19
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 9",
+      "duration": "39m",
+      "location": "Main Location - 9"
+    },
+    {
+      "event": "GD U13",
+      "round": "Final",
+      "header": "GD U13 · Final",
+      "team1": [
+        "Hanyi (Sissi) Lei [3/4]",
+        "Daisy Xu"
+      ],
+      "team2": [
+        "Bella Liu [3/4]",
+        "Sophia Liu"
+      ],
+      "team1Ids": [
+        46,
+        219
+      ],
+      "team2Ids": [
+        203,
+        205
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          14,
+          21
+        ],
+        [
+          12,
+          21
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 17",
+      "duration": "23m",
+      "location": "Main Location - 17"
+    },
+    {
+      "event": "BD U11",
+      "round": "3rd/4th place",
+      "header": "BD U11 · 3rd/4th place",
+      "team1": [
+        "Fonghong Lin [3/4]",
+        "Naksh Shetty"
+      ],
+      "team2": [
+        "Mingyuan Zang [5/8]",
+        "Adrian Zhang"
+      ],
+      "team1Ids": [
+        389,
+        417
+      ],
+      "team2Ids": [
+        489,
+        424
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "12:35 PM",
+      "court": "Main Location - 8",
+      "duration": "24m",
+      "location": "Main Location - 8"
+    },
+    {
+      "event": "XD U15",
+      "round": "3rd/4th place",
+      "header": "XD U15 · 3rd/4th place",
+      "team1": [
+        "Abhiram Tripuraneni [3/4]",
+        "Shraddha Prakash"
+      ],
+      "team2": [
+        "Mikael Chang [3/4]",
+        "Janice Chen"
+      ],
+      "team1Ids": [
+        480,
+        319
+      ],
+      "team2Ids": [
+        6,
+        8
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          13
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 18",
+      "duration": "26m",
+      "location": "Main Location - 18"
+    },
+    {
+      "event": "XD U15",
+      "round": "Consolation final",
+      "header": "XD U15 · Consolation final",
+      "team1": [
+        "Seth Li [5/8]",
+        "Emily Min Tang"
+      ],
+      "team2": [
+        "Yifei Zhang [9/16]",
+        "Jessica Zhang"
+      ],
+      "team1Ids": [
+        594,
+        357
+      ],
+      "team2Ids": [
+        188,
+        121
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          7,
+          21
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 15",
+      "duration": "19m",
+      "location": "Main Location - 15"
+    },
+    {
+      "event": "XD U17",
+      "round": "3rd/4th place",
+      "header": "XD U17 · 3rd/4th place",
+      "team1": [
+        "Mihir Thaha [5/8]",
+        "Meghana Nishant"
+      ],
+      "team2": [
+        "Darsh Jain [3/4]",
+        "Lydia Chao"
+      ],
+      "team1Ids": [
+        477,
+        416
+      ],
+      "team2Ids": [
+        521,
+        399
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          16,
+          21
+        ],
+        [
+          21,
+          18
+        ],
+        [
+          25,
+          23
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 6",
+      "duration": "39m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "XD U17",
+      "round": "Consolation final",
+      "header": "XD U17 · Consolation final",
+      "team1": [
+        "Noah Chien [5/8]",
+        "Ishi Reddy"
+      ],
+      "team2": [
+        "Raymond Haiwen Song",
+        "Savannah Kam"
+      ],
+      "team1Ids": [
+        562,
+        237
+      ],
+      "team2Ids": [
+        88,
+        408
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 6",
+      "duration": "25m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "XD U19",
+      "round": "3rd/4th place",
+      "header": "XD U19 · 3rd/4th place",
+      "team1": [
+        "Jaden Ke Hong Chen",
+        "Sydney Li"
+      ],
+      "team2": [
+        "Mitchell Purnomo",
+        "Anvita Jamsandekar"
+      ],
+      "team1Ids": [
+        296,
+        635
+      ],
+      "team2Ids": [
+        637,
+        631
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          9
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          21,
+          15
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 8",
+      "duration": "35m",
+      "location": "Main Location - 8"
+    },
+    {
+      "event": "GD U13",
+      "round": "Consolation final",
+      "header": "GD U13 · Consolation final",
+      "team1": [
+        "Krishnavi Kasu [2]",
+        "Claire QiuChen Li"
+      ],
+      "team2": [
+        "Trisha Mehta",
+        "Grace Zichen Qu Zhao"
+      ],
+      "team1Ids": [
+        199,
+        47
+      ],
+      "team2Ids": [
+        67,
+        126
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          19
+        ],
+        [
+          21,
+          17
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 5",
+      "duration": "49m",
+      "location": "Main Location - 5"
+    },
+    {
+      "event": "GD U13",
+      "round": "3rd/4th place",
+      "header": "GD U13 · 3rd/4th place",
+      "team1": [
+        "Lilian Feng [1]",
+        "Keira Winarto"
+      ],
+      "team2": [
+        "Alaina Benjamin",
+        "Mizuki Ikeuchi"
+      ],
+      "team1Ids": [
+        252,
+        174
+      ],
+      "team2Ids": [
+        360,
+        35
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          16
+        ],
+        [
+          22,
+          20
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 17",
+      "duration": "32m",
+      "location": "Main Location - 17"
+    },
+    {
+      "event": "BD U11",
+      "round": "Final",
+      "header": "BD U11 · Final",
+      "team1": [
+        "Magadheesan Velu [1]",
+        "Boqian Zheng"
+      ],
+      "team2": [
+        "Virat Satish [2]",
+        "Srihari Shyam"
+      ],
+      "team1Ids": [
+        169,
+        127
+      ],
+      "team2Ids": [
+        322,
+        469
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          15,
+          21
+        ],
+        [
+          21,
+          19
+        ],
+        [
+          21,
+          16
+        ]
+      ],
+      "time": "1:10 PM",
+      "court": "Main Location - 2",
+      "duration": "38m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "XD U19",
+      "round": "Consolation final",
+      "header": "XD U19 · Consolation final",
+      "team1": [
+        "Evan Liu [2]",
+        "Sophia Wu"
+      ],
+      "team2": [
+        "Ansen Liu [1]",
+        "Charity Lam"
+      ],
+      "team1Ids": [
+        56,
+        106
+      ],
+      "team2Ids": [
+        506,
+        412
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          18
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          17,
+          21
+        ]
+      ],
+      "time": "1:45 PM",
+      "court": "Main Location - 9",
+      "duration": "41m",
+      "location": "Main Location - 9"
+    },
+    {
+      "event": "XD U17",
+      "round": "Final",
+      "header": "XD U17 · Final",
+      "team1": [
+        "Vincent Chen [5/8]",
+        "Jennifer Bangcaya"
+      ],
+      "team2": [
+        "Vivek Rai [5/8]",
+        "Sasha Suman"
+      ],
+      "team1Ids": [
+        403,
+        398
+      ],
+      "team2Ids": [
+        288,
+        356
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          18,
+          21
+        ],
+        [
+          18,
+          21
+        ]
+      ],
+      "time": "1:45 PM",
+      "court": "Main Location - 2",
+      "duration": "22m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "XD U19",
+      "round": "Final",
+      "header": "XD U19 · Final",
+      "team1": [
+        "Zicheng Xu",
+        "Cassidy Yeh"
+      ],
+      "team2": [
+        "Justin Xia",
+        "Coco Cenke Tao"
+      ],
+      "team1Ids": [
+        421,
+        423
+      ],
+      "team2Ids": [
+        177,
+        289
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          8
+        ],
+        [
+          21,
+          13
+        ]
+      ],
+      "time": "1:45 PM",
+      "court": "Main Location - 3",
+      "duration": "20m",
+      "location": "Main Location - 3"
+    },
+    {
+      "event": "XD U15",
+      "round": "Final",
+      "header": "XD U15 · Final",
+      "team1": [
+        "William Geng [5/8]",
+        "Erica Chen Lin"
+      ],
+      "team2": [
+        "Joey Liu [9/16]",
+        "Selena Wei"
+      ],
+      "team1Ids": [
+        27,
+        54
+      ],
+      "team2Ids": [
+        363,
+        383
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          13
+        ],
+        [
+          21,
+          9
+        ]
+      ],
+      "time": "1:45 PM",
+      "court": "Main Location - 13",
+      "duration": "22m",
+      "location": "Main Location - 13"
+    },
+    {
+      "event": "XD U13",
+      "round": "3rd/4th place",
+      "header": "XD U13 · 3rd/4th place",
+      "team1": [
+        "Melvin Cui [5/8]",
+        "Rachel Yao"
+      ],
+      "team2": [
+        "Arnav Satish [5/8]",
+        "Alaina Benjamin"
+      ],
+      "team1Ids": [
+        18,
+        115
+      ],
+      "team2Ids": [
+        321,
+        360
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          21,
+          15
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "time": "2:20 PM",
+      "court": "Main Location - 3",
+      "duration": "35m",
+      "location": "Main Location - 3"
+    },
+    {
+      "event": "XD U13",
+      "round": "Consolation final",
+      "header": "XD U13 · Consolation final",
+      "team1": [
+        "Michael Yufu Sun [3/4]",
+        "Sophia Liu"
+      ],
+      "team2": [
+        "Kevin Xie [5/8]",
+        "Claire QiuChen Li"
+      ],
+      "team1Ids": [
+        473,
+        205
+      ],
+      "team2Ids": [
+        394,
+        47
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          21,
+          17
+        ],
+        [
+          21,
+          11
+        ]
+      ],
+      "time": "2:20 PM",
+      "court": "Main Location - 13",
+      "duration": "21m",
+      "location": "Main Location - 13"
+    },
+    {
+      "event": "XD U11",
+      "round": "3rd/4th place",
+      "header": "XD U11 · 3rd/4th place",
+      "team1": [
+        "Shubhan Sarikonda",
+        "Samyutha Aluri"
+      ],
+      "team2": [
+        "Boqian Zheng [5/8]",
+        "Aadya Yanamandra"
+      ],
+      "team1Ids": [
+        606,
+        397
+      ],
+      "team2Ids": [
+        127,
+        111
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          6,
+          21
+        ],
+        [
+          12,
+          21
+        ]
+      ],
+      "time": "2:20 PM",
+      "court": "Main Location - 5",
+      "duration": "22m",
+      "location": "Main Location - 5"
+    },
+    {
+      "event": "XD U11",
+      "round": "Consolation final",
+      "header": "XD U11 · Consolation final",
+      "team1": [
+        "Srihari Shyam [3/4]",
+        "Kavya Balaji"
+      ],
+      "team2": [
+        "Naksh Shetty [5/8]",
+        "Xiner Hu"
+      ],
+      "team1Ids": [
+        469,
+        294
+      ],
+      "team2Ids": [
+        417,
+        505
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          16,
+          21
+        ],
+        [
+          15,
+          21
+        ]
+      ],
+      "time": "2:20 PM",
+      "court": "Main Location - 6",
+      "duration": "27m",
+      "location": "Main Location - 6"
+    },
+    {
+      "event": "XD U11",
+      "round": "Final",
+      "header": "XD U11 · Final",
+      "team1": [
+        "Virat Satish [1]",
+        "Laasya Polineni"
+      ],
+      "team2": [
+        "Magadheesan Velu [2]",
+        "Riana Soprala"
+      ],
+      "team1Ids": [
+        322,
+        354
+      ],
+      "team2Ids": [
+        169,
+        238
+      ],
+      "team1Won": true,
+      "team2Won": false,
+      "scores": [
+        [
+          11,
+          21
+        ],
+        [
+          21,
+          6
+        ],
+        [
+          21,
+          18
+        ]
+      ],
+      "time": "2:55 PM",
+      "court": "Main Location - 2",
+      "duration": "35m",
+      "location": "Main Location - 2"
+    },
+    {
+      "event": "XD U13",
+      "round": "Final",
+      "header": "XD U13 · Final",
+      "team1": [
+        "Aditya Namboodiripad [1]",
+        "Bella Liu"
+      ],
+      "team2": [
+        "Varish Karri [2]",
+        "Keira Winarto"
+      ],
+      "team1Ids": [
+        70,
+        203
+      ],
+      "team2Ids": [
+        444,
+        174
+      ],
+      "team1Won": false,
+      "team2Won": true,
+      "scores": [
+        [
+          14,
+          21
+        ],
+        [
+          16,
+          21
+        ]
+      ],
+      "time": "2:55 PM",
+      "court": "Main Location - 10",
+      "duration": "25m",
+      "location": "Main Location - 10"
+    }
+  ]
+}
