@@ -35,7 +35,7 @@ graph TD
 ## Tournament List Page
 
 **Route:** `/tournaments`
-**Component:** `Tournaments` (`src/pages/Tournaments.tsx`, ~424 lines)
+**Component:** `Tournaments` (`src/pages/Tournaments.tsx`, ~423 lines)
 
 ### Data Flow
 
@@ -111,7 +111,7 @@ interface TournamentsResponse {
 ## Tournament Hub Page
 
 **Route:** `/tournaments/:tswId`
-**Component:** `TournamentHub` (`src/pages/TournamentHub.tsx`, ~193 lines)
+**Component:** `TournamentHub` (`src/pages/TournamentHub.tsx`, ~205 lines)
 
 ### Purpose
 

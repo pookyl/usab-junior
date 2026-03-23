@@ -1,7 +1,7 @@
 # Player Profile Page
 
 **Route:** `/directory/:id`
-**Component:** `PlayerProfile` (`src/pages/PlayerProfile.tsx`, 1288 lines)
+**Component:** `PlayerProfile` (`src/pages/PlayerProfile.tsx`, 1373 lines)
 
 ## Purpose
 
@@ -148,9 +148,9 @@ Each `TournamentMatchCard` renders:
 - Score with game-by-game display
 - Walkover/retired badges when applicable
 
-## Schedule Link (Currently Disabled)
+## Schedule Link
 
-The Player Schedule feature is fully implemented but disabled in production:
+The Player Schedule feature shows upcoming matches with bracket-based predictions of future opponents.
 
 ### How It Works
 
@@ -160,20 +160,16 @@ The Player Schedule feature is fully implemented but disabled in production:
    ```
    i.e., any match with no result, not a bye/walkover, and a scheduled time.
 
-2. **Link:** If `hasUpcomingMatches` is true, the UI would show a Calendar icon linking to:
+2. **Link:** If `hasUpcomingMatches` is true, `TournamentPlayerDetail.tsx` shows a Calendar icon linking to:
    ```
    /tournaments/:tswId/player/:playerId/schedule
    ```
 
-3. **Schedule Page:** `PlayerSchedulePage` (`src/pages/tournament/PlayerSchedulePage.tsx`, 343 lines) calls `fetchPlayerSchedule(tswId, [playerId])` which returns:
+3. **Schedule Page:** `PlayerSchedulePage` (`src/pages/tournament/PlayerSchedulePage.tsx`) calls `fetchPlayerSchedule(tswId, [playerId])` which returns:
    - Tournament metadata (name, dates)
    - `ScheduleDay[]` -- matches grouped by date, each with event, round, court, time, status, opponent, partner, result, and crucially `nextMatches[]` and `consolationMatches[]` showing upcoming opponents
 
 4. **Server Logic:** The server builds the schedule by fetching the player's matches and, for elimination draws, walking the bracket to find `findPotentialNextMatches()` and `findConsolationPath()` -- predicting who the player might face next based on bracket position.
-
-### Current State
-
-Both the route and the link are commented out in `src/App.tsx` (lines 202-203) with the note "temporarily disabled for production". The `TournamentPlayerDetail.tsx` component has the schedule link UI commented out as well. All implementation code (page, API endpoint, service function) remains intact.
 
 ## Cross-Linking
 

@@ -1,7 +1,7 @@
 # Tournaments: Player Detail Page
 
 **Route:** `/tournaments/:tswId/player/:playerId`
-**Component:** `TournamentPlayerDetail` (`src/pages/TournamentPlayerDetail.tsx`, 195 lines)
+**Component:** `TournamentPlayerDetail` (`src/pages/TournamentPlayerDetail.tsx`, 192 lines)
 
 ## Purpose
 
@@ -67,9 +67,9 @@ interface TournamentPlayerWinLoss {
 
 If `memberId` is present in the response (the player's USAB member ID was found on their TSW profile), a "Player Profile" link is shown pointing to `/directory/:memberId`. This cross-links tournament data back to the USAB rankings-based profile.
 
-### Schedule Link (Disabled)
+### Schedule Link
 
-When `hasUpcomingMatches` is true, the page is intended to show a Calendar icon linking to `/tournaments/:tswId/player/:playerId/schedule`. This feature is currently commented out. See [Player Profile Page - Schedule Link](player-profile-page.md#schedule-link-currently-disabled) for details.
+When `hasUpcomingMatches` is true, the page shows a Calendar icon linking to `/tournaments/:tswId/player/:playerId/schedule`. The schedule page predicts upcoming opponents by walking the bracket. See [Player Profile Page - Schedule Link](player-profile-page.md#schedule-link) for implementation details.
 
 ### Match List
 

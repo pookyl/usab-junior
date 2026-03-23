@@ -1,7 +1,7 @@
 # Head-to-Head (H2H) Page
 
 **Route:** `/head-to-head`
-**Component:** `HeadToHead` (`src/pages/HeadToHead.tsx`, ~1330 lines)
+**Component:** `HeadToHead` (`src/pages/HeadToHead.tsx`, ~1339 lines)
 
 ## Purpose
 

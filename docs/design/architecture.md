@@ -142,9 +142,10 @@ All routes are declared in `src/App.tsx`:
 | `/tournaments/:tswId/winners` | `TournamentWinnersPage` | Results/placements |
 | `/tournaments/:tswId/medals` | `TournamentMedalsPage` | Medal tally by club and draw |
 | `/tournaments/:tswId/player/:playerId` | `TournamentPlayerDetail` | Player matches within a tournament |
+| `/tournaments/:tswId/player/:playerId/schedule` | `PlayerSchedulePage` | Upcoming match schedule with bracket predictions |
+| `/tournaments/:tswId/watchlist` | `TournamentWatchlistPage` | Track players and their match results |
 | `/players/:id` | redirect to `/directory/:id` | Legacy redirect |
-
-Routes for Watchlist and Player Schedule exist in code but are commented out.
+| `/analytics` | redirect to `/players` | Legacy redirect |
 
 ## Client-Side Caching
 
@@ -182,15 +183,15 @@ TournamentSoftware.com requires cookie acceptance before serving content. `share
 
 | File | Lines | Role |
 |------|-------|------|
-| `src/types/junior.ts` | 541 | Canonical TypeScript types for all domain objects |
-| `src/services/rankingsService.ts` | 528 | Client-side fetch functions with caching |
-| `src/App.tsx` | 218 | Provider tree, routing, error boundary |
-| `src/contexts/PlayersContext.tsx` | 171 | Global player/rankings state |
-| `api/_lib/shared.js` | ~1886 | Server parsers, TSW integration, caching |
-| `api/tournaments/[tswId]/[action].js` | ~1078 | Tournament API action router |
-| `src/components/tournament/BracketView.tsx` | ~700 | Elimination bracket rendering |
-| `src/pages/HeadToHead.tsx` | ~1330 | H2H comparison with merge algorithm |
-| `src/pages/PlayerProfile.tsx` | 1288 | Player profile page |
+| `src/types/junior.ts` | 543 | Canonical TypeScript types for all domain objects |
+| `src/services/rankingsService.ts` | 510 | Client-side fetch functions with LRU caching |
+| `src/App.tsx` | 212 | Provider tree, routing, error boundary, analytics |
+| `src/contexts/PlayersContext.tsx` | 170 | Global player/rankings state |
+| `api/_lib/shared.js` | ~1896 | Server parsers, TSW integration, caching |
+| `api/tournaments/[tswId]/[action].js` | ~1077 | Tournament API action router |
+| `src/components/tournament/BracketView.tsx` | ~667 | Elimination bracket rendering |
+| `src/pages/HeadToHead.tsx` | ~1339 | H2H comparison with merge algorithm |
+| `src/pages/PlayerProfile.tsx` | 1373 | Player profile page |
 | `src/pages/Players.tsx` | 1068 | Rankings page with analytics |
 
 ## Deployment

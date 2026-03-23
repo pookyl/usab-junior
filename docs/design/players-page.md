@@ -1,7 +1,7 @@
 # Player Directory Page
 
 **Route:** `/directory`
-**Component:** `AllPlayers` (`src/pages/AllPlayers.tsx`, 335 lines)
+**Component:** `AllPlayers` (`src/pages/AllPlayers.tsx`, 334 lines)
 
 ## Purpose
 
