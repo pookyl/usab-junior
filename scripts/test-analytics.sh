@@ -15,21 +15,37 @@ else
 fi
 
 URL="https://${HOST}"
-ENDPOINT="${URL}/_vercel/insights/view"
 TS=$(date +%s000)
+PAYLOAD="{\"o\":\"${URL}/\",\"sv\":\"0.1.3\",\"ts\":${TS}}"
+UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
 
-echo "Sending pageview to ${ENDPOINT} ..."
-
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+echo ""
+echo "1) Testing proxied endpoint: /api/a/view"
+CODE_PROXY=$(curl -s -o /dev/null -w "%{http_code}" \
   -X POST \
   -H "Content-Type: application/json" \
-  -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36" \
+  -H "User-Agent: $UA" \
   -H "Origin: ${URL}" \
-  -d "{\"o\":\"${URL}/\",\"sv\":\"0.1.3\",\"ts\":${TS}}" \
-  "$ENDPOINT")
+  -d "$PAYLOAD" \
+  "${URL}/api/a/view")
+echo "   POST /api/a/view → HTTP $CODE_PROXY"
 
-if [ "$HTTP_CODE" = "200" ]; then
-  echo "Success (HTTP $HTTP_CODE) — check Vercel Analytics in a few minutes."
+echo ""
+echo "2) Testing direct endpoint: /_vercel/insights/view"
+CODE_DIRECT=$(curl -s -o /dev/null -w "%{http_code}" \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: $UA" \
+  -H "Origin: ${URL}" \
+  -d "$PAYLOAD" \
+  "${URL}/_vercel/insights/view")
+echo "   POST /_vercel/insights/view → HTTP $CODE_DIRECT"
+
+echo ""
+if [ "$CODE_PROXY" = "200" ]; then
+  echo "Proxy endpoint works — check Vercel Analytics in a few minutes."
+elif [ "$CODE_DIRECT" = "200" ]; then
+  echo "Direct endpoint works but proxy failed (HTTP $CODE_PROXY) — check api/a/[type].js"
 else
-  echo "Failed (HTTP $HTTP_CODE) — the endpoint rejected the request."
+  echo "Both endpoints failed — proxy=$CODE_PROXY, direct=$CODE_DIRECT"
 fi
