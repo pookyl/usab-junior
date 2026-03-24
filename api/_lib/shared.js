@@ -206,6 +206,82 @@ export function parsePlayerDetail(html) {
   return entries;
 }
 
+// ── Grouped player detail parser (by category section) ──────────────────────
+export function parsePlayerDetailGrouped(html) {
+  const sections = [];
+  const sectionRegex = /<div class="category-section">([\s\S]*?)<\/div>/gi;
+  let sectionMatch;
+
+  while ((sectionMatch = sectionRegex.exec(html)) !== null) {
+    const sectionHtml = sectionMatch[1];
+
+    const h4Regex = /<h4>([\s\S]*?)<\/h4>/gi;
+    const h4s = [];
+    let h4Match;
+    while ((h4Match = h4Regex.exec(sectionHtml)) !== null) {
+      h4s.push(h4Match[1].trim());
+    }
+    if (h4s.length < 2) continue;
+
+    const categoryText = h4s[0].replace(/<[^>]*>/g, '').trim();
+    const rankPointsText = h4s[1].replace(/<[^>]*>/g, '').trim();
+
+    const catParts = categoryText.match(/^(BS|GS|BD|GD|XD)\s+(U\d+)$/i);
+    if (!catParts) continue;
+
+    const eventType = catParts[1].toUpperCase();
+    const ageGroup = catParts[2];
+
+    const rpMatch = rankPointsText.match(/Ranking Points\s*\(Rank\)\s*:\s*([\d,]+)\s*\(\s*(\d+)\s*\)/i);
+    const rankingPoints = rpMatch ? parseInt(rpMatch[1].replace(/,/g, ''), 10) : 0;
+    const rank = rpMatch ? parseInt(rpMatch[2], 10) : 0;
+
+    const tournaments = [];
+    const rowRegex = /<tr[^>]*class="([^"]*)"[^>]*>([\s\S]*?)<\/tr>/gi;
+    let rowMatch;
+    while ((rowMatch = rowRegex.exec(sectionHtml)) !== null) {
+      const trClass = rowMatch[1];
+      const rowHtml = rowMatch[2];
+
+      const tdTagMatch = rowHtml.match(/<td[^>]*class="[^"]*tournament-link[^"]*"[^>]*>/i);
+      if (!tdTagMatch) continue;
+      const tag = tdTagMatch[0];
+
+      const attr = (name) => { const m = tag.match(new RegExp(`data-${name}="([^"]*)"`)); return m ? m[1] : ''; };
+      const tournamentId = attr('tournament-id');
+      const tournamentName = decodeHtmlEntities(attr('tournament-name'));
+      const location = decodeHtmlEntities(attr('tournament-location'));
+      const startDate = attr('tournament-start-date') || undefined;
+      const endDate = attr('tournament-end-date') || undefined;
+      const tournamentType = attr('tournament-type') || undefined;
+
+      const cells = [];
+      const cellRegex = /<td(?![^>]*tournament-link)[^>]*>([\s\S]*?)<\/td>/gi;
+      let cellMatch;
+      while ((cellMatch = cellRegex.exec(rowHtml)) !== null) {
+        cells.push(cellMatch[1].replace(/<[^>]*>/g, '').trim());
+      }
+
+      const place = cells[0] ?? '';
+      const pts = parseInt((cells[1] ?? '0').replace(/,/g, ''), 10);
+      const contributing = !trClass.includes('white-row');
+
+      if (tournamentName && pts > 0) {
+        tournaments.push({
+          tournamentName, location, tournamentId, place, points: pts,
+          startDate, endDate, tournamentType, contributing,
+        });
+      }
+    }
+
+    if (tournaments.length > 0 || rank > 0) {
+      sections.push({ ageGroup, eventType, rank, rankingPoints, tournaments });
+    }
+  }
+
+  return sections;
+}
+
 // ── H2H HTML parser ──────────────────────────────────────────────────────────
 export function parseH2HContent(html, headers) {
   const team1wins = parseInt(headers.get('team1wins') ?? '0', 10);

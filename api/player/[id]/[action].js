@@ -1,9 +1,10 @@
 import {
-  TSW_BASE, TSW_ORG_CODE,
+  USAB_BASE, BROWSER_HEADERS, TSW_BASE, TSW_ORG_CODE,
   getCached, setCache, listCachedDates, loadDiskCacheForDate,
+  fetchWithRetry, parsePlayerDetailGrouped, parsePlayerGender,
   tswFetch, tswUsabProfilePath, tswUsabTournamentsPath, tswUsabOverviewPath,
   emptyCat, parseTswOverviewStats, parseTswTournaments,
-  setCors, isValidUsabId,
+  setCors, isValidUsabId, getDiskCachedDate,
 } from '../../_lib/shared.js';
 import {
   sendApiError,
@@ -20,6 +21,7 @@ export default async function handler(req, res) {
 
   if (action === 'tsw-stats') return handleTswStats(req, res, usabId);
   if (action === 'ranking-trend') return handleRankingTrend(req, res, usabId);
+  if (action === 'ranking-detail') return handleRankingDetail(req, res, usabId);
 
   return sendJson(res, 404, { error: { code: 'NOT_FOUND', message: `Unknown action: ${action}` } });
 }
@@ -170,5 +172,32 @@ async function handleRankingTrend(req, res, usabId) {
     sendJson(res, 200, result, { 'X-Cache': 'MISS' });
   } catch (err) {
     sendApiError(res, err, { logLabel: 'ranking-trend' });
+  }
+}
+
+async function handleRankingDetail(req, res, usabId) {
+  if (!usabId || !isValidUsabId(usabId)) {
+    return sendApiError(res, new ValidationError('Invalid player ID', { field: 'id' }));
+  }
+
+  const defaultDate = await getDiskCachedDate() || new Date().toISOString().slice(0, 10);
+  const date = req.query.date || defaultDate;
+  const cacheKey = `ranking-detail:${usabId}:${date}`;
+
+  const cached = getCached(cacheKey);
+  if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }
+
+  try {
+    const url = `${USAB_BASE}/${encodeURIComponent(usabId)}/details?date=${encodeURIComponent(date)}`;
+    const response = await fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 });
+    if (!response.ok) throw new UpstreamError(`USAB ranking detail HTTP ${response.status}`);
+    const html = await response.text();
+    const gender = parsePlayerGender(html);
+    const sections = parsePlayerDetailGrouped(html);
+    const result = { usabId, gender, sections };
+    setCache(cacheKey, result);
+    sendJson(res, 200, result, { 'X-Cache': 'MISS' });
+  } catch (err) {
+    sendApiError(res, err, { logLabel: 'ranking-detail' });
   }
 }

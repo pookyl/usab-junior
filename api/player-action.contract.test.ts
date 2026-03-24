@@ -1,12 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const shared = vi.hoisted(() => ({
+  USAB_BASE: 'https://usabjrrankings.org',
+  BROWSER_HEADERS: {},
   TSW_BASE: 'https://www.tournamentsoftware.com',
   TSW_ORG_CODE: 'ORG',
   getCached: vi.fn(),
   setCache: vi.fn(),
   listCachedDates: vi.fn(),
   loadDiskCacheForDate: vi.fn(),
+  fetchWithRetry: vi.fn(),
+  parsePlayerDetailGrouped: vi.fn(),
+  parsePlayerGender: vi.fn(),
   tswFetch: vi.fn(),
   tswUsabProfilePath: vi.fn(() => '/profile'),
   tswUsabTournamentsPath: vi.fn(() => '/tournaments'),
@@ -16,6 +21,7 @@ const shared = vi.hoisted(() => ({
   parseTswTournaments: vi.fn(),
   setCors: vi.fn(),
   isValidUsabId: vi.fn(),
+  getDiskCachedDate: vi.fn(() => Promise.resolve('2026-03-01')),
 }));
 
 vi.mock('./_lib/shared.js', () => shared);
@@ -75,6 +81,22 @@ describe('api/player/[id]/[action] contract', () => {
 
   it('returns validation error for invalid id on ranking-trend', async () => {
     const req = { method: 'GET', query: { id: 'bad-id', action: 'ranking-trend' } };
+    const res = createRes();
+
+    await handler(req as never, res as never);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid player ID',
+        details: { field: 'id' },
+      },
+    });
+  });
+
+  it('returns validation error for invalid id on ranking-detail', async () => {
+    const req = { method: 'GET', query: { id: 'bad-id', action: 'ranking-detail' } };
     const res = createRes();
 
     await handler(req as never, res as never);

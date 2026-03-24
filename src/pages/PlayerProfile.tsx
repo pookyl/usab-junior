@@ -36,7 +36,6 @@ import {
   fetchPlayerDetail,
   fetchPlayerTswStats,
   fetchPlayerRankingTrend,
-  usabPlayerUrl,
   tswSearchUrl,
 } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
@@ -1012,16 +1011,14 @@ export default function PlayerProfile() {
 
         <div className="mt-4 md:mt-5 flex flex-wrap gap-2 md:gap-3">
           {bestEntry && (
-            <a
-              href={usabPlayerUrl(usabId, bestEntry.ageGroup, bestEntry.eventType)}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to={`/directory/${usabId}/rankings`}
+              state={{ name: displayName }}
               className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
             >
               <Trophy className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              USAB Profile
-              <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
-            </a>
+              Rankings
+            </Link>
           )}
           <a
             href={tswStats?.tswProfileUrl ?? tswSearchUrl(displayName)}

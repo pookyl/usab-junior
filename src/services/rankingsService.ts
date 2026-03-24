@@ -8,6 +8,7 @@ import type {
   DirectoryPlayer,
   TswPlayerStats,
   PlayerRankingTrend,
+  RankingCategoryDetail,
   TournamentsResponse,
   SpotlightResponse,
   TournamentDetail,
@@ -198,6 +199,17 @@ export async function fetchPlayerDetail(
   }
 }
 
+export async function fetchPlayerRankingDetail(
+  usabId: string,
+  date: string = RANKINGS_DATE,
+): Promise<RankingCategoryDetail[]> {
+  const url = `/api/player/${usabId}/ranking-detail?date=${date}`;
+  const res = await fetchWithRetry(url, 30_000, 1);
+  if (!res.ok) await throwApiError(res, 'Ranking detail API');
+  const data = await res.json();
+  return data.sections ?? [];
+}
+
 export function usabPlayerUrl(
   usabId: string,
   ageGroup: AgeGroup,
@@ -205,6 +217,10 @@ export function usabPlayerUrl(
   date = RANKINGS_DATE,
 ) {
   return `https://usabjrrankings.org/${usabId}/details?age_group=${ageGroup}&category=${eventType}&date=${date}`;
+}
+
+export function usabPlayerBaseUrl(usabId: string, date = RANKINGS_DATE) {
+  return `https://usabjrrankings.org/${usabId}/details?date=${date}`;
 }
 
 export async function fetchH2H(

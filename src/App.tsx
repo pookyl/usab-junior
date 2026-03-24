@@ -14,6 +14,7 @@ import Home from './pages/Dashboard';
 import Rankings from './pages/Players';
 import AllPlayers from './pages/AllPlayers';
 import PlayerProfile from './pages/PlayerProfile';
+import PlayerRankingDetail from './pages/PlayerRankingDetail';
 import HeadToHead from './pages/HeadToHead';
 import Tournaments from './pages/Tournaments';
 import TournamentHub, { TournamentPlayerDetail, TournamentDrawDetail } from './pages/TournamentHub';
@@ -145,6 +146,7 @@ const ROUTE_PATTERNS = [
   '/tournaments/:tswId/medals',
   '/tournaments/:tswId/watchlist',
   '/tournaments/:tswId',
+  '/directory/:id/rankings',
   '/directory/:id',
   '/players/:id',
   '/players',
@@ -181,6 +183,7 @@ export default function App() {
                     <Route path="/players" element={<Rankings />} />
                     <Route path="/players/:id" element={<PlayerRedirect />} />
                     <Route path="/directory" element={<AllPlayers />} />
+                    <Route path="/directory/:id/rankings" element={<PlayerRankingDetail />} />
                     <Route path="/directory/:id" element={<PlayerProfile />} />
                     <Route path="/analytics" element={<Navigate to="/players" replace />} />
                     <Route path="/head-to-head" element={<HeadToHead />} />

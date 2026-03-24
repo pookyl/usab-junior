@@ -30,6 +30,26 @@ export interface TournamentEntry {
   tournamentId?: string;
 }
 
+export interface RankingTournamentEntry {
+  tournamentName: string;
+  location?: string;
+  tournamentId?: string;
+  place: string;
+  points: number;
+  startDate?: string;
+  endDate?: string;
+  tournamentType?: string;
+  contributing: boolean;
+}
+
+export interface RankingCategoryDetail {
+  ageGroup: AgeGroup;
+  eventType: EventType;
+  rank: number;
+  rankingPoints: number;
+  tournaments: RankingTournamentEntry[];
+}
+
 export interface JuniorPlayerDetail extends JuniorPlayer {
   gender: string | null;
   tournamentHistory: TournamentEntry[];
