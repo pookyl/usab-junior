@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "lint:api": "eslint api-server.mjs \"api/**/*.js\"",
+    "e2e": "npx playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "^4.2.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",

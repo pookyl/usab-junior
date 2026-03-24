@@ -28,5 +28,9 @@ dist-ssr
 *.sw?
 .vercel
 
+# Playwright
+test-results/
+playwright-report/
+
 # Pre-scraped tournament data (served by api-server from data/)
 data/tournament-cache/
