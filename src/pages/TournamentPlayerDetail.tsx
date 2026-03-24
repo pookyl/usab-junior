@@ -5,12 +5,54 @@ import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
 import MatchCard from '../components/tournament/MatchCard';
-import type { TournamentPlayerDetailResponse } from '../types/junior';
+import MedalIcon from '../components/tournament/MedalIcon';
+import type { MedalPlace } from '../components/tournament/MedalIcon';
+import type { TournamentPlayerDetailResponse, TournamentMatch } from '../types/junior';
+
+interface DeducedMedal {
+  place: MedalPlace;
+  event: string;
+}
+
+const PLACE_ORDER: Record<MedalPlace, number> = { gold: 1, silver: 2, bronze: 3, fourth: 4 };
+
+function deduceMedals(matches: TournamentMatch[], playerId: number): DeducedMedal[] {
+  const medals: DeducedMedal[] = [];
+  const seen = new Set<string>();
+
+  for (const m of matches) {
+    if (/consolation/i.test(m.round)) continue;
+
+    const onTeam1 = m.team1Ids?.includes(playerId) ?? false;
+    const onTeam2 = m.team2Ids?.includes(playerId) ?? false;
+    if (!onTeam1 && !onTeam2) continue;
+
+    const matchDecided = m.team1Won || m.team2Won;
+    if (!matchDecided) continue;
+
+    const playerWon = (onTeam1 && m.team1Won) || (onTeam2 && m.team2Won);
+    let place: MedalPlace | null = null;
+
+    if (m.round === 'Final') {
+      place = playerWon ? 'gold' : 'silver';
+    } else if (/3rd.*4th/i.test(m.round)) {
+      place = playerWon ? 'bronze' : 'fourth';
+    }
+
+    if (!place) continue;
+    const key = `${m.event}:${place}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    medals.push({ place, event: m.event });
+  }
+
+  medals.sort((a, b) => PLACE_ORDER[a.place] - PLACE_ORDER[b.place]);
+  return medals;
+}
 
 export default function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
   const location = useLocation();
-
 
   const [data, setData] = useState<TournamentPlayerDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,6 +96,11 @@ export default function TournamentPlayerDetail() {
     return data.matches.filter(m => m.event === eventFilter);
   }, [data, eventFilter]);
 
+  const medals = useMemo(() => {
+    if (!data || data.hasUpcomingMatches) return [];
+    return deduceMedals(data.matches, data.playerId);
+  }, [data]);
+
   if (!tswId || !playerId) return null;
 
   const parsedPlayerId = Number(playerId);
@@ -81,31 +128,46 @@ export default function TournamentPlayerDetail() {
         <>
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div className="min-w-0">
-                <div className="flex items-baseline gap-2 flex-wrap">
+              <div className="min-w-0 space-y-3">
+                <div>
                   <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
                     {data.playerName || 'Player'}
                   </h1>
                   {data.memberId && (
-                    <span className="text-sm text-slate-400 dark:text-slate-500 font-mono">({data.memberId})</span>
+                    <p className="text-sm text-slate-400 dark:text-slate-500 font-mono mt-0.5">
+                      {data.memberId}
+                    </p>
                   )}
                 </div>
+
+                {data.winLoss && (
+                  <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Win-Loss</p>
+                    <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                      {data.winLoss.wins}-{data.winLoss.losses}
+                      <span className="text-sm font-semibold ml-1">({data.winLoss.total})</span>
+                    </p>
+                    <div className="w-32 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mt-1.5">
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+                        style={{ width: `${data.winLoss.winPct}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{data.winLoss.winPct}% won</p>
+                  </div>
+                )}
               </div>
 
-              {data.winLoss && (
-                <div className="shrink-0 sm:text-right">
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Win-Loss</p>
-                  <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                    {data.winLoss.wins}-{data.winLoss.losses}
-                    <span className="text-sm font-semibold ml-1">({data.winLoss.total})</span>
-                  </p>
-                  <div className="w-32 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mt-1.5">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
-                      style={{ width: `${data.winLoss.winPct}%` }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{data.winLoss.winPct}% won</p>
+              {medals.length > 0 && (
+                <div className="shrink-0 flex flex-col gap-1.5 sm:items-end">
+                  {medals.map((m, i) => (
+                    <div key={i} className="inline-flex items-center gap-2">
+                      <MedalIcon place={m.place} size={28} />
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                        {m.event}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Medal } from 'lucide-react';
 import { useTabData, TabLoading, TabError, TabEmpty, getEventColor } from '../shared';
 import { fetchTournamentMedals } from '../../../services/rankingsService';
-import fourthPlaceMedalIcon from '../../../assets/icons/fourth-place-medal.png';
+import MedalIcon from '../MedalIcon';
 import type { TournamentMedals, ClubMedalSummary, DrawMedals, MedalPlayer } from '../../../types/junior';
 
 type SortKey = 'gold' | 'silver' | 'bronze' | 'total' | 'club';
@@ -21,29 +21,6 @@ function PlayerName({ player, tswId, fromPath }: { player: MedalPlayer; tswId: s
     );
   }
   return <span>{player.name}</span>;
-}
-
-function MedalIcon({ place, size = 22 }: { place: 'gold' | 'silver' | 'bronze' | 'fourth'; size?: number }) {
-  const iconBox = { width: size, height: size };
-
-  if (place === 'fourth') {
-    return (
-      <span className="inline-flex items-center justify-center shrink-0" style={iconBox}>
-        <img
-          src={fourthPlaceMedalIcon}
-          alt="4th place medal"
-          className="block w-full h-full object-cover"
-        />
-      </span>
-    );
-  }
-
-  const emoji: Record<string, string> = { gold: '🥇', silver: '🥈', bronze: '🥉' };
-  return (
-    <span className="inline-flex items-center justify-center shrink-0 leading-none" style={iconBox}>
-      <span style={{ fontSize: size }}>{emoji[place]}</span>
-    </span>
-  );
 }
 
 const PLACE_LABEL: Record<string, string> = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze', fourth: '4th' };
