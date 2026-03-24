@@ -556,6 +556,40 @@ export function parseTswTournamentInfo(html) {
   return { name, dates, location };
 }
 
+// ── TSW tournament schedule/timeline parser ──────────────────────────────────
+export function parseTswSchedule(html) {
+  const timelineMatch = html.match(/<ol[^>]*class="[^"]*list--timeline[^"]*"[^>]*>([\s\S]*?)<\/ol>/i);
+  if (!timelineMatch) return [];
+
+  const items = [];
+  const liRe = /<li[^>]*class="([^"]*)"[^>]*>([\s\S]*?)<\/li>/gi;
+  let m;
+  while ((m = liRe.exec(timelineMatch[1])) !== null) {
+    const classes = m[1];
+    const body = m[2];
+
+    const labelMatch = body.match(/<div[^>]*class="[^"]*list__value[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+    const label = labelMatch ? labelMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+
+    const timeMatch = body.match(/<time[^>]*datetime="([^"]*)"[^>]*>([^<]*)<\/time>/i);
+    const datetime = timeMatch ? timeMatch[1] : null;
+    const displayDate = timeMatch ? timeMatch[2].trim() : '';
+
+    let type = 'unknown';
+    if (classes.includes('is-entry-open')) type = 'entry-open';
+    else if (classes.includes('is-entry-closed')) type = 'entry-closed';
+    else if (classes.includes('is-withdrawal-deadline')) type = 'withdrawal-deadline';
+    else if (classes.includes('is-started')) type = 'started';
+    else if (classes.includes('is-finished')) type = 'finished';
+
+    const isCurrent = classes.includes('is-current');
+    const isPast = (classes.includes('is-success') || classes.includes('is-completed')) && !isCurrent;
+
+    items.push({ label, datetime, displayDate, type, isCurrent, isPast });
+  }
+  return items;
+}
+
 // ── TSW tournament history parser ────────────────────────────────────────────
 export function deriveCategoryFromEvent(eventName) {
   const ev = eventName.toLowerCase();

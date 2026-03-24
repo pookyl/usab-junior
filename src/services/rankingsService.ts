@@ -22,6 +22,7 @@ import type {
   EliminationDrawResponse,
   RoundRobinDrawResponse,
   PlayerScheduleResponse,
+  TournamentScheduleEntry,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
 
@@ -342,6 +343,21 @@ export async function fetchTournamentDetail(
   const data = await fetchTournamentApi<TournamentDetail>(url, 30_000, 'Tournament detail API');
   cappedSet(tournamentDetailCache, tswId, data);
   return data;
+}
+
+// ── Tournament Schedule ──────────────────────────────────────────────────────
+
+const tournamentScheduleCache = new Map<string, TournamentScheduleEntry[]>();
+
+export async function fetchTournamentSchedule(
+  tswId: string,
+): Promise<TournamentScheduleEntry[]> {
+  if (tournamentScheduleCache.has(tswId)) return tournamentScheduleCache.get(tswId)!;
+
+  const url = `/api/tournaments/${encodeURIComponent(tswId)}/schedule`;
+  const data = await fetchTournamentApi<{ tswId: string; schedule: TournamentScheduleEntry[] }>(url, 15_000, 'Tournament schedule API');
+  cappedSet(tournamentScheduleCache, tswId, data.schedule);
+  return data.schedule;
 }
 
 // ── Tournament Events ────────────────────────────────────────────────────────

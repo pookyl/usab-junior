@@ -2,7 +2,7 @@ import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import {
   setCors, getCached, setCache,
-  tswFetch, parseTswDrawsList, parseTswTournamentInfo,
+  tswFetch, parseTswDrawsList, parseTswTournamentInfo, parseTswSchedule,
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
   parseTswSeeding,
   parseTswEvents, parseTswEventDetail,
@@ -373,6 +373,32 @@ async function handleDetail(tswId, _req, res) {
     res.end(JSON.stringify(result));
   } catch (err) {
     sendError(res, err, 'tournament-detail');
+  }
+}
+
+async function handleSchedule(tswId, _req, res) {
+  const refresh = isRefreshRequest(_req);
+  const cacheKey = `tournament-schedule:${tswId}`;
+  if (!refresh) {
+    const cached = getCached(cacheKey);
+    if (cached) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'HIT' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+  }
+
+  try {
+    const resp = tswOk(await tswFetch(`/tournament/${tswId.toLowerCase()}`), 'TSW tournament overview');
+    const html = await resp.text();
+    const schedule = parseTswSchedule(html);
+    const result = { tswId, schedule };
+
+    setCache(cacheKey, result);
+    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
+    res.end(JSON.stringify(result));
+  } catch (err) {
+    sendError(res, err, 'tournament-schedule');
   }
 }
 
@@ -1277,6 +1303,7 @@ async function handlePlayerSchedule(tswId, req, res) {
 
 const ACTIONS = {
   detail: handleDetail,
+  schedule: handleSchedule,
   winners: handleWinners,
   medals: handleMedals,
   matches: handleMatches,

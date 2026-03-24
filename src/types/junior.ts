@@ -184,6 +184,15 @@ export interface ScheduledTournament {
   status: TournamentStatus;
 }
 
+export interface TournamentScheduleEntry {
+  label: string;
+  datetime: string | null;
+  displayDate: string;
+  type: string;
+  isCurrent: boolean;
+  isPast: boolean;
+}
+
 export interface TournamentSeasonData {
   tournaments: ScheduledTournament[];
 }

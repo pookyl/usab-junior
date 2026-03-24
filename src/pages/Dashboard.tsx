@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Trophy, Users, Swords, Calendar, Clock,
-  MapPin, CheckCircle2, Loader2, Medal, FileText, ExternalLink,
+  Trophy, Users, Swords, Calendar, Clock, ChevronDown,
+  MapPin, CheckCircle2, Loader2, Medal, FileText, ExternalLink, CalendarClock,
 } from 'lucide-react';
 import { usePlayers } from '../contexts/PlayersContext';
 import { fetchSpotlight } from '../services/rankingsService';
+import ScheduleInline from '../components/ScheduleInline';
 import type { ScheduledTournament } from '../types/junior';
 
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
@@ -91,6 +92,7 @@ export default function Home() {
   const [spotlights, setSpotlights] = useState<ScheduledTournament[]>([]);
   const [spotlightLoading, setSpotlightLoading] = useState(true);
   const [spotlightError, setSpotlightError] = useState<string | null>(null);
+  const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -189,6 +191,20 @@ export default function Home() {
                       </div>
 
                       <div className="flex items-center gap-2 flex-wrap pt-1">
+                        {sl.tswId && (sl.status === 'upcoming' || sl.status === 'in-progress') && (
+                          <button
+                            onClick={() => setExpandedSchedule(expandedSchedule === sl.tswId ? null : sl.tswId)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                              expandedSchedule === sl.tswId
+                                ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
+                                : 'bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40'
+                            }`}
+                          >
+                            <CalendarClock className="w-3 h-3" />
+                            Schedule
+                            <ChevronDown className={`w-3 h-3 transition-transform ${expandedSchedule === sl.tswId ? 'rotate-180' : ''}`} />
+                          </button>
+                        )}
                         {sl.tswId && sl.status === 'completed' && (
                           <Link
                             to={`/tournaments/${sl.tswId}/medals`}
@@ -221,6 +237,12 @@ export default function Home() {
                           </a>
                         )}
                       </div>
+
+                      {expandedSchedule === sl.tswId && sl.tswId && (
+                        <div className="mt-3 pt-3 border-t border-violet-200/50 dark:border-violet-800/30">
+                          <ScheduleInline tswId={sl.tswId} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

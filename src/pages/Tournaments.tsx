@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { track } from '@vercel/analytics';
 import {
   Calendar, MapPin, ChevronDown, ExternalLink, FileText,
-  Clock, CheckCircle2, Loader2, Filter, Medal,
+  Clock, CheckCircle2, Loader2, Filter, Medal, CalendarClock,
 } from 'lucide-react';
 import { fetchTournaments } from '../services/rankingsService';
+import ScheduleInline from '../components/ScheduleInline';
 import type { ScheduledTournament, TournamentsResponse } from '../types/junior';
 
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
@@ -183,9 +184,11 @@ function FilterPills({ label, options, selected, onChange }: {
 }
 
 function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
+  const [showSchedule, setShowSchedule] = useState(false);
   const days = tournament.status === 'upcoming' ? daysUntil(tournament.startDate) : null;
   const year = formatYear(tournament.startDate);
   const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
+  const showSchedulePill = !!tournament.tswId && (tournament.status === 'upcoming' || tournament.status === 'in-progress');
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
@@ -237,6 +240,20 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
+        {showSchedulePill && (
+          <button
+            onClick={() => setShowSchedule(!showSchedule)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              showSchedule
+                ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
+                : 'bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40'
+            }`}
+          >
+            <CalendarClock className="w-3 h-3" />
+            Schedule
+            <ChevronDown className={`w-3 h-3 transition-transform ${showSchedule ? 'rotate-180' : ''}`} />
+          </button>
+        )}
         {tournament.tswId && tournament.status === 'completed' && (
           <Link
             to={`/tournaments/${tournament.tswId}/medals`}
@@ -269,6 +286,12 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
           </a>
         )}
       </div>
+
+      {showSchedule && tournament.tswId && (
+        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <ScheduleInline tswId={tournament.tswId} />
+        </div>
+      )}
     </div>
   );
 }
