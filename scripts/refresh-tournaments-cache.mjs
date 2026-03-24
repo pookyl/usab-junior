@@ -371,7 +371,7 @@ async function main() {
     seasons = { [forceSeason]: seasons[forceSeason] };
   } else if (!allSeasons) {
     const keys = Object.keys(seasons).sort().reverse();
-    const keep = keys.slice(0, 2);
+    const keep = keys.slice(0, 1);
     const filtered = {};
     for (const k of keep) filtered[k] = seasons[k];
     seasons = filtered;
@@ -422,6 +422,17 @@ async function main() {
 
     await enrichWithTswIds(data.tournaments);
     await enrichWithTswDetails(data.tournaments);
+
+    if (existsSync(filePath)) {
+      try {
+        const existing = JSON.parse(readFileSync(filePath, 'utf-8'));
+        if (JSON.stringify(existing.tournaments) === JSON.stringify(data.tournaments)) {
+          console.log(`[tournaments] ${season}: no changes — skipping write`);
+          skipped++;
+          continue;
+        }
+      } catch { /* write anyway if existing file is corrupt */ }
+    }
 
     const cache = {
       season,

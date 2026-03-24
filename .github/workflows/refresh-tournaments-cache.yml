@@ -1,0 +1,42 @@
+name: Refresh Tournaments Cache
+
+on:
+  schedule:
+    # Run daily at 08:30 UTC (30 min after rankings to avoid concurrent pushes)
+    - cron: '30 8 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Refresh tournaments cache
+        run: node scripts/refresh-tournaments-cache.mjs
+        continue-on-error: true
+
+      - name: Check if any cache files changed
+        id: check
+        run: |
+          git add data/tournaments-*.json 2>/dev/null || true
+          if git diff --cached --quiet 2>/dev/null; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push updated cache
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: refresh tournament seasons"
+          git push
