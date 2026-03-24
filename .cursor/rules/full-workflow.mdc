@@ -1,0 +1,145 @@
+---
+description: Autonomous development workflow — plan, branch, implement, test, verify in browser, and open a PR. Triggered when the user says "Full workflow".
+alwaysApply: false
+---
+
+# Full Workflow — Autonomous Development
+
+This workflow is activated **only** when the user explicitly says "Full workflow" (or similar: "autonomous mode", "full workflow mode"). For all other requests, use the normal interactive style.
+
+## Phase 1: Plan Review
+
+Before writing any code:
+
+1. Switch to **Plan Mode**.
+2. Propose a plan covering:
+   - What will change and why
+   - Which files are affected
+   - Any trade-offs or alternatives considered
+   - How you will test / verify the change
+3. Discuss with the user. Iterate until they say "go ahead" or approve the plan.
+4. Do **not** proceed to Phase 2 until the user explicitly approves.
+
+## Phase 2: Feature Branch (Git Worktree)
+
+Use a **git worktree** so the user's workspace is never disrupted.
+
+1. Ensure the local `main` branch is up to date:
+   ```bash
+   git fetch origin main
+   ```
+2. Create a worktree in a sibling directory:
+   ```bash
+   WORKTREE_BASE="/Users/pli/wrk/usab-junior-worktrees"
+   BRANCH_NAME="auto/<short-description>"
+   mkdir -p "$WORKTREE_BASE"
+   git worktree add "$WORKTREE_BASE/$BRANCH_NAME" -b "$BRANCH_NAME" origin/main
+   ```
+3. All subsequent work (edits, tests, commits) happens inside the worktree directory:
+   ```
+   /Users/pli/wrk/usab-junior-worktrees/auto/<short-description>/
+   ```
+4. The user's workspace (`/Users/pli/wrk/usab-junior/`) stays on their current branch, untouched.
+5. Never commit directly to `main`.
+
+## Phase 3: Implement
+
+All commands run inside the worktree directory.
+
+1. **If no new dependencies**: Symlink `node_modules` from the main workspace:
+   ```bash
+   ln -s /Users/pli/wrk/usab-junior/node_modules "$WORKTREE_BASE/$BRANCH_NAME/node_modules"
+   ```
+   **If the feature adds new dependencies**: Do NOT symlink. Instead run a fresh install in the worktree:
+   ```bash
+   cd "$WORKTREE_BASE/$BRANCH_NAME" && npm install
+   ```
+   After the PR is merged, run `npm ci` in the user's main workspace to sync the new packages.
+2. Make the code changes as planned.
+3. Run the full CI checks locally:
+   - `npm test`
+   - `npm run lint:api`
+   - `npm run build`
+4. Fix any failures before proceeding.
+
+## Phase 4: Verify in Browser
+
+1. If the change has any visual or client-side behavior:
+   - Run **Playwright** tests to verify the feature works as expected.
+   - Capture screenshots as evidence.
+2. If the change is backend-only or config-only, verify with appropriate commands (curl, scripts, etc.).
+
+## Phase 5: Commit, Push, and Open PR
+
+All commands run inside the worktree directory.
+
+1. Commit with a clear message describing the change.
+2. Push the feature branch to origin:
+   ```bash
+   git push -u origin "$BRANCH_NAME"
+   ```
+3. Create a PR targeting `main` using `gh pr create`.
+4. Wait for Vercel to create a preview deployment. Get the preview URL by:
+   - Polling for the Vercel bot comment on the PR:
+     ```bash
+     gh pr view --json comments --jq '.comments[] | select(.author.login == "vercel[bot]") | .body'
+     ```
+   - Or constructing it from the Vercel deployment API.
+5. Update the PR body with the preview URL if it wasn't available at creation time.
+6. PR format:
+
+   ```
+   ## Summary
+   - <what changed and why>
+
+   ## Vercel Preview
+   <preview deployment URL>
+
+   ## Test Results
+   - Playwright: <pass/fail with details>
+   - CI: <npm test, lint, build — all passed>
+   - Screenshots: <attach Playwright screenshots>
+
+   ## Reviewer Checklist
+   - [ ] Check the Vercel preview URL above
+   - [ ] Review the code changes
+   ```
+
+## Phase 6: PR Review
+
+1. Share the PR link with the user.
+2. Wait for the user to review.
+3. If changes are requested:
+   - Make the fixes in the worktree on the same branch.
+   - Re-run CI checks (Phase 3).
+   - Re-verify if needed (Phase 4).
+   - Push and update the PR.
+4. If approved:
+   - Merge the PR to main.
+   - Clean up the worktree and branch:
+     ```bash
+     cd /Users/pli/wrk/usab-junior
+     git worktree remove "$WORKTREE_BASE/$BRANCH_NAME"
+     git branch -d "$BRANCH_NAME"
+     ```
+   - Confirm the merge to the user.
+
+## Important Notes
+
+- This workflow is **opt-in only**. Do not use it unless the user triggers it.
+- The user's normal workflow (direct edits, immediate commits) remains the default.
+- Always wait for explicit user approval at Phase 1 (plan) and Phase 6 (PR review).
+- Include the Vercel preview URL in every PR so the user can test the deployed version.
+- The worktree base directory is `/Users/pli/wrk/usab-junior-worktrees/`. Clean it up after each PR is merged.
+
+## Parallel Execution
+
+Multiple Full Workflow agents may run simultaneously. Each agent gets its own worktree and branch, but be aware of:
+
+1. **node_modules**: If neither agent adds new dependencies, both can symlink to the main workspace's `node_modules`. If **any** agent adds a new dependency, that agent must use its own `npm install` (no symlink).
+2. **Dev server ports**: If multiple agents need to start a dev server for browser testing, each must use a unique port:
+   ```bash
+   npx vite --port 3002  # agent 1
+   npx vite --port 3003  # agent 2
+   ```
+3. **Merge order**: If two PRs modify the same files, the second PR to merge may have conflicts. Resolve by rebasing onto the updated `main` before merging.
