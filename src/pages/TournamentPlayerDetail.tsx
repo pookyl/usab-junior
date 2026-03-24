@@ -142,9 +142,9 @@ export default function TournamentPlayerDetail() {
               {medals.length > 0 && (
                 <div className="shrink-0 flex flex-col items-end gap-1.5">
                   {medals.map((m, i) => (
-                    <div key={i} className="inline-flex items-center gap-2">
+                    <div key={i} className="inline-flex items-center gap-0.5">
                       <MedalIcon place={m.place} size={28} />
-                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 translate-y-[5px]">
                         {m.event}
                       </span>
                     </div>
