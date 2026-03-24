@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { track } from '@vercel/analytics';
 import {
   Calendar, MapPin, ChevronDown, ExternalLink, FileText,
-  Clock, CheckCircle2, Loader2, Filter, Medal, SquareArrowOutUpRight,
+  Clock, CheckCircle2, Loader2, Filter, Medal,
 } from 'lucide-react';
 import { fetchTournaments } from '../services/rankingsService';
 import type { ScheduledTournament, TournamentsResponse } from '../types/junior';
@@ -216,10 +216,9 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
                 tournamentType: tournament.type,
               });
             }}
-            className="inline-flex items-center gap-1 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+            className="text-violet-600 dark:text-violet-400 hover:underline transition-colors"
           >
             {tournament.name}
-            <SquareArrowOutUpRight className="w-4 h-4 text-violet-400 dark:text-violet-500 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors shrink-0" />
           </Link>
         ) : (
           tournament.name

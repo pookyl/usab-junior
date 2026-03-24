@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   Trophy, Users, Swords, Calendar, Clock,
   MapPin, CheckCircle2, Loader2, Medal, FileText, ExternalLink,
-  SquareArrowOutUpRight,
 } from 'lucide-react';
 import { usePlayers } from '../contexts/PlayersContext';
 import { fetchSpotlight } from '../services/rankingsService';
@@ -164,15 +163,14 @@ export default function Home() {
                         )}
                       </div>
 
-                      <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 leading-snug group">
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 leading-snug">
                         {sl.tswId ? (
                           <Link
                             to={`/tournaments/${sl.tswId}`}
                             state={{ name: sl.name, hostClub: sl.hostClub, startDate: sl.startDate, endDate: sl.endDate }}
-                            className="inline-flex items-center gap-1.5 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+                            className="text-violet-600 dark:text-violet-400 hover:underline transition-colors"
                           >
                             {sl.name}
-                            <SquareArrowOutUpRight className="w-4 h-4 text-violet-400 dark:text-violet-500 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors shrink-0" />
                           </Link>
                         ) : (
                           sl.name
