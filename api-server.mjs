@@ -215,7 +215,7 @@ async function synthesizePlayerSchedule(tswId, url) {
   if (players.length === 0) return null;
 
   const drawsList = detailData.draws || [];
-  const tournamentName = (detailData.name || '').replace(/^Tournamentsoftware\.com\s*-\s*/i, '');
+  const tournamentName = (detailData.name || '').replace(/^Tournamentsoftware\.com\s*-\s*/i, '').replace(/\s*-\s*Draws$/i, '');
 
   const dateRangeMatch = (detailData.dates || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   let startDate = '', endDate = '';
@@ -225,17 +225,15 @@ async function synthesizePlayerSchedule(tswId, url) {
     endDate = `${eY}-${eM.padStart(2, '0')}-${eD.padStart(2, '0')}`;
   }
 
-  // Phase 2: Read future-date match files, filter to upcoming player matches
-  const now = new Date();
-  const todayStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-
+  // Phase 2: Read match files, filter to upcoming (unfinished) player matches.
+  // No date filtering — cached data may be from past tournament days that still
+  // have unfinished matches at scrape time.
   const allUpcoming = [];
   try {
     const matchFiles = await readdir(join(cacheDir, 'matches'));
     for (const f of matchFiles.sort()) {
       if (!f.endsWith('.json')) continue;
       const dp = f.replace('.json', '');
-      if (dp < todayStr) continue;
       const dayData = JSON.parse(await readFile(join(cacheDir, 'matches', f), 'utf-8'));
       for (const m of dayData.matches || []) {
         for (const pid of playerIds) {
@@ -337,7 +335,7 @@ async function synthesizePlayerSchedule(tswId, url) {
     return [];
   }
 
-  function findConsolationPath(bracket, playerId, mainCurrentLevel, mainCurrentNum) {
+  function findConsolationPath(bracket, playerId, mainCurrentLevel, mainCurrentNum, consolationType) {
     if (!bracket || bracket.drawType !== 'elimination') return null;
     const mainSection = (bracket.sections || [])[0];
     if (!mainSection) return null;
@@ -347,6 +345,7 @@ async function synthesizePlayerSchedule(tswId, url) {
     const consMaxRL = Math.max(...consSection.matches.map(m => m.roundLevel));
     const consEntryRL = consMaxRL - (mainMaxRL - mainCurrentLevel);
     if (consEntryRL < 1 || consEntryRL > consMaxRL) return null;
+    if (/first match/i.test(consolationType || '') && consEntryRL !== consMaxRL) return null;
     const countAtEntry = (consSection.matches || []).filter(m => m.roundLevel === consEntryRL).length;
     const countAbove = (consSection.matches || []).filter(m => m.roundLevel === consEntryRL + 1).length;
     const isFeedIn = consEntryRL === consMaxRL || countAtEntry > Math.ceil(countAbove / 2);
@@ -397,7 +396,7 @@ async function synthesizePlayerSchedule(tswId, url) {
     if (!consPlayoffSection || !(consPlayoffSection.matches || []).length) return null;
     const sectionLabel = consPlayoffSection.name.replace(/^[^-]*-\s*/, '') || 'Consolation Play-off 3/4';
     const finalMatch = (consPlayoffSection.matches || []).find(m => m.matchId === '1001');
-    const roundName = getRoundName(consPlayoffSection, 1);
+    const roundName = '3rd/4th Place';
     let opponent = null;
     const otherSlotId = `2${String(currentNum === 1 ? 2 : 1).padStart(3, '0')}`;
     const otherSlot = (consPlayoffSection.matches || []).find(m => m.matchId === otherSlotId);
@@ -419,7 +418,7 @@ async function synthesizePlayerSchedule(tswId, url) {
     if (!playoffSection || !(playoffSection.matches || []).length) return null;
     const sectionLabel = playoffSection.name.replace(/^[^-]*-\s*/, '') || 'Play-off 3/4';
     const finalMatch = (playoffSection.matches || []).find(m => m.matchId === '1001');
-    const roundName = getRoundName(playoffSection, 1);
+    const roundName = '3rd/4th Place';
     let opponent = null;
     const otherSlotId = `2${String(mainCurrentNum === 1 ? 2 : 1).padStart(3, '0')}`;
     const otherSlot = (playoffSection.matches || []).find(m => m.matchId === otherSlotId);
@@ -434,8 +433,9 @@ async function synthesizePlayerSchedule(tswId, url) {
     return { section: sectionLabel, matches };
   }
 
-  function computeConsolationInfo(bracket, playerId, roundName) {
+  function computeConsolationInfo(bracket, playerId, roundName, consolationType) {
     let consolation = null, consolationMatches = [];
+    if (/3rd\/4th|3rd.4th|play-?off/i.test(roundName || '')) return { consolation, consolationMatches };
     const isConsMatch = /consolation/i.test(roundName || '');
     if (isConsMatch) {
       if (/semi/i.test(roundName || '')) {
@@ -458,7 +458,7 @@ async function synthesizePlayerSchedule(tswId, url) {
         if (deepestWinLevel !== Infinity) {
           const currentLevel = deepestWinLevel - 1, currentNum = Math.ceil(deepestWinNum / 2);
           if (currentLevel >= 1) {
-            let consPath = findConsolationPath(bracket, playerId, currentLevel, currentNum) || findPlayoffPath(bracket, playerId, currentLevel, currentNum);
+            let consPath = findConsolationPath(bracket, playerId, currentLevel, currentNum, consolationType) || findPlayoffPath(bracket, playerId, currentLevel, currentNum);
             if (!consPath && /semi/i.test(roundName || '')) consPath = findPlayoffPath(bracket, playerId, 2, currentNum);
             if (consPath) { consolation = consPath.section; consolationMatches = consPath.matches; }
           }
@@ -517,7 +517,7 @@ async function synthesizePlayerSchedule(tswId, url) {
       const bracket = bracketCache.get(drawObj.drawId);
       if (bracket) {
         nextMatches = findPotentialNextMatches(bracket, pid);
-        const consInfo = computeConsolationInfo(bracket, pid, m.round);
+        const consInfo = computeConsolationInfo(bracket, pid, m.round, drawObj.consolation);
         consolation = consInfo.consolation;
         consolationMatches = consInfo.consolationMatches;
       }
