@@ -127,39 +127,20 @@ export default function TournamentPlayerDetail() {
       ) : data ? (
         <>
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div className="min-w-0 space-y-3">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
-                    {data.playerName || 'Player'}
-                  </h1>
-                  {data.memberId && (
-                    <p className="text-sm text-slate-400 dark:text-slate-500 font-mono mt-0.5">
-                      {data.memberId}
-                    </p>
-                  )}
-                </div>
-
-                {data.winLoss && (
-                  <div>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Win-Loss</p>
-                    <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                      {data.winLoss.wins}-{data.winLoss.losses}
-                      <span className="text-sm font-semibold ml-1">({data.winLoss.total})</span>
-                    </p>
-                    <div className="w-32 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mt-1.5">
-                      <div
-                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
-                        style={{ width: `${data.winLoss.winPct}%` }}
-                      />
-                    </div>
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{data.winLoss.winPct}% won</p>
-                  </div>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+                  {data.playerName || 'Player'}
+                </h1>
+                {data.memberId && (
+                  <p className="text-sm text-slate-400 dark:text-slate-500 font-mono mt-0.5">
+                    {data.memberId}
+                  </p>
                 )}
               </div>
 
               {medals.length > 0 && (
-                <div className="shrink-0 flex flex-col gap-1.5 sm:items-end">
+                <div className="shrink-0 flex flex-col items-end gap-1.5">
                   {medals.map((m, i) => (
                     <div key={i} className="inline-flex items-center gap-2">
                       <MedalIcon place={m.place} size={28} />
@@ -171,6 +152,23 @@ export default function TournamentPlayerDetail() {
                 </div>
               )}
             </div>
+
+            {data.winLoss && (
+              <div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Win-Loss</p>
+                <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {data.winLoss.wins}-{data.winLoss.losses}
+                  <span className="text-sm font-semibold ml-1">({data.winLoss.total})</span>
+                </p>
+                <div className="w-32 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mt-1.5">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+                    style={{ width: `${data.winLoss.winPct}%` }}
+                  />
+                </div>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{data.winLoss.winPct}% won</p>
+              </div>
+            )}
 
             {data.events.length > 0 && (
               <div className="flex flex-wrap gap-x-1 gap-y-1 text-sm text-slate-600 dark:text-slate-300">
