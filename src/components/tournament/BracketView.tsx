@@ -129,7 +129,8 @@ export function buildDisplayRounds(section: BracketSection): { rounds: DisplayRo
     }
 
     const allWinnersNull = topMatches.every(m => m.winner === null);
-    if (allUnscored && topMatches.length === sortedEntries.length && (!isFeedInLevel || canMergeFeedIn || allWinnersNull)) {
+    const hasScheduledTimes = topMatches.some(m => m.scheduledTime);
+    if (allUnscored && !hasScheduledTimes && topMatches.length === sortedEntries.length && (!isFeedInLevel || canMergeFeedIn || allWinnersNull)) {
       sortedEntries = topMatches.map((m, i) => ({
         position: sortedEntries[i]?.position ?? (i + 1),
         name: m.winner?.name || 'Bye',

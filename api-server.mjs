@@ -288,7 +288,20 @@ async function synthesizePlayerSchedule(tswId, url) {
     const idx = finalIdx - (level - 1);
     if (idx >= 0 && idx < rounds.length) {
       const name = rounds[idx];
-      if (name && !/^(club|state)$/i.test(name)) return name;
+      if (name && !/^(club|state)$/i.test(name)) {
+        const roundNum = name.match(/^Round\s+(\d+)$/i);
+        if (roundNum) {
+          const drawSize = (section.entries || []).length;
+          if (drawSize > 0) {
+            const playersInRound = drawSize / Math.pow(2, parseInt(roundNum[1], 10) - 1);
+            if (playersInRound >= 2 && Number.isInteger(playersInRound)) return `Round of ${playersInRound}`;
+          } else {
+            const matchCount = (section.matches || []).filter(m => m.roundLevel === level).length;
+            if (matchCount > 0) return `Round of ${matchCount * 2}`;
+          }
+        }
+        return name;
+      }
     }
     return `Round ${level}`;
   }
@@ -363,10 +376,19 @@ async function synthesizePlayerSchedule(tswId, url) {
     const isHighest = consEntryRL === consMaxRL;
     const consEntryMN = isHighest ? mainCurrentNum : mainCurrentNum * 2;
     const sectionLabel = consSection.name.replace(/^[^-]*-\s*/, '') || 'Consolation';
+    const consMatchCounts = new Map();
+    for (const m of consSection.matches) consMatchCounts.set(m.roundLevel, (consMatchCounts.get(m.roundLevel) || 0) + 1);
     const matches = [];
     let prevNum = consEntryMN;
     for (let level = consEntryRL; level >= 1; level--) {
-      const levelNum = level === consEntryRL ? prevNum : Math.ceil(prevNum / 2);
+      let levelNum;
+      if (level === consEntryRL) {
+        levelNum = prevNum;
+      } else {
+        const prevCount = consMatchCounts.get(level + 1) || 0;
+        const currCount = consMatchCounts.get(level) || 0;
+        levelNum = currCount >= prevCount ? prevNum : Math.ceil(prevNum / 2);
+      }
       const matchId = `${level}${String(levelNum).padStart(3, '0')}`;
       const bm = (consSection.matches || []).find(m => m.matchId === matchId);
       if (!bm?.scheduledTime) { prevNum = levelNum; continue; }
@@ -468,7 +490,9 @@ async function synthesizePlayerSchedule(tswId, url) {
         if (deepestWinLevel !== Infinity) {
           const currentLevel = deepestWinLevel - 1, currentNum = Math.ceil(deepestWinNum / 2);
           if (currentLevel >= 1) {
-            let consPath = findConsolationPath(bracket, playerId, currentLevel, currentNum, consolationType) || findPlayoffPath(bracket, playerId, currentLevel, currentNum);
+            const maxRL = Math.max(...(mainSection.matches || []).map(mm => mm.roundLevel), 0);
+            const consMainNum = deepestWinLevel > maxRL ? deepestWinNum : currentNum;
+            let consPath = findConsolationPath(bracket, playerId, currentLevel, consMainNum, consolationType) || findPlayoffPath(bracket, playerId, currentLevel, currentNum);
             if (!consPath && /semi/i.test(roundName || '')) consPath = findPlayoffPath(bracket, playerId, 2, currentNum);
             if (consPath) { consolation = consPath.section; consolationMatches = consPath.matches; }
           }
