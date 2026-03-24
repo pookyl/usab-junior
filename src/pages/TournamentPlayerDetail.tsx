@@ -20,6 +20,13 @@ function deduceMedals(matches: TournamentMatch[], playerId: number): DeducedMeda
   const medals: DeducedMedal[] = [];
   const seen = new Set<string>();
 
+  const playerInThirdFourth = new Set<string>();
+  for (const m of matches) {
+    if (!/3rd.*4th/i.test(m.round)) continue;
+    const inMatch = (m.team1Ids?.includes(playerId) ?? false) || (m.team2Ids?.includes(playerId) ?? false);
+    if (inMatch) playerInThirdFourth.add(m.event);
+  }
+
   for (const m of matches) {
     if (/consolation/i.test(m.round)) continue;
 
@@ -37,6 +44,8 @@ function deduceMedals(matches: TournamentMatch[], playerId: number): DeducedMeda
       place = playerWon ? 'gold' : 'silver';
     } else if (/3rd.*4th/i.test(m.round)) {
       place = playerWon ? 'bronze' : 'fourth';
+    } else if (/semi/i.test(m.round) && !playerWon && !playerInThirdFourth.has(m.event)) {
+      place = 'bronze';
     }
 
     if (!place) continue;
@@ -142,9 +151,9 @@ export default function TournamentPlayerDetail() {
               {medals.length > 0 && (
                 <div className="shrink-0 flex flex-col items-end gap-1.5">
                   {medals.map((m, i) => (
-                    <div key={i} className="inline-flex items-center gap-0.5">
+                    <div key={i} className="inline-flex items-center">
                       <MedalIcon place={m.place} size={28} />
-                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 translate-y-[5px]">
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 translate-y-[4px]">
                         {m.event}
                       </span>
                     </div>
