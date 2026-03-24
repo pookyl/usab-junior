@@ -444,7 +444,7 @@ export default function PlayerRankingDetail() {
 
       {/* Footer reference */}
       {!loading && !error && sections.length > 0 && (
-        <div className="flex items-center justify-center gap-2 pt-2 pb-4">
+        <div className="flex items-center justify-center flex-wrap gap-x-2 gap-y-1 pt-2 pb-4">
           <Trophy className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
           <span className="text-[11px] text-slate-400 dark:text-slate-500">
             Data from USAB Junior Rankings
@@ -457,6 +457,15 @@ export default function PlayerRankingDetail() {
             className="text-[11px] text-slate-400 dark:text-slate-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors inline-flex items-center gap-1"
           >
             View original <ExternalLink className="w-3 h-3" />
+          </a>
+          <span className="text-slate-300 dark:text-slate-600">·</span>
+          <a
+            href="https://usabjrrankings.org/show_points_table"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] text-slate-400 dark:text-slate-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors inline-flex items-center gap-1"
+          >
+            Points Table <ExternalLink className="w-3 h-3" />
           </a>
         </div>
       )}

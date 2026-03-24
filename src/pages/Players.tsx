@@ -939,8 +939,15 @@ export default function Rankings() {
               href="https://usabjrrankings.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >usabjrrankings.org</a>
+              className="text-blue-600 hover:underline inline-flex items-center gap-1"
+            >usabjrrankings.org<ExternalLink className="w-3 h-3 inline" /></a>
+            {' · '}
+            <a
+              href="https://usabjrrankings.org/show_points_table"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline inline-flex items-center gap-1"
+            >Points Table<ExternalLink className="w-3 h-3 inline" /></a>
           </p>
         </div>
       </div>
