@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Trophy, Users, Swords, Calendar, Clock,
@@ -6,7 +6,7 @@ import {
   SquareArrowOutUpRight,
 } from 'lucide-react';
 import { usePlayers } from '../contexts/PlayersContext';
-import { fetchTournaments } from '../services/rankingsService';
+import { fetchSpotlight } from '../services/rankingsService';
 import type { ScheduledTournament } from '../types/junior';
 
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
@@ -89,32 +89,26 @@ const STATUS_CONFIG: Record<string, { icon: typeof Clock; label: string; bg: str
 export default function Home() {
   const { players, loading } = usePlayers();
 
-  const [spotlight, setSpotlight] = useState<ScheduledTournament | null>(null);
+  const [spotlights, setSpotlights] = useState<ScheduledTournament[]>([]);
   const [spotlightLoading, setSpotlightLoading] = useState(true);
   const [spotlightError, setSpotlightError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetchTournaments()
+    fetchSpotlight()
       .then(data => {
         if (cancelled) return;
-        setSpotlight(data.spotlight ?? null);
+        setSpotlights(data.spotlight ?? []);
         setSpotlightError(null);
       })
       .catch((err) => {
         if (cancelled) return;
         setSpotlightError(err instanceof Error ? err.message : 'Could not load spotlight tournament');
-        setSpotlight(null);
+        setSpotlights([]);
       })
       .finally(() => { if (!cancelled) setSpotlightLoading(false); });
     return () => { cancelled = true; };
   }, []);
-
-  const spotlightDays = useMemo(() => {
-    if (!spotlight) return null;
-    if (spotlight.status === 'upcoming') return daysUntil(spotlight.startDate);
-    return null;
-  }, [spotlight]);
 
   const totalPlayers = players.length;
 
@@ -140,100 +134,105 @@ export default function Home() {
         )}
       </div>
 
-      {/* Spotlight Tournament */}
-      {!spotlightLoading && spotlight && (() => {
-        const config = STATUS_CONFIG[spotlight.status] || STATUS_CONFIG.upcoming;
-        const StatusIcon = config.icon;
-        return (
-          <div className="relative overflow-hidden rounded-2xl border border-violet-200 dark:border-violet-800/60 bg-gradient-to-br from-violet-50 via-white to-sky-50 dark:from-violet-950/40 dark:via-slate-900 dark:to-sky-950/30 shadow-sm">
-            <div className="px-5 pt-4 pb-1 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-violet-500 dark:text-violet-400" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-violet-500 dark:text-violet-400">
-                {spotlight.status === 'in-progress' ? 'Happening Now' : spotlight.status === 'upcoming' ? 'Up Next' : 'Latest Tournament'}
-              </span>
-            </div>
-            <div className="px-5 pb-5 pt-2">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div className="flex-1 min-w-0 space-y-2.5">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
-                      <StatusIcon className={`w-3 h-3 ${spotlight.status === 'in-progress' ? 'animate-spin' : ''}`} />
-                      {config.label}
-                    </span>
-                    {spotlightDays !== null && spotlightDays > 0 && (
-                      <span className="text-xs text-slate-400 dark:text-slate-500">
-                        {spotlightDays === 1 ? 'Tomorrow' : `in ${spotlightDays} days`}
-                      </span>
-                    )}
-                  </div>
+      {/* Spotlight Tournaments */}
+      {!spotlightLoading && spotlights.length > 0 && (
+        <div className={`grid gap-4 ${spotlights.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+          {spotlights.map((sl) => {
+            const config = STATUS_CONFIG[sl.status] || STATUS_CONFIG.upcoming;
+            const StatusIcon = config.icon;
+            const days = sl.status === 'upcoming' ? daysUntil(sl.startDate) : null;
+            return (
+              <div key={sl.tswId ?? sl.name} className="relative overflow-hidden rounded-2xl border border-violet-200 dark:border-violet-800/60 bg-gradient-to-br from-violet-50 via-white to-sky-50 dark:from-violet-950/40 dark:via-slate-900 dark:to-sky-950/30 shadow-sm">
+                <div className="px-5 pt-4 pb-1 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-violet-500 dark:text-violet-400" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-violet-500 dark:text-violet-400">
+                    {sl.status === 'in-progress' ? 'Happening Now' : sl.status === 'upcoming' ? 'Up Next' : 'Latest Tournament'}
+                  </span>
+                </div>
+                <div className="px-5 pb-5 pt-2">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex-1 min-w-0 space-y-2.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+                          <StatusIcon className={`w-3 h-3 ${sl.status === 'in-progress' ? 'animate-spin' : ''}`} />
+                          {config.label}
+                        </span>
+                        {days !== null && days > 0 && (
+                          <span className="text-xs text-slate-400 dark:text-slate-500">
+                            {days === 1 ? 'Tomorrow' : `in ${days} days`}
+                          </span>
+                        )}
+                      </div>
 
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 leading-snug group">
-                    {spotlight.tswId ? (
-                      <Link
-                        to={`/tournaments/${spotlight.tswId}`}
-                        state={{ name: spotlight.name, hostClub: spotlight.hostClub, startDate: spotlight.startDate, endDate: spotlight.endDate }}
-                        className="inline-flex items-center gap-1.5 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
-                      >
-                        {spotlight.name}
-                        <SquareArrowOutUpRight className="w-4 h-4 text-violet-400 dark:text-violet-500 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors shrink-0" />
-                      </Link>
-                    ) : (
-                      spotlight.name
-                    )}
-                  </h3>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 leading-snug group">
+                        {sl.tswId ? (
+                          <Link
+                            to={`/tournaments/${sl.tswId}`}
+                            state={{ name: sl.name, hostClub: sl.hostClub, startDate: sl.startDate, endDate: sl.endDate }}
+                            className="inline-flex items-center gap-1.5 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+                          >
+                            {sl.name}
+                            <SquareArrowOutUpRight className="w-4 h-4 text-violet-400 dark:text-violet-500 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors shrink-0" />
+                          </Link>
+                        ) : (
+                          sl.name
+                        )}
+                      </h3>
 
-                  <div className="flex flex-col gap-1 text-sm text-slate-500 dark:text-slate-400">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 shrink-0" />
-                      <span>{formatDateRange(spotlight.startDate, spotlight.endDate)}</span>
+                      <div className="flex flex-col gap-1 text-sm text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-3.5 h-3.5 shrink-0" />
+                          <span>{formatDateRange(sl.startDate, sl.endDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate">{sl.hostClub}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap pt-1">
+                        {sl.tswId && sl.status === 'completed' && (
+                          <Link
+                            to={`/tournaments/${sl.tswId}/medals`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
+                          >
+                            <Medal className="w-3 h-3" />
+                            Medals
+                          </Link>
+                        )}
+                        {sl.prospectusUrl && (
+                          <a
+                            href={sl.prospectusUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                          >
+                            <FileText className="w-3 h-3" />
+                            Prospectus
+                          </a>
+                        )}
+                        {sl.usabUrl && (
+                          <a
+                            href={sl.usabUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            USAB
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">{spotlight.hostClub}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-wrap pt-1">
-                    {spotlight.tswId && spotlight.status === 'completed' && (
-                      <Link
-                        to={`/tournaments/${spotlight.tswId}/medals`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
-                      >
-                        <Medal className="w-3 h-3" />
-                        Medals
-                      </Link>
-                    )}
-                    {spotlight.prospectusUrl && (
-                      <a
-                        href={spotlight.prospectusUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                      >
-                        <FileText className="w-3 h-3" />
-                        Prospectus
-                      </a>
-                    )}
-                    {spotlight.usabUrl && (
-                      <a
-                        href={spotlight.usabUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        USAB
-                      </a>
-                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        );
-      })()}
+            );
+          })}
+        </div>
+      )}
 
-      {!spotlightLoading && !spotlight && spotlightError && (
+      {!spotlightLoading && spotlights.length === 0 && spotlightError && (
         <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
           Spotlight tournament is currently unavailable. {spotlightError}
         </div>

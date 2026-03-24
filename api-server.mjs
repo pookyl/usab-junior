@@ -706,10 +706,11 @@ const server = createServer(async (req, res) => {
   // GET /api/tournaments?season=2025-2026
   if (reqUrl.pathname === '/api/tournaments') {
     const season = reqUrl.searchParams.get('season');
+    const spotlightOnly = reqUrl.searchParams.get('spotlight') === 'true';
     if (season && !isValidSeason(season)) {
       return sendApiError(res, new ValidationError('Invalid season format', { field: 'season' }));
     }
-    const cacheKey = `tournaments:${season || 'all'}`;
+    const cacheKey = spotlightOnly ? 'tournaments:spotlight' : `tournaments:${season || 'all'}`;
     const cached = getCached(cacheKey);
     if (cached) {
       res.writeHead(200, { 'X-Cache': 'HIT' });
@@ -729,7 +730,8 @@ const server = createServer(async (req, res) => {
       availableSeasons.sort().reverse();
 
       if (availableSeasons.length === 0) {
-        sendJson(res, 200, { seasons: {}, availableSeasons: [] });
+        const empty = spotlightOnly ? { spotlight: [] } : { seasons: {}, availableSeasons: [] };
+        sendJson(res, 200, empty);
         return;
       }
 
@@ -927,58 +929,67 @@ const server = createServer(async (req, res) => {
         } catch { return null; }
       }
 
-      let result;
-      let allTournaments = [];
-      if (season) {
-        const data = await loadSeason(season);
-        const list = data ? recomputeStatuses(data.tournaments) : [];
-        allTournaments = list;
-        result = {
-          season,
-          tournaments: list,
-          availableSeasons,
-        };
-      } else {
-        const allSeasons = {};
+      if (spotlightOnly) {
+        let allTournaments = [];
         for (const s of availableSeasons) {
           const data = await loadSeason(s);
-          if (data) {
-            const list = recomputeStatuses(data.tournaments);
-            allSeasons[s] = { tournaments: list };
-            allTournaments.push(...list);
+          if (data) allTournaments.push(...recomputeStatuses(data.tournaments));
+        }
+
+        const MAX_SPOTLIGHT = 3;
+        const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+        const todayMs = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00').getTime();
+        const inProgress = allTournaments.filter(t => t.status === 'in-progress');
+        let spotlight = [];
+        if (inProgress.length > 0) {
+          spotlight = inProgress;
+        } else {
+          const completed = allTournaments
+            .filter(t => t.status === 'completed' && t.endDate)
+            .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+          const upcoming = allTournaments
+            .filter(t => t.status === 'upcoming' && t.startDate)
+            .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+          const recentCompleted = completed[0] ?? null;
+          const nextUpcoming = upcoming[0] ?? null;
+          if (recentCompleted && (todayMs - new Date(recentCompleted.endDate).getTime()) < TWO_DAYS_MS) {
+            spotlight = [recentCompleted];
+          } else if (nextUpcoming) {
+            spotlight = upcoming.filter(t => t.startDate === nextUpcoming.startDate);
+          } else if (recentCompleted) {
+            spotlight = [recentCompleted];
           }
         }
-        result = { seasons: allSeasons, availableSeasons };
-      }
-
-      // Pick spotlight: in-progress > closest to today (upcoming or recently completed)
-      const todayMs = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00').getTime();
-      const inProgress = allTournaments.filter(t => t.status === 'in-progress');
-      let spotlight = null;
-      if (inProgress.length > 0) {
-        spotlight = inProgress[0];
+        const result = { spotlight: spotlight.slice(0, MAX_SPOTLIGHT) };
+        setCache(cacheKey, result);
+        console.log(`[tournaments] serving spotlight (${spotlight.length} cards)`);
+        sendJson(res, 200, result, { 'X-Cache': 'MISS' });
       } else {
-        const completed = allTournaments
-          .filter(t => t.status === 'completed' && t.endDate)
-          .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
-        const upcoming = allTournaments
-          .filter(t => t.status === 'upcoming' && t.startDate)
-          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-        const recentCompleted = completed[0] ?? null;
-        const nextUpcoming = upcoming[0] ?? null;
-        if (recentCompleted && nextUpcoming) {
-          const completedGap = todayMs - new Date(recentCompleted.endDate).getTime();
-          const upcomingGap = new Date(nextUpcoming.startDate).getTime() - todayMs;
-          spotlight = upcomingGap <= completedGap ? nextUpcoming : recentCompleted;
+        let result;
+        if (season) {
+          const data = await loadSeason(season);
+          const list = data ? recomputeStatuses(data.tournaments) : [];
+          result = {
+            season,
+            tournaments: list,
+            availableSeasons,
+          };
         } else {
-          spotlight = nextUpcoming ?? recentCompleted;
+          const allSeasons = {};
+          for (const s of availableSeasons) {
+            const data = await loadSeason(s);
+            if (data) {
+              const list = recomputeStatuses(data.tournaments);
+              allSeasons[s] = { tournaments: list };
+            }
+          }
+          result = { seasons: allSeasons, availableSeasons };
         }
-      }
-      result.spotlight = spotlight;
 
-      setCache(cacheKey, result);
-      console.log(`[tournaments] serving ${season || 'all'} (${availableSeasons.length} seasons available)`);
-      sendJson(res, 200, result, { 'X-Cache': 'MISS' });
+        setCache(cacheKey, result);
+        console.log(`[tournaments] serving ${season || 'all'} (${availableSeasons.length} seasons available)`);
+        sendJson(res, 200, result, { 'X-Cache': 'MISS' });
+      }
     } catch (err) {
       sendApiError(res, err, { logLabel: 'tournaments' });
     }

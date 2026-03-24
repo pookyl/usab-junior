@@ -9,6 +9,7 @@ import type {
   TswPlayerStats,
   PlayerRankingTrend,
   TournamentsResponse,
+  SpotlightResponse,
   TournamentDetail,
   TournamentMedals,
   TournamentMatchDayResponse,
@@ -308,6 +309,23 @@ export async function fetchTournaments(
   tournamentsCache = data;
   tournamentsCacheSeason = cacheKey;
   tournamentsCacheTs = Date.now();
+  return data;
+}
+
+let spotlightCache: SpotlightResponse | null = null;
+let spotlightCacheTs = 0;
+
+export async function fetchSpotlight(): Promise<SpotlightResponse> {
+  if (spotlightCache && (Date.now() - spotlightCacheTs) < TOURNAMENTS_CACHE_TTL_MS) {
+    return spotlightCache;
+  }
+
+  const res = await fetchWithRetry('/api/tournaments?spotlight=true', 15_000);
+  if (!res.ok) await throwApiError(res, 'Spotlight API');
+
+  const data: SpotlightResponse = await res.json();
+  spotlightCache = data;
+  spotlightCacheTs = Date.now();
   return data;
 }
 

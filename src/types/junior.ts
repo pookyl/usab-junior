@@ -193,7 +193,10 @@ export interface TournamentsResponse {
   tournaments?: ScheduledTournament[];
   seasons?: Record<string, TournamentSeasonData>;
   availableSeasons: string[];
-  spotlight?: ScheduledTournament | null;
+}
+
+export interface SpotlightResponse {
+  spotlight: ScheduledTournament[];
 }
 
 export interface TournamentDraw {
