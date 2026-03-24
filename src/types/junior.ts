@@ -316,6 +316,7 @@ export interface TournamentPlayerDetailResponse {
   playerId: number;
   playerName: string;
   memberId?: string;
+  tournamentName?: string;
   club: string;
   events: string[];
   winLoss: TournamentPlayerWinLoss | null;

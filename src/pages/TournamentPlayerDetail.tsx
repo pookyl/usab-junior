@@ -136,6 +136,11 @@ export default function TournamentPlayerDetail() {
       ) : data ? (
         <>
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 space-y-5">
+            {data.tournamentName && (
+              <p className="text-xs font-medium text-slate-400 dark:text-slate-500 truncate">
+                {data.tournamentName}
+              </p>
+            )}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">

@@ -168,12 +168,22 @@ async function synthesizePlayerDetail(tswId, url) {
     memberId = idMap[String(playerId)] || undefined;
   } catch { /* no map file */ }
 
+  let tournamentName;
+  try {
+    const detail = JSON.parse(await readFile(join(cacheDir, 'detail.json'), 'utf-8'));
+    tournamentName = (detail.name || '')
+      .replace(/^Tournamentsoftware\.com\s*-\s*/i, '')
+      .replace(/\s*-\s*Draws$/i, '')
+      .trim() || undefined;
+  } catch { /* no detail file */ }
+
   const hasUpcomingMatches = allMatches.some(m => !m.team1Won && !m.team2Won && !m.bye && !m.walkover && m.time);
   const result = {
     tswId,
     playerId,
     playerName: player.name,
     memberId,
+    tournamentName,
     club: player.club || '',
     events,
     winLoss: total > 0 ? { wins, losses, total, winPct } : null,

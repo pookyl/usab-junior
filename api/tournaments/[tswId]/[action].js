@@ -769,12 +769,12 @@ async function fetchPlayerDetailInternal(tswId, playerId, refresh) {
   }
   const resp = tswOk(await tswFetch(`/tournament/${tswId.toLowerCase()}/player/${playerId}`), 'TSW player page');
   const html = await resp.text();
-  const { playerName, memberId } = parseTswPlayerInfo(html);
+  const { playerName, memberId, tournamentName } = parseTswPlayerInfo(html);
   const events = parseTswPlayerEvents(html);
   const winLoss = parseTswPlayerWinLoss(html);
   const matches = parseTswPlayerMatches(html);
   const hasUpcomingMatches = matches.some(m => !m.team1Won && !m.team2Won && !m.bye && !m.walkover && m.time);
-  const result = { tswId, playerId, playerName, memberId: memberId || undefined, club: '', events, winLoss, matches, hasUpcomingMatches };
+  const result = { tswId, playerId, playerName, memberId: memberId || undefined, tournamentName: tournamentName || undefined, club: '', events, winLoss, matches, hasUpcomingMatches };
   setCache(cacheKey, result);
   return result;
 }

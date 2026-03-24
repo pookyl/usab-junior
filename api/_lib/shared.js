@@ -1232,7 +1232,13 @@ export function parseTswPlayerInfo(html) {
     const asideMatch = nameMatch[1].match(/media__title-aside[^>]*>\s*\((\d+)\)/);
     if (asideMatch) memberId = asideMatch[1];
   }
-  return { playerName, memberId };
+  let tournamentName = '';
+  const tnMatch = html.match(/<h2[^>]*class="[^"]*media__title[^"]*"[^>]*>([\s\S]*?)<\/h2>/i);
+  if (tnMatch) {
+    const valMatch = tnMatch[1].match(/nav-link__value">([^<]+)<\/span>/);
+    if (valMatch) tournamentName = valMatch[1].trim();
+  }
+  return { playerName, memberId, tournamentName };
 }
 
 export function parseTswPlayerEvents(html) {
