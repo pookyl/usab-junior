@@ -17,7 +17,7 @@ import {
   Link2,
   Check,
 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { toBlob } from 'html-to-image';
 import {
   LineChart,
@@ -673,7 +673,9 @@ function QrCardModal({
   const handleShare = useCallback(async () => {
     if (!cardRef.current) return;
     try {
-      const blob = await toBlob(cardRef.current, { pixelRatio: Math.max(window.devicePixelRatio, 3) });
+      const opts = { pixelRatio: Math.max(window.devicePixelRatio, 3) };
+      await toBlob(cardRef.current, opts); // warmup pass — ensures fonts/styles are resolved
+      const blob = await toBlob(cardRef.current, opts);
       if (!blob) return;
       const file = new File([blob], `${name.replace(/\s+/g, '-')}-qr.png`, { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
@@ -704,8 +706,14 @@ function QrCardModal({
             ref={cardRef}
             className={`w-72 md:w-80 rounded-3xl bg-gradient-to-br ${theme.gradient} p-6 md:p-8 flex flex-col items-center text-center overflow-hidden relative`}
           >
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+            <div
+              className="absolute top-0 right-0 w-64 h-64 -translate-y-1/3 translate-x-1/4 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)' }}
+            />
+            <div
+              className="absolute bottom-0 left-0 w-48 h-48 translate-y-1/4 -translate-x-1/4 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' }}
+            />
 
             <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${theme.avatar} flex items-center justify-center text-xl font-black text-white shadow-lg mb-3`}>
               {initials}
@@ -726,7 +734,7 @@ function QrCardModal({
             </div>
 
             <div className="relative bg-white rounded-2xl p-4 shadow-lg mb-4">
-              <QRCodeSVG value={profileUrl} size={160} level="M" fgColor={theme.qrColor} />
+              <QRCodeCanvas value={profileUrl} size={160} level="M" fgColor={theme.qrColor} />
             </div>
 
             <p className="relative text-xs text-white/70 mb-1">Scan to view profile</p>
