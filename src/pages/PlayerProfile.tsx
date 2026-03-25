@@ -18,7 +18,6 @@ import {
   Check,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { toBlob } from 'html-to-image';
 import {
   LineChart,
   Line,
@@ -635,13 +634,166 @@ function PlayerNameLinkGroup({
 }
 
 const CARD_THEMES = [
-  { name: 'Galaxy', gradient: 'from-violet-600 via-indigo-600 to-blue-600', avatar: 'from-violet-400 to-blue-500', qrColor: '#4338ca' },
-  { name: 'Sunset', gradient: 'from-orange-500 via-rose-500 to-pink-600', avatar: 'from-orange-400 to-pink-500', qrColor: '#be123c' },
-  { name: 'Ocean', gradient: 'from-cyan-500 via-blue-500 to-indigo-600', avatar: 'from-cyan-400 to-indigo-500', qrColor: '#1d4ed8' },
-  { name: 'Forest', gradient: 'from-emerald-500 via-green-600 to-teal-700', avatar: 'from-emerald-400 to-teal-500', qrColor: '#047857' },
-  { name: 'Flame', gradient: 'from-red-500 via-orange-500 to-amber-500', avatar: 'from-red-400 to-amber-400', qrColor: '#c2410c' },
-  { name: 'Storm', gradient: 'from-slate-600 via-slate-700 to-slate-900', avatar: 'from-slate-400 to-slate-600', qrColor: '#1e293b' },
+  { name: 'Galaxy', gradient: 'from-violet-600 via-indigo-600 to-blue-600', avatar: 'from-violet-400 to-blue-500', qrColor: '#4338ca', stops: ['#7c3aed', '#4f46e5', '#2563eb'], avatarHex: ['#a78bfa', '#3b82f6'] },
+  { name: 'Sunset', gradient: 'from-orange-500 via-rose-500 to-pink-600', avatar: 'from-orange-400 to-pink-500', qrColor: '#be123c', stops: ['#f97316', '#f43f5e', '#db2777'], avatarHex: ['#fb923c', '#ec4899'] },
+  { name: 'Ocean', gradient: 'from-cyan-500 via-blue-500 to-indigo-600', avatar: 'from-cyan-400 to-indigo-500', qrColor: '#1d4ed8', stops: ['#06b6d4', '#3b82f6', '#4f46e5'], avatarHex: ['#22d3ee', '#6366f1'] },
+  { name: 'Forest', gradient: 'from-emerald-500 via-green-600 to-teal-700', avatar: 'from-emerald-400 to-teal-500', qrColor: '#047857', stops: ['#10b981', '#16a34a', '#0f766e'], avatarHex: ['#34d399', '#14b8a6'] },
+  { name: 'Flame', gradient: 'from-red-500 via-orange-500 to-amber-500', avatar: 'from-red-400 to-amber-400', qrColor: '#c2410c', stops: ['#ef4444', '#f97316', '#f59e0b'], avatarHex: ['#f87171', '#fbbf24'] },
+  { name: 'Storm', gradient: 'from-slate-600 via-slate-700 to-slate-900', avatar: 'from-slate-400 to-slate-600', qrColor: '#1e293b', stops: ['#475569', '#334155', '#0f172a'], avatarHex: ['#94a3b8', '#475569'] },
 ];
+
+const AGE_PILL_HEX: Record<AgeGroup, string> = {
+  U11: '#7c3aed', U13: '#3b82f6', U15: '#059669', U17: '#d97706', U19: '#e11d48',
+};
+
+function canvasRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawShareCard(
+  opts: { name: string; usabId: string; ageGroups: AgeGroup[]; isRanked: boolean; theme: typeof CARD_THEMES[number]; qrCanvas: HTMLCanvasElement | null },
+): HTMLCanvasElement {
+  const { name, usabId, ageGroups, isRanked, theme, qrCanvas } = opts;
+  const DPR = Math.max(window.devicePixelRatio, 3);
+  const W = 320;
+  const PAD = 32;
+  const AVATAR = 64;
+  const QR = 160;
+  const QR_PAD = 16;
+  const QR_BOX = QR + QR_PAD * 2;
+  const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  const MONO = '"SF Mono", SFMono-Regular, Menlo, Consolas, monospace';
+
+  let H = PAD + AVATAR + 12 + 24 + 10 + 20 + 20 + QR_BOX + 16 + 16 + 4 + 14 + PAD;
+  if (!isRanked || ageGroups.length === 0) H += 0;
+
+  const c = document.createElement('canvas');
+  c.width = W * DPR;
+  c.height = H * DPR;
+  const ctx = c.getContext('2d')!;
+  ctx.scale(DPR, DPR);
+
+  // Clipped rounded background
+  ctx.save();
+  canvasRoundRect(ctx, 0, 0, W, H, 24);
+  ctx.clip();
+
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, theme.stops[0]);
+  bg.addColorStop(0.5, theme.stops[1]);
+  bg.addColorStop(1, theme.stops[2]);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Glow effects
+  const g1 = ctx.createRadialGradient(W * 0.85, H * 0.05, 0, W * 0.85, H * 0.05, 140);
+  g1.addColorStop(0, 'rgba(255,255,255,0.12)');
+  g1.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g1;
+  ctx.fillRect(0, 0, W, H);
+  const g2 = ctx.createRadialGradient(W * 0.15, H * 0.95, 0, W * 0.15, H * 0.95, 100);
+  g2.addColorStop(0, 'rgba(255,255,255,0.06)');
+  g2.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g2;
+  ctx.fillRect(0, 0, W, H);
+
+  let y = PAD;
+  ctx.textAlign = 'center';
+
+  // Avatar
+  const ax = (W - AVATAR) / 2;
+  const av = ctx.createLinearGradient(ax, y, ax + AVATAR, y + AVATAR);
+  av.addColorStop(0, theme.avatarHex[0]);
+  av.addColorStop(1, theme.avatarHex[1]);
+  ctx.shadowColor = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 4;
+  canvasRoundRect(ctx, ax, y, AVATAR, AVATAR, 16);
+  ctx.fillStyle = av;
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('');
+  ctx.fillStyle = '#fff';
+  ctx.font = `900 22px ${FONT}`;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(initials, W / 2, y + AVATAR / 2);
+  y += AVATAR + 12;
+
+  // Name
+  ctx.fillStyle = '#fff';
+  ctx.font = `700 20px ${FONT}`;
+  ctx.textBaseline = 'top';
+  ctx.fillText(name, W / 2, y, W - PAD * 2);
+  y += 24 + 10;
+
+  // Age pills
+  ctx.font = `700 10px ${FONT}`;
+  ctx.textBaseline = 'middle';
+  if (isRanked && ageGroups.length > 0) {
+    const pillH = 18;
+    const gap = 6;
+    const widths = ageGroups.map((ag) => ctx.measureText(ag).width + 20);
+    const total = widths.reduce((a, b) => a + b, 0) + (ageGroups.length - 1) * gap;
+    let px = (W - total) / 2;
+    for (let i = 0; i < ageGroups.length; i++) {
+      canvasRoundRect(ctx, px, y, widths[i], pillH, 9);
+      ctx.fillStyle = AGE_PILL_HEX[ageGroups[i]];
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = `700 10px ${FONT}`;
+      ctx.fillText(ageGroups[i], px + widths[i] / 2, y + pillH / 2);
+      px += widths[i] + gap;
+    }
+  } else {
+    const pillH = 18;
+    const pw = ctx.measureText('Player').width + 20;
+    canvasRoundRect(ctx, (W - pw) / 2, y, pw, pillH, 9);
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillText('Player', W / 2, y + pillH / 2);
+  }
+  y += 20 + 20;
+
+  // QR white container
+  const qx = (W - QR_BOX) / 2;
+  ctx.shadowColor = 'rgba(0,0,0,0.15)';
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 4;
+  canvasRoundRect(ctx, qx, y, QR_BOX, QR_BOX, 16);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  if (qrCanvas) {
+    ctx.drawImage(qrCanvas, qx + QR_PAD, y + QR_PAD, QR, QR);
+  }
+  y += QR_BOX + 16;
+
+  // Footer text
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = `400 12px ${FONT}`;
+  ctx.fillText('Scan to view profile', W / 2, y);
+  y += 16 + 4;
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = `400 10px ${MONO}`;
+  ctx.fillText(`USAB #${usabId}`, W / 2, y);
+
+  ctx.restore();
+  return c;
+}
 
 function QrCardModal({
   name,
@@ -658,7 +810,7 @@ function QrCardModal({
 }) {
   const [themeIdx, setThemeIdx] = useState(0);
   const [copied, setCopied] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const qrRef = useRef<HTMLDivElement>(null);
   const theme = CARD_THEMES[themeIdx];
   const profileUrl = `${window.location.origin}/directory/${usabId}`;
   const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('');
@@ -671,11 +823,10 @@ function QrCardModal({
   }, [onClose]);
 
   const handleShare = useCallback(async () => {
-    if (!cardRef.current) return;
+    const qrCanvas = qrRef.current?.querySelector('canvas') ?? null;
+    const card = drawShareCard({ name, usabId, ageGroups, isRanked, theme, qrCanvas });
     try {
-      const opts = { pixelRatio: Math.max(window.devicePixelRatio, 3) };
-      await toBlob(cardRef.current, opts); // warmup pass — ensures fonts/styles are resolved
-      const blob = await toBlob(cardRef.current, opts);
+      const blob = await new Promise<Blob | null>((res) => card.toBlob(res, 'image/png'));
       if (!blob) return;
       const file = new File([blob], `${name.replace(/\s+/g, '-')}-qr.png`, { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
@@ -684,7 +835,7 @@ function QrCardModal({
         await navigator.share({ title: `${name} – Player Profile`, url: profileUrl });
       }
     } catch { /* user cancelled or unsupported */ }
-  }, [name, profileUrl]);
+  }, [name, usabId, ageGroups, isRanked, theme, profileUrl]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -703,7 +854,6 @@ function QrCardModal({
       >
         <div className="relative">
           <div
-            ref={cardRef}
             className={`w-72 md:w-80 rounded-3xl bg-gradient-to-br ${theme.gradient} p-6 md:p-8 flex flex-col items-center text-center overflow-hidden relative`}
           >
             <div
@@ -733,7 +883,7 @@ function QrCardModal({
               )}
             </div>
 
-            <div className="relative bg-white rounded-2xl p-4 shadow-lg mb-4">
+            <div ref={qrRef} className="relative bg-white rounded-2xl p-4 shadow-lg mb-4">
               <QRCodeCanvas value={profileUrl} size={160} level="M" fgColor={theme.qrColor} />
             </div>
 
