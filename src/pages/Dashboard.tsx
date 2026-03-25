@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Trophy, Users, Swords, Calendar, Clock, ChevronDown,
   MapPin, CheckCircle2, Loader2, Medal, FileText, ExternalLink, CalendarClock,
+  QrCode, Share2, X, Link2, Check,
 } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { usePlayersRankings } from '../contexts/PlayersContext';
 import { fetchSpotlight } from '../services/rankingsService';
 import ScheduleInline from '../components/ScheduleInline';
@@ -86,6 +88,185 @@ const STATUS_CONFIG: Record<string, { icon: typeof Clock; label: string; bg: str
   upcoming:      { icon: Clock,        label: 'Upcoming',    bg: 'bg-blue-100 dark:bg-blue-900/30',       text: 'text-blue-700 dark:text-blue-300' },
 };
 
+function canvasRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawSiteCard(qrCanvas: HTMLCanvasElement | null): HTMLCanvasElement {
+  const DPR = Math.max(window.devicePixelRatio, 3);
+  const W = 320;
+  const PAD = 32;
+  const QR = 160;
+  const QR_PAD = 16;
+  const QR_BOX = QR + QR_PAD * 2;
+  const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+  const H = PAD + 28 + 8 + 16 + 20 + QR_BOX + 16 + 16 + PAD;
+
+  const c = document.createElement('canvas');
+  c.width = W * DPR;
+  c.height = H * DPR;
+  const ctx = c.getContext('2d')!;
+  ctx.scale(DPR, DPR);
+
+  ctx.save();
+  canvasRoundRect(ctx, 0, 0, W, H, 24);
+  ctx.clip();
+
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#7c3aed');
+  bg.addColorStop(0.5, '#4f46e5');
+  bg.addColorStop(1, '#2563eb');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const g1 = ctx.createRadialGradient(W * 0.85, H * 0.05, 0, W * 0.85, H * 0.05, 140);
+  g1.addColorStop(0, 'rgba(255,255,255,0.12)');
+  g1.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g1;
+  ctx.fillRect(0, 0, W, H);
+  const g2 = ctx.createRadialGradient(W * 0.15, H * 0.95, 0, W * 0.15, H * 0.95, 100);
+  g2.addColorStop(0, 'rgba(255,255,255,0.06)');
+  g2.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g2;
+  ctx.fillRect(0, 0, W, H);
+
+  let y = PAD;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+
+  ctx.fillStyle = '#fff';
+  ctx.font = `800 24px ${FONT}`;
+  ctx.fillText('USAB Junior Hub', W / 2, y);
+  y += 28 + 8;
+
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = `400 13px ${FONT}`;
+  ctx.fillText('Players · Rankings · Tournaments', W / 2, y, W - PAD * 2);
+  y += 16 + 20;
+
+  const qx = (W - QR_BOX) / 2;
+  ctx.shadowColor = 'rgba(0,0,0,0.15)';
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 4;
+  canvasRoundRect(ctx, qx, y, QR_BOX, QR_BOX, 16);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  if (qrCanvas) {
+    ctx.drawImage(qrCanvas, qx + QR_PAD, y + QR_PAD, QR, QR);
+  }
+  y += QR_BOX + 16;
+
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = `400 12px ${FONT}`;
+  ctx.fillText('Scan to visit', W / 2, y);
+
+  ctx.restore();
+  return c;
+}
+
+function SiteQrModal({ onClose }: { onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
+  const siteUrl = window.location.origin;
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  const handleShare = useCallback(async () => {
+    const qrCanvas = qrRef.current?.querySelector('canvas') ?? null;
+    const card = drawSiteCard(qrCanvas);
+    try {
+      const blob = await new Promise<Blob | null>((res) => card.toBlob(res, 'image/png'));
+      if (!blob) return;
+      const file = new File([blob], 'usab-junior-hub-qr.png', { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'USAB Junior Hub', url: siteUrl });
+      } else {
+        await navigator.share({ title: 'USAB Junior Hub', url: siteUrl });
+      }
+    } catch { /* user cancelled or unsupported */ }
+  }, [siteUrl]);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(siteUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
+  }, [siteUrl]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className="relative flex flex-col items-center gap-4 animate-scale-in motion-reduce:animate-none"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative">
+          <div className="w-72 md:w-80 rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 p-6 md:p-8 flex flex-col items-center text-center overflow-hidden relative">
+            <div
+              className="absolute top-0 right-0 w-64 h-64 -translate-y-1/3 translate-x-1/4 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)' }}
+            />
+            <div
+              className="absolute bottom-0 left-0 w-48 h-48 translate-y-1/4 -translate-x-1/4 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' }}
+            />
+
+            <h3 className="relative text-xl md:text-2xl font-extrabold text-white mb-1">
+              USAB Junior <span className="text-violet-200">Hub</span>
+            </h3>
+            <p className="relative text-xs text-white/70 mb-5">Players · Rankings · Tournaments</p>
+
+            <div ref={qrRef} className="relative bg-white rounded-2xl p-4 shadow-lg mb-4">
+              <QRCodeCanvas value={siteUrl} size={160} level="M" fgColor="#4338ca" />
+            </div>
+
+            <p className="relative text-xs text-white/70">Scan to visit</p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white/80 hover:text-white transition-colors backdrop-blur-sm"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            Share
+          </button>
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
+          >
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
+            {copied ? 'Copied!' : 'Copy Link'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { players, loading, ensurePlayers } = usePlayersRankings();
 
@@ -93,6 +274,7 @@ export default function Home() {
   const [spotlightLoading, setSpotlightLoading] = useState(true);
   const [spotlightError, setSpotlightError] = useState<string | null>(null);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
+  const [showQr, setShowQr] = useState(false);
 
   useEffect(() => {
     void ensurePlayers();
@@ -137,7 +319,16 @@ export default function Home() {
             ranked junior players across 5 age groups and 5 event groups
           </p>
         )}
+        <button
+          onClick={() => setShowQr(true)}
+          className="inline-flex items-center gap-1.5 mx-auto px-4 py-1.5 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-colors"
+        >
+          <QrCode className="w-3.5 h-3.5" />
+          Share This Site
+        </button>
       </div>
+
+      {showQr && <SiteQrModal onClose={() => setShowQr(false)} />}
 
       {/* Spotlight Tournaments */}
       {!spotlightLoading && spotlights.length > 0 && (
