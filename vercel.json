@@ -4,31 +4,8 @@
   "outputDirectory": "dist",
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 60
-    },
-    "api/rankings.js": {
-      "includeFiles": "data/{rankings-cache.json,rankings-*.json}"
-    },
-    "api/all-players.js": {
-      "includeFiles": "data/{rankings-cache.json,rankings-*.json}"
-    },
-    "api/cached-dates.js": {
-      "includeFiles": "data/rankings-*.json"
-    },
-    "api/player-directory.js": {
-      "includeFiles": "data/player-directory.json"
-    },
-    "api/player/[id].js": {
-      "includeFiles": "data/rankings-cache.json"
-    },
-    "api/player/[id]/[action].js": {
-      "includeFiles": "data/{rankings-cache.json,player-ranking-trends.json}"
-    },
-    "api/tournaments.js": {
-      "includeFiles": "data/tournaments-*.json"
-    },
-    "api/tournaments/[tswId]/[action].js": {
-      "includeFiles": "data/tournament-cache/**"
+      "maxDuration": 60,
+      "includeFiles": "data/**"
     }
   },
   "rewrites": [
