@@ -155,6 +155,14 @@ function PlayersDataLayout() {
   );
 }
 
+function TournamentDetailLayout() {
+  return (
+    <WatchlistProvider>
+      <Outlet />
+    </WatchlistProvider>
+  );
+}
+
 const ROUTE_PATTERNS = [
   '/tournaments/:tswId/event/:eventId',
   '/tournaments/:tswId/draw/:drawId',
@@ -191,7 +199,6 @@ export default function App() {
       <ThemeProvider>
         <BrowserRouter>
           <TournamentFocusProvider>
-            <WatchlistProvider>
               <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
                 <AnalyticsWithRoutes />
                 <ScrollManager />
@@ -212,24 +219,25 @@ export default function App() {
                       <Route path="/head-to-head" element={<SuspendedPage><HeadToHead /></SuspendedPage>} />
                     </Route>
                     <Route path="/tournaments" element={<SuspendedPage><Tournaments /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId" element={<SuspendedPage><TournamentHub /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/matches" element={<SuspendedPage><TournamentMatchesPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/players" element={<SuspendedPage><TournamentPlayersPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/draws" element={<SuspendedPage><TournamentDrawsPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/events" element={<SuspendedPage><TournamentEventsPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/seeds" element={<SuspendedPage><TournamentSeedsPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/winners" element={<SuspendedPage><TournamentWinnersPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/medals" element={<SuspendedPage><TournamentMedalsPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/watchlist" element={<SuspendedPage><TournamentWatchlistPage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/event/:eventId" element={<SuspendedPage><TournamentEventDetail /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/draw/:drawId" element={<SuspendedPage><TournamentDrawDetail /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/player/:playerId/schedule" element={<SuspendedPage><PlayerSchedulePage /></SuspendedPage>} />
-                    <Route path="/tournaments/:tswId/player/:playerId" element={<SuspendedPage><TournamentPlayerDetail /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId" element={<TournamentDetailLayout />}>
+                      <Route index element={<SuspendedPage><TournamentHub /></SuspendedPage>} />
+                      <Route path="matches" element={<SuspendedPage><TournamentMatchesPage /></SuspendedPage>} />
+                      <Route path="players" element={<SuspendedPage><TournamentPlayersPage /></SuspendedPage>} />
+                      <Route path="draws" element={<SuspendedPage><TournamentDrawsPage /></SuspendedPage>} />
+                      <Route path="events" element={<SuspendedPage><TournamentEventsPage /></SuspendedPage>} />
+                      <Route path="seeds" element={<SuspendedPage><TournamentSeedsPage /></SuspendedPage>} />
+                      <Route path="winners" element={<SuspendedPage><TournamentWinnersPage /></SuspendedPage>} />
+                      <Route path="medals" element={<SuspendedPage><TournamentMedalsPage /></SuspendedPage>} />
+                      <Route path="watchlist" element={<SuspendedPage><TournamentWatchlistPage /></SuspendedPage>} />
+                      <Route path="event/:eventId" element={<SuspendedPage><TournamentEventDetail /></SuspendedPage>} />
+                      <Route path="draw/:drawId" element={<SuspendedPage><TournamentDrawDetail /></SuspendedPage>} />
+                      <Route path="player/:playerId/schedule" element={<SuspendedPage><PlayerSchedulePage /></SuspendedPage>} />
+                      <Route path="player/:playerId" element={<SuspendedPage><TournamentPlayerDetail /></SuspendedPage>} />
+                    </Route>
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </main>
               </div>
-            </WatchlistProvider>
           </TournamentFocusProvider>
         </BrowserRouter>
       </ThemeProvider>

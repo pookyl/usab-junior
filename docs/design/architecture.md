@@ -109,15 +109,15 @@ The app wraps the component tree in nested context providers (`src/App.tsx`):
 ErrorBoundary
   ThemeProvider            -- dark/light mode (localStorage)
     BrowserRouter
-      PlayersProvider      -- all-players, directory, rankings date, cached dates
-        TournamentFocusProvider  -- tournament focus mode (sessionStorage)
-          WatchlistProvider      -- per-tournament watchlist (in-memory Map)
-            Navbar + Routes
+      TournamentFocusProvider  -- tournament focus mode (sessionStorage)
+        Navbar + Routes
+          PlayersDataLayout      -- wraps player/directory routes with PlayersProvider
+          TournamentDetailLayout -- wraps /tournaments/:tswId/* routes with WatchlistProvider
 ```
 
-- **PlayersProvider** loads `fetchAllPlayers`, `fetchCachedDates`, and `fetchPlayerDirectory` on mount. Exposes `players`, `directoryPlayers`, `rankingsDate`, `availableDates`, `changeDate()`, and a `playerNameMap` for name lookups.
 - **TournamentFocusProvider** manages a "tournament mode" that locks the Navbar to tournament-specific navigation while the user is exploring a specific tournament.
-- **WatchlistProvider** maintains a per-tournament set of watched players (stored in-memory, not persisted).
+- **PlayersDataLayout** wraps player/directory routes with `PlayersProvider`, which loads `fetchAllPlayers`, `fetchCachedDates`, and `fetchPlayerDirectory` on mount. Exposes `players`, `directoryPlayers`, `rankingsDate`, `availableDates`, `changeDate()`, and a `playerNameMap` for name lookups.
+- **TournamentDetailLayout** wraps `/tournaments/:tswId/*` routes with `WatchlistProvider`. The provider mounts per-tournament and unmounts when leaving, so watchlist state is naturally scoped without manual cleanup.
 
 ## Routing
 

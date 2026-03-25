@@ -6,8 +6,7 @@ import {
 } from 'lucide-react';
 import { useTournamentMeta, formatDateRange } from '../hooks/useTournamentMeta';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
-
-const _forceWatchlist = new URLSearchParams(window.location.search).has('watchlist_enable');
+import { WATCHLIST_FORCE_ENABLED } from '../utils/urlFlags';
 
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
 
@@ -62,7 +61,7 @@ export default function TournamentHub() {
 
   const tswUrl = `https://www.tournamentsoftware.com/tournament/${tswId}`;
   const isFocusedTournament = isActive && activeTswId === tswId;
-  const showWatchlist = isFocusedTournament && (_forceWatchlist || isWatchlistEligible(meta.startDate, meta.endDate));
+  const showWatchlist = isFocusedTournament && (WATCHLIST_FORCE_ENABLED || isWatchlistEligible(meta.startDate, meta.endDate));
   const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
   const handleTournamentModeToggle = () => {
     track('mode_toggle', {

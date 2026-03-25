@@ -15,7 +15,7 @@ The Watchlist link on the Tournament Hub is only shown when **all** conditions a
 1. **Tournament Focus Mode** is active for this tournament (`isFocusedTournament`).
 2. **Date eligibility** — the tournament starts within 2 days from today, or is currently ongoing (i.e. `startDate <= today + 2 days` AND `endDate >= today`).
 
-The `?debug` URL parameter bypasses the date check (see [URL Parameters](#url-parameters)).
+The `?watchlist_enable` URL parameter bypasses the date check (see [URL Parameters](#url-parameters)).
 
 ## Player Cap
 
@@ -75,11 +75,10 @@ graph TD
 
 ### Global (WatchlistContext)
 
-The `WatchlistProvider` wraps the entire app. It stores watched players in a `Map<number, TournamentPlayer>` keyed by `playerId`.
+The `WatchlistProvider` is scoped to tournament detail routes via `TournamentDetailLayout` in `App.tsx`. It stores watched players in a `Map<number, TournamentPlayer>` keyed by `playerId`. The provider mounts when the user enters any `/tournaments/:tswId/*` route and unmounts (clearing state) when they leave, so no manual tournament-binding logic is needed.
 
-- **Tournament binding:** The watchlist auto-clears when the user switches to a different focused tournament.
 - **Player cap:** `addPlayer` silently rejects additions when `playerMap.size >= WATCHLIST_MAX`.
-- **Persistence:** In-memory only; cleared on page refresh.
+- **Persistence:** In-memory only; cleared on page refresh or when leaving tournament routes.
 
 ### Local (WatchlistTab)
 
@@ -124,25 +123,26 @@ Collapsible section states and filter selections are persisted to `sessionStorag
 
 ## URL Parameters
 
-Read once at module load time; persist for the entire SPA session.
+Parsed once at app startup in `src/utils/urlFlags.ts` (eagerly loaded), so they are captured before lazy-loaded pages change the URL.
 
-| Parameter | Where Used | Effect |
-|-----------|------------|--------|
-| `?debug` | `TournamentHub.tsx` | Bypasses the date eligibility check — watchlist link always appears in tournament focus mode |
-| `?watchlist_max=N` | `WatchlistContext.tsx` | Overrides the default player cap of 7 |
+| Parameter | Where Defined | Where Consumed | Effect |
+|-----------|---------------|----------------|--------|
+| `?watchlist_enable` | `urlFlags.ts` | `TournamentHub.tsx` | Bypasses the date eligibility check — watchlist link always appears in tournament focus mode |
+| `?watchlist_max=N` | `urlFlags.ts` | `WatchlistContext.tsx` | Overrides the default player cap of 7 |
 
-These two parameters are independent. Examples:
+The two parameters are independent. Examples:
 
-- `http://localhost:5173?debug` — watchlist visible for any tournament, cap is 7
+- `http://localhost:5173?watchlist_enable` — watchlist visible for any tournament, cap is 7
 - `http://localhost:5173?watchlist_max=25` — cap is 25, date restriction still applies
-- `http://localhost:5173?debug&watchlist_max=25` — both overrides active
+- `http://localhost:5173?watchlist_enable&watchlist_max=25` — both overrides active
 
 ## Key Files
 
 | File | Role |
 |------|------|
-| `src/contexts/WatchlistContext.tsx` | Global state: player map, add/remove/clear, cap enforcement |
+| `src/utils/urlFlags.ts` | Eagerly-loaded URL parameter capture (`watchlist_enable`, `watchlist_max`) |
+| `src/contexts/WatchlistContext.tsx` | Tournament-scoped state: player map, add/remove/clear, cap enforcement |
 | `src/components/tournament/tabs/WatchlistTab.tsx` | Main UI: picker, summary, filters, match feed |
 | `src/pages/tournament/TournamentWatchlistPage.tsx` | Page wrapper with SubPageLayout and refresh |
-| `src/pages/TournamentHub.tsx` | Visibility gate: date eligibility + debug override |
+| `src/pages/TournamentHub.tsx` | Visibility gate: date eligibility + watchlist_enable override |
 | `src/components/tournament/MatchCard.tsx` | Shared match card used in the feed |
