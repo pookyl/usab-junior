@@ -6,7 +6,6 @@ import {
   QrCode, Share2, X, Link2, Check,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { usePlayersRankings } from '../contexts/PlayersContext';
 import { fetchSpotlight } from '../services/rankingsService';
 import ScheduleInline from '../components/ScheduleInline';
 import type { ScheduledTournament } from '../types/junior';
@@ -35,7 +34,7 @@ const features: Feature[] = [
   },
   {
     title: 'Player Directory',
-    description: 'Browse and search ranked junior players',
+    description: 'Browse and search all junior players past and present',
     icon: Users,
     to: '/directory',
     iconBg: 'bg-emerald-100 dark:bg-emerald-900/30',
@@ -268,17 +267,11 @@ function SiteQrModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function Home() {
-  const { players, loading, ensurePlayers } = usePlayersRankings();
-
   const [spotlights, setSpotlights] = useState<ScheduledTournament[]>([]);
   const [spotlightLoading, setSpotlightLoading] = useState(true);
   const [spotlightError, setSpotlightError] = useState<string | null>(null);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [showQr, setShowQr] = useState(false);
-
-  useEffect(() => {
-    void ensurePlayers();
-  }, [ensurePlayers]);
 
   useEffect(() => {
     let cancelled = false;
@@ -297,8 +290,6 @@ export default function Home() {
     return () => { cancelled = true; };
   }, []);
 
-  const totalPlayers = players.length;
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-10 md:space-y-14">
       {/* Hero */}
@@ -308,17 +299,8 @@ export default function Home() {
           <span className="text-violet-600 dark:text-violet-400"> Hub</span>
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          Your hub for USAB junior rankings, player directory, head-to-head, and tournament info
+          Track rankings, discover players, compare matchups, and explore tournaments — all in one place
         </p>
-        {!loading && totalPlayers > 0 && (
-          <p className="text-sm text-slate-400 dark:text-slate-500">
-            Tracking{' '}
-            <span className="font-semibold text-slate-600 dark:text-slate-300">
-              {totalPlayers.toLocaleString()}
-            </span>{' '}
-            ranked junior players across 5 age groups and 5 event groups
-          </p>
-        )}
         <button
           onClick={() => setShowQr(true)}
           className="inline-flex items-center gap-1.5 mx-auto px-4 py-1.5 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-colors"
