@@ -13,13 +13,12 @@ import {
   ChevronDown,
   QrCode,
   X,
-  Download,
   Share2,
   Link2,
   Check,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { toPng, toBlob } from 'html-to-image';
+import { toBlob } from 'html-to-image';
 import {
   LineChart,
   Line,
@@ -671,21 +670,10 @@ function QrCardModal({
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  const handleSave = useCallback(async () => {
-    if (!cardRef.current) return;
-    try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `${name.replace(/\s+/g, '-')}-qr.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch { /* ignore */ }
-  }, [name]);
-
   const handleShare = useCallback(async () => {
     if (!cardRef.current) return;
     try {
-      const blob = await toBlob(cardRef.current, { pixelRatio: 2 });
+      const blob = await toBlob(cardRef.current, { pixelRatio: Math.max(window.devicePixelRatio, 3) });
       if (!blob) return;
       const file = new File([blob], `${name.replace(/\s+/g, '-')}-qr.png`, { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
@@ -767,13 +755,6 @@ function QrCardModal({
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleSave}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Save Image
-          </button>
           {canShare && (
             <button
               onClick={handleShare}
