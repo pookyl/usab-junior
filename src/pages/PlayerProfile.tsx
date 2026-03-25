@@ -11,7 +11,15 @@ import {
   Award,
   Activity,
   ChevronDown,
+  QrCode,
+  X,
+  Download,
+  Share2,
+  Link2,
+  Check,
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { toPng, toBlob } from 'html-to-image';
 import {
   LineChart,
   Line,
@@ -627,6 +635,167 @@ function PlayerNameLinkGroup({
   );
 }
 
+const CARD_THEMES = [
+  { name: 'Galaxy', gradient: 'from-violet-600 via-indigo-600 to-blue-600', avatar: 'from-violet-400 to-blue-500', qrColor: '#4338ca' },
+  { name: 'Sunset', gradient: 'from-orange-500 via-rose-500 to-pink-600', avatar: 'from-orange-400 to-pink-500', qrColor: '#be123c' },
+  { name: 'Ocean', gradient: 'from-cyan-500 via-blue-500 to-indigo-600', avatar: 'from-cyan-400 to-indigo-500', qrColor: '#1d4ed8' },
+  { name: 'Forest', gradient: 'from-emerald-500 via-green-600 to-teal-700', avatar: 'from-emerald-400 to-teal-500', qrColor: '#047857' },
+  { name: 'Flame', gradient: 'from-red-500 via-orange-500 to-amber-500', avatar: 'from-red-400 to-amber-400', qrColor: '#c2410c' },
+  { name: 'Storm', gradient: 'from-slate-600 via-slate-700 to-slate-900', avatar: 'from-slate-400 to-slate-600', qrColor: '#1e293b' },
+];
+
+function QrCardModal({
+  name,
+  usabId,
+  ageGroups,
+  isRanked,
+  onClose,
+}: {
+  name: string;
+  usabId: string;
+  ageGroups: AgeGroup[];
+  isRanked: boolean;
+  onClose: () => void;
+}) {
+  const [themeIdx, setThemeIdx] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const theme = CARD_THEMES[themeIdx];
+  const profileUrl = `${window.location.origin}/directory/${usabId}`;
+  const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('');
+  const canShare = typeof navigator.share === 'function';
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  const handleSave = useCallback(async () => {
+    if (!cardRef.current) return;
+    try {
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+      const link = document.createElement('a');
+      link.download = `${name.replace(/\s+/g, '-')}-qr.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch { /* ignore */ }
+  }, [name]);
+
+  const handleShare = useCallback(async () => {
+    if (!cardRef.current) return;
+    try {
+      const blob = await toBlob(cardRef.current, { pixelRatio: 2 });
+      if (!blob) return;
+      const file = new File([blob], `${name.replace(/\s+/g, '-')}-qr.png`, { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: `${name} – Player Profile`, url: profileUrl });
+      } else {
+        await navigator.share({ title: `${name} – Player Profile`, url: profileUrl });
+      }
+    } catch { /* user cancelled or unsupported */ }
+  }, [name, profileUrl]);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
+  }, [profileUrl]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className="relative flex flex-col items-center gap-4 animate-scale-in motion-reduce:animate-none"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative">
+          <div
+            ref={cardRef}
+            className={`w-72 md:w-80 rounded-3xl bg-gradient-to-br ${theme.gradient} p-6 md:p-8 flex flex-col items-center text-center overflow-hidden relative`}
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+
+            <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${theme.avatar} flex items-center justify-center text-xl font-black text-white shadow-lg mb-3`}>
+              {initials}
+            </div>
+
+            <h3 className="relative text-lg md:text-xl font-bold text-white mb-2">{name}</h3>
+
+            <div className="relative flex flex-wrap justify-center gap-1.5 mb-5">
+              {isRanked && ageGroups.length > 0 ? ageGroups.map((ag) => (
+                <span key={ag} className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r ${AGE_GRADIENT[ag]} text-white shadow-sm`}>
+                  {ag}
+                </span>
+              )) : (
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white/80">
+                  Player
+                </span>
+              )}
+            </div>
+
+            <div className="relative bg-white rounded-2xl p-4 shadow-lg mb-4">
+              <QRCodeSVG value={profileUrl} size={160} level="M" fgColor={theme.qrColor} />
+            </div>
+
+            <p className="relative text-xs text-white/70 mb-1">Scan to view profile</p>
+            <p className="relative text-[10px] font-mono text-white/50">USAB #{usabId}</p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white/80 hover:text-white transition-colors backdrop-blur-sm"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {CARD_THEMES.map((t, i) => (
+            <button
+              key={t.name}
+              onClick={() => setThemeIdx(i)}
+              title={t.name}
+              className={`w-7 h-7 rounded-full bg-gradient-to-br ${t.gradient} transition-all ${
+                i === themeIdx ? 'ring-2 ring-white ring-offset-2 ring-offset-black/50 scale-110' : 'opacity-70 hover:opacity-100'
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSave}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Save Image
+          </button>
+          {canShare && (
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              Share
+            </button>
+          )}
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
+          >
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
+            {copied ? 'Copied!' : 'Copy Link'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function useVisibleOnScroll() {
   const [el, setEl] = useState<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -691,6 +860,7 @@ export default function PlayerProfile() {
   const [trendError, setTrendError] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [statsTab, setStatsTab] = useState<StatsCategory>('total');
+  const [showQr, setShowQr] = useState(false);
   const [expandedYears, setExpandedYears] = useState<Set<string>>(new Set());
   const [collapsedTournaments, setCollapsedTournaments] = useState<Set<string>>(new Set());
   const expandedYearsRef = useRef(expandedYears);
@@ -1046,8 +1216,25 @@ export default function PlayerProfile() {
             TSW Profile
             <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
           </a>
+          <button
+            onClick={() => setShowQr(true)}
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
+          >
+            <QrCode className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            QR Code
+          </button>
         </div>
       </div>
+
+      {showQr && (
+        <QrCardModal
+          name={displayName}
+          usabId={usabId}
+          ageGroups={ageGroupSet}
+          isRanked={isRanked}
+          onClose={() => setShowQr(false)}
+        />
+      )}
 
       {/* Rankings overview — only shown for currently ranked players */}
       {isRanked && (
