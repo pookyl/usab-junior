@@ -21,7 +21,6 @@ jobs:
 
       - name: Refresh tournaments cache
         run: node scripts/refresh-tournaments-cache.mjs
-        continue-on-error: true
 
       - name: Check if any cache files changed
         id: check

@@ -269,6 +269,9 @@ async function main() {
   );
 
   console.log(`\nDone. Scraped: ${scraped}, Skipped (cached): ${skipped}, Failed: ${failed}`);
+  if (failed > 0) {
+    process.exitCode = 1;
+  }
 }
 
 main().catch(err => {

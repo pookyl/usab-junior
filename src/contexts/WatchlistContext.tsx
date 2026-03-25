@@ -21,9 +21,9 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
   const [playerMap, setPlayerMap] = useState<Map<number, TournamentPlayer>>(new Map());
   const boundTswId = useRef<string | null>(null);
   const activeTswIdRef = useRef(activeTswId);
-  activeTswIdRef.current = activeTswId;
 
   useEffect(() => {
+    activeTswIdRef.current = activeTswId;
     if (!activeTswId) return;
     if (boundTswId.current && activeTswId !== boundTswId.current) {
       setPlayerMap(new Map());

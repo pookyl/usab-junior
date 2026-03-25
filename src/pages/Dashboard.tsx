@@ -4,7 +4,7 @@ import {
   Trophy, Users, Swords, Calendar, Clock, ChevronDown,
   MapPin, CheckCircle2, Loader2, Medal, FileText, ExternalLink, CalendarClock,
 } from 'lucide-react';
-import { usePlayers } from '../contexts/PlayersContext';
+import { usePlayersRankings } from '../contexts/PlayersContext';
 import { fetchSpotlight } from '../services/rankingsService';
 import ScheduleInline from '../components/ScheduleInline';
 import type { ScheduledTournament } from '../types/junior';
@@ -87,7 +87,7 @@ const STATUS_CONFIG: Record<string, { icon: typeof Clock; label: string; bg: str
 };
 
 export default function Home() {
-  const { players, loading, ensurePlayers } = usePlayers();
+  const { players, loading, ensurePlayers } = usePlayersRankings();
 
   const [spotlights, setSpotlights] = useState<ScheduledTournament[]>([]);
   const [spotlightLoading, setSpotlightLoading] = useState(true);

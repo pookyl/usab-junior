@@ -683,8 +683,7 @@ function H2HRankingTrendChart({
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 
-// Module-level cache — survives route changes, immune to StrictMode double-mount
-let _h2hSnap: {
+type HeadToHeadSnapshot = {
   ageGroup: AgeGroup | null;
   gender: Gender;
   playerAId: string;
@@ -694,7 +693,10 @@ let _h2hSnap: {
   tswStatsB: TswPlayerStats | null;
   filterCat: 'All' | 'Singles' | 'Doubles' | 'Mixed';
   scrollY: number;
-} | null = null;
+};
+
+// Module-level cache — survives route changes, immune to StrictMode double-mount
+let _h2hSnap: HeadToHeadSnapshot | null = null;
 
 export default function HeadToHead() {
   const location = useLocation();
@@ -728,6 +730,7 @@ export default function HeadToHead() {
   const [filterCat, setFilterCat] = useState<'All' | 'Singles' | 'Doubles' | 'Mixed'>(snap?.filterCat ?? 'All');
   const [expandedRankingKey, setExpandedRankingKey] = useState<string | null>(null);
   const compareRequestId = useRef(0);
+  const snapshotRef = useRef<HeadToHeadSnapshot | null>(snap);
 
   const allDirectoryPool: UniquePlayer[] = useMemo(() => {
     if (directoryPlayers.length === 0) return allPlayers;
@@ -764,22 +767,26 @@ export default function HeadToHead() {
     }
   }, [playersLoading, allPlayers, allDirectoryPool, snap]);
 
-  // Save snapshot on unmount
+  useEffect(() => {
+    snapshotRef.current = {
+      ageGroup,
+      gender,
+      playerAId: playerA?.usabId ?? '',
+      playerBId: playerB?.usabId ?? '',
+      h2hResult,
+      tswStatsA,
+      tswStatsB,
+      filterCat,
+      scrollY: window.scrollY,
+    };
+  }, [ageGroup, gender, playerA, playerB, h2hResult, tswStatsA, tswStatsB, filterCat]);
+
+  // Save snapshot on unmount without rewriting it on every render.
   useEffect(() => {
     return () => {
-      _h2hSnap = {
-        ageGroup,
-        gender,
-        playerAId: playerA?.usabId ?? '',
-        playerBId: playerB?.usabId ?? '',
-        h2hResult,
-        tswStatsA,
-        tswStatsB,
-        filterCat,
-        scrollY: window.scrollY,
-      };
+      _h2hSnap = snapshotRef.current;
     };
-  });
+  }, []);
 
   const filteredPlayers = useMemo(() => {
     const pool = (ageGroup === null && gender === 'All') ? allDirectoryPool : allPlayers;
@@ -864,8 +871,9 @@ export default function HeadToHead() {
       if (requestId !== compareRequestId.current) return;
       setError('Unexpected error. Please try again.');
     } finally {
-      if (requestId !== compareRequestId.current) return;
-      setComparing(false);
+      if (requestId === compareRequestId.current) {
+        setComparing(false);
+      }
     }
   }, [playerA, playerB, ageGroup, gender, releaseVersion]);
 

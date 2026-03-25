@@ -15,7 +15,7 @@ import {
 import { Search, ExternalLink, RefreshCw, Trophy, WifiOff, Calendar, X, BarChart2, ListOrdered, Users, Feather, LayoutDashboard } from 'lucide-react';
 import type { AgeGroup, EventType, UniquePlayer } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES, EVENT_LABELS } from '../types/junior';
-import { usePlayers } from '../contexts/PlayersContext';
+import { usePlayersRankings } from '../contexts/PlayersContext';
 import StatCard from '../components/StatCard';
 import { inferGender } from '../utils/playerUtils';
 import { AGE_COLORS } from '../constants/ageGroupStyles';
@@ -45,6 +45,32 @@ interface GroupStats {
   total: number;
   boys: number;
   girls: number;
+}
+
+interface RankedCategoryPlayer {
+  usabId: string;
+  name: string;
+  rank: number;
+  rankingPoints: number;
+}
+
+export function buildCategoryRankings(
+  players: UniquePlayer[],
+  ageGroup: AgeGroup,
+  eventType: EventType,
+): RankedCategoryPlayer[] {
+  return players
+    .flatMap((player) =>
+      player.entries
+        .filter((entry) => entry.ageGroup === ageGroup && entry.eventType === eventType)
+        .map((entry) => ({
+          usabId: player.usabId,
+          name: player.name,
+          rank: entry.rank,
+          rankingPoints: entry.rankingPoints,
+        })),
+    )
+    .sort((a, b) => a.rank - b.rank);
 }
 
 function GenderBar({ boys, girls }: { boys: number; girls: number }) {
@@ -115,30 +141,31 @@ function RankBadge({ rank }: { rank: number }) {
 
 /* ─── Rankings Table ─── */
 
-function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; eventType: EventType; date: string }) {
+function RankingsTable({
+  ageGroup,
+  eventType,
+  date,
+  rankings,
+  loading,
+  error,
+}: {
+  ageGroup: AgeGroup;
+  eventType: EventType;
+  date: string;
+  rankings: RankedCategoryPlayer[];
+  loading: boolean;
+  error: string | null;
+}) {
   const [search, setSearch] = useState('');
-  const { players: allPlayers, loading, error } = usePlayers();
-
-  const players = useMemo(
-    () =>
-      allPlayers
-        .flatMap((p) =>
-          p.entries
-            .filter((e) => e.ageGroup === ageGroup && e.eventType === eventType)
-            .map((e) => ({ usabId: p.usabId, name: p.name, rank: e.rank, rankingPoints: e.rankingPoints })),
-        )
-        .sort((a, b) => a.rank - b.rank),
-    [allPlayers, ageGroup, eventType],
-  );
 
   const filtered = useMemo(
     () =>
-      players.filter(
+      rankings.filter(
         (p) =>
           p.name.toLowerCase().includes(search.toLowerCase()) ||
           p.usabId.includes(search),
       ),
-    [players, search],
+    [rankings, search],
   );
 
   return (
@@ -172,12 +199,12 @@ function RankingsTable({ ageGroup, eventType, date }: { ageGroup: AgeGroup; even
           </a>
         </div>
 
-        {loading && players.length === 0 ? (
+        {loading && rankings.length === 0 ? (
           <div className="py-16 text-center">
             <RefreshCw className="w-8 h-8 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
             <p className="text-slate-400 dark:text-slate-500 text-sm">Loading rankings…</p>
           </div>
-        ) : error && players.length === 0 ? (
+        ) : error && rankings.length === 0 ? (
           <div className="py-16 text-center space-y-3">
             <WifiOff className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
             <p className="text-slate-400 dark:text-slate-500 text-sm">Could not load rankings for {ageGroup} {eventType.toUpperCase()}</p>
@@ -401,24 +428,36 @@ function PlayerModal({ data, onClose }: { data: ModalData; onClose: () => void }
 
 /* ─── Analytics View ─── */
 
-function AnalyticsView({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType: EventType }) {
-  const { players, loading } = usePlayers();
+function AnalyticsView({
+  ageGroup,
+  eventType,
+  players,
+  loading,
+  categoryRankings,
+}: {
+  ageGroup: AgeGroup;
+  eventType: EventType;
+  players: UniquePlayer[];
+  loading: boolean;
+  categoryRankings: RankedCategoryPlayer[];
+}) {
   const [modal, setModal] = useState<ModalData | null>(null);
 
+  const playerSummaries = useMemo(() => {
+    return players.map((player) => ({
+      player,
+      bestPoints: player.entries.reduce((max, entry) => Math.max(max, entry.rankingPoints), 0),
+      categoryCount: new Set(player.entries.map((entry) => `${entry.ageGroup}-${entry.eventType}`)).size,
+    }));
+  }, [players]);
+
   const top20 = useMemo(() => {
-    const raw = players
-      .flatMap((p) =>
-        p.entries
-          .filter((e) => e.ageGroup === ageGroup && e.eventType === eventType)
-          .map((e) => ({
-            name: p.name,
-            usabId: p.usabId,
-            points: e.rankingPoints,
-            rank: e.rank,
-          })),
-      )
-      .sort((a, b) => a.rank - b.rank)
-      .slice(0, 20);
+    const raw = categoryRankings.slice(0, 20).map((player) => ({
+      name: player.name,
+      usabId: player.usabId,
+      points: player.rankingPoints,
+      rank: player.rank,
+    }));
 
     const nameCounts = new Map<string, number>();
     for (const r of raw) nameCounts.set(r.name, (nameCounts.get(r.name) ?? 0) + 1);
@@ -430,23 +469,18 @@ function AnalyticsView({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
           ? `${r.name.split(' ')[0]} (${r.usabId.slice(-4)})`
           : r.name.split(' ')[0],
     }));
-  }, [players, ageGroup, eventType]);
+  }, [categoryRankings]);
 
   const dropoffData = useMemo(() => {
-    return players
-      .flatMap((p) =>
-        p.entries
-          .filter((e) => e.ageGroup === ageGroup && e.eventType === eventType)
-          .map((e) => ({ points: e.rankingPoints, rank: e.rank })),
-      )
+    return categoryRankings
+      .map((player) => ({ points: player.rankingPoints, rank: player.rank }))
       .filter((d) => d.points > 0)
-      .sort((a, b) => a.rank - b.rank)
       .slice(0, 50);
-  }, [players, ageGroup, eventType]);
+  }, [categoryRankings]);
 
   const { distribution } = useMemo(() => {
-    const allPts = players
-      .map((p) => p.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0))
+    const allPts = playerSummaries
+      .map((summary) => summary.bestPoints)
       .filter((pts) => pts > 0);
     if (allPts.length === 0) return { distribution: [], bucketSize: 0 };
 
@@ -468,13 +502,12 @@ function AnalyticsView({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
     }
 
     return { distribution: buckets, bucketSize: size };
-  }, [players]);
+  }, [playerSummaries]);
 
   const multiEventData = useMemo(() => {
     const counts: Record<number, number> = {};
-    for (const p of players) {
-      const numEvents = new Set(p.entries.map((e) => `${e.ageGroup}-${e.eventType}`)).size;
-      counts[numEvents] = (counts[numEvents] ?? 0) + 1;
+    for (const summary of playerSummaries) {
+      counts[summary.categoryCount] = (counts[summary.categoryCount] ?? 0) + 1;
     }
     return Object.entries(counts)
       .map(([n, count]) => ({
@@ -483,51 +516,41 @@ function AnalyticsView({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
         n: Number(n),
       }))
       .sort((a, b) => a.n - b.n);
-  }, [players]);
+  }, [playerSummaries]);
 
-  const categoryPlayerCount = useMemo(() => {
-    return players.filter((p) =>
-      p.entries.some((e) => e.ageGroup === ageGroup && e.eventType === eventType),
-    ).length;
-  }, [players, ageGroup, eventType]);
+  const categoryPlayerCount = categoryRankings.length;
 
   const handleDistributionClick = useCallback(
     (data: { lo: number; hi: number }) => {
       const { lo, hi } = data;
-      const matched = players.filter((p) => {
-        const best = p.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
-        return best >= lo && best < hi;
-      });
+      const matched = playerSummaries
+        .filter((summary) => summary.bestPoints >= lo && summary.bestPoints < hi)
+        .map((summary) => ({ player: summary.player, bestPoints: summary.bestPoints }));
       matched.sort((a, b) => {
-        const aPts = a.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
-        const bPts = b.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
-        return bPts - aPts;
+        return b.bestPoints - a.bestPoints;
       });
       setModal({
         title: `Points ${lo.toLocaleString()} – ${hi.toLocaleString()}`,
-        players: matched,
+        players: matched.map((summary) => summary.player),
       });
     },
-    [players],
+    [playerSummaries],
   );
 
   const handleCategoryClick = useCallback(
     (data: { n: number; label: string }) => {
-      const matched = players.filter((p) => {
-        const numCats = new Set(p.entries.map((e) => `${e.ageGroup}-${e.eventType}`)).size;
-        return numCats === data.n;
-      });
+      const matched = playerSummaries
+        .filter((summary) => summary.categoryCount === data.n)
+        .map((summary) => ({ player: summary.player, bestPoints: summary.bestPoints }));
       matched.sort((a, b) => {
-        const aPts = a.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
-        const bPts = b.entries.reduce((max, e) => Math.max(max, e.rankingPoints), 0);
-        return bPts - aPts;
+        return b.bestPoints - a.bestPoints;
       });
       setModal({
         title: `Players in ${data.label}`,
-        players: matched,
+        players: matched.map((summary) => summary.player),
       });
     },
-    [players],
+    [playerSummaries],
   );
 
   return (
@@ -686,8 +709,7 @@ function AnalyticsView({ ageGroup, eventType }: { ageGroup: AgeGroup; eventType:
 
 /* ─── Player Stats View ─── */
 
-function PlayerStatsView() {
-  const { players, loading } = usePlayers();
+function PlayerStatsView({ players, loading }: { players: UniquePlayer[]; loading: boolean }) {
   const hasData = players.length > 0;
 
   const { totalBoys, totalGirls, totalPlayers, groupStats } = useMemo(() => {
@@ -905,8 +927,21 @@ export default function Rankings() {
   const [view, setView] = useState<ViewMode>('rankings');
   const [isDateOpen, setIsDateOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
-  const { rankingsDate, availableDates, changeDate, loading, ensurePlayers, ensureAvailableDates } = usePlayers();
+  const {
+    players,
+    loading,
+    error,
+    rankingsDate,
+    availableDates,
+    changeDate,
+    ensurePlayers,
+    ensureAvailableDates,
+  } = usePlayersRankings();
   const hasMultipleDates = availableDates.length > 1;
+  const categoryRankings = useMemo(
+    () => buildCategoryRankings(players, ageGroup, eventType),
+    [players, ageGroup, eventType],
+  );
 
   useEffect(() => {
     if (paramAge && AGE_GROUPS.includes(paramAge)) setAgeGroup(paramAge);
@@ -1072,11 +1107,24 @@ export default function Rankings() {
       )}
 
       {view === 'player-stats' ? (
-        <PlayerStatsView />
+        <PlayerStatsView players={players} loading={loading} />
       ) : view === 'rankings' ? (
-        <RankingsTable ageGroup={ageGroup} eventType={eventType} date={rankingsDate} />
+        <RankingsTable
+          ageGroup={ageGroup}
+          eventType={eventType}
+          date={rankingsDate}
+          rankings={categoryRankings}
+          loading={loading}
+          error={error}
+        />
       ) : (
-        <AnalyticsView ageGroup={ageGroup} eventType={eventType} />
+        <AnalyticsView
+          ageGroup={ageGroup}
+          eventType={eventType}
+          players={players}
+          loading={loading}
+          categoryRankings={categoryRankings}
+        />
       )}
     </div>
   );

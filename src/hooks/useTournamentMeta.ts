@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ensureTournamentMeta, getTournamentMetaSnapshot } from '../services/rankingsService';
 
@@ -7,6 +7,23 @@ interface TournamentMeta {
   hostClub: string;
   startDate: string;
   endDate: string;
+}
+
+export function mergeTournamentMeta(
+  routeState: {
+    name?: string;
+    hostClub?: string;
+    startDate?: string;
+    endDate?: string;
+  } | null,
+  cachedMeta: Partial<TournamentMeta> | null,
+): TournamentMeta {
+  return {
+    name: routeState?.name || cachedMeta?.name || '',
+    hostClub: routeState?.hostClub || cachedMeta?.hostClub || '',
+    startDate: routeState?.startDate || cachedMeta?.startDate || '',
+    endDate: routeState?.endDate || cachedMeta?.endDate || '',
+  };
 }
 
 export function useTournamentMeta(tswId: string | undefined): TournamentMeta {
@@ -18,33 +35,38 @@ export function useTournamentMeta(tswId: string | undefined): TournamentMeta {
     endDate?: string;
   } | null;
 
-  const [meta, setMeta] = useState<TournamentMeta>({
-    name: routeState?.name || getTournamentMetaSnapshot(tswId)?.name || '',
-    hostClub: routeState?.hostClub || getTournamentMetaSnapshot(tswId)?.hostClub || '',
-    startDate: routeState?.startDate || getTournamentMetaSnapshot(tswId)?.startDate || '',
-    endDate: routeState?.endDate || getTournamentMetaSnapshot(tswId)?.endDate || '',
-  });
+  const seed = useMemo(
+    () => mergeTournamentMeta(routeState, getTournamentMetaSnapshot(tswId)),
+    [tswId, routeState],
+  );
+  const [meta, setMeta] = useState<TournamentMeta>(seed);
 
   useEffect(() => {
-    if (meta.name || !tswId) return;
+    setMeta(seed);
+  }, [seed]);
+
+  useEffect(() => {
+    if (!tswId) return;
+    const needsFetch = !seed.name || !seed.hostClub || !seed.startDate || !seed.endDate;
+    if (!needsFetch) return;
     let cancelled = false;
     ensureTournamentMeta(tswId)
       .then((resolvedMeta) => {
         if (cancelled) return;
         if (resolvedMeta) {
-          setMeta({
-            name: resolvedMeta.name,
-            hostClub: resolvedMeta.hostClub,
-            startDate: resolvedMeta.startDate,
-            endDate: resolvedMeta.endDate,
-          });
+          setMeta((current) => ({
+            name: current.name || resolvedMeta.name,
+            hostClub: current.hostClub || resolvedMeta.hostClub,
+            startDate: current.startDate || resolvedMeta.startDate,
+            endDate: current.endDate || resolvedMeta.endDate,
+          }));
         }
       })
       .catch((err: Error) => {
         if (!cancelled) console.warn('[useTournamentMeta] failed to load metadata:', err.message);
       });
     return () => { cancelled = true; };
-  }, [tswId, meta.name]);
+  }, [tswId, seed.name, seed.hostClub, seed.startDate, seed.endDate]);
 
   return meta;
 }

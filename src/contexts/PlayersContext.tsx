@@ -6,10 +6,8 @@ import ToastContainer, { type ToastItem } from '../components/Toast';
 
 export type DataSource = 'live' | 'cached' | 'none';
 
-interface PlayersContextValue {
+interface PlayersRankingsContextValue {
   players: UniquePlayer[];
-  directoryPlayers: DirectoryPlayer[];
-  directoryLoading: boolean;
   loading: boolean;
   error: string | null;
   source: DataSource;
@@ -19,12 +17,18 @@ interface PlayersContextValue {
   refresh: () => void;
   ensurePlayers: () => Promise<void>;
   ensureAvailableDates: () => Promise<void>;
-  ensureDirectoryPlayers: () => Promise<void>;
-  playerNameMap: Map<string, string[]>;
-  playerIdSet: Set<string>;
 }
 
-const PlayersContext = createContext<PlayersContextValue | null>(null);
+interface PlayersDirectoryContextValue {
+  directoryPlayers: DirectoryPlayer[];
+  directoryLoading: boolean;
+  ensureDirectoryPlayers: () => Promise<void>;
+}
+
+type PlayersContextValue = PlayersRankingsContextValue & PlayersDirectoryContextValue;
+
+const PlayersRankingsContext = createContext<PlayersRankingsContextValue | null>(null);
+const PlayersDirectoryContext = createContext<PlayersDirectoryContextValue | null>(null);
 
 let nextToastId = 0;
 
@@ -147,51 +151,52 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     void load(date);
   }, [rankingsDate, load]);
 
-  const playerNameMap = useMemo(() => {
-    const map = new Map<string, string[]>();
-    const nameSource = directoryPlayers.length > 0 ? directoryPlayers : players;
-    for (const p of nameSource) {
-      const allNames = 'names' in p && Array.isArray(p.names) ? p.names : [p.name];
-      for (const name of allNames) {
-        const key = name.toLowerCase();
-        const ids = map.get(key);
-        if (ids) {
-          if (!ids.includes(p.usabId)) ids.push(p.usabId);
-        } else {
-          map.set(key, [p.usabId]);
-        }
-      }
-    }
-    return map;
-  }, [directoryPlayers, players]);
-
-  const playerIdSet = useMemo(() => {
-    const set = new Set<string>();
-    const source = directoryPlayers.length > 0 ? directoryPlayers : players;
-    for (const p of source) set.add(p.usabId);
-    return set;
-  }, [directoryPlayers, players]);
-
   const refresh = useCallback(() => load(), [load]);
 
-  const contextValue = useMemo(() => ({
-    players, directoryPlayers, directoryLoading, loading, error,
-    source, rankingsDate, availableDates, changeDate, refresh, ensurePlayers, ensureAvailableDates,
-    ensureDirectoryPlayers, playerNameMap, playerIdSet,
-  }), [players, directoryPlayers, directoryLoading, loading, error,
-       source, rankingsDate, availableDates, changeDate, refresh, ensurePlayers, ensureAvailableDates,
-       ensureDirectoryPlayers, playerNameMap, playerIdSet]);
+  const rankingsValue = useMemo(() => ({
+    players,
+    loading,
+    error,
+    source,
+    rankingsDate,
+    availableDates,
+    changeDate,
+    refresh,
+    ensurePlayers,
+    ensureAvailableDates,
+  }), [players, loading, error, source, rankingsDate, availableDates, changeDate, refresh, ensurePlayers, ensureAvailableDates]);
+
+  const directoryValue = useMemo(() => ({
+    directoryPlayers,
+    directoryLoading,
+    ensureDirectoryPlayers,
+  }), [directoryPlayers, directoryLoading, ensureDirectoryPlayers]);
 
   return (
-    <PlayersContext.Provider value={contextValue}>
-      {children}
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
-    </PlayersContext.Provider>
+    <PlayersRankingsContext.Provider value={rankingsValue}>
+      <PlayersDirectoryContext.Provider value={directoryValue}>
+        {children}
+        <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      </PlayersDirectoryContext.Provider>
+    </PlayersRankingsContext.Provider>
   );
 }
 
-export function usePlayers(): PlayersContextValue {
-  const ctx = useContext(PlayersContext);
+export function usePlayersRankings(): PlayersRankingsContextValue {
+  const ctx = useContext(PlayersRankingsContext);
   if (!ctx) throw new Error('usePlayers must be used within PlayersProvider');
   return ctx;
+}
+
+export function usePlayersDirectory(): PlayersDirectoryContextValue {
+  const ctx = useContext(PlayersDirectoryContext);
+  if (!ctx) throw new Error('usePlayers must be used within PlayersProvider');
+  return ctx;
+}
+
+export function usePlayers(): PlayersContextValue {
+  return {
+    ...usePlayersRankings(),
+    ...usePlayersDirectory(),
+  };
 }

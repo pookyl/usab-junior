@@ -20,7 +20,7 @@ import {
   fetchTournaments,
   usabPlayerBaseUrl,
 } from '../services/rankingsService';
-import { usePlayers } from '../contexts/PlayersContext';
+import { usePlayersRankings } from '../contexts/PlayersContext';
 
 const AGE_GRADIENT: Record<string, string> = {
   U11: 'from-violet-500 to-violet-700',
@@ -250,7 +250,7 @@ function TournamentMobileCard({
 export default function PlayerRankingDetail() {
   const { id: usabId } = useParams<{ id: string }>();
   const location = useLocation();
-  const { players, ensurePlayers } = usePlayers();
+  const { players, ensurePlayers } = usePlayersRankings();
 
   const [sections, setSections] = useState<RankingCategoryDetail[]>([]);
   const [loading, setLoading] = useState(true);

@@ -19,14 +19,8 @@ const PlayerRankingDetail = lazy(() => import('./pages/PlayerRankingDetail'));
 const HeadToHead = lazy(() => import('./pages/HeadToHead'));
 const Tournaments = lazy(() => import('./pages/Tournaments'));
 const TournamentHub = lazy(() => import('./pages/TournamentHub'));
-const TournamentPlayerDetail = lazy(async () => {
-  const mod = await import('./pages/TournamentHub');
-  return { default: mod.TournamentPlayerDetail };
-});
-const TournamentDrawDetail = lazy(async () => {
-  const mod = await import('./pages/TournamentHub');
-  return { default: mod.TournamentDrawDetail };
-});
+const TournamentPlayerDetail = lazy(() => import('./pages/TournamentPlayerDetail'));
+const TournamentDrawDetail = lazy(() => import('./pages/TournamentDrawDetail'));
 const TournamentMatchesPage = lazy(() => import('./pages/tournament/TournamentMatchesPage'));
 const TournamentPlayersPage = lazy(() => import('./pages/tournament/TournamentPlayersPage'));
 const TournamentDrawsPage = lazy(() => import('./pages/tournament/TournamentDrawsPage'));

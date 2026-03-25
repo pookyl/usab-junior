@@ -30,19 +30,14 @@ const {
   tswFetch,
   parseTswTournamentPlayers,
   TSW_BASE,
+  BROWSER_HEADERS,
+  fetchWithRetry,
 } = await import('../api/_lib/shared.js');
 
 const TSW_DETAILS_BATCH_SIZE = Math.max(1, Number(process.env.TSW_DETAILS_BATCH_SIZE ?? 3));
 const TSW_DETAILS_BATCH_DELAY_MS = Math.max(0, Number(process.env.TSW_DETAILS_BATCH_DELAY_MS ?? 500));
 
 const USAB_SCHEDULE_URL = 'https://usabadminton.org/athletes/juniors/junior-tournament-schedule/';
-
-const BROWSER_HEADERS = {
-  'User-Agent':
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'Accept-Language': 'en-US,en;q=0.9',
-};
 
 function seasonCachePath(season) {
   return join(DATA_DIR, `tournaments-${season}.json`);
@@ -278,10 +273,11 @@ async function enrichWithTswIds(tournaments, lookupEntries) {
     const batch = toFetch.slice(i, i + 3);
     const results = await Promise.allSettled(
       batch.map(async (tournament) => {
-        const resp = await fetch(tournament.usabUrl, {
-          headers: BROWSER_HEADERS,
-          redirect: 'follow',
-        });
+        const resp = await fetchWithRetry(
+          tournament.usabUrl,
+          { headers: BROWSER_HEADERS, redirect: 'follow' },
+          { timeoutMs: 20_000, retries: 2 },
+        );
         if (!resp.ok) return null;
         const html = await resp.text();
         const tswMatch = html.match(/href="([^"]*tournamentsoftware\.com[^"]*)"/i);
@@ -433,7 +429,11 @@ async function main() {
   const allSeasons = args.includes('--all');
 
   console.log('[tournaments] fetching USAB schedule page…');
-  const response = await fetch(USAB_SCHEDULE_URL, { headers: BROWSER_HEADERS });
+  const response = await fetchWithRetry(
+    USAB_SCHEDULE_URL,
+    { headers: BROWSER_HEADERS },
+    { timeoutMs: 30_000, retries: 2 },
+  );
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const html = await response.text();
   console.log(`[tournaments] fetched ${(html.length / 1024).toFixed(0)} KB`);

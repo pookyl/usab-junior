@@ -22,9 +22,18 @@ jobs:
       - name: Refresh rankings cache
         id: refresh
         run: |
+          set +e
           node scripts/refresh-rankings-cache.mjs
-          echo "updated=true" >> "$GITHUB_OUTPUT"
-        continue-on-error: true
+          status=$?
+          if [ "$status" -eq 0 ]; then
+            echo "refresh_state=updated" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$status" -eq 2 ]; then
+            echo "refresh_state=no_changes" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          exit "$status"
 
       - name: Check if any cache files changed
         id: check

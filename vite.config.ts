@@ -16,6 +16,24 @@ export default defineConfig({
         })
       : null,
   ].filter(Boolean),
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('/recharts/') || id.includes('/d3-')) return 'charts';
+          if (
+            id.includes('/react/') ||
+            id.includes('/react-dom/') ||
+            id.includes('/react-router/') ||
+            id.includes('/react-router-dom/')
+          ) {
+            return 'react-vendor';
+          }
+        },
+      },
+    },
+  },
   define: {
     __VERCEL_GIT_COMMIT_SHA__: JSON.stringify(process.env.VERCEL_GIT_COMMIT_SHA ?? null),
     __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
