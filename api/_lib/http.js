@@ -55,6 +55,10 @@ function isExpressLikeResponse(res) {
   return typeof res?.status === 'function' && typeof res?.json === 'function';
 }
 
+function nowMs() {
+  return Number(process.hrtime.bigint()) / 1e6;
+}
+
 export function sendJson(res, status, data, headers = {}) {
   if (isExpressLikeResponse(res)) {
     for (const [key, value] of Object.entries(headers)) {
@@ -81,4 +85,50 @@ export function sendApiError(res, err, { logLabel } = {}) {
 
 export function sendValidationError(res, message, details) {
   return sendApiError(res, new ValidationError(message, details));
+}
+
+export function createRequestMetrics(label) {
+  const startedAt = nowMs();
+  const steps = [];
+
+  async function time(stepLabel, fn) {
+    const stepStartedAt = nowMs();
+    try {
+      return await fn();
+    } finally {
+      steps.push({ label: stepLabel, durationMs: nowMs() - stepStartedAt });
+    }
+  }
+
+  function buildHeaders(headers = {}) {
+    const totalDurationMs = nowMs() - startedAt;
+    const serverTiming = [
+      `total;dur=${totalDurationMs.toFixed(1)}`,
+      ...steps.map((step) => `${step.label};dur=${step.durationMs.toFixed(1)}`),
+    ].join(', ');
+
+    return {
+      ...headers,
+      'Server-Timing': serverTiming,
+      'X-Response-Time-Ms': totalDurationMs.toFixed(1),
+    };
+  }
+
+  function log(extra = {}) {
+    const totalDurationMs = nowMs() - startedAt;
+    console.info(`[perf:${label}]`, {
+      totalMs: Number(totalDurationMs.toFixed(1)),
+      steps: steps.map((step) => ({
+        label: step.label,
+        durationMs: Number(step.durationMs.toFixed(1)),
+      })),
+      ...extra,
+    });
+  }
+
+  return {
+    time,
+    buildHeaders,
+    log,
+  };
 }

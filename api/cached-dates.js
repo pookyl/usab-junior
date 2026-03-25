@@ -1,4 +1,5 @@
-import { listCachedDates, setCors } from './_lib/shared.js';
+import { listCachedDates } from './_lib/shared.js';
+import { setCors } from './_lib/runtime.js';
 import { sendJson } from './_lib/http.js';
 
 export default async function handler(req, res) {

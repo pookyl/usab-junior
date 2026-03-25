@@ -5,6 +5,8 @@ import { join } from 'path';
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const DISK_CACHE_DIR = join(process.cwd(), 'data');
 const DISK_CACHE_FILE = join(DISK_CACHE_DIR, 'rankings-cache.json');
+const PLAYER_DIRECTORY_INDEX_FILE = join(DISK_CACHE_DIR, 'player-directory.json');
+const PLAYER_TRENDS_INDEX_FILE = join(DISK_CACHE_DIR, 'player-ranking-trends.json');
 
 function isValidDateValue(value) {
   return typeof value === 'string' && DATE_RE.test(value);
@@ -103,4 +105,29 @@ export async function getDiskCachedAllPlayers(date) {
 export async function getDiskCachedDate() {
   const disk = await loadDiskCache();
   return disk?.date ?? null;
+}
+
+async function loadIndexFile(filePath) {
+  try {
+    const raw = await readFile(filePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function playerDirectoryIndexPath() {
+  return PLAYER_DIRECTORY_INDEX_FILE;
+}
+
+export function playerTrendsIndexPath() {
+  return PLAYER_TRENDS_INDEX_FILE;
+}
+
+export async function loadPlayerDirectoryIndex() {
+  return loadIndexFile(PLAYER_DIRECTORY_INDEX_FILE);
+}
+
+export async function loadPlayerTrendsIndex() {
+  return loadIndexFile(PLAYER_TRENDS_INDEX_FILE);
 }

@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Users, RefreshCw, ChevronRight } from 'lucide-react';
 import type { AgeGroup, EventType, PlayerEntry } from '../types/junior';
@@ -45,7 +46,11 @@ function bestRankingForGroup(player: DirectoryViewPlayer, ageGroup: AgeGroup | n
   return entries.reduce((best, e) => (e.rank < best.rank ? e : best));
 }
 
-function PlayerCard({ player, ageGroupFilter }: { player: DirectoryViewPlayer; ageGroupFilter: AgeGroup | null }) {
+const VIRTUALIZE_AFTER = 180;
+
+const PlayerCard = memo(function PlayerCard(
+  { player, ageGroupFilter }: { player: DirectoryViewPlayer; ageGroupFilter: AgeGroup | null },
+) {
   const best = bestRankingForGroup(player, ageGroupFilter);
   const isRanked = player.entries.length > 0;
   const ageGroups = [...new Set(player.entries.map((e) => e.ageGroup))].sort(
@@ -104,10 +109,128 @@ function PlayerCard({ player, ageGroupFilter }: { player: DirectoryViewPlayer; a
       )}
     </Link>
   );
+});
+
+type VirtualDirectoryRow =
+  | { type: 'header'; key: string; letter: string; count: number }
+  | { type: 'players'; key: string; players: DirectoryViewPlayer[] };
+
+function chunkPlayers(players: DirectoryViewPlayer[], size: number) {
+  const rows: DirectoryViewPlayer[][] = [];
+  for (let i = 0; i < players.length; i += size) {
+    rows.push(players.slice(i, i + size));
+  }
+  return rows;
+}
+
+function VirtualizedDirectory({
+  grouped,
+  ageGroupFilter,
+}: {
+  grouped: Array<[string, DirectoryViewPlayer[]]>;
+  ageGroupFilter: AgeGroup | null;
+}) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [columns, setColumns] = useState(1);
+
+  useEffect(() => {
+    const node = scrollRef.current;
+    if (!node) return;
+
+    const updateColumns = () => {
+      const width = node.clientWidth;
+      setColumns(width >= 1024 ? 3 : width >= 640 ? 2 : 1);
+    };
+
+    updateColumns();
+    const observer = new ResizeObserver(updateColumns);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const rows = useMemo(() => {
+    const flattened: VirtualDirectoryRow[] = [];
+    for (const [letter, players] of grouped) {
+      flattened.push({
+        type: 'header',
+        key: `header:${letter}`,
+        letter,
+        count: players.length,
+      });
+      const chunks = chunkPlayers(players, columns);
+      chunks.forEach((chunk, index) => {
+        flattened.push({
+          type: 'players',
+          key: `${letter}:${index}`,
+          players: chunk,
+        });
+      });
+    }
+    return flattened;
+  }, [grouped, columns]);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: (index) => (rows[index]?.type === 'header' ? 52 : 170),
+    overscan: 8,
+  });
+
+  return (
+    <div
+      ref={scrollRef}
+      className="max-h-[70vh] overflow-auto rounded-2xl border border-slate-100 bg-white/40 pr-1 dark:border-slate-800 dark:bg-slate-900/30"
+    >
+      <div
+        className="relative"
+        style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
+      >
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+          const row = rows[virtualRow.index];
+          if (!row) return null;
+
+          return (
+            <div
+              key={row.key}
+              ref={rowVirtualizer.measureElement}
+              className="absolute left-0 top-0 w-full px-3 py-1 md:px-4"
+              style={{ transform: `translateY(${virtualRow.start}px)` }}
+            >
+              {row.type === 'header' ? (
+                <div className="flex items-center gap-3 py-2 md:py-2.5">
+                  <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
+                    {row.letter}
+                  </span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{row.count} players</span>
+                  <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+                </div>
+              ) : (
+                <div
+                  className="grid gap-2.5 md:gap-3"
+                  style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+                >
+                  {row.players.map((player) => (
+                    <PlayerCard key={player.usabId} player={player} ageGroupFilter={ageGroupFilter} />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export default function AllPlayers() {
-  const { players, directoryPlayers, directoryLoading, loading, error } = usePlayers();
+  const {
+    players,
+    directoryPlayers,
+    directoryLoading,
+    loading,
+    error,
+    ensureDirectoryPlayers,
+  } = usePlayers();
   const [searchParams] = useSearchParams();
   const paramAge = searchParams.get('age_group') as AgeGroup | null;
   const [search, setSearch] = useState('');
@@ -115,6 +238,10 @@ export default function AllPlayers() {
   const [ageGroupFilter, setAgeGroupFilter] = useState<AgeGroup | null>(
     paramAge && AGE_GROUPS.includes(paramAge) ? paramAge : null,
   );
+
+  useEffect(() => {
+    void ensureDirectoryPlayers();
+  }, [ensureDirectoryPlayers]);
 
   const rankedMap = useMemo(() => {
     const map = new Map<string, PlayerEntry[]>();
@@ -180,7 +307,8 @@ export default function AllPlayers() {
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [filtered]);
 
-  const isLoading = directoryLoading && loading;
+  const isLoading = directoryLoading || (loading && allDirectoryViewPlayers.length === 0);
+  const shouldVirtualize = filtered.length >= VIRTUALIZE_AFTER;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
@@ -303,24 +431,33 @@ export default function AllPlayers() {
       )}
 
       {/* Grouped player cards */}
-      <div className="space-y-5 md:space-y-6">
-        {grouped.map(([letter, group]) => (
-          <div key={letter}>
-            <div className="flex items-center gap-3 mb-2.5 md:mb-3">
-              <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
-                {letter}
-              </span>
-              <span className="text-xs text-slate-400 dark:text-slate-500">{group.length} players</span>
-              <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+      {shouldVirtualize ? (
+        <div className="space-y-2">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            Large result set detected, using a virtualized list for smoother scrolling.
+          </p>
+          <VirtualizedDirectory grouped={grouped} ageGroupFilter={ageGroupFilter} />
+        </div>
+      ) : (
+        <div className="space-y-5 md:space-y-6">
+          {grouped.map(([letter, group]) => (
+            <div key={letter}>
+              <div className="flex items-center gap-3 mb-2.5 md:mb-3">
+                <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
+                  {letter}
+                </span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">{group.length} players</span>
+                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
+                {group.map((player) => (
+                  <PlayerCard key={player.usabId} player={player} ageGroupFilter={ageGroupFilter} />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
-              {group.map((player) => (
-                <PlayerCard key={player.usabId} player={player} ageGroupFilter={ageGroupFilter} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Loading overlay for refresh */}
       {loading && allDirectoryViewPlayers.length > 0 && (

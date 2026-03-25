@@ -24,8 +24,56 @@ import type {
   RoundRobinDrawResponse,
   PlayerScheduleResponse,
   TournamentScheduleEntry,
+  ScheduledTournament,
 } from '../types/junior';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
+
+interface TournamentMetaSnapshot {
+  name: string;
+  hostClub: string;
+  startDate: string;
+  endDate: string;
+}
+
+function nowMs(): number {
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+    return performance.now();
+  }
+  return Date.now();
+}
+
+function isPerfLoggingEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (window.localStorage.getItem('usab:perf') === '1') return true;
+  } catch {
+    // Ignore localStorage access errors.
+  }
+  return new URLSearchParams(window.location.search).get('debugPerf') === '1';
+}
+
+function logPerf(label: string, details: Record<string, unknown>) {
+  if (!isPerfLoggingEnabled()) return;
+  console.info(`[perf:${label}]`, details);
+}
+
+async function parseJsonWithPerf<T>(
+  res: Response,
+  label: string,
+  startedAt: number,
+  extra: Record<string, unknown> = {},
+): Promise<T> {
+  const parseStartedAt = nowMs();
+  const data = await res.json();
+  logPerf(label, {
+    fetchMs: Number((parseStartedAt - startedAt).toFixed(1)),
+    parseMs: Number((nowMs() - parseStartedAt).toFixed(1)),
+    status: res.status,
+    cache: res.headers.get('X-Cache') ?? res.headers.get('X-Source') ?? 'none',
+    ...extra,
+  });
+  return data as T;
+}
 
 // ── Fetch with retry ────────────────────────────────────────────────────────
 async function fetchWithRetry(url: string, timeoutMs: number, retries = 2): Promise<Response> {
@@ -104,9 +152,10 @@ async function fetchTournamentApi<T>(
   timeoutMs: number,
   errorLabel: string,
 ): Promise<T> {
+  const startedAt = nowMs();
   const res = await fetchWithRetry(apiUrl, timeoutMs);
   if (!res.ok) await throwApiError(res, errorLabel);
-  return res.json();
+  return parseJsonWithPerf<T>(res, errorLabel, startedAt, { url: apiUrl });
 }
 
 // ── Module-level caches ─────────────────────────────────────────────────────
@@ -115,6 +164,9 @@ let allPlayersCache: UniquePlayer[] | null = null;
 let allPlayersCacheDate = '';
 const tswStatsCache = new Map<string, TswPlayerStats>();
 const trendCache = new Map<string, PlayerRankingTrend>();
+const tournamentMetaCache = new Map<string, TournamentMetaSnapshot>();
+let cachedDatesPromise: Promise<string[]> | null = null;
+let directoryPromise: Promise<DirectoryPlayer[]> | null = null;
 
 export interface FetchAllPlayersResult {
   players: UniquePlayer[];
@@ -136,38 +188,58 @@ let directoryCache: DirectoryPlayer[] | null = null;
 
 export async function fetchPlayerDirectory(): Promise<DirectoryPlayer[]> {
   if (directoryCache) return directoryCache;
+  if (directoryPromise) return directoryPromise;
+
+  directoryPromise = (async () => {
+    const startedAt = nowMs();
+    try {
+      const res = await fetchWithRetry('/api/player-directory', 30_000);
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      const data = await parseJsonWithPerf<DirectoryPlayer[]>(res, 'player-directory', startedAt);
+      if (Array.isArray(data) && data.length > 0) {
+        directoryCache = data;
+        return data;
+      }
+    } catch (err) {
+      console.warn('[rankingsService] player-directory unavailable:', err);
+    }
+    return [];
+  })();
 
   try {
-    const res = await fetchWithRetry('/api/player-directory', 30_000);
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data: DirectoryPlayer[] = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      directoryCache = data;
-      return data;
-    }
-  } catch (err) {
-    console.warn('[rankingsService] player-directory unavailable:', err);
+    return await directoryPromise;
+  } finally {
+    directoryPromise = null;
   }
-  return [];
 }
 
 // ── Cached dates (only dates with files on disk) ────────────────────────────
 
 export async function fetchCachedDates(): Promise<string[]> {
   if (cachedDatesCache) return cachedDatesCache;
+  if (cachedDatesPromise) return cachedDatesPromise;
+
+  cachedDatesPromise = (async () => {
+    const startedAt = nowMs();
+    try {
+      const res = await fetchWithRetry('/api/cached-dates', 10_000);
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      const data = await parseJsonWithPerf<{ dates?: string[] }>(res, 'cached-dates', startedAt);
+      if (Array.isArray(data.dates) && data.dates.length > 0) {
+        cachedDatesCache = data.dates;
+        return data.dates;
+      }
+    } catch (err) {
+      console.warn('[rankingsService] cached-dates unavailable:', err);
+    }
+    return [RANKINGS_DATE];
+  })();
 
   try {
-    const res = await fetchWithRetry('/api/cached-dates', 10_000);
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data = await res.json();
-    if (Array.isArray(data.dates) && data.dates.length > 0) {
-      cachedDatesCache = data.dates;
-      return data.dates;
-    }
-  } catch (err) {
-    console.warn('[rankingsService] cached-dates unavailable:', err);
+    return await cachedDatesPromise;
+  } finally {
+    cachedDatesPromise = null;
   }
-  return [RANKINGS_DATE];
 }
 
 export async function fetchPlayerDetail(
@@ -245,10 +317,11 @@ export async function fetchAllPlayers(
   }
 
   const url = `/api/all-players?date=${date}`;
+  const startedAt = nowMs();
   const res = await fetchWithRetry(url, 120_000);
   if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
 
-  const players: UniquePlayer[] = await res.json();
+  const players = await parseJsonWithPerf<UniquePlayer[]>(res, 'all-players', startedAt, { date });
   if (!Array.isArray(players)) throw new Error('Invalid response');
 
   const partial = res.headers.get('X-Partial') === 'true';
@@ -266,14 +339,17 @@ export async function fetchPlayerTswStats(
   usabId: string,
   playerName: string,
 ): Promise<TswPlayerStats> {
-  if (tswStatsCache.has(usabId)) return tswStatsCache.get(usabId)!;
+  const normalizedName = playerName.toLowerCase().replace(/\s+/g, ' ').trim();
+  const cacheKey = `${usabId}:${normalizedName || '__unknown__'}`;
+  if (tswStatsCache.has(cacheKey)) return tswStatsCache.get(cacheKey)!;
 
   const url = `/api/player/${usabId}/tsw-stats?name=${encodeURIComponent(playerName)}`;
+  const startedAt = nowMs();
   const res = await fetchWithRetry(url, 60_000, 1);
   if (!res.ok) await throwApiError(res, 'TSW stats API');
 
-  const stats: TswPlayerStats = await res.json();
-  cappedSet(tswStatsCache, usabId, stats);
+  const stats = await parseJsonWithPerf<TswPlayerStats>(res, 'tsw-stats', startedAt, { usabId });
+  cappedSet(tswStatsCache, cacheKey, stats);
   return stats;
 }
 
@@ -291,10 +367,11 @@ export async function fetchPlayerRankingTrend(
   if (trendCache.has(usabId)) return trendCache.get(usabId)!;
 
   const url = `/api/player/${usabId}/ranking-trend`;
+  const startedAt = nowMs();
   const res = await fetchWithRetry(url, 30_000, 1);
   if (!res.ok) await throwApiError(res, 'Trend API');
 
-  const data: PlayerRankingTrend = await res.json();
+  const data = await parseJsonWithPerf<PlayerRankingTrend>(res, 'ranking-trend', startedAt, { usabId });
   cappedSet(trendCache, usabId, data);
   return data;
 }
@@ -305,6 +382,36 @@ let tournamentsCache: TournamentsResponse | null = null;
 let tournamentsCacheSeason = '';
 let tournamentsCacheTs = 0;
 const TOURNAMENTS_CACHE_TTL_MS = 60_000;
+
+function rememberTournamentMeta(entries: ScheduledTournament[]) {
+  for (const tournament of entries) {
+    const tswId = tournament.tswId?.toUpperCase();
+    if (!tswId) continue;
+    tournamentMetaCache.set(tswId, {
+      name: tournament.name,
+      hostClub: tournament.hostClub,
+      startDate: tournament.startDate ?? '',
+      endDate: tournament.endDate ?? '',
+    });
+  }
+}
+
+export function getTournamentMetaSnapshot(tswId: string | undefined): TournamentMetaSnapshot | null {
+  if (!tswId) return null;
+  return tournamentMetaCache.get(tswId.toUpperCase()) ?? null;
+}
+
+export async function ensureTournamentMeta(tswId: string | undefined): Promise<TournamentMetaSnapshot | null> {
+  if (!tswId) return null;
+  const cached = getTournamentMetaSnapshot(tswId);
+  if (cached) return cached;
+
+  const data = await fetchTournaments();
+  const tournaments = data.tournaments
+    ?? Object.values(data.seasons ?? {}).flatMap((season) => season.tournaments);
+  rememberTournamentMeta(tournaments);
+  return getTournamentMetaSnapshot(tswId);
+}
 
 export async function fetchTournaments(
   season?: string,
@@ -319,10 +426,14 @@ export async function fetchTournaments(
   }
 
   const url = season ? `/api/tournaments?season=${encodeURIComponent(season)}` : '/api/tournaments';
+  const startedAt = nowMs();
   const res = await fetchWithRetry(url, 15_000);
   if (!res.ok) await throwApiError(res, 'Tournaments API');
 
-  const data: TournamentsResponse = await res.json();
+  const data = await parseJsonWithPerf<TournamentsResponse>(res, 'tournaments', startedAt, { season: cacheKey });
+  const tournaments = data.tournaments
+    ?? Object.values(data.seasons ?? {}).flatMap((seasonData) => seasonData.tournaments);
+  rememberTournamentMeta(tournaments);
   tournamentsCache = data;
   tournamentsCacheSeason = cacheKey;
   tournamentsCacheTs = Date.now();
@@ -337,10 +448,11 @@ export async function fetchSpotlight(): Promise<SpotlightResponse> {
     return spotlightCache;
   }
 
+  const startedAt = nowMs();
   const res = await fetchWithRetry('/api/tournaments?spotlight=true', 15_000);
   if (!res.ok) await throwApiError(res, 'Spotlight API');
 
-  const data: SpotlightResponse = await res.json();
+  const data = await parseJsonWithPerf<SpotlightResponse>(res, 'spotlight', startedAt);
   spotlightCache = data;
   spotlightCacheTs = Date.now();
   return data;

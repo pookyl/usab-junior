@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { fetchTournaments } from '../services/rankingsService';
+import { ensureTournamentMeta, getTournamentMetaSnapshot } from '../services/rankingsService';
 
 interface TournamentMeta {
   name: string;
@@ -19,29 +19,24 @@ export function useTournamentMeta(tswId: string | undefined): TournamentMeta {
   } | null;
 
   const [meta, setMeta] = useState<TournamentMeta>({
-    name: routeState?.name || '',
-    hostClub: routeState?.hostClub || '',
-    startDate: routeState?.startDate || '',
-    endDate: routeState?.endDate || '',
+    name: routeState?.name || getTournamentMetaSnapshot(tswId)?.name || '',
+    hostClub: routeState?.hostClub || getTournamentMetaSnapshot(tswId)?.hostClub || '',
+    startDate: routeState?.startDate || getTournamentMetaSnapshot(tswId)?.startDate || '',
+    endDate: routeState?.endDate || getTournamentMetaSnapshot(tswId)?.endDate || '',
   });
 
   useEffect(() => {
     if (meta.name || !tswId) return;
     let cancelled = false;
-    fetchTournaments()
-      .then(data => {
+    ensureTournamentMeta(tswId)
+      .then((resolvedMeta) => {
         if (cancelled) return;
-        const allTournaments = data.tournaments
-          ?? Object.values(data.seasons ?? {}).flatMap(s => s.tournaments);
-        const match = allTournaments.find(
-          t => t.tswId?.toUpperCase() === tswId.toUpperCase(),
-        );
-        if (match) {
+        if (resolvedMeta) {
           setMeta({
-            name: match.name,
-            hostClub: match.hostClub,
-            startDate: match.startDate ?? '',
-            endDate: match.endDate ?? '',
+            name: resolvedMeta.name,
+            hostClub: resolvedMeta.hostClub,
+            startDate: resolvedMeta.startDate,
+            endDate: resolvedMeta.endDate,
           });
         }
       })

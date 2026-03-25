@@ -8,6 +8,20 @@ import {
   getDiskCachedAllPlayers,
   getDiskCachedDate,
 } from './rankingsDiskCache.js';
+import {
+  getCached,
+  setCache,
+  setCors,
+} from './runtime.js';
+import {
+  isValidDate,
+  isValidUsabId,
+  isValidAgeGroup,
+  isValidEventType,
+  isValidTswId,
+  isValidSeason,
+  isValidTswDayParam,
+} from './validation.js';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 export const USAB_BASE = 'https://usabjrrankings.org';
@@ -21,35 +35,18 @@ export const BROWSER_HEADERS = {
   'Accept-Language': 'en-US,en;q=0.9',
 };
 
-// ── In-memory cache (persists across warm invocations) ───────────────────────
-const cache = new Map();
-const CACHE_TTL_MS = 10 * 60 * 1000;
-const MAX_CACHE_ENTRIES = 500;
-
-export function getCached(key) {
-  const entry = cache.get(key);
-  if (!entry) return null;
-  if (Date.now() - entry.timestamp >= CACHE_TTL_MS) {
-    cache.delete(key);
-    return null;
-  }
-  return entry.data;
-}
-
-export function setCache(key, data) {
-  if (cache.size >= MAX_CACHE_ENTRIES) {
-    let oldestKey = null;
-    let oldestTs = Infinity;
-    for (const [k, v] of cache) {
-      if (v.timestamp < oldestTs) { oldestTs = v.timestamp; oldestKey = k; }
-    }
-    if (oldestKey) cache.delete(oldestKey);
-  }
-  cache.set(key, { data, timestamp: Date.now() });
-}
-
 // ── Disk cache (bundled read-only fallback for Vercel) ───────────────────────
 export {
+  getCached,
+  setCache,
+  setCors,
+  isValidDate,
+  isValidUsabId,
+  isValidAgeGroup,
+  isValidEventType,
+  isValidTswId,
+  isValidSeason,
+  isValidTswDayParam,
   listCachedDates,
   loadDiskCacheForDate,
   loadDiskCache,
@@ -76,29 +73,6 @@ export async function saveMedalsDiskCache(tswId, data) {
   await mkdir(DISK_CACHE_DIR, { recursive: true });
   await writeFile(medalsCachePath(tswId), JSON.stringify(data, null, 2));
 }
-
-// ── CORS helper ──────────────────────────────────────────────────────────────
-export function setCors(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-}
-
-// ── Input validation helpers ─────────────────────────────────────────────────
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const USAB_ID_RE = /^\d+$/;
-const AGE_GROUP_RE = /^U\d{1,2}$/;
-const EVENT_TYPE_RE = /^[A-Z]{2}$/;
-const TSW_ID_RE = /^[0-9A-Fa-f-]+$/;
-const SEASON_RE = /^\d{4}-\d{4}$/;
-const TSW_DAY_RE = /^\d{8}$/;
-
-export function isValidDate(v) { return typeof v === 'string' && DATE_RE.test(v); }
-export function isValidUsabId(v) { return typeof v === 'string' && USAB_ID_RE.test(v); }
-export function isValidAgeGroup(v) { return typeof v === 'string' && AGE_GROUP_RE.test(v); }
-export function isValidEventType(v) { return typeof v === 'string' && EVENT_TYPE_RE.test(v); }
-export function isValidTswId(v) { return typeof v === 'string' && TSW_ID_RE.test(v); }
-export function isValidSeason(v) { return typeof v === 'string' && SEASON_RE.test(v); }
-export function isValidTswDayParam(v) { return typeof v === 'string' && TSW_DAY_RE.test(v); }
 
 // ── Shared fetch helpers (timeouts + retry) ─────────────────────────────────
 const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504]);

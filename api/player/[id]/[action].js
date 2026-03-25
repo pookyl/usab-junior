@@ -1,12 +1,25 @@
 import {
-  USAB_BASE, BROWSER_HEADERS, TSW_BASE, TSW_ORG_CODE,
-  getCached, setCache, listCachedDates, loadDiskCacheForDate,
-  fetchWithRetry, parsePlayerDetailGrouped, parsePlayerGender,
-  tswFetch, tswUsabProfilePath, tswUsabTournamentsPath, tswUsabOverviewPath,
-  emptyCat, parseTswOverviewStats, parseTswTournaments,
-  setCors, isValidUsabId, getDiskCachedDate,
+  USAB_BASE,
+  BROWSER_HEADERS,
+  TSW_BASE,
+  TSW_ORG_CODE,
+  fetchWithRetry,
+  parsePlayerDetailGrouped,
+  parsePlayerGender,
+  tswFetch,
+  tswUsabProfilePath,
+  tswUsabTournamentsPath,
+  tswUsabOverviewPath,
+  emptyCat,
+  parseTswOverviewStats,
+  parseTswTournaments,
+  getDiskCachedDate,
 } from '../../_lib/shared.js';
+import { getCached, setCache, setCors } from '../../_lib/runtime.js';
+import { isValidUsabId } from '../../_lib/validation.js';
+import { listCachedDates, loadDiskCacheForDate, loadPlayerTrendsIndex } from '../../_lib/rankingsDiskCache.js';
 import {
+  createRequestMetrics,
   sendApiError,
   sendJson,
   UpstreamError,
@@ -31,8 +44,9 @@ async function handleTswStats(req, res, usabId) {
     return sendApiError(res, new ValidationError('Invalid player ID', { field: 'id' }));
   }
 
-  const playerName = req.query.name ?? '';
-  const cacheKey = `tsw-stats:v2:${usabId}`;
+  const playerName = typeof req.query.name === 'string' ? req.query.name.trim() : '';
+  const normalizedName = playerName.toLowerCase().replace(/\s+/g, ' ').trim();
+  const cacheKey = `tsw-stats:v3:${usabId}:${normalizedName || '__unknown__'}`;
 
   const cached = getCached(cacheKey);
   if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }
@@ -41,14 +55,15 @@ async function handleTswStats(req, res, usabId) {
   const tswProfileUrl = `${TSW_BASE}${profilePath}`;
   const tswSearchLink = `${TSW_BASE}/find/player?q=${encodeURIComponent(playerName)}`;
   try {
+    const metrics = createRequestMetrics('tsw-stats');
     const encoded = Buffer.from('base64:' + usabId).toString('base64');
     const encodedNoPad = encoded.replace(/=+$/, '');
     const warnings = [];
 
-    const [overviewResp, tournamentsResp] = await Promise.all([
+    const [overviewResp, tournamentsResp] = await metrics.time('initial_fetches', () => Promise.all([
       tswFetch(tswUsabOverviewPath(usabId)),
       tswFetch(tswUsabTournamentsPath(usabId)),
-    ]);
+    ]));
 
     if (!overviewResp.ok && !tournamentsResp.ok) {
       throw new UpstreamError(`TSW profile unavailable (overview=${overviewResp.status}, tournaments=${tournamentsResp.status})`);
@@ -60,7 +75,7 @@ async function handleTswStats(req, res, usabId) {
       recentHistory: [],
     };
     if (overviewResp.ok) {
-      overviewStats = parseTswOverviewStats(await overviewResp.text());
+      overviewStats = await metrics.time('parse_overview', async () => parseTswOverviewStats(await overviewResp.text()));
     } else {
       warnings.push(`overview:${overviewResp.status}`);
     }
@@ -68,21 +83,21 @@ async function handleTswStats(req, res, usabId) {
     const tournamentsByYear = {};
 
     if (tournamentsResp.ok) {
-      const tournamentsHtml = await tournamentsResp.text();
+      const tournamentsHtml = await metrics.time('read_tournaments_html', () => tournamentsResp.text());
 
       const yearRegex = /data-tabid="(\d{4})"/g;
       const years = [];
       let ym;
       while ((ym = yearRegex.exec(tournamentsHtml)) !== null) years.push(parseInt(ym[1]));
 
-      const currentYearData = parseTswTournaments(tournamentsHtml, playerName);
+      const currentYearData = await metrics.time('parse_current_year', async () => parseTswTournaments(tournamentsHtml, playerName));
       if (years[0] && currentYearData.tournaments.length > 0) {
         tournamentsByYear[years[0]] = currentYearData.tournaments;
       }
 
       const olderYears = years.slice(1);
       if (olderYears.length > 0) {
-        const olderResults = await Promise.allSettled(
+        const olderResults = await metrics.time('fetch_older_years', () => Promise.allSettled(
           olderYears.map(async (year) => {
             const path = `/player/${TSW_ORG_CODE}/${encodeURIComponent(encoded)}/tournaments/GetPlayerTournamentsByYear?AOrganizationCode=${TSW_ORG_CODE}&AMemberID=${encodedNoPad}&Year=${year}&IncludeOlderTournaments=False`;
             const resp = await tswFetch(path);
@@ -91,7 +106,7 @@ async function handleTswStats(req, res, usabId) {
             const data = parseTswTournaments(html, playerName);
             return { year, tournaments: data.tournaments };
           }),
-        );
+        ));
 
         for (const r of olderResults) {
           if (r.status === 'fulfilled') {
@@ -106,7 +121,7 @@ async function handleTswStats(req, res, usabId) {
       if (olderTabMatch) {
         try {
           const olderPath = olderTabMatch[1].replace(/&amp;/g, '&');
-          const olderResp = await tswFetch(olderPath);
+          const olderResp = await metrics.time('fetch_older_tab', () => tswFetch(olderPath));
           if (olderResp.ok) {
             const olderHtml = await olderResp.text();
             const olderData = parseTswTournaments(olderHtml, playerName);
@@ -137,7 +152,8 @@ async function handleTswStats(req, res, usabId) {
       stats.warnings = warnings;
     }
     setCache(cacheKey, stats);
-    sendJson(res, 200, stats, { 'X-Cache': 'MISS' });
+    metrics.log({ years: Object.keys(tournamentsByYear).length, degraded: warnings.length > 0 });
+    sendJson(res, 200, stats, metrics.buildHeaders({ 'X-Cache': 'MISS' }));
   } catch (err) {
     sendApiError(res, err, { logLabel: 'tsw-stats' });
   }
@@ -154,22 +170,30 @@ async function handleRankingTrend(req, res, usabId) {
   if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }
 
   try {
-    const dates = (await listCachedDates()).sort();
-    const trend = [];
-    let playerName = '';
+    const metrics = createRequestMetrics('ranking-trend');
+    const indexed = await metrics.time('load_index', () => loadPlayerTrendsIndex());
+    let result = indexed?.players?.[usabId] ?? null;
 
-    for (const date of dates) {
-      const disk = await loadDiskCacheForDate(date);
-      if (!disk || !disk.allPlayers) continue;
-      const player = disk.allPlayers.find((p) => p.usabId === usabId);
-      if (!player) continue;
-      if (!playerName && player.name) playerName = player.name;
-      trend.push({ date, entries: player.entries });
+    if (!result) {
+      const dates = (await metrics.time('list_dates', () => listCachedDates())).sort();
+      const trend = [];
+      let playerName = '';
+
+      for (const date of dates) {
+        const disk = await metrics.time(`load_${date}`, () => loadDiskCacheForDate(date));
+        if (!disk || !disk.allPlayers) continue;
+        const player = disk.allPlayers.find((p) => p.usabId === usabId);
+        if (!player) continue;
+        if (!playerName && player.name) playerName = player.name;
+        trend.push({ date, entries: player.entries });
+      }
+
+      result = { usabId, name: playerName, trend };
     }
 
-    const result = { usabId, name: playerName, trend };
     setCache(cacheKey, result);
-    sendJson(res, 200, result, { 'X-Cache': 'MISS' });
+    metrics.log({ points: result.trend.length, source: indexed?.players?.[usabId] ? 'index' : 'scan' });
+    sendJson(res, 200, result, metrics.buildHeaders({ 'X-Cache': 'MISS' }));
   } catch (err) {
     sendApiError(res, err, { logLabel: 'ranking-trend' });
   }
@@ -188,15 +212,17 @@ async function handleRankingDetail(req, res, usabId) {
   if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }
 
   try {
+    const metrics = createRequestMetrics('ranking-detail');
     const url = `${USAB_BASE}/${encodeURIComponent(usabId)}/details?date=${encodeURIComponent(date)}`;
-    const response = await fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 });
+    const response = await metrics.time('fetch_detail', () => fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 }));
     if (!response.ok) throw new UpstreamError(`USAB ranking detail HTTP ${response.status}`);
-    const html = await response.text();
+    const html = await metrics.time('read_html', () => response.text());
     const gender = parsePlayerGender(html);
     const sections = parsePlayerDetailGrouped(html);
     const result = { usabId, gender, sections };
     setCache(cacheKey, result);
-    sendJson(res, 200, result, { 'X-Cache': 'MISS' });
+    metrics.log({ sections: sections.length });
+    sendJson(res, 200, result, metrics.buildHeaders({ 'X-Cache': 'MISS' }));
   } catch (err) {
     sendApiError(res, err, { logLabel: 'ranking-detail' });
   }

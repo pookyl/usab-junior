@@ -8,7 +8,7 @@
 // Fully standalone — does NOT require the dev API server to be running.
 
 import { readFileSync, mkdirSync, writeFileSync, readdirSync } from 'fs';
-import { readFile } from 'fs/promises';
+import { readFile, readdir } from 'fs/promises';
 import { execSync } from 'child_process';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -93,6 +93,233 @@ function generateDateParams(startDate, endDate) {
   return params;
 }
 
+async function runInBatches(items, concurrency, worker) {
+  const batchSize = Math.max(1, concurrency);
+  const results = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.allSettled(batch.map(worker));
+    results.push(...batchResults);
+  }
+  return results;
+}
+
+function resolveDrawForEvent(draws, eventName) {
+  const exact = draws.find((draw) => draw.name === eventName);
+  if (exact) return exact;
+  return draws.find(
+    (draw) => draw.name.startsWith(eventName)
+      && !/consolation/i.test(draw.name)
+      && !/play-?off/i.test(draw.name),
+  ) ?? null;
+}
+
+function classifyDrawType(drawType) {
+  const normalized = (drawType || '').toLowerCase();
+  if (normalized.includes('elimination')) return 'elimination';
+  if (normalized.includes('round')) return 'round-robin';
+  return 'unknown';
+}
+
+function parseScheduledTime(timeStr) {
+  if (!timeStr) return { date: '', time: '', dateLabel: '' };
+  const match = timeStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+  if (match) {
+    const date = `${match[3]}-${match[1].padStart(2, '0')}-${match[2].padStart(2, '0')}`;
+    const dateObj = new Date(`${date}T00:00:00`);
+    return {
+      date,
+      time: match[4].trim(),
+      dateLabel: Number.isNaN(dateObj.getTime())
+        ? ''
+        : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+    };
+  }
+  return { date: '', time: timeStr, dateLabel: '' };
+}
+
+async function buildPlayerIndexes({
+  tswId,
+  tournamentName,
+  startDate,
+  endDate,
+  draws,
+  playerIdMap,
+}) {
+  let playersData;
+  try {
+    playersData = JSON.parse(await readFile(join(outDir, 'players.json'), 'utf-8'));
+  } catch {
+    return false;
+  }
+  const players = playersData.players || [];
+
+  const detailEntries = new Map(
+    players.map((player) => [
+      player.playerId,
+      {
+        tswId,
+        playerId: player.playerId,
+        playerName: player.name,
+        memberId: playerIdMap[player.playerId] || undefined,
+        club: player.club || '',
+        events: new Set(),
+        matches: [],
+        wins: 0,
+        losses: 0,
+        hasUpcomingMatches: false,
+      },
+    ]),
+  );
+
+  const scheduleEntries = new Map(
+    players.map((player) => [
+      player.playerId,
+      {
+        playerId: player.playerId,
+        playerName: player.name,
+        matches: [],
+      },
+    ]),
+  );
+
+  try {
+    const matchFiles = (await readdir(join(outDir, 'matches'))).filter((fileName) => fileName.endsWith('.json')).sort();
+    for (const fileName of matchFiles) {
+      const dayData = JSON.parse(await readFile(join(outDir, 'matches', fileName), 'utf-8'));
+      for (const match of dayData.matches || []) {
+        const participantIds = [
+          ...new Set([
+            ...((match.team1Ids || []).filter(Boolean)),
+            ...((match.team2Ids || []).filter(Boolean)),
+          ]),
+        ];
+
+        for (const playerId of participantIds) {
+          const detailEntry = detailEntries.get(playerId);
+          if (!detailEntry) continue;
+
+          detailEntry.matches.push(match);
+          if (!match.bye) {
+            const inTeam1 = (match.team1Ids || []).includes(playerId);
+            if (inTeam1 && match.team1Won) detailEntry.wins += 1;
+            else if (inTeam1 && match.team2Won) detailEntry.losses += 1;
+            else if (!inTeam1 && match.team2Won) detailEntry.wins += 1;
+            else if (!inTeam1 && match.team1Won) detailEntry.losses += 1;
+          }
+
+          const isUpcoming = !match.team1Won && !match.team2Won && !match.bye && !match.walkover && !!match.time;
+          if (!isUpcoming) continue;
+
+          detailEntry.hasUpcomingMatches = true;
+          const scheduleEntry = scheduleEntries.get(playerId);
+          if (!scheduleEntry) continue;
+
+          const parsedTime = parseScheduledTime(match.time);
+          const inTeam1 = (match.team1Ids || []).includes(playerId);
+          const opponentNames = inTeam1 ? match.team2 : match.team1;
+          const opponentIds = inTeam1 ? (match.team2Ids || []) : (match.team1Ids || []);
+          const playerTeamNames = inTeam1 ? match.team1 : match.team2;
+          const playerTeamIds = inTeam1 ? (match.team1Ids || []) : (match.team2Ids || []);
+          const partnerNames = [];
+          const partnerPlayerIds = [];
+
+          for (let i = 0; i < playerTeamNames.length; i += 1) {
+            if ((playerTeamIds[i] || null) !== playerId) {
+              partnerNames.push(playerTeamNames[i]);
+              partnerPlayerIds.push(playerTeamIds[i] ?? null);
+            }
+          }
+
+          const drawObj = resolveDrawForEvent(draws, match.event || '');
+          scheduleEntry.matches.push({
+            date: parsedTime.date,
+            dateLabel: parsedTime.dateLabel,
+            event: match.event || '',
+            round: match.round || '',
+            time: parsedTime.time || match.time || '',
+            court: match.court || '',
+            drawType: classifyDrawType(drawObj?.type),
+            status: (match.status || '').toLowerCase().includes('now') ? 'in-progress' : 'upcoming',
+            opponent: { names: opponentNames, playerIds: opponentIds },
+            partner: partnerNames.length > 0 ? { names: partnerNames, playerIds: partnerPlayerIds } : null,
+            result: null,
+            nextMatches: [],
+            consolation: null,
+            consolationMatches: [],
+          });
+        }
+      }
+    }
+  } catch {
+    // Matches are optional for partially scraped tournaments.
+  }
+
+  try {
+    const eventFiles = (await readdir(join(outDir, 'event-details'))).filter((fileName) => fileName.endsWith('.json'));
+    for (const fileName of eventFiles) {
+      const eventData = JSON.parse(await readFile(join(outDir, 'event-details', fileName), 'utf-8'));
+      for (const entry of eventData.entries || []) {
+        for (const player of entry.players || []) {
+          const detailEntry = detailEntries.get(player.playerId);
+          if (!detailEntry) continue;
+          const partners = (entry.players || [])
+            .filter((candidate) => candidate.playerId !== player.playerId)
+            .map((candidate) => candidate.name);
+          const label = partners.length > 0
+            ? `${eventData.eventName} with ${partners.join(' / ')}`
+            : eventData.eventName;
+          detailEntry.events.add(label);
+        }
+      }
+    }
+  } catch {
+    // Event details are optional for partially scraped tournaments.
+  }
+
+  const playerDetailsById = Object.fromEntries(
+    [...detailEntries.entries()].map(([playerId, entry]) => {
+      const total = entry.wins + entry.losses;
+      return [playerId, {
+        tswId,
+        playerId: entry.playerId,
+        playerName: entry.playerName,
+        memberId: entry.memberId,
+        club: entry.club,
+        events: [...entry.events].sort(),
+        winLoss: total > 0
+          ? { wins: entry.wins, losses: entry.losses, total, winPct: Math.round((entry.wins / total) * 100) }
+          : null,
+        matches: entry.matches,
+        hasUpcomingMatches: entry.hasUpcomingMatches,
+      }];
+    }),
+  );
+
+  const playerScheduleById = Object.fromEntries(
+    [...scheduleEntries.entries()].map(([playerId, entry]) => [playerId, {
+      playerId: entry.playerId,
+      playerName: entry.playerName,
+      matches: entry.matches.sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.time.localeCompare(b.time);
+      }),
+    }]),
+  );
+
+  await Promise.all([
+    saveJson('player-detail-index.json', { tswId, playersById: playerDetailsById }),
+    saveJson('player-schedule-index.json', {
+      tswId,
+      tournamentName,
+      startDate,
+      endDate,
+      playersById: playerScheduleById,
+    }),
+  ]);
+  return true;
+}
+
 function discoverDateRange() {
   const DATA_DIR = join(PROJECT_ROOT, 'data');
   try {
@@ -169,113 +396,112 @@ async function main() {
   saveJson('draws.json', drawsData);
   console.log('  Saved: draws.json (reused from Phase 1)');
 
-  const staticTasks = [
-    {
-      name: 'seeds',
-      fetch: async () => {
-        const resp = tswOk(await tswFetch(`/sport/seeds.aspx?id=${encodeURIComponent(tswId)}`), 'seeds page');
-        const html = await resp.text();
-        const seedEvents = parseTswSeeding(html);
-        return { tswId, eventCount: seedEvents.length, events: seedEvents };
-      },
-    },
-    {
-      name: 'players',
-      fetch: async () => {
-        const resp = tswOk(await tswFetch(`/tournament/${tswIdLower}/Players/GetPlayersContent`, {
-          method: 'POST',
-          extraHeaders: { 'Content-Type': 'application/x-www-form-urlencoded', Referer: `${TSW_BASE}/tournament/${tswId}/players` },
-          body: '',
-        }), 'players content');
-        const html = await resp.text();
-        const players = parseTswTournamentPlayersArray(html);
-        return { tswId, playerCount: players.length, players };
-      },
-    },
-    {
-      name: 'winners',
-      fetch: async () => {
-        const resp = tswOk(await tswFetch(`/sport/winners.aspx?id=${encodeURIComponent(tswId)}`), 'winners page');
-        const html = await resp.text();
-        const winnerEvents = parseTswWinners(html);
-        const titleMatch = html.match(/<title>\s*([\s\S]*?)\s*<\/title>/i);
-        const tn = titleMatch
-          ? titleMatch[1].replace(/^Tournamentsoftware\.com\s*-\s*/i, '').replace(/\s*-\s*Winners$/i, '').trim()
-          : '';
-        return { tswId, tournamentName: tn, events: winnerEvents };
-      },
-    },
-    {
-      name: 'medals',
-      fetch: async () => {
-        const [winnersResp, playersResp] = await Promise.all([
-          tswFetch(`/sport/winners.aspx?id=${encodeURIComponent(tswId)}`),
-          tswFetch(`/tournament/${tswIdLower}/Players/GetPlayersContent`, {
-            method: 'POST',
-            extraHeaders: { 'Content-Type': 'application/x-www-form-urlencoded', Referer: `${TSW_BASE}/tournament/${tswId}/players` },
-            body: '',
-          }),
-        ]);
-        tswOk(winnersResp, 'winners page');
-        tswOk(playersResp, 'players content');
-        const winnersHtml = await winnersResp.text();
-        const playersHtml = await playersResp.text();
-        const playersMap = parseTswTournamentPlayers(playersHtml);
-        const winnerEvents = parseTswWinners(winnersHtml);
+  const staticResults = await Promise.allSettled([
+    (async () => {
+      const resp = tswOk(await tswFetch(`/sport/seeds.aspx?id=${encodeURIComponent(tswId)}`), 'seeds page');
+      const html = await resp.text();
+      const seedEvents = parseTswSeeding(html);
+      const data = { tswId, eventCount: seedEvents.length, events: seedEvents };
+      await saveJson('seeds.json', data);
+      return { name: 'seeds', data };
+    })(),
+    (async () => {
+      const resp = tswOk(await tswFetch(`/tournament/${tswIdLower}/Players/GetPlayersContent`, {
+        method: 'POST',
+        extraHeaders: { 'Content-Type': 'application/x-www-form-urlencoded', Referer: `${TSW_BASE}/tournament/${tswId}/players` },
+        body: '',
+      }), 'players content');
+      const html = await resp.text();
+      const players = parseTswTournamentPlayersArray(html);
+      const data = { tswId, playerCount: players.length, players };
+      await saveJson('players.json', data);
+      return { name: 'players', data, playersMap: parseTswTournamentPlayers(html) };
+    })(),
+    (async () => {
+      const resp = tswOk(await tswFetch(`/sport/winners.aspx?id=${encodeURIComponent(tswId)}`), 'winners page');
+      const html = await resp.text();
+      const winnerEvents = parseTswWinners(html);
+      const titleMatch = html.match(/<title>\s*([\s\S]*?)\s*<\/title>/i);
+      const tn = titleMatch
+        ? titleMatch[1].replace(/^Tournamentsoftware\.com\s*-\s*/i, '').replace(/\s*-\s*Winners$/i, '').trim()
+        : '';
+      const data = { tswId, tournamentName: tn, events: winnerEvents };
+      await saveJson('winners.json', data);
+      return { name: 'winners', data, winnerEvents, tournamentName: tn };
+    })(),
+  ]);
 
-        const titleMatch = winnersHtml.match(/<title>\s*([\s\S]*?)\s*<\/title>/i);
-        const tn = titleMatch
-          ? titleMatch[1].replace(/^Tournamentsoftware\.com\s*-\s*/i, '').replace(/\s*-\s*Winners$/i, '').trim()
-          : '';
+  let playersMap = null;
+  let winnerEvents = null;
+  let winnersTournamentName = '';
 
-        const medals = winnerEvents.map(event => {
-          const { gold, silver, bronze, fourth } = normalizePlaces(event.results);
-          const enrichPlayers = (entries) => entries.flatMap(r =>
-            r.players.map(p => ({ name: p.name, club: playersMap.get(p.playerId)?.club || '', playerId: p.playerId })),
-          );
-          const enrichBronze = (entries) => entries.map(r =>
-            r.players.map(p => ({ name: p.name, club: playersMap.get(p.playerId)?.club || '', playerId: p.playerId })),
-          );
-          const ageGroup = (event.eventName.match(/U\d+/i) || [''])[0].toUpperCase();
-          const eventType = (event.eventName.match(/^(BS|GS|BD|GD|XD)/i) || [''])[0].toUpperCase();
-          return {
-            drawName: event.eventName, ageGroup, eventType,
-            gold: enrichPlayers(gold), silver: enrichPlayers(silver),
-            bronze: enrichBronze(bronze), fourth: enrichBronze(fourth),
-          };
-        });
+  for (const result of staticResults) {
+    if (result.status === 'fulfilled') {
+      console.log(`  Saved: ${result.value.name}.json`);
+      if (result.value.name === 'players') playersMap = result.value.playersMap;
+      if (result.value.name === 'winners') {
+        winnerEvents = result.value.winnerEvents;
+        winnersTournamentName = result.value.tournamentName;
+      }
+    } else {
+      console.warn(`  FAILED: ${result.reason.message}`);
+    }
+  }
 
-        return { tswId, tournamentName: tn, clubs: buildClubStats(medals), medals };
-      },
-    },
-  ];
+  if (playersMap && winnerEvents) {
+    const medals = winnerEvents.map((event) => {
+      const { gold, silver, bronze, fourth } = normalizePlaces(event.results);
+      const enrichPlayers = (entries) => entries.flatMap((resultEntries) =>
+        resultEntries.players.map((player) => ({
+          name: player.name,
+          club: playersMap.get(player.playerId)?.club || '',
+          playerId: player.playerId,
+        })),
+      );
+      const enrichBronze = (entries) => entries.map((resultEntries) =>
+        resultEntries.players.map((player) => ({
+          name: player.name,
+          club: playersMap.get(player.playerId)?.club || '',
+          playerId: player.playerId,
+        })),
+      );
+      const ageGroup = (event.eventName.match(/U\d+/i) || [''])[0].toUpperCase();
+      const eventType = (event.eventName.match(/^(BS|GS|BD|GD|XD)/i) || [''])[0].toUpperCase();
+      return {
+        drawName: event.eventName,
+        ageGroup,
+        eventType,
+        gold: enrichPlayers(gold),
+        silver: enrichPlayers(silver),
+        bronze: enrichBronze(bronze),
+        fourth: enrichBronze(fourth),
+      };
+    });
 
-  const staticResults = await Promise.allSettled(staticTasks.map(async (t) => {
-    const data = await t.fetch();
-    saveJson(`${t.name}.json`, data);
-    return t.name;
-  }));
-  for (const r of staticResults) {
-    if (r.status === 'fulfilled') console.log(`  Saved: ${r.value}.json`);
-    else console.warn(`  FAILED: ${r.reason.message}`);
+    await saveJson('medals.json', {
+      tswId,
+      tournamentName: winnersTournamentName,
+      clubs: buildClubStats(medals),
+      medals,
+    });
+    console.log('  Saved: medals.json');
   }
 
   // Phase 4: fetch matches for each day
   let totalMatchCount = 0;
   if (dateParams.length > 0) {
     console.log('Phase 3: Fetching matches per day from TSW...');
-    const matchResults = await Promise.allSettled(
-      dateParams.map(async (dp) => {
-        const resp = tswOk(await tswFetch(
-          `/tournament/${tswIdLower}/Matches/MatchesInDay?date=${encodeURIComponent(dp)}`,
-        ), `matches ${dp}`);
-        const html = await resp.text();
-        const matches = parseTswMatches(html);
-        const data = { tswId, date: formatMatchDate(dp), matches };
-        saveJson(`matches/${dp}.json`, data);
-        return { dp, matchCount: matches.length };
-      }),
-    );
+    const MATCH_DAY_CONCURRENCY = Math.max(1, Number(process.env.TSW_MATCH_DAY_CONCURRENCY ?? 5));
+    const matchResults = await runInBatches(dateParams, MATCH_DAY_CONCURRENCY, async (dp) => {
+      const resp = tswOk(await tswFetch(
+        `/tournament/${tswIdLower}/Matches/MatchesInDay?date=${encodeURIComponent(dp)}`,
+      ), `matches ${dp}`);
+      const html = await resp.text();
+      const matches = parseTswMatches(html);
+      const data = { tswId, date: formatMatchDate(dp), matches };
+      await saveJson(`matches/${dp}.json`, data);
+      return { dp, matchCount: matches.length };
+    });
     for (const r of matchResults) {
       if (r.status === 'fulfilled') {
         totalMatchCount += r.value.matchCount;
@@ -405,8 +631,34 @@ async function main() {
     console.log('Phase 6: Skipping player-id-map (pass --all to include)');
   }
 
+  console.log('Phase 7: Building tournament player indexes...');
+  const builtIndexes = await buildPlayerIndexes({
+    tswId,
+    tournamentName,
+    startDate,
+    endDate,
+    draws,
+    playerIdMap,
+  });
+  if (builtIndexes) {
+    console.log('  Saved: player-detail-index.json, player-schedule-index.json');
+  } else {
+    console.log('  Skipped: player indexes (players.json unavailable)');
+  }
+
   // Phase 8: write manifest
-  const staticFiles = ['detail.json', 'draws.json', 'events.json', 'seeds.json', 'players.json', 'winners.json', 'medals.json'];
+  const staticFiles = [
+    'detail.json',
+    'draws.json',
+    'events.json',
+    'seeds.json',
+    'players.json',
+    'winners.json',
+    'medals.json',
+  ];
+  if (builtIndexes) {
+    staticFiles.push('player-detail-index.json', 'player-schedule-index.json');
+  }
   if (flagAll) staticFiles.push('player-id-map.json');
 
   const manifest = {

@@ -698,7 +698,14 @@ let _h2hSnap: {
 
 export default function HeadToHead() {
   const location = useLocation();
-  const { players: allPlayers, directoryPlayers, directoryLoading, loading: playersLoading, rankingsDate } = usePlayers();
+  const {
+    players: allPlayers,
+    directoryPlayers,
+    directoryLoading,
+    loading: playersLoading,
+    rankingsDate,
+    ensureDirectoryPlayers,
+  } = usePlayers();
   const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
 
   const snap = _h2hSnap;
@@ -730,6 +737,10 @@ export default function HeadToHead() {
       entries: rankedMap.get(dp.usabId) ?? [],
     }));
   }, [directoryPlayers, allPlayers]);
+
+  useEffect(() => {
+    void ensureDirectoryPlayers();
+  }, [ensureDirectoryPlayers]);
 
   // Restore player objects from snapshot IDs once allPlayers loads
   const restoredPlayers = useRef(false);

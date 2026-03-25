@@ -12,7 +12,7 @@
  *   node scripts/refresh-rankings-cache.mjs 2026-03-01 # force a specific date
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -21,6 +21,8 @@ const ROOT = join(__dirname, '..');
 const DATA_DIR = join(ROOT, 'data');
 const CACHE_FILE = join(DATA_DIR, 'rankings-cache.json');
 const META_FILE = join(DATA_DIR, 'rankings-meta.json');
+const PLAYER_DIRECTORY_INDEX_FILE = join(DATA_DIR, 'player-directory.json');
+const PLAYER_TRENDS_INDEX_FILE = join(DATA_DIR, 'player-ranking-trends.json');
 const USAB_BASE = 'https://usabjrrankings.org';
 
 function perDateCacheFile(date) {
@@ -176,6 +178,86 @@ async function fetchAllAvailableDates() {
   return dates;
 }
 
+function listPerDateCacheDates() {
+  if (!existsSync(DATA_DIR)) return [];
+  return readdirSync(DATA_DIR)
+    .map((fileName) => fileName.match(/^rankings-(\d{4}-\d{2}-\d{2})\.json$/)?.[1] ?? null)
+    .filter(Boolean)
+    .sort();
+}
+
+function rebuildPlayerIndexes() {
+  const dates = listPerDateCacheDates();
+  const directoryMap = new Map();
+  const trendMap = new Map();
+
+  for (const date of dates) {
+    const filePath = perDateCacheFile(date);
+    const disk = JSON.parse(readFileSync(filePath, 'utf-8'));
+    const allPlayers = disk.allPlayers || [];
+
+    for (const player of allPlayers) {
+      const existingDirectory = directoryMap.get(player.usabId);
+      if (existingDirectory) {
+        existingDirectory.latestName = player.name;
+        existingDirectory.nameSet.add(player.name);
+      } else {
+        directoryMap.set(player.usabId, {
+          usabId: player.usabId,
+          latestName: player.name,
+          nameSet: new Set([player.name]),
+        });
+      }
+
+      const existingTrend = trendMap.get(player.usabId);
+      if (existingTrend) {
+        existingTrend.name = player.name || existingTrend.name;
+        existingTrend.trend.push({ date, entries: player.entries });
+      } else {
+        trendMap.set(player.usabId, {
+          usabId: player.usabId,
+          name: player.name,
+          trend: [{ date, entries: player.entries }],
+        });
+      }
+    }
+  }
+
+  const savedAt = new Date().toISOString();
+  const directory = [...directoryMap.values()]
+    .map((entry) => ({
+      usabId: entry.usabId,
+      name: entry.latestName,
+      names: [entry.latestName, ...[...entry.nameSet].filter((name) => name !== entry.latestName)],
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const players = Object.fromEntries(
+    [...trendMap.values()].map((entry) => [
+      entry.usabId,
+      {
+        usabId: entry.usabId,
+        name: entry.name,
+        trend: entry.trend,
+      },
+    ]),
+  );
+
+  writeFileSync(PLAYER_DIRECTORY_INDEX_FILE, JSON.stringify({
+    savedAt,
+    count: directory.length,
+    directory,
+  }) + '\n');
+
+  writeFileSync(PLAYER_TRENDS_INDEX_FILE, JSON.stringify({
+    savedAt,
+    count: Object.keys(players).length,
+    players,
+  }) + '\n');
+
+  console.log(`[refresh] rebuilt player indexes (${directory.length} directory players, ${Object.keys(players).length} trend entries)`);
+}
+
 // ── Write cache files for a single date ──────────────────────────────────────
 
 async function refreshDate(date, { updateLatest = false } = {}) {
@@ -226,6 +308,7 @@ async function main() {
       const wrote = await refreshDate(date, { updateLatest: date === allDates[0] });
       if (wrote) fetched++;
     }
+    if (fetched > 0) rebuildPlayerIndexes();
     console.log(`[refresh] backfill complete: ${fetched} new date(s) cached`);
     process.exit(fetched > 0 ? 0 : 2);
   }
@@ -239,6 +322,7 @@ async function main() {
   }
 
   const wrote = await refreshDate(date, { updateLatest: true });
+  if (wrote) rebuildPlayerIndexes();
   process.exit(wrote ? 0 : 1);
 }
 

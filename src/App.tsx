@@ -1,6 +1,6 @@
-import { Component, useEffect } from 'react';
+import { Component, Suspense, lazy, useEffect } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, matchPath } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams, useLocation, matchPath } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import useScrollRestore from './hooks/useScrollRestore';
 import Navbar from './components/Navbar';
@@ -10,24 +10,33 @@ import { TournamentFocusProvider, useTournamentFocus } from './contexts/Tourname
 import { WatchlistProvider } from './contexts/WatchlistContext';
 import { rememberTournamentDetailOrigin } from './utils/tournamentReturnState';
 import { isWithinTournamentFocusScope, getLastTournamentPath, setLastTournamentPath } from './utils/tournamentFocus';
-import Home from './pages/Dashboard';
-import Rankings from './pages/Players';
-import AllPlayers from './pages/AllPlayers';
-import PlayerProfile from './pages/PlayerProfile';
-import PlayerRankingDetail from './pages/PlayerRankingDetail';
-import HeadToHead from './pages/HeadToHead';
-import Tournaments from './pages/Tournaments';
-import TournamentHub, { TournamentPlayerDetail, TournamentDrawDetail } from './pages/TournamentHub';
-import TournamentMatchesPage from './pages/tournament/TournamentMatchesPage';
-import TournamentPlayersPage from './pages/tournament/TournamentPlayersPage';
-import TournamentDrawsPage from './pages/tournament/TournamentDrawsPage';
-import TournamentEventsPage from './pages/tournament/TournamentEventsPage';
-import TournamentSeedsPage from './pages/tournament/TournamentSeedsPage';
-import TournamentWinnersPage from './pages/tournament/TournamentWinnersPage';
-import TournamentMedalsPage from './pages/tournament/TournamentMedalsPage';
-import TournamentWatchlistPage from './pages/tournament/TournamentWatchlistPage';
-import TournamentEventDetail from './pages/TournamentEventDetail';
-import PlayerSchedulePage from './pages/tournament/PlayerSchedulePage';
+
+const Home = lazy(() => import('./pages/Dashboard'));
+const Rankings = lazy(() => import('./pages/Players'));
+const AllPlayers = lazy(() => import('./pages/AllPlayers'));
+const PlayerProfile = lazy(() => import('./pages/PlayerProfile'));
+const PlayerRankingDetail = lazy(() => import('./pages/PlayerRankingDetail'));
+const HeadToHead = lazy(() => import('./pages/HeadToHead'));
+const Tournaments = lazy(() => import('./pages/Tournaments'));
+const TournamentHub = lazy(() => import('./pages/TournamentHub'));
+const TournamentPlayerDetail = lazy(async () => {
+  const mod = await import('./pages/TournamentHub');
+  return { default: mod.TournamentPlayerDetail };
+});
+const TournamentDrawDetail = lazy(async () => {
+  const mod = await import('./pages/TournamentHub');
+  return { default: mod.TournamentDrawDetail };
+});
+const TournamentMatchesPage = lazy(() => import('./pages/tournament/TournamentMatchesPage'));
+const TournamentPlayersPage = lazy(() => import('./pages/tournament/TournamentPlayersPage'));
+const TournamentDrawsPage = lazy(() => import('./pages/tournament/TournamentDrawsPage'));
+const TournamentEventsPage = lazy(() => import('./pages/tournament/TournamentEventsPage'));
+const TournamentSeedsPage = lazy(() => import('./pages/tournament/TournamentSeedsPage'));
+const TournamentWinnersPage = lazy(() => import('./pages/tournament/TournamentWinnersPage'));
+const TournamentMedalsPage = lazy(() => import('./pages/tournament/TournamentMedalsPage'));
+const TournamentWatchlistPage = lazy(() => import('./pages/tournament/TournamentWatchlistPage'));
+const TournamentEventDetail = lazy(() => import('./pages/TournamentEventDetail'));
+const PlayerSchedulePage = lazy(() => import('./pages/tournament/PlayerSchedulePage'));
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -132,6 +141,26 @@ function PlayerRedirect() {
   return <Navigate to={`/directory/${id}`} replace />;
 }
 
+function RouteFallback() {
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div className="h-32 rounded-2xl border border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900/60 animate-pulse" />
+    </div>
+  );
+}
+
+function SuspendedPage({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<RouteFallback />}>{children}</Suspense>;
+}
+
+function PlayersDataLayout() {
+  return (
+    <PlayersProvider>
+      <Outlet />
+    </PlayersProvider>
+  );
+}
+
 const ROUTE_PATTERNS = [
   '/tournaments/:tswId/event/:eventId',
   '/tournaments/:tswId/draw/:drawId',
@@ -167,9 +196,8 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <BrowserRouter>
-          <PlayersProvider>
-            <TournamentFocusProvider>
-              <WatchlistProvider>
+          <TournamentFocusProvider>
+            <WatchlistProvider>
               <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
                 <AnalyticsWithRoutes />
                 <ScrollManager />
@@ -179,35 +207,36 @@ export default function App() {
                 <Navbar />
                 <main className="pb-20 md:pb-0">
                   <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/players" element={<Rankings />} />
-                    <Route path="/players/:id" element={<PlayerRedirect />} />
-                    <Route path="/directory" element={<AllPlayers />} />
-                    <Route path="/directory/:id/rankings" element={<PlayerRankingDetail />} />
-                    <Route path="/directory/:id" element={<PlayerProfile />} />
-                    <Route path="/analytics" element={<Navigate to="/players" replace />} />
-                    <Route path="/head-to-head" element={<HeadToHead />} />
-                    <Route path="/tournaments" element={<Tournaments />} />
-                    <Route path="/tournaments/:tswId" element={<TournamentHub />} />
-                    <Route path="/tournaments/:tswId/matches" element={<TournamentMatchesPage />} />
-                    <Route path="/tournaments/:tswId/players" element={<TournamentPlayersPage />} />
-                    <Route path="/tournaments/:tswId/draws" element={<TournamentDrawsPage />} />
-                    <Route path="/tournaments/:tswId/events" element={<TournamentEventsPage />} />
-                    <Route path="/tournaments/:tswId/seeds" element={<TournamentSeedsPage />} />
-                    <Route path="/tournaments/:tswId/winners" element={<TournamentWinnersPage />} />
-                    <Route path="/tournaments/:tswId/medals" element={<TournamentMedalsPage />} />
-                    <Route path="/tournaments/:tswId/watchlist" element={<TournamentWatchlistPage />} />
-                    <Route path="/tournaments/:tswId/event/:eventId" element={<TournamentEventDetail />} />
-                    <Route path="/tournaments/:tswId/draw/:drawId" element={<TournamentDrawDetail />} />
-                    <Route path="/tournaments/:tswId/player/:playerId/schedule" element={<PlayerSchedulePage />} />
-                    <Route path="/tournaments/:tswId/player/:playerId" element={<TournamentPlayerDetail />} />
+                    <Route element={<PlayersDataLayout />}>
+                      <Route path="/" element={<SuspendedPage><Home /></SuspendedPage>} />
+                      <Route path="/players" element={<SuspendedPage><Rankings /></SuspendedPage>} />
+                      <Route path="/players/:id" element={<PlayerRedirect />} />
+                      <Route path="/directory" element={<SuspendedPage><AllPlayers /></SuspendedPage>} />
+                      <Route path="/directory/:id/rankings" element={<SuspendedPage><PlayerRankingDetail /></SuspendedPage>} />
+                      <Route path="/directory/:id" element={<SuspendedPage><PlayerProfile /></SuspendedPage>} />
+                      <Route path="/analytics" element={<Navigate to="/players" replace />} />
+                      <Route path="/head-to-head" element={<SuspendedPage><HeadToHead /></SuspendedPage>} />
+                    </Route>
+                    <Route path="/tournaments" element={<SuspendedPage><Tournaments /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId" element={<SuspendedPage><TournamentHub /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/matches" element={<SuspendedPage><TournamentMatchesPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/players" element={<SuspendedPage><TournamentPlayersPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/draws" element={<SuspendedPage><TournamentDrawsPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/events" element={<SuspendedPage><TournamentEventsPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/seeds" element={<SuspendedPage><TournamentSeedsPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/winners" element={<SuspendedPage><TournamentWinnersPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/medals" element={<SuspendedPage><TournamentMedalsPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/watchlist" element={<SuspendedPage><TournamentWatchlistPage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/event/:eventId" element={<SuspendedPage><TournamentEventDetail /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/draw/:drawId" element={<SuspendedPage><TournamentDrawDetail /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/player/:playerId/schedule" element={<SuspendedPage><PlayerSchedulePage /></SuspendedPage>} />
+                    <Route path="/tournaments/:tswId/player/:playerId" element={<SuspendedPage><TournamentPlayerDetail /></SuspendedPage>} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </main>
               </div>
             </WatchlistProvider>
-            </TournamentFocusProvider>
-          </PlayersProvider>
+          </TournamentFocusProvider>
         </BrowserRouter>
       </ThemeProvider>
     </ErrorBoundary>

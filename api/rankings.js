@@ -1,7 +1,9 @@
 import {
-  getCached, setCache, getDiskCachedRankings, getDiskCachedDate,
-  setCors, isValidDate, isValidAgeGroup, isValidEventType,
+  getDiskCachedRankings,
+  getDiskCachedDate,
 } from './_lib/shared.js';
+import { getCached, setCache, setCors } from './_lib/runtime.js';
+import { isValidAgeGroup, isValidDate, isValidEventType } from './_lib/validation.js';
 import { sendApiError, sendJson, ValidationError, UnavailableError } from './_lib/http.js';
 
 export default async function handler(req, res) {

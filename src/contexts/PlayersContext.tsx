@@ -17,6 +17,8 @@ interface PlayersContextValue {
   availableDates: string[];
   changeDate: (date: string) => void;
   refresh: () => void;
+  ensureAvailableDates: () => Promise<void>;
+  ensureDirectoryPlayers: () => Promise<void>;
   playerNameMap: Map<string, string[]>;
   playerIdSet: Set<string>;
 }
@@ -28,7 +30,7 @@ let nextToastId = 0;
 export function PlayersProvider({ children }: { children: ReactNode }) {
   const [players, setPlayers] = useState<UniquePlayer[]>([]);
   const [directoryPlayers, setDirectoryPlayers] = useState<DirectoryPlayer[]>([]);
-  const [directoryLoading, setDirectoryLoading] = useState(true);
+  const [directoryLoading, setDirectoryLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<DataSource>('none');
@@ -84,6 +86,25 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     });
   }, [rankingsDate, pushToast]);
 
+  const ensureAvailableDates = useCallback(async () => {
+    try {
+      const cachedDates = await fetchCachedDates();
+      if (cachedDates.length > 0) setAvailableDates(cachedDates);
+    } catch {
+      // Keep default availableDates.
+    }
+  }, []);
+
+  const ensureDirectoryPlayers = useCallback(async () => {
+    setDirectoryLoading(true);
+    try {
+      const dir = await fetchPlayerDirectory();
+      if (dir.length > 0) setDirectoryPlayers(dir);
+    } finally {
+      setDirectoryLoading(false);
+    }
+  }, []);
+
   const changeDate = useCallback((date: string) => {
     if (date === rankingsDate) return;
     invalidateRankingsCache();
@@ -91,34 +112,9 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     load(date);
   }, [rankingsDate, load]);
 
-  // Auto-fetch on mount: rankings, directory, and available dates
+  // Auto-fetch rankings only. Directory and historic dates are loaded on demand.
   useEffect(() => {
     load(RANKINGS_DATE);
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const cachedDates = await fetchCachedDates();
-        if (cancelled) return;
-        if (cachedDates.length > 0) setAvailableDates(cachedDates);
-      } catch {
-        // keep default availableDates
-      }
-    })();
-
-    (async () => {
-      try {
-        const dir = await fetchPlayerDirectory();
-        if (cancelled) return;
-        if (dir.length > 0) setDirectoryPlayers(dir);
-      } catch {
-        // directory is best-effort
-      } finally {
-        if (!cancelled) setDirectoryLoading(false);
-      }
-    })();
-
-    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -151,9 +147,11 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
 
   const contextValue = useMemo(() => ({
     players, directoryPlayers, directoryLoading, loading, error,
-    source, rankingsDate, availableDates, changeDate, refresh, playerNameMap, playerIdSet,
+    source, rankingsDate, availableDates, changeDate, refresh, ensureAvailableDates,
+    ensureDirectoryPlayers, playerNameMap, playerIdSet,
   }), [players, directoryPlayers, directoryLoading, loading, error,
-       source, rankingsDate, availableDates, changeDate, refresh, playerNameMap, playerIdSet]);
+       source, rankingsDate, availableDates, changeDate, refresh, ensureAvailableDates,
+       ensureDirectoryPlayers, playerNameMap, playerIdSet]);
 
   return (
     <PlayersContext.Provider value={contextValue}>

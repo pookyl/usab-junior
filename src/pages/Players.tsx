@@ -905,7 +905,7 @@ export default function Rankings() {
   const [view, setView] = useState<ViewMode>('rankings');
   const [isDateOpen, setIsDateOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
-  const { rankingsDate, availableDates, changeDate, loading } = usePlayers();
+  const { rankingsDate, availableDates, changeDate, loading, ensureAvailableDates } = usePlayers();
   const hasMultipleDates = availableDates.length > 1;
 
   useEffect(() => {
@@ -913,6 +913,10 @@ export default function Rankings() {
     if (paramEvent && EVENT_TYPES.includes(paramEvent)) setEventType(paramEvent);
     if (paramAge || paramEvent) setView('rankings');
   }, [paramAge, paramEvent]);
+
+  useEffect(() => {
+    void ensureAvailableDates();
+  }, [ensureAvailableDates]);
 
   useEffect(() => {
     if (!isDateOpen) return;

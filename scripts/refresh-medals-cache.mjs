@@ -31,6 +31,8 @@ const {
 
 const DATA_DIR = join(ROOT, 'data');
 const PROFILE_CONCURRENCY = 5;
+const TOURNAMENT_CONCURRENCY = Math.max(1, Number(process.env.MEDALS_TOURNAMENT_CONCURRENCY ?? 2));
+const profileMemberCache = new Map();
 
 // ── CLI args ─────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -95,11 +97,19 @@ async function fetchPlayerMemberIds(tswId, playerIds) {
   async function worker() {
     while (queue.length > 0) {
       const pid = queue.shift();
+      const cacheKey = `${tswId}:${pid}`;
+      if (profileMemberCache.has(cacheKey)) {
+        const cachedMemberId = profileMemberCache.get(cacheKey);
+        if (cachedMemberId) memberMap.set(pid, cachedMemberId);
+        done++;
+        continue;
+      }
       try {
         const resp = await tswFetch(`/sport/player.aspx?id=${encodeURIComponent(tswId)}&player=${pid}`);
         if (resp.ok) {
           const html = await resp.text();
           const memberId = parseTswPlayerMemberId(html);
+          profileMemberCache.set(cacheKey, memberId || '');
           if (memberId) memberMap.set(pid, memberId);
         }
       } catch { /* skip */ }
@@ -212,7 +222,7 @@ function collectSeasonTswIds(season) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const targets = season ? collectSeasonTswIds(season) : all ? collectAllTswIds() : tswIds;
+  const targets = [...new Set(season ? collectSeasonTswIds(season) : all ? collectAllTswIds() : tswIds)];
 
   if (targets.length === 0) {
     console.log('No tournaments found.');
@@ -221,27 +231,42 @@ async function main() {
 
   console.log(`Processing ${targets.length} tournament(s)...`);
   let scraped = 0, skipped = 0, failed = 0;
+  let started = 0;
+  const queue = [...targets];
 
-  for (const id of targets) {
-    if (!force) {
-      const existing = await loadMedalsDiskCache(id);
-      if (existing) {
-        skipped++;
-        continue;
+  async function worker() {
+    while (queue.length > 0) {
+      const id = queue.shift();
+      if (!id) continue;
+
+      const ordinal = ++started;
+      if (!force) {
+        const existing = await loadMedalsDiskCache(id);
+        if (existing) {
+          skipped++;
+          continue;
+        }
+      }
+
+      console.log(`\n[${ordinal}/${targets.length}] ${id}`);
+      try {
+        const result = await scrapeMedals(id);
+        await saveMedalsDiskCache(id, result);
+        console.log(`  saved medals-${id.toLowerCase()}.json (${result.medals.length} events)`);
+        scraped++;
+      } catch (err) {
+        console.error(`  FAILED: ${err.message}`);
+        failed++;
       }
     }
-
-    console.log(`\n[${scraped + skipped + failed + 1}/${targets.length}] ${id}`);
-    try {
-      const result = await scrapeMedals(id);
-      await saveMedalsDiskCache(id, result);
-      console.log(`  saved medals-${id.toLowerCase()}.json (${result.medals.length} events)`);
-      scraped++;
-    } catch (err) {
-      console.error(`  FAILED: ${err.message}`);
-      failed++;
-    }
   }
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(TOURNAMENT_CONCURRENCY, targets.length) },
+      () => worker(),
+    ),
+  );
 
   console.log(`\nDone. Scraped: ${scraped}, Skipped (cached): ${skipped}, Failed: ${failed}`);
 }

@@ -656,7 +656,14 @@ function useVisibleOnScroll() {
 export default function PlayerProfile() {
   const { id: usabId } = useParams<{ id: string }>();
   const location = useLocation();
-  const { players: allPlayers, directoryPlayers, directoryLoading, loading: loadingAllPlayers, rankingsDate } = usePlayers();
+  const {
+    players: allPlayers,
+    directoryPlayers,
+    directoryLoading,
+    loading: loadingAllPlayers,
+    rankingsDate,
+    ensureDirectoryPlayers,
+  } = usePlayers();
   const fromPath = (location.state as { fromPath?: string } | null)?.fromPath;
   const backTarget = fromPath ?? '/directory';
   const backLabel = fromPath ? 'Back' : 'Back to Players';
@@ -708,6 +715,10 @@ export default function PlayerProfile() {
   const [tswSentinelRef, tswVisible] = useVisibleOnScroll();
   const trendTriggered = trendVisible || hasScrollRestore;
   const tswTriggered = tswVisible || hasScrollRestore;
+
+  useEffect(() => {
+    void ensureDirectoryPlayers();
+  }, [ensureDirectoryPlayers]);
 
   useEffect(() => {
     expandedYearsRef.current = expandedYears;

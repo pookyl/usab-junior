@@ -1,6 +1,6 @@
 import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
-import { setCors, getCached, setCache } from './_lib/shared.js';
+import { getCached, setCache, setCors } from './_lib/runtime.js';
 import { sendApiError, sendJson, ValidationError } from './_lib/http.js';
 
 const DATA_DIR = join(process.cwd(), 'data');

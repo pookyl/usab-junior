@@ -30,6 +30,9 @@ const {
   TSW_BASE,
 } = await import('../api/_lib/shared.js');
 
+const TSW_DETAILS_BATCH_SIZE = Math.max(1, Number(process.env.TSW_DETAILS_BATCH_SIZE ?? 3));
+const TSW_DETAILS_BATCH_DELAY_MS = Math.max(0, Number(process.env.TSW_DETAILS_BATCH_DELAY_MS ?? 500));
+
 const USAB_SCHEDULE_URL = 'https://usabadminton.org/athletes/juniors/junior-tournament-schedule/';
 
 const BROWSER_HEADERS = {
@@ -302,8 +305,8 @@ async function enrichWithTswDetails(tournaments) {
 
   console.log(`[tsw-details] fetching venue & player info for ${toFetch.length} tournaments…`);
 
-  for (let i = 0; i < toFetch.length; i += 3) {
-    const batch = toFetch.slice(i, i + 3);
+  for (let i = 0; i < toFetch.length; i += TSW_DETAILS_BATCH_SIZE) {
+    const batch = toFetch.slice(i, i + TSW_DETAILS_BATCH_SIZE);
     await Promise.allSettled(
       batch.map(async (tournament) => {
         try {
@@ -341,8 +344,8 @@ async function enrichWithTswDetails(tournaments) {
       }),
     );
 
-    if (i + 3 < toFetch.length) {
-      await new Promise(r => setTimeout(r, 500));
+    if (i + TSW_DETAILS_BATCH_SIZE < toFetch.length && TSW_DETAILS_BATCH_DELAY_MS > 0) {
+      await new Promise(r => setTimeout(r, TSW_DETAILS_BATCH_DELAY_MS));
     }
   }
 }
@@ -385,6 +388,7 @@ async function main() {
   for (const [season, data] of Object.entries(seasons)) {
     const filePath = seasonCachePath(season);
     const fullyCompleted = isSeasonFullyCompleted(data.tournaments);
+    let existingCache = null;
 
     // Skip past seasons that are already cached (unless --season forces it)
     if (!forceSeason && fullyCompleted && existsSync(filePath)) {
@@ -397,9 +401,9 @@ async function main() {
     // we don't re-scrape blog posts for tournaments we already resolved.
     if (existsSync(filePath)) {
       try {
-        const existing = JSON.parse(readFileSync(filePath, 'utf-8'));
-        if (existing.tournaments) {
-          const existingMap = new Map(existing.tournaments.map(t => [t.name, t]));
+        existingCache = JSON.parse(readFileSync(filePath, 'utf-8'));
+        if (existingCache.tournaments) {
+          const existingMap = new Map(existingCache.tournaments.map(t => [t.name, t]));
           for (const t of data.tournaments) {
             const prev = existingMap.get(t.name);
             if (prev?.tswId && !t.tswId) {
@@ -423,15 +427,12 @@ async function main() {
     await enrichWithTswIds(data.tournaments);
     await enrichWithTswDetails(data.tournaments);
 
-    if (existsSync(filePath)) {
-      try {
-        const existing = JSON.parse(readFileSync(filePath, 'utf-8'));
-        if (JSON.stringify(existing.tournaments) === JSON.stringify(data.tournaments)) {
-          console.log(`[tournaments] ${season}: no changes — skipping write`);
-          skipped++;
-          continue;
-        }
-      } catch { /* write anyway if existing file is corrupt */ }
+    if (existingCache?.tournaments) {
+      if (JSON.stringify(existingCache.tournaments) === JSON.stringify(data.tournaments)) {
+        console.log(`[tournaments] ${season}: no changes — skipping write`);
+        skipped++;
+        continue;
+      }
     }
 
     const cache = {

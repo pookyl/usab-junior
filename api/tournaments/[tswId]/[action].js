@@ -1,7 +1,6 @@
 import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import {
-  setCors, getCached, setCache,
   tswFetch, parseTswDrawsList, parseTswTournamentInfo, parseTswSchedule,
   parseTswWinners, parseTswTournamentPlayers, parseTswTournamentPlayersArray,
   parseTswSeeding,
@@ -11,10 +10,12 @@ import {
   parseTswRoundRobinGroups, parseTswRoundRobinGroupName,
   parseTswRoundRobinStandings, parseTswRoundRobinMatches,
   parseTswPlayerInfo, parseTswPlayerEvents, parseTswPlayerWinLoss,
-  isValidTswId, isValidTswDayParam,
   TSW_BASE,
 } from '../../_lib/shared.js';
+import { getCached, setCache, setCors } from '../../_lib/runtime.js';
+import { isValidTswDayParam, isValidTswId } from '../../_lib/validation.js';
 import {
+  createRequestMetrics,
   sendApiError,
   UpstreamError,
   ValidationError,
@@ -68,6 +69,15 @@ async function synthesizePlayerDetail(tswId, q) {
   if (!playerId) return null;
 
   const cacheDir = join(TOURNAMENT_CACHE_DIR, tswId);
+  try {
+    const indexed = JSON.parse(await readFile(join(cacheDir, 'player-detail-index.json'), 'utf-8'));
+    const indexedPlayer = indexed.playersById?.[String(playerId)] ?? indexed.playersById?.[playerId];
+    if (indexedPlayer) {
+      return JSON.stringify(indexedPlayer);
+    }
+  } catch {
+    // Fall back to the older synthesized path.
+  }
 
   let playersData;
   try {
@@ -136,6 +146,51 @@ async function synthesizePlayerSchedule(tswId, q) {
   if (playerIds.length === 0) return null;
 
   const cacheDir = join(TOURNAMENT_CACHE_DIR, tswId);
+  try {
+    const indexed = JSON.parse(await readFile(join(cacheDir, 'player-schedule-index.json'), 'utf-8'));
+    const players = playerIds
+      .map((playerId) => indexed.playersById?.[String(playerId)] ?? indexed.playersById?.[playerId] ?? null)
+      .filter(Boolean);
+
+    if (players.length > 0) {
+      const matchesByDate = new Map();
+      for (const player of players) {
+        for (const match of player.matches || []) {
+          const dateKey = match.date || 'unknown';
+          if (!matchesByDate.has(dateKey)) {
+            matchesByDate.set(dateKey, { dateLabel: match.dateLabel || '', matches: [] });
+          }
+          matchesByDate.get(dateKey).matches.push({
+            playerId: player.playerId,
+            ...match,
+          });
+        }
+      }
+
+      const days = [...matchesByDate.entries()]
+        .filter(([date]) => date !== 'unknown')
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, data]) => ({ date, dateLabel: data.dateLabel, matches: data.matches }));
+      const unknownDay = matchesByDate.get('unknown');
+      if (unknownDay?.matches.length) {
+        days.push({ date: '', dateLabel: '', matches: unknownDay.matches });
+      }
+
+      return JSON.stringify({
+        tswId,
+        tournamentName: indexed.tournamentName || '',
+        startDate: indexed.startDate || '',
+        endDate: indexed.endDate || '',
+        players: players.map((player) => ({
+          playerId: player.playerId,
+          playerName: player.playerName,
+        })),
+        days,
+      });
+    }
+  } catch {
+    // Fall back to the older synthesized path.
+  }
 
   let detailData;
   try {
@@ -335,6 +390,10 @@ function sendError(res, err, label) {
 function isRefreshRequest(req) {
   const urlObj = new URL(req.url, 'http://localhost');
   return req.query?.refresh === '1' || urlObj.searchParams.get('refresh') === '1';
+}
+
+function responseHeaders(req, headers = {}) {
+  return req?.metrics ? req.metrics.buildHeaders(headers) : headers;
 }
 
 // ── Action handlers ─────────────────────────────────────────────────────────
@@ -714,7 +773,8 @@ async function handlePlayerDetail(tswId, req, res) {
 
   try {
     const result = await fetchPlayerDetailInternal(tswId, parseInt(playerId, 10), refresh);
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    req.metrics?.log({ action: 'player-detail', playerId, refresh });
+    res.writeHead(200, responseHeaders(req, { 'Content-Type': 'application/json' }));
     res.end(JSON.stringify(result));
   } catch (err) {
     sendError(res, err, 'tournament-player-detail');
@@ -1316,7 +1376,8 @@ async function handlePlayerSchedule(tswId, req, res) {
     const result = { tswId, tournamentName, startDate, endDate, players, days };
 
     setCache(cacheKey, result);
-    res.writeHead(200, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' });
+    req.metrics?.log({ action: 'player-schedule', playerCount: players.length, dayCount: days.length, refresh });
+    res.writeHead(200, responseHeaders(req, { 'Content-Type': 'application/json', 'X-Cache': 'MISS' }));
     res.end(JSON.stringify(result));
   } catch (err) {
     sendError(res, err, 'tournament-player-schedule');
@@ -1342,6 +1403,7 @@ const ACTIONS = {
 };
 
 export default async function handler(req, res) {
+  req.metrics = createRequestMetrics(`tournament:${req.query?.action || 'detail'}`);
   setCors(res);
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
@@ -1372,7 +1434,8 @@ export default async function handler(req, res) {
     };
     const diskCached = await serveDiskCache(tswId, action, queryParams);
     if (diskCached) {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'X-Source': 'cache' });
+      req.metrics.log({ action, source: 'disk-cache' });
+      res.writeHead(200, responseHeaders(req, { 'Content-Type': 'application/json', 'X-Source': 'cache' }));
       res.end(diskCached);
       return;
     }
