@@ -3,25 +3,28 @@
     "api/**/*.js": {
       "maxDuration": 60
     },
-    "api/*rankings.js": {
+    "api/rankings.js": {
       "includeFiles": "data/{rankings-cache.json,rankings-*.json}"
     },
-    "api/*players.js": {
+    "api/all-players.js": {
       "includeFiles": "data/{rankings-cache.json,rankings-*.json}"
     },
-    "api/*dates.js": {
+    "api/cached-dates.js": {
       "includeFiles": "data/rankings-*.json"
     },
-    "api/*directory.js": {
+    "api/player-directory.js": {
       "includeFiles": "data/player-directory.json"
     },
-    "api/player/**/*.js": {
+    "api/player/[id].js": {
+      "includeFiles": "data/rankings-cache.json"
+    },
+    "api/player/[id]/[action].js": {
       "includeFiles": "data/{rankings-cache.json,player-ranking-trends.json}"
     },
-    "api/*tournaments.js": {
+    "api/tournaments.js": {
       "includeFiles": "data/tournaments-*.json"
     },
-    "api/tournaments/**/*.js": {
+    "api/tournaments/[tswId]/[action].js": {
       "includeFiles": "data/tournament-cache/**"
     }
   },
