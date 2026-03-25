@@ -1,27 +1,15 @@
-import {
-  USAB_BASE,
-  BROWSER_HEADERS,
-  TSW_BASE,
-  TSW_ORG_CODE,
-  fetchWithRetry,
-  parsePlayerDetailGrouped,
-  parsePlayerGender,
-  tswFetch,
-  tswUsabProfilePath,
-  tswUsabTournamentsPath,
-  tswUsabOverviewPath,
-  emptyCat,
-  parseTswOverviewStats,
-  parseTswTournaments,
-  getDiskCachedDate,
-} from '../../_lib/shared.js';
+import { USAB_BASE, BROWSER_HEADERS, TSW_BASE, TSW_ORG_CODE, fetchWithRetry } from '../../_lib/core.js';
+import { parsePlayerDetailGrouped, parsePlayerGender } from '../../_lib/rankingsData.js';
+import { tswFetch, tswUsabProfilePath, tswUsabTournamentsPath, tswUsabOverviewPath } from '../../_lib/tswClient.js';
+import { emptyCat, parseTswOverviewStats, parseTswTournaments } from '../../_lib/tswStats.js';
 import { getCached, setCache, setCors } from '../../_lib/runtime.js';
 import { isValidUsabId } from '../../_lib/validation.js';
-import { listCachedDates, loadDiskCacheForDate, loadPlayerTrendsIndex } from '../../_lib/rankingsDiskCache.js';
+import { getDiskCachedDate, loadPlayerTrendsIndex } from '../../_lib/rankingsDiskCache.js';
 import {
   createRequestMetrics,
   sendApiError,
   sendJson,
+  UnavailableError,
   UpstreamError,
   ValidationError,
 } from '../../_lib/http.js';
@@ -172,28 +160,15 @@ async function handleRankingTrend(req, res, usabId) {
   try {
     const metrics = createRequestMetrics('ranking-trend');
     const indexed = await metrics.time('load_index', () => loadPlayerTrendsIndex());
-    let result = indexed?.players?.[usabId] ?? null;
+    const result = indexed?.players?.[usabId] ?? null;
 
     if (!result) {
-      const dates = (await metrics.time('list_dates', () => listCachedDates())).sort();
-      const trend = [];
-      let playerName = '';
-
-      for (const date of dates) {
-        const disk = await metrics.time(`load_${date}`, () => loadDiskCacheForDate(date));
-        if (!disk || !disk.allPlayers) continue;
-        const player = disk.allPlayers.find((p) => p.usabId === usabId);
-        if (!player) continue;
-        if (!playerName && player.name) playerName = player.name;
-        trend.push({ date, entries: player.entries });
-      }
-
-      result = { usabId, name: playerName, trend };
+      throw new UnavailableError('Player ranking trend index unavailable');
     }
 
     setCache(cacheKey, result);
-    metrics.log({ points: result.trend.length, source: indexed?.players?.[usabId] ? 'index' : 'scan' });
-    sendJson(res, 200, result, metrics.buildHeaders({ 'X-Cache': 'MISS' }));
+    metrics.log({ points: result.trend.length, source: 'index' });
+    sendJson(res, 200, result, metrics.buildHeaders({ 'X-Cache': 'DISK' }));
   } catch (err) {
     sendApiError(res, err, { logLabel: 'ranking-trend' });
   }

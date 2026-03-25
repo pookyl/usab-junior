@@ -22,6 +22,8 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DATA_DIR = join(ROOT, 'data');
+const TSW_ID_LOOKUP_FILE = join(DATA_DIR, 'tournament-tsw-lookup.json');
+const TSW_DETAILS_LOOKUP_FILE = join(DATA_DIR, 'tournament-tsw-details.json');
 
 process.chdir(ROOT);
 const {
@@ -44,6 +46,23 @@ const BROWSER_HEADERS = {
 
 function seasonCachePath(season) {
   return join(DATA_DIR, `tournaments-${season}.json`);
+}
+
+function readJsonIfExists(filePath) {
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+function writeLookupFile(filePath, entries) {
+  writeFileSync(filePath, JSON.stringify({
+    savedAt: new Date().toISOString(),
+    count: Object.keys(entries).length,
+    entries,
+  }, null, 2));
 }
 
 // ── HTML entity decoder ──────────────────────────────────────────────────────
@@ -108,6 +127,23 @@ function extractTswId(url) {
   if (!url) return null;
   const m = url.match(/(?:\/tournament\/|[?&]id=)([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/i);
   return m ? m[1].toUpperCase() : null;
+}
+
+function normalizeTournamentKeyPart(value) {
+  return (value || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function buildTournamentLookupKeys(tournament) {
+  const keys = [];
+  if (tournament.usabUrl) keys.push(`usab:${tournament.usabUrl}`);
+  if (tournament.tswUrl) keys.push(`tsw:${tournament.tswUrl}`);
+  const stableKey = `${tournament.startDate || 'tba'}:${normalizeTournamentKeyPart(tournament.name)}`;
+  keys.push(`name:${stableKey}`);
+  return [...new Set(keys)];
 }
 
 // ── Normalize tournament type ────────────────────────────────────────────────
@@ -220,8 +256,20 @@ function parseSeasonTable(html) {
 
 // ── Fetch TSW IDs from USAB blog posts ───────────────────────────────────────
 
-async function enrichWithTswIds(tournaments) {
-  const toFetch = tournaments.filter(t => !t.tswId && t.usabUrl);
+async function enrichWithTswIds(tournaments, lookupEntries) {
+  for (const tournament of tournaments) {
+    if (tournament.tswId) continue;
+    for (const key of buildTournamentLookupKeys(tournament)) {
+      const cached = lookupEntries[key];
+      if (cached?.tswId) {
+        tournament.tswId = cached.tswId;
+        tournament.tswUrl = cached.tswUrl || tournament.tswUrl;
+        break;
+      }
+    }
+  }
+
+  const toFetch = tournaments.filter((tournament) => !tournament.tswId && tournament.usabUrl);
   if (toFetch.length === 0) return;
 
   console.log(`[tsw-ids] fetching ${toFetch.length} USAB blog posts for TSW IDs…`);
@@ -243,6 +291,9 @@ async function enrichWithTswIds(tournaments) {
           if (id) {
             tournament.tswId = id;
             tournament.tswUrl = url;
+            for (const key of buildTournamentLookupKeys(tournament)) {
+              lookupEntries[key] = { tswId: id, tswUrl: url };
+            }
             console.log(`  ✓ ${tournament.name} → ${id}`);
             return id;
           }
@@ -299,8 +350,25 @@ function parseTswVenueInfo(html) {
   return { venueClub, venueLocation };
 }
 
-async function enrichWithTswDetails(tournaments) {
-  const toFetch = tournaments.filter(t => t.tswId && t.totalPlayers == null);
+async function enrichWithTswDetails(tournaments, lookupEntries) {
+  for (const tournament of tournaments) {
+    if (!tournament.tswId) continue;
+    const cached = lookupEntries[tournament.tswId];
+    if (!cached) continue;
+    if (tournament.totalPlayers == null && cached.totalPlayers != null) {
+      tournament.totalPlayers = cached.totalPlayers;
+    }
+    if (!tournament.venueClub && cached.venueClub) {
+      tournament.venueClub = cached.venueClub;
+    }
+    if (!tournament.venueLocation && cached.venueLocation) {
+      tournament.venueLocation = cached.venueLocation;
+    }
+  }
+
+  const toFetch = tournaments.filter(
+    (tournament) => tournament.tswId && (tournament.totalPlayers == null || !tournament.venueClub || !tournament.venueLocation),
+  );
   if (toFetch.length === 0) return;
 
   console.log(`[tsw-details] fetching venue & player info for ${toFetch.length} tournaments…`);
@@ -336,6 +404,12 @@ async function enrichWithTswDetails(tournaments) {
             const playersMap = parseTswTournamentPlayers(playersHtml);
             tournament.totalPlayers = playersMap.size > 0 ? playersMap.size : null;
           }
+
+          lookupEntries[tswId] = {
+            totalPlayers: tournament.totalPlayers,
+            venueClub: tournament.venueClub,
+            venueLocation: tournament.venueLocation,
+          };
 
           console.log(`  ✓ ${tournament.name}: ${tournament.totalPlayers ?? '?'} players, venue: ${tournament.venueClub || 'N/A'} (${tournament.venueLocation || 'N/A'})`);
         } catch (err) {
@@ -382,6 +456,9 @@ async function main() {
 
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 
+  const tswIdLookupEntries = readJsonIfExists(TSW_ID_LOOKUP_FILE)?.entries || {};
+  const tswDetailsLookupEntries = readJsonIfExists(TSW_DETAILS_LOOKUP_FILE)?.entries || {};
+
   let written = 0;
   let skipped = 0;
 
@@ -424,8 +501,8 @@ async function main() {
       } catch { /* ignore */ }
     }
 
-    await enrichWithTswIds(data.tournaments);
-    await enrichWithTswDetails(data.tournaments);
+    await enrichWithTswIds(data.tournaments, tswIdLookupEntries);
+    await enrichWithTswDetails(data.tournaments, tswDetailsLookupEntries);
 
     if (existingCache?.tournaments) {
       if (JSON.stringify(existingCache.tournaments) === JSON.stringify(data.tournaments)) {
@@ -445,6 +522,9 @@ async function main() {
     console.log(`[tournaments] wrote ${filePath} (${data.tournaments.length} tournaments)`);
     written++;
   }
+
+  writeLookupFile(TSW_ID_LOOKUP_FILE, tswIdLookupEntries);
+  writeLookupFile(TSW_DETAILS_LOOKUP_FILE, tswDetailsLookupEntries);
 
   console.log(`\n[tournaments] done: ${written} written, ${skipped} skipped`);
 }

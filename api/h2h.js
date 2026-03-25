@@ -1,10 +1,15 @@
+import { TSW_ORG_CODE } from './_lib/core.js';
+import { tswFetch } from './_lib/tswClient.js';
+import { parseH2HContent } from './_lib/tswH2h.js';
+import { getCached, setCache, setCors } from './_lib/runtime.js';
+import { isValidUsabId } from './_lib/validation.js';
 import {
-  TSW_ORG_CODE,
-  getCached, setCache,
-  tswFetch, parseH2HContent,
-  setCors, isValidUsabId,
-} from './_lib/shared.js';
-import { sendApiError, sendJson, UpstreamError, ValidationError } from './_lib/http.js';
+  createRequestMetrics,
+  sendApiError,
+  sendJson,
+  UpstreamError,
+  ValidationError,
+} from './_lib/http.js';
 
 export default async function handler(req, res) {
   setCors(res);
@@ -20,16 +25,18 @@ export default async function handler(req, res) {
 
   const cacheKey = `h2h:${[p1, p2].sort().join(':')}`;
   const cached = getCached(cacheKey);
-  if (cached) return sendJson(res, 200, cached, { 'X-Cache': 'HIT' });
+  const metrics = createRequestMetrics('h2h');
+  if (cached) return sendJson(res, 200, cached, metrics.buildHeaders({ 'X-Cache': 'HIT' }));
 
   try {
     const path = `/head-2-head/Head2HeadContent?OrganizationCode=${TSW_ORG_CODE}&t1p1memberid=${encodeURIComponent(p1)}&t2p1memberid=${encodeURIComponent(p2)}`;
-    const resp = await tswFetch(path);
+    const resp = await metrics.time('fetch_h2h', () => tswFetch(path));
     if (!resp.ok) throw new UpstreamError(`TSW HTTP ${resp.status}`);
-    const html = await resp.text();
-    const data = parseH2HContent(html, resp.headers);
+    const html = await metrics.time('read_html', () => resp.text());
+    const data = await metrics.time('parse_h2h', async () => parseH2HContent(html, resp.headers));
     setCache(cacheKey, data);
-    return sendJson(res, 200, data, { 'X-Cache': 'MISS' });
+    metrics.log({ matches: data.matches.length });
+    return sendJson(res, 200, data, metrics.buildHeaders({ 'X-Cache': 'MISS' }));
   } catch (err) {
     return sendApiError(res, err, { logLabel: 'h2h' });
   }

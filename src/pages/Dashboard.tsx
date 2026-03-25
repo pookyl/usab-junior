@@ -87,12 +87,16 @@ const STATUS_CONFIG: Record<string, { icon: typeof Clock; label: string; bg: str
 };
 
 export default function Home() {
-  const { players, loading } = usePlayers();
+  const { players, loading, ensurePlayers } = usePlayers();
 
   const [spotlights, setSpotlights] = useState<ScheduledTournament[]>([]);
   const [spotlightLoading, setSpotlightLoading] = useState(true);
   const [spotlightError, setSpotlightError] = useState<string | null>(null);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
+
+  useEffect(() => {
+    void ensurePlayers();
+  }, [ensurePlayers]);
 
   useEffect(() => {
     let cancelled = false;

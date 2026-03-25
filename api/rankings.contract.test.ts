@@ -1,17 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const shared = vi.hoisted(() => ({
+const runtime = vi.hoisted(() => ({
   getCached: vi.fn(),
   setCache: vi.fn(),
+  setCors: vi.fn(),
+}));
+
+const diskCache = vi.hoisted(() => ({
   getDiskCachedRankings: vi.fn(),
   getDiskCachedDate: vi.fn(),
-  setCors: vi.fn(),
+}));
+
+const validation = vi.hoisted(() => ({
   isValidDate: vi.fn(),
   isValidAgeGroup: vi.fn(),
   isValidEventType: vi.fn(),
 }));
 
-vi.mock('./_lib/shared.js', () => shared);
+vi.mock('./_lib/runtime.js', () => runtime);
+vi.mock('./_lib/rankingsDiskCache.js', () => diskCache);
+vi.mock('./_lib/validation.js', () => validation);
 
 import handler from './rankings.js';
 
@@ -47,16 +55,16 @@ function createRes() {
 describe('api/rankings contract', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    shared.getDiskCachedDate.mockResolvedValue('2026-03-01');
-    shared.getCached.mockReturnValue(null);
-    shared.getDiskCachedRankings.mockResolvedValue(null);
-    shared.isValidAgeGroup.mockReturnValue(true);
-    shared.isValidEventType.mockReturnValue(true);
-    shared.isValidDate.mockReturnValue(true);
+    diskCache.getDiskCachedDate.mockResolvedValue('2026-03-01');
+    runtime.getCached.mockReturnValue(null);
+    diskCache.getDiskCachedRankings.mockResolvedValue(null);
+    validation.isValidAgeGroup.mockReturnValue(true);
+    validation.isValidEventType.mockReturnValue(true);
+    validation.isValidDate.mockReturnValue(true);
   });
 
   it('returns validation error shape on invalid query', async () => {
-    shared.isValidAgeGroup.mockReturnValue(false);
+    validation.isValidAgeGroup.mockReturnValue(false);
     const req = { method: 'GET', query: { age_group: 'BAD', category: 'BS', date: '2026-03-01' } };
     const res = createRes();
 

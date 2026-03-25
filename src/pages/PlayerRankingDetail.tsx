@@ -250,7 +250,7 @@ function TournamentMobileCard({
 export default function PlayerRankingDetail() {
   const { id: usabId } = useParams<{ id: string }>();
   const location = useLocation();
-  const { players } = usePlayers();
+  const { players, ensurePlayers } = usePlayers();
 
   const [sections, setSections] = useState<RankingCategoryDetail[]>([]);
   const [loading, setLoading] = useState(true);
@@ -265,6 +265,10 @@ export default function PlayerRankingDetail() {
   const playerName = rankedPlayer?.name
     ?? (location.state as { name?: string } | null)?.name
     ?? '';
+
+  useEffect(() => {
+    void ensurePlayers();
+  }, [ensurePlayers]);
 
   useEffect(() => {
     if (!usabId) return;

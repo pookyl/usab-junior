@@ -60,18 +60,29 @@ function nowMs() {
 }
 
 export function sendJson(res, status, data, headers = {}) {
+  const serialized = JSON.stringify(data);
+  const responseHeaders = {
+    'Content-Type': 'application/json',
+    'X-Payload-Bytes': String(Buffer.byteLength(serialized)),
+    ...headers,
+  };
+
   if (isExpressLikeResponse(res)) {
-    for (const [key, value] of Object.entries(headers)) {
+    for (const [key, value] of Object.entries(responseHeaders)) {
       res.setHeader(key, value);
     }
-    return res.status(status).json(data);
+    const response = res.status(status);
+    if (typeof response.send === 'function') {
+      return response.send(serialized);
+    }
+    return response.json(data);
   }
 
   res.writeHead(status, {
     'Content-Type': 'application/json',
-    ...headers,
+    ...responseHeaders,
   });
-  res.end(JSON.stringify(data));
+  res.end(serialized);
   return undefined;
 }
 

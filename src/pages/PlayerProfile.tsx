@@ -662,6 +662,7 @@ export default function PlayerProfile() {
     directoryLoading,
     loading: loadingAllPlayers,
     rankingsDate,
+    ensurePlayers,
     ensureDirectoryPlayers,
   } = usePlayers();
   const fromPath = (location.state as { fromPath?: string } | null)?.fromPath;
@@ -719,6 +720,10 @@ export default function PlayerProfile() {
   useEffect(() => {
     void ensureDirectoryPlayers();
   }, [ensureDirectoryPlayers]);
+
+  useEffect(() => {
+    void ensurePlayers();
+  }, [ensurePlayers]);
 
   useEffect(() => {
     expandedYearsRef.current = expandedYears;

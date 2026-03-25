@@ -229,6 +229,7 @@ export default function AllPlayers() {
     directoryLoading,
     loading,
     error,
+    ensurePlayers,
     ensureDirectoryPlayers,
   } = usePlayers();
   const [searchParams] = useSearchParams();
@@ -242,6 +243,10 @@ export default function AllPlayers() {
   useEffect(() => {
     void ensureDirectoryPlayers();
   }, [ensureDirectoryPlayers]);
+
+  useEffect(() => {
+    void ensurePlayers();
+  }, [ensurePlayers]);
 
   const rankedMap = useMemo(() => {
     const map = new Map<string, PlayerEntry[]>();

@@ -1,17 +1,22 @@
+import { USAB_BASE, BROWSER_HEADERS, fetchWithRetry } from '../_lib/core.js';
+import { parsePlayerDetail, parsePlayerGender } from '../_lib/rankingsData.js';
+import { getDiskCachedDate } from '../_lib/rankingsDiskCache.js';
+import { getCached, setCache, setCors } from '../_lib/runtime.js';
+import { isValidUsabId, isValidAgeGroup, isValidEventType, isValidDate } from '../_lib/validation.js';
 import {
-  USAB_BASE, BROWSER_HEADERS,
-  getCached, setCache, getDiskCachedDate,
-  fetchWithRetry,
-  parsePlayerDetail, parsePlayerGender,
-  setCors, isValidUsabId, isValidAgeGroup, isValidEventType, isValidDate,
-} from '../_lib/shared.js';
-import { sendApiError, sendJson, UpstreamError, ValidationError } from '../_lib/http.js';
+  createRequestMetrics,
+  sendApiError,
+  sendJson,
+  UpstreamError,
+  ValidationError,
+} from '../_lib/http.js';
 
 export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const defaultDate = await getDiskCachedDate() || new Date().toISOString().slice(0, 10);
+  const metrics = createRequestMetrics('player');
+  const defaultDate = await metrics.time('load_default_date', async () => getDiskCachedDate() || new Date().toISOString().slice(0, 10));
   const { id: usabId, age_group: ageGroup = 'U11', category: eventType = 'BS', date = defaultDate } = req.query;
 
   if (!usabId || !isValidUsabId(usabId)) return sendApiError(res, new ValidationError('Invalid player ID', { field: 'id' }));
@@ -22,18 +27,19 @@ export default async function handler(req, res) {
   const cacheKey = `player:${usabId}:${ageGroup}:${eventType}:${date}`;
 
   const cached = getCached(cacheKey);
-  if (cached) return sendJson(res, 200, cached, { 'X-Cache': 'HIT' });
+  if (cached) return sendJson(res, 200, cached, metrics.buildHeaders({ 'X-Cache': 'HIT' }));
 
   try {
     const url = `${USAB_BASE}/${encodeURIComponent(usabId)}/details?age_group=${encodeURIComponent(ageGroup)}&category=${encodeURIComponent(eventType)}&date=${encodeURIComponent(date)}`;
-    const response = await fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 });
+    const response = await metrics.time('fetch_detail', () => fetchWithRetry(url, { headers: BROWSER_HEADERS }, { timeoutMs: 30_000, retries: 1 }));
     if (!response.ok) throw new UpstreamError(`USAB player detail HTTP ${response.status}`);
-    const html = await response.text();
-    const history = parsePlayerDetail(html);
+    const html = await metrics.time('read_html', () => response.text());
+    const history = await metrics.time('parse_detail', async () => parsePlayerDetail(html));
     const gender = parsePlayerGender(html);
     const result = { gender, entries: history };
     setCache(cacheKey, result);
-    return sendJson(res, 200, result, { 'X-Cache': 'MISS' });
+    metrics.log({ entries: history.length });
+    return sendJson(res, 200, result, metrics.buildHeaders({ 'X-Cache': 'MISS' }));
   } catch (err) {
     return sendApiError(res, err, { logLabel: 'player' });
   }

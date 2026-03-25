@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useMemo, useCallback, type ReactNode } from 'react';
 import type { UniquePlayer, DirectoryPlayer } from '../types/junior';
 import { fetchAllPlayers, fetchCachedDates, fetchPlayerDirectory, invalidateRankingsCache } from '../services/rankingsService';
 import { RANKINGS_DATE } from '../data/usaJuniorData';
@@ -17,6 +17,7 @@ interface PlayersContextValue {
   availableDates: string[];
   changeDate: (date: string) => void;
   refresh: () => void;
+  ensurePlayers: () => Promise<void>;
   ensureAvailableDates: () => Promise<void>;
   ensureDirectoryPlayers: () => Promise<void>;
   playerNameMap: Map<string, string[]>;
@@ -31,7 +32,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   const [players, setPlayers] = useState<UniquePlayer[]>([]);
   const [directoryPlayers, setDirectoryPlayers] = useState<DirectoryPlayer[]>([]);
   const [directoryLoading, setDirectoryLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<DataSource>('none');
   const [rankingsDate, setRankingsDate] = useState<string>(RANKINGS_DATE);
@@ -40,6 +41,9 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
   const fetchCount = useRef(0);
   const lastGoodPlayers = useRef<UniquePlayer[]>([]);
   const lastGoodDate = useRef<string>(RANKINGS_DATE);
+  const playersPromise = useRef<Promise<void> | null>(null);
+  const datesPromise = useRef<Promise<void> | null>(null);
+  const directoryPromise = useRef<Promise<void> | null>(null);
 
   const pushToast = useCallback((message: string, type: ToastItem['type']) => {
     const id = String(++nextToastId);
@@ -55,7 +59,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
 
-    const doFetch = async () => {
+    const promise = (async () => {
       const date = dateOverride ?? rankingsDate;
       const result = await fetchAllPlayers(date);
       if (fetchCount.current !== id) return;
@@ -69,9 +73,7 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
         const cats = result.failedCategories.join(', ');
         pushToast(`Some categories could not be loaded: ${cats}`, 'warning');
       }
-    };
-
-    doFetch().catch((err: Error) => {
+    })().catch((err: Error) => {
       if (fetchCount.current !== id) return;
       const hadData = lastGoodPlayers.current.length > 0;
       setPlayers(lastGoodPlayers.current);
@@ -83,40 +85,67 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
       if (hadData) {
         pushToast(`Could not load rankings — showing previous data`, 'error');
       }
+    }).finally(() => {
+      if (playersPromise.current === promise) {
+        playersPromise.current = null;
+      }
     });
+
+    playersPromise.current = promise;
+    return promise;
   }, [rankingsDate, pushToast]);
 
-  const ensureAvailableDates = useCallback(async () => {
-    try {
-      const cachedDates = await fetchCachedDates();
-      if (cachedDates.length > 0) setAvailableDates(cachedDates);
-    } catch {
-      // Keep default availableDates.
+  const ensurePlayers = useCallback(async () => {
+    if (playersPromise.current) {
+      await playersPromise.current;
+      return;
     }
-  }, []);
+    if (lastGoodPlayers.current.length > 0 && lastGoodDate.current === rankingsDate) {
+      return;
+    }
+    await load(rankingsDate);
+  }, [load, rankingsDate]);
+
+  const ensureAvailableDates = useCallback(async () => {
+    if (availableDates.length > 1) return;
+    if (!datesPromise.current) {
+      datesPromise.current = (async () => {
+        try {
+          const cachedDates = await fetchCachedDates();
+          if (cachedDates.length > 0) setAvailableDates(cachedDates);
+        } catch {
+          // Keep default availableDates.
+        } finally {
+          datesPromise.current = null;
+        }
+      })();
+    }
+    await datesPromise.current;
+  }, [availableDates.length]);
 
   const ensureDirectoryPlayers = useCallback(async () => {
-    setDirectoryLoading(true);
-    try {
-      const dir = await fetchPlayerDirectory();
-      if (dir.length > 0) setDirectoryPlayers(dir);
-    } finally {
-      setDirectoryLoading(false);
+    if (directoryPlayers.length > 0) return;
+    if (!directoryPromise.current) {
+      directoryPromise.current = (async () => {
+        setDirectoryLoading(true);
+        try {
+          const dir = await fetchPlayerDirectory();
+          if (dir.length > 0) setDirectoryPlayers(dir);
+        } finally {
+          setDirectoryLoading(false);
+          directoryPromise.current = null;
+        }
+      })();
     }
-  }, []);
+    await directoryPromise.current;
+  }, [directoryPlayers.length]);
 
   const changeDate = useCallback((date: string) => {
     if (date === rankingsDate) return;
     invalidateRankingsCache();
     setRankingsDate(date);
-    load(date);
+    void load(date);
   }, [rankingsDate, load]);
-
-  // Auto-fetch rankings only. Directory and historic dates are loaded on demand.
-  useEffect(() => {
-    load(RANKINGS_DATE);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const playerNameMap = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -147,10 +176,10 @@ export function PlayersProvider({ children }: { children: ReactNode }) {
 
   const contextValue = useMemo(() => ({
     players, directoryPlayers, directoryLoading, loading, error,
-    source, rankingsDate, availableDates, changeDate, refresh, ensureAvailableDates,
+    source, rankingsDate, availableDates, changeDate, refresh, ensurePlayers, ensureAvailableDates,
     ensureDirectoryPlayers, playerNameMap, playerIdSet,
   }), [players, directoryPlayers, directoryLoading, loading, error,
-       source, rankingsDate, availableDates, changeDate, refresh, ensureAvailableDates,
+       source, rankingsDate, availableDates, changeDate, refresh, ensurePlayers, ensureAvailableDates,
        ensureDirectoryPlayers, playerNameMap, playerIdSet]);
 
   return (

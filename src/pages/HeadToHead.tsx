@@ -704,6 +704,7 @@ export default function HeadToHead() {
     directoryLoading,
     loading: playersLoading,
     rankingsDate,
+    ensurePlayers,
     ensureDirectoryPlayers,
   } = usePlayers();
   const releaseVersion = import.meta.env.VITE_RELEASE_VERSION ?? __VERCEL_GIT_COMMIT_SHA__ ?? 'unversioned';
@@ -741,6 +742,10 @@ export default function HeadToHead() {
   useEffect(() => {
     void ensureDirectoryPlayers();
   }, [ensureDirectoryPlayers]);
+
+  useEffect(() => {
+    void ensurePlayers();
+  }, [ensurePlayers]);
 
   // Restore player objects from snapshot IDs once allPlayers loads
   const restoredPlayers = useRef(false);

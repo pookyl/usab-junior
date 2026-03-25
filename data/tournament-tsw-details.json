@@ -1,0 +1,31 @@
+{
+  "savedAt": "2026-03-25T04:20:48.418Z",
+  "count": 5,
+  "entries": {
+    "9BA4D091-5DA0-44B3-ADD7-511F99031852": {
+      "totalPlayers": 236,
+      "venueClub": "Vistara Sports",
+      "venueLocation": "400 W Vista Ridge Mall Dr, Lewsville, TX 75067, U.S.A."
+    },
+    "1ED39347-2461-4BB8-945F-F694BE254915": {
+      "totalPlayers": null,
+      "venueClub": "Oregon Badminton Academy",
+      "venueLocation": "11150 SW Allen Blvd, Suite 200, Beaverton, OR 97005, U.S.A."
+    },
+    "0E3C129B-28CA-43FF-9C2C-96C92D3C7090": {
+      "totalPlayers": null,
+      "venueClub": "Wayside Athletic Club",
+      "venueLocation": "80 Broadmeadow Street, Marlborough, MA 01752, U.S.A."
+    },
+    "138DE723-8D99-44DE-A898-13492AD3F717": {
+      "totalPlayers": null,
+      "venueClub": "Schafer Badminton",
+      "venueLocation": "24825 Roesner Rd, Katy, TX 77494, U.S.A."
+    },
+    "3F1D1F98-15A0-487E-971B-E550B7513560": {
+      "totalPlayers": null,
+      "venueClub": "Elite Badminton Center",
+      "venueLocation": "33540 Central Ave, Union City, CA 94587, U.S.A."
+    }
+  }
+}
