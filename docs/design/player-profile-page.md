@@ -171,6 +171,82 @@ The Player Schedule feature shows upcoming matches with bracket-based prediction
 
 4. **Server Logic:** The server builds the schedule by fetching the player's matches and, for elimination draws, walking the bracket to find `findPotentialNextMatches()` and `findConsolationPath()` -- predicting who the player might face next based on bracket position.
 
+## QR Code Trading Card
+
+A shareable player card with a scannable QR code linking to the player's profile. Designed as a "trading card" that junior players would be excited to share with friends.
+
+### Entry Point
+
+A **"QR Code" pill button** in the hero card CTA row (alongside Rankings and TSW Profile) opens the card modal.
+
+### Card Modal (`QrCardModal`)
+
+Full-screen overlay with a centered card and controls below it. Click-outside or Escape key to close, with `animate-scale-in` entrance animation.
+
+**Card layout (top to bottom):**
+1. Gradient background with decorative radial glow effects
+2. Player initials avatar (rounded square, gradient matching theme)
+3. Player name (bold, white)
+4. Age group pills (reusing `AGE_GRADIENT` colors), or "Player" pill if unranked
+5. QR code in white rounded container (`QRCodeCanvas` from `qrcode.react`)
+6. "Scan to view profile" label
+7. USAB ID in monospace
+
+**Controls (outside card, not captured in share image):**
+- **Theme selector** -- 6 gradient circle buttons below the card
+- **Share button** -- captures the card as a PNG and opens the native share sheet via `navigator.share({ files })` (mobile only, hidden on desktop)
+- **Copy Link button** -- copies the profile URL to clipboard with "Copied!" feedback
+
+### Theme System
+
+Six predefined color themes, each defining CSS Tailwind classes for the display card and hex color values for canvas export:
+
+| Theme | Gradient | QR Color |
+|-------|----------|----------|
+| Galaxy | violet → indigo → blue | `#4338ca` |
+| Sunset | orange → rose → pink | `#be123c` |
+| Ocean | cyan → blue → indigo | `#1d4ed8` |
+| Forest | emerald → green → teal | `#047857` |
+| Flame | red → orange → amber | `#c2410c` |
+| Storm | slate-600 → slate-700 → slate-900 | `#1e293b` |
+
+No persistence -- defaults to Galaxy each time.
+
+### Image Export Architecture
+
+The on-screen card uses Tailwind CSS for beautiful rendering. For sharing, a separate **`drawShareCard` function** draws the card on an offscreen `<canvas>` using the Canvas 2D API:
+
+```mermaid
+flowchart LR
+    Display["On-screen card\n(Tailwind CSS)"]
+    Share["Share button click"]
+    Draw["drawShareCard()\n(Canvas 2D API)"]
+    QR["QRCodeCanvas\n(grabbed via ref)"]
+    Blob["canvas.toBlob()"]
+    Native["navigator.share()\n(native share sheet)"]
+
+    Share --> Draw
+    QR -->|"drawImage()"| Draw
+    Draw --> Blob
+    Blob --> Native
+```
+
+This dual approach was chosen because DOM-to-image libraries (`html-to-image`, `html2canvas`) cannot faithfully reproduce CSS gradients, blur effects, and text rendering. The canvas approach draws each element programmatically -- gradient fills, radial glows, rounded rects, text, and the QR code (copied from the on-screen `<canvas>` element) -- guaranteeing the exported PNG matches the design exactly at native device resolution (`devicePixelRatio`, minimum 3x).
+
+### Sharing Flow
+
+| Method | How | Platform |
+|--------|-----|----------|
+| **Scan QR** | Friend points phone camera at screen | In-person |
+| **Share** | Canvas → PNG blob → `navigator.share({ files })` with card image | Mobile |
+| **Copy Link** | `navigator.clipboard.writeText()` with profile URL | All browsers |
+
+### Dependencies
+
+- **`qrcode.react`** -- renders the QR code as a `<canvas>` element (also used for canvas export via `drawImage`)
+
+No image-export library needed; the canvas drawing is self-contained.
+
 ## Cross-Linking
 
 ```mermaid
