@@ -77,6 +77,13 @@ function stripHtml(html) {
 
 // ── Date parsing ─────────────────────────────────────────────────────────────
 
+const MONTH_MAP = {
+  jan: '01', january: '01', feb: '02', february: '02', mar: '03', march: '03',
+  apr: '04', april: '04', may: '05', jun: '06', june: '06',
+  jul: '07', july: '07', aug: '08', august: '08', sep: '09', september: '09',
+  oct: '10', october: '10', nov: '11', november: '11', dec: '12', december: '12',
+};
+
 function parseUSABDateRange(raw) {
   const cleaned = stripHtml(raw).replace(/Rescheduled\s*/i, '').trim();
   if (/^TBA$/i.test(cleaned)) return { startDate: null, endDate: null };
@@ -93,6 +100,28 @@ function parseUSABDateRange(raw) {
   if (singleMatch) {
     const d = toISODate(singleMatch[1], singleMatch[2], singleMatch[3]);
     return { startDate: d, endDate: d };
+  }
+
+  // "Month Day-Day, Year" (e.g. "June 21-28, 2021", "Aug 6-8, 2021")
+  const wordRangeMatch = cleaned.match(/(\w+)\s+(\d{1,2})\s*[–\-]\s*(\d{1,2}),?\s*(\d{4})/);
+  if (wordRangeMatch) {
+    const mm = MONTH_MAP[wordRangeMatch[1].toLowerCase()];
+    if (mm) {
+      return {
+        startDate: toISODate(mm, wordRangeMatch[2], wordRangeMatch[4]),
+        endDate: toISODate(mm, wordRangeMatch[3], wordRangeMatch[4]),
+      };
+    }
+  }
+
+  // "Month Day, Year" (single date)
+  const wordSingleMatch = cleaned.match(/(\w+)\s+(\d{1,2}),?\s*(\d{4})/);
+  if (wordSingleMatch) {
+    const mm = MONTH_MAP[wordSingleMatch[1].toLowerCase()];
+    if (mm) {
+      const d = toISODate(mm, wordSingleMatch[2], wordSingleMatch[3]);
+      return { startDate: d, endDate: d };
+    }
   }
 
   return { startDate: null, endDate: null };
@@ -193,10 +222,23 @@ function parseSchedulePage(html) {
   return seasons;
 }
 
+function detectTableLayout(html) {
+  const theadMatch = html.match(/<thead>([\s\S]*?)<\/thead>/i);
+  if (!theadMatch) return 'standard';
+  const headers = [];
+  const thRegex = /<th[^>]*>([\s\S]*?)<\/th>/gi;
+  let m;
+  while ((m = thRegex.exec(theadMatch[1])) !== null) headers.push(stripHtml(m[1]).toLowerCase());
+  if (headers.length === 4 && headers[0] === 'tournament') return 'compact';
+  return 'standard';
+}
+
 function parseSeasonTable(html) {
   const tournaments = [];
   const tbodyMatch = html.match(/<tbody>([\s\S]*?)<\/tbody>/i);
   if (!tbodyMatch) return tournaments;
+
+  const layout = detectTableLayout(html);
 
   const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
   let rowMatch;
@@ -207,11 +249,37 @@ function parseSeasonTable(html) {
     while ((cellMatch = cellRegex.exec(rowMatch[1])) !== null) {
       cells.push(cellMatch[1]);
     }
-    if (cells.length < 5) continue;
 
-    const { startDate, endDate } = parseUSABDateRange(cells[0]);
-    const nameHtml = cells[1];
-    const name = stripHtml(nameHtml);
+    let name, nameHtml, startDate, endDate, region, hostClub, type, prospectusUrl = null;
+
+    if (layout === 'compact') {
+      if (cells.length < 4) continue;
+      // Columns: Tournament, Dates, Location, Prospectus
+      nameHtml = cells[0];
+      ({ startDate, endDate } = parseUSABDateRange(cells[1]));
+      const location = stripHtml(cells[2]);
+      region = 'National';
+      hostClub = location;
+      type = 'National';
+      if (cells[3]) {
+        const prospLink = cells[3].match(/<a[^>]+href="([^"]+\.pdf)"[^>]*>/i);
+        if (prospLink) prospectusUrl = decodeHtmlEntities(prospLink[1]);
+      }
+    } else {
+      if (cells.length < 5) continue;
+      // Columns: Dates, Tournament Name, Region, Host Club, Type, [Prospectus]
+      ({ startDate, endDate } = parseUSABDateRange(cells[0]));
+      nameHtml = cells[1];
+      region = normalizeRegion(stripHtml(cells[2]) || 'National');
+      hostClub = stripHtml(cells[3]);
+      type = normalizeTournamentType(stripHtml(cells[4]));
+      if (cells[5]) {
+        const prospLink = cells[5].match(/<a[^>]+href="([^"]+\.pdf)"[^>]*>/i);
+        if (prospLink) prospectusUrl = decodeHtmlEntities(prospLink[1]);
+      }
+    }
+
+    name = stripHtml(nameHtml);
     const nameLink = nameHtml.match(/<a[^>]+href="([^"]+)"[^>]*>/i);
     let usabUrl = null, tswId = null, tswUrl = null;
 
@@ -225,19 +293,9 @@ function parseSeasonTable(html) {
       }
     }
 
-    const region = normalizeRegion(stripHtml(cells[2]) || 'National');
-    const hostClub = stripHtml(cells[3]);
-    const type = normalizeTournamentType(stripHtml(cells[4]));
-
-    let prospectusUrl = null;
-    if (cells[5]) {
-      const prospLink = cells[5].match(/<a[^>]+href="([^"]+\.pdf)"[^>]*>/i);
-      if (prospLink) prospectusUrl = decodeHtmlEntities(prospLink[1]);
-    }
-
     const status = computeStatus(startDate, endDate);
 
-    if (name && !name.toLowerCase().includes('date') && name !== 'TOURNAMENT NAME') {
+    if (name && !name.toLowerCase().includes('date') && name !== 'TOURNAMENT NAME' && name.toLowerCase() !== 'tournament') {
       tournaments.push({
         name, startDate, endDate, region, hostClub, type,
         tswId, tswUrl, usabUrl, prospectusUrl, status,

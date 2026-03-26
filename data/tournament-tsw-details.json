@@ -1,6 +1,6 @@
 {
-  "savedAt": "2026-03-25T04:20:48.418Z",
-  "count": 5,
+  "savedAt": "2026-03-26T05:11:21.187Z",
+  "count": 7,
   "entries": {
     "9BA4D091-5DA0-44B3-ADD7-511F99031852": {
       "totalPlayers": 236,
@@ -26,6 +26,16 @@
       "totalPlayers": null,
       "venueClub": "Elite Badminton Center",
       "venueLocation": "33540 Central Ave, Union City, CA 94587, U.S.A."
+    },
+    "2E0F476B-6A60-43D5-A5EB-067B0A43261F": {
+      "totalPlayers": 36,
+      "venueClub": "Arena Badminton & Sports Club",
+      "venueLocation": "2780 S. Reservoir St, Pomona, CA 91766, U.S.A."
+    },
+    "FE6CE881-C6BA-4D12-ACCA-2C2C4D3687E1": {
+      "totalPlayers": 152,
+      "venueClub": "Atlanta Recreation Club",
+      "venueLocation": "2711 Pine Grove Rd, Cumming, GA 30041, U.S.A."
     }
   }
 }

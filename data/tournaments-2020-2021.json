@@ -1,0 +1,54 @@
+{
+  "season": "2020-2021",
+  "tournaments": [
+    {
+      "name": "2021 USA Badminton U.S. Junior National Championships",
+      "startDate": "2021-06-21",
+      "endDate": "2021-06-28",
+      "region": "National",
+      "hostClub": "Concord, NC",
+      "type": "National",
+      "tswId": "2D2FC227-4ADA-46F7-AB81-6D317BE065EB",
+      "tswUrl": "https://www.tournamentsoftware.com/tournament/2D2FC227-4ADA-46F7-AB81-6D317BE065EB",
+      "usabUrl": "https://usabadminton.org/2021-junior-national-championships-in-north-carolina-announced/",
+      "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/05/2021-Yonex-Junior-Nationals-Prospectus-final.pdf",
+      "status": "completed",
+      "totalPlayers": null,
+      "venueClub": null,
+      "venueLocation": null
+    },
+    {
+      "name": "2021 Selection Event for Junior Pan American Games",
+      "startDate": "2021-08-06",
+      "endDate": "2021-08-08",
+      "region": "National",
+      "hostClub": "Pomona, CA",
+      "type": "Selection",
+      "tswId": "2E0F476B-6A60-43D5-A5EB-067B0A43261F",
+      "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=2E0F476B-6A60-43D5-A5EB-067B0A43261F",
+      "usabUrl": "https://usabadminton.org/2021-2022-selection-event-for-junior-pan-american-games/",
+      "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/07/2021-Selection-Event-JPAG-Prospectus.pdf",
+      "status": "completed",
+      "totalPlayers": 36,
+      "venueClub": "Arena Badminton & Sports Club",
+      "venueLocation": "2780 S. Reservoir St, Pomona, CA 91766, U.S.A."
+    },
+    {
+      "name": "2021 USAB South Open Local Championships",
+      "startDate": "2021-08-07",
+      "endDate": "2021-08-08",
+      "region": "South",
+      "hostClub": "Atlanta, GA",
+      "type": "OLC",
+      "tswId": "FE6CE881-C6BA-4D12-ACCA-2C2C4D3687E1",
+      "tswUrl": "https://www.tournamentsoftware.com/sport/tournament?id=FE6CE881-C6BA-4D12-ACCA-2C2C4D3687E1",
+      "usabUrl": "https://usabadminton.org/2021-2022-usa-badminton-arc-usab-south-open-local-championships/",
+      "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2021/07/ARC-USAB-Prospectus-Final-2021-2022.pdf",
+      "status": "completed",
+      "totalPlayers": 152,
+      "venueClub": "Atlanta Recreation Club",
+      "venueLocation": "2711 Pine Grove Rd, Cumming, GA 30041, U.S.A."
+    }
+  ],
+  "savedAt": "2026-03-26T05:11:01.289Z"
+}
