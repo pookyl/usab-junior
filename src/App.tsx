@@ -10,30 +10,31 @@ import { TournamentFocusProvider, useTournamentFocus } from './contexts/Tourname
 import { WatchlistProvider } from './contexts/WatchlistContext';
 import { rememberTournamentDetailOrigin } from './utils/tournamentReturnState';
 import { isWithinTournamentFocusScope, getLastTournamentPath, setLastTournamentPath } from './utils/tournamentFocus';
+import { routeImports } from './routeImports';
 
-const Home = lazy(() => import('./pages/Dashboard'));
-const Rankings = lazy(() => import('./pages/Players'));
-const AllPlayers = lazy(() => import('./pages/AllPlayers'));
-const PlayerProfileLayout = lazy(() => import('./components/player/PlayerProfileLayout'));
-const PlayerProfile = lazy(() => import('./pages/PlayerProfile'));
-const PlayerRankingDetail = lazy(() => import('./pages/PlayerRankingDetail'));
-const HeadToHead = lazy(() => import('./pages/HeadToHead'));
-const Tournaments = lazy(() => import('./pages/Tournaments'));
-const TournamentHub = lazy(() => import('./pages/TournamentHub'));
-const TournamentPlayerDetail = lazy(() => import('./pages/TournamentPlayerDetail'));
-const TournamentDrawDetail = lazy(() => import('./pages/TournamentDrawDetail'));
-const TournamentMatchesPage = lazy(() => import('./pages/tournament/TournamentMatchesPage'));
-const TournamentPlayersPage = lazy(() => import('./pages/tournament/TournamentPlayersPage'));
-const TournamentDrawsPage = lazy(() => import('./pages/tournament/TournamentDrawsPage'));
-const TournamentEventsPage = lazy(() => import('./pages/tournament/TournamentEventsPage'));
-const TournamentSeedsPage = lazy(() => import('./pages/tournament/TournamentSeedsPage'));
-const TournamentWinnersPage = lazy(() => import('./pages/tournament/TournamentWinnersPage'));
-const TournamentMedalsPage = lazy(() => import('./pages/tournament/TournamentMedalsPage'));
-const TournamentWatchlistPage = lazy(() => import('./pages/tournament/TournamentWatchlistPage'));
-const TournamentEventDetail = lazy(() => import('./pages/TournamentEventDetail'));
-const PlayerSchedulePage = lazy(() => import('./pages/tournament/PlayerSchedulePage'));
-const PlayerMedals = lazy(() => import('./pages/PlayerMedals'));
-const PlayerTournaments = lazy(() => import('./pages/PlayerTournaments'));
+const Home = lazy(routeImports.dashboard);
+const Rankings = lazy(routeImports.players);
+const AllPlayers = lazy(routeImports.allPlayers);
+const PlayerProfileLayout = lazy(routeImports.playerProfileLayout);
+const PlayerProfile = lazy(routeImports.playerProfile);
+const PlayerRankingDetail = lazy(routeImports.playerRankingDetail);
+const HeadToHead = lazy(routeImports.headToHead);
+const Tournaments = lazy(routeImports.tournaments);
+const TournamentHub = lazy(routeImports.tournamentHub);
+const TournamentPlayerDetail = lazy(routeImports.tournamentPlayerDetail);
+const TournamentDrawDetail = lazy(routeImports.tournamentDrawDetail);
+const TournamentMatchesPage = lazy(routeImports.tournamentMatches);
+const TournamentPlayersPage = lazy(routeImports.tournamentPlayers);
+const TournamentDrawsPage = lazy(routeImports.tournamentDraws);
+const TournamentEventsPage = lazy(routeImports.tournamentEvents);
+const TournamentSeedsPage = lazy(routeImports.tournamentSeeds);
+const TournamentWinnersPage = lazy(routeImports.tournamentWinners);
+const TournamentMedalsPage = lazy(routeImports.tournamentMedals);
+const TournamentWatchlistPage = lazy(routeImports.tournamentWatchlist);
+const TournamentEventDetail = lazy(routeImports.tournamentEventDetail);
+const PlayerSchedulePage = lazy(routeImports.playerSchedule);
+const PlayerMedals = lazy(routeImports.playerMedals);
+const PlayerTournaments = lazy(routeImports.playerTournaments);
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -73,6 +74,25 @@ class ErrorBoundary extends Component<
     }
     return this.props.children;
   }
+}
+
+function RoutePreloader() {
+  useEffect(() => {
+    const preload = () => {
+      routeImports.players();
+      routeImports.allPlayers();
+      routeImports.tournaments();
+      routeImports.headToHead();
+      routeImports.playerProfileLayout();
+    };
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(preload);
+      return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(preload, 2000);
+    return () => clearTimeout(id);
+  }, []);
+  return null;
 }
 
 function ScrollManager() {
@@ -206,6 +226,7 @@ export default function App() {
           <TournamentFocusProvider>
               <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
                 <AnalyticsWithRoutes />
+                <RoutePreloader />
                 <ScrollManager />
                 <TournamentRouteTracker />
                 <TournamentFocusAutoExit />

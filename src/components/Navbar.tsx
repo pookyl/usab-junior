@@ -3,6 +3,15 @@ import { Trophy, Home, Swords, Users, Moon, Sun, Monitor, Award, List } from 'lu
 import { useTheme, type ThemeMode } from '../contexts/ThemeContext';
 import { useTournamentFocus } from '../contexts/TournamentFocusContext';
 import { buildTournamentFocusNavItems } from '../utils/tournamentFocus';
+import { routeImports } from '../routeImports';
+
+const pathPreloaders: Record<string, (() => void) | undefined> = {
+  '/':            routeImports.dashboard,
+  '/players':     routeImports.players,
+  '/directory':   routeImports.allPlayers,
+  '/tournaments': routeImports.tournaments,
+  '/head-to-head':routeImports.headToHead,
+};
 
 const navItems = [
   { path: '/', label: 'Home', shortLabel: 'Home', icon: Home },
@@ -82,6 +91,7 @@ export default function Navbar() {
                   <Link
                     key={path}
                     to={path}
+                    onPointerEnter={() => pathPreloaders[path]?.()}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       active
                         ? 'bg-violet-600 text-white'
@@ -145,6 +155,7 @@ export default function Navbar() {
                 <Link
                   key={path}
                   to={path}
+                  onPointerEnter={() => pathPreloaders[path]?.()}
                   className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
                     active
                       ? 'text-violet-600 dark:text-violet-400'
@@ -167,6 +178,7 @@ export default function Navbar() {
                 <Link
                   key={path}
                   to={path}
+                  onPointerEnter={() => pathPreloaders[path]?.()}
                   className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
                     active
                       ? 'text-violet-600 dark:text-violet-400'
