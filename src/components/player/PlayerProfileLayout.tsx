@@ -31,6 +31,7 @@ export interface PlayerProfileContext {
   ageGroupSet: AgeGroup[];
   gender: string | null;
   rankingsDate: string;
+  scrollToTabs: () => void;
 }
 
 export function usePlayerProfile(): PlayerProfileContext {
@@ -362,6 +363,7 @@ export default function PlayerProfileLayout() {
   const [gender, setGender] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [showQr, setShowQr] = useState(false);
+  const tabRowRef = useRef<HTMLDivElement>(null);
 
   const entries = rankedPlayer?.entries ?? [];
   const bestEntry = entries.length > 0 ? entries.reduce((b, e) => (e.rank < b.rank ? e : b)) : null;
@@ -405,6 +407,16 @@ export default function PlayerProfileLayout() {
   const displayName = playerName;
   const basePath = `/directory/${usabId}`;
 
+  const scrollToTabs = useCallback(() => {
+    requestAnimationFrame(() => {
+      const el = tabRowRef.current;
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: y, behavior: 'instant' });
+      }
+    });
+  }, []);
+
   const outletContext = useMemo<PlayerProfileContext>(() => ({
     usabId: usabId ?? '',
     displayName,
@@ -414,7 +426,8 @@ export default function PlayerProfileLayout() {
     ageGroupSet,
     gender,
     rankingsDate,
-  }), [usabId, displayName, isRanked, entries, sortedEntries, ageGroupSet, gender, rankingsDate]);
+    scrollToTabs,
+  }), [usabId, displayName, isRanked, entries, sortedEntries, ageGroupSet, gender, rankingsDate, scrollToTabs]);
 
   if (!usabId) {
     return (
@@ -543,7 +556,7 @@ export default function PlayerProfileLayout() {
           )}
         </div>
 
-        <div className="mt-5 md:mt-6 border-t border-white/10 pt-4 md:pt-5">
+        <div ref={tabRowRef} className="mt-5 md:mt-6 border-t border-white/10 pt-4 md:pt-5">
           <div className="grid grid-cols-2 gap-2 md:gap-3 sm:flex sm:flex-wrap">
             {visibleTabs.map((tab, index) => (
               <NavLink

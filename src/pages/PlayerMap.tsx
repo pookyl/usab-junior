@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin, RefreshCw, ExternalLink } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet.markercluster';
@@ -17,7 +18,8 @@ interface GeocodedVenue {
   location: string;
   tournaments: {
     name: string;
-    url: string;
+    tswId?: string;
+    selfPlayerId?: number;
     dates: string;
     wins: number;
     losses: number;
@@ -69,16 +71,59 @@ function createClusterIcon(cluster: L.MarkerCluster): L.DivIcon {
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 const US_CENTER: L.LatLngExpression = [39.5, -98.35];
+const SESSION_KEY_VENUES = 'playerMap:venues:';
+const SESSION_KEY_VIEW = 'playerMap:view:';
 
-function FitBoundsOnReady({ bounds }: { bounds: L.LatLngBounds }) {
+interface SavedView { lat: number; lng: number; zoom: number }
+
+function saveView(usabId: string, map: L.Map) {
+  const c = map.getCenter();
+  const view: SavedView = { lat: c.lat, lng: c.lng, zoom: map.getZoom() };
+  try { sessionStorage.setItem(SESSION_KEY_VIEW + usabId, JSON.stringify(view)); } catch { /* full */ }
+}
+
+function loadView(usabId: string): SavedView | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY_VIEW + usabId);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function saveVenuesCache(usabId: string, venues: GeocodedVenue[]) {
+  try { sessionStorage.setItem(SESSION_KEY_VENUES + usabId, JSON.stringify(venues)); } catch { /* full */ }
+}
+
+function loadVenuesCache(usabId: string): GeocodedVenue[] | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY_VENUES + usabId);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function FitBoundsOnReady({ bounds, usabId }: { bounds: L.LatLngBounds; usabId: string }) {
   const map = useMap();
   useEffect(() => {
+    const saved = loadView(usabId);
     const raf = requestAnimationFrame(() => {
       map.invalidateSize({ animate: false });
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12, animate: false });
+      if (saved) {
+        map.setView([saved.lat, saved.lng], saved.zoom, { animate: false });
+      } else {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12, animate: false });
+      }
     });
     return () => cancelAnimationFrame(raf);
-  }, [map, bounds]);
+  }, [map, bounds, usabId]);
+  return null;
+}
+
+function PersistView({ usabId }: { usabId: string }) {
+  const map = useMap();
+  useEffect(() => {
+    const handler = () => saveView(usabId, map);
+    map.on('moveend', handler);
+    return () => { map.off('moveend', handler); };
+  }, [map, usabId]);
   return null;
 }
 
@@ -100,27 +145,43 @@ function ThemeTileLayer({ isDark }: { isDark: boolean }) {
 }
 
 
+interface TournamentEntry {
+  name: string;
+  tswId?: string;
+  selfPlayerId?: number;
+  dates: string;
+  wins: number;
+  losses: number;
+}
+
 interface GroupedResult {
-  grouped: Map<string, { name: string; url: string; dates: string; wins: number; losses: number }[]>;
+  grouped: Map<string, TournamentEntry[]>;
   tswIds: Record<string, string>;
+}
+
+function normalizeLocationKey(loc: string): string {
+  return loc.trim().replace(/\s+/g, ' ').replace(/\s*,\s*/g, ', ');
 }
 
 function groupTournamentsByLocation(
   tournamentsByYear: Record<string, TswTournament[]>,
 ): GroupedResult {
-  const grouped = new Map<string, { name: string; url: string; dates: string; wins: number; losses: number }[]>();
+  const grouped = new Map<string, TournamentEntry[]>();
   const tswIds: Record<string, string> = {};
   for (const tournaments of Object.values(tournamentsByYear)) {
     for (const t of tournaments) {
       if (!t.location) continue;
-      const key = t.location.trim();
+      const key = normalizeLocationKey(t.location);
       if (!grouped.has(key)) grouped.set(key, []);
       if (t.tswId && !tswIds[key]) tswIds[key] = t.tswId;
       const wins = t.events.reduce((s, e) => s + e.wins, 0);
       const losses = t.events.reduce((s, e) => s + e.losses, 0);
       const existing = grouped.get(key)!;
       if (!existing.some((e) => e.name === t.name && e.dates === t.dates)) {
-        existing.push({ name: t.name, url: t.url, dates: t.dates, wins, losses });
+        existing.push({
+          name: t.name, tswId: t.tswId, selfPlayerId: t.selfPlayerId,
+          dates: t.dates, wins, losses,
+        });
       }
     }
   }
@@ -128,16 +189,22 @@ function groupTournamentsByLocation(
 }
 
 export default function PlayerMap() {
-  const { usabId, displayName } = usePlayerProfile();
+  const { usabId, displayName, scrollToTabs } = usePlayerProfile();
   const { loading: loadingAllPlayers, directoryLoading } = usePlayers();
   const { resolved: theme } = useTheme();
   const isDark = theme === 'dark';
 
-  const [venues, setVenues] = useState<GeocodedVenue[]>([]);
-  const [busy, setBusy] = useState(true);
+  const cachedVenues = usabId ? loadVenuesCache(usabId) : null;
+  const [venues, setVenues] = useState<GeocodedVenue[]>(cachedVenues ?? []);
+  const [busy, setBusy] = useState(!cachedVenues);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!busy && venues.length > 0) scrollToTabs();
+  }, [busy, venues.length, scrollToTabs]);
+
+  useEffect(() => {
+    if (cachedVenues) return;
     if (!usabId || !displayName) {
       if (!loadingAllPlayers && !directoryLoading) setBusy(false);
       return;
@@ -163,6 +230,7 @@ export default function PlayerMap() {
             if (c) result.push({ lat: c.lat, lng: c.lng, location: loc, tournaments });
           }
           setVenues(result);
+          if (usabId) saveVenuesCache(usabId, result);
         });
       })
       .catch((err) => {
@@ -171,7 +239,7 @@ export default function PlayerMap() {
       .finally(() => { if (!cancelled) setBusy(false); });
 
     return () => { cancelled = true; };
-  }, [usabId, displayName, loadingAllPlayers, directoryLoading]);
+  }, [cachedVenues, usabId, displayName, loadingAllPlayers, directoryLoading]);
 
   const totalTournaments = venues.reduce((s, v) => s + v.tournaments.length, 0);
 
@@ -244,7 +312,8 @@ export default function PlayerMap() {
             scrollWheelZoom
             style={{ background: isDark ? '#1e293b' : '#f1f5f9' }}
           >
-            {initialBounds && <FitBoundsOnReady bounds={initialBounds} />}
+            {initialBounds && <FitBoundsOnReady bounds={initialBounds} usabId={usabId} />}
+            <PersistView usabId={usabId} />
             <ThemeTileLayer isDark={isDark} />
             <MarkerClusterGroup
               iconCreateFunction={createClusterIcon}
@@ -278,24 +347,24 @@ export default function PlayerMap() {
                       <div className="space-y-2 mt-2">
                         {venue.tournaments.map((t, ti) => (
                           <div key={ti} className="border-t border-slate-100 pt-1.5 first:border-0 first:pt-0">
-                            {t.url ? (
-                              <a
-                                href={t.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs font-medium text-violet-600 hover:text-violet-800 hover:underline"
-                              >
-                                {t.name}
-                              </a>
-                            ) : (
-                              <p className="text-xs font-medium text-slate-700">{t.name}</p>
-                            )}
+                            <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{t.name}</p>
                             <p className="text-[11px] text-slate-400 mt-0.5">{t.dates}</p>
-                            <p className="text-[11px] mt-0.5">
-                              <span className="font-semibold text-emerald-600">{t.wins}W</span>
-                              <span className="text-slate-300 mx-0.5">-</span>
-                              <span className="font-semibold text-rose-500">{t.losses}L</span>
-                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <p className="text-[11px]">
+                                <span className="font-semibold text-emerald-600">{t.wins}W</span>
+                                <span className="text-slate-300 mx-0.5">-</span>
+                                <span className="font-semibold text-rose-500">{t.losses}L</span>
+                              </p>
+                              {t.tswId && t.selfPlayerId && (
+                                <Link
+                                  to={`/tournaments/${t.tswId}/player/${t.selfPlayerId}`}
+                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600 hover:bg-violet-100 text-[10px] font-medium transition-colors"
+                                >
+                                  Match details
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </Link>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
