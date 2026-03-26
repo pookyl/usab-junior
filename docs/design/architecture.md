@@ -58,13 +58,13 @@ flowchart LR
     S2["refresh-tournaments-cache.mjs"] -->|scrape| USAB2["usabadminton.org<br/>schedule page"]
     S2 -->|write| T["data/tournaments-YYYY-YYYY.json"]
 
-    S3["scrape-tournament-fixtures.mjs &lt;tswId&gt; [--all]"] -->|scrape| TSW["tournamentsoftware.com"]
+    S3["refresh-tournament-cache.mjs &lt;tswId&gt; [--all]"] -->|scrape| TSW["tournamentsoftware.com"]
     S3 -->|write| TC["data/tournament-cache/{tswId}/<br/>detail, draws, matches..."]
 
     S4["patch-tournaments-tsw.mjs"] -->|search TSW| TSW
     S4 -->|patch tswId into| T
 
-    S5["scrape-tournament-fixtures.mjs"] -->|scrape all| TSW
+    S5["refresh-tournament-cache.mjs"] -->|scrape all| TSW
     S5 -->|write| TC["data/tournament-cache/{tswId}/"]
 ```
 

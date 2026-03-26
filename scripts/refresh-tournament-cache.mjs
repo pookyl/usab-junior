@@ -1,13 +1,24 @@
 #!/usr/bin/env node
-// Usage: node scripts/scrape-tournament-fixtures.mjs <tswId> [--all]
+// Usage: node scripts/refresh-tournament-cache.mjs <tswId> [--all]
 //
-// Scrapes all tournament data directly from TournamentSoftware.com using
+// Refreshes one tournament cache tree directly from TournamentSoftware.com using
 // tswFetch (handles cookie wall) and saves parsed JSON into
-// data/tournament-cache/{tswId}/ for offline serving.
+// data/tournament-cache/ using either a final folder or a timestamped snapshot
+// plus a {tswId} symlink, depending on whether the tournament has finished.
 //
 // Fully standalone — does NOT require the dev API server to be running.
 
-import { readFileSync, mkdirSync, writeFileSync, readdirSync } from 'fs';
+import {
+  readFileSync,
+  mkdirSync,
+  writeFileSync,
+  existsSync,
+  lstatSync,
+  readlinkSync,
+  rmSync,
+  renameSync,
+  symlinkSync,
+} from 'fs';
 import { readFile, readdir } from 'fs/promises';
 import { execSync } from 'child_process';
 import { join, dirname } from 'path';
@@ -15,6 +26,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(__dirname, '..');
+const CACHE_ROOT = join(PROJECT_ROOT, 'data', 'tournament-cache');
 
 process.chdir(PROJECT_ROOT);
 const {
@@ -47,20 +59,20 @@ const positional = args.filter(a => !a.startsWith('--'));
 const tswId = positional[0];
 
 if (!tswId) {
-  console.error(`Usage: node scripts/scrape-tournament-fixtures.mjs <tswId> [--all]
+  console.error(`Usage: node scripts/refresh-tournament-cache.mjs <tswId> [--all]
 
 Options:
   --all   Include player-id-map scraping (slow, scrapes each player page)
 
 Examples:
-  node scripts/scrape-tournament-fixtures.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852
-  node scripts/scrape-tournament-fixtures.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852 --all
+  node scripts/refresh-tournament-cache.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852
+  node scripts/refresh-tournament-cache.mjs 9BA4D091-5DA0-44B3-ADD7-511F99031852 --all
 `);
   process.exit(1);
 }
 
 const tswIdLower = tswId.toLowerCase();
-const outDir = join(PROJECT_ROOT, 'data', 'tournament-cache', tswId);
+let outDir = '';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -136,6 +148,211 @@ function parseScheduledTime(timeStr) {
     };
   }
   return { date: '', time: timeStr, dateLabel: '' };
+}
+
+const MONTH_MAP = {
+  jan: '01', january: '01',
+  feb: '02', february: '02',
+  mar: '03', march: '03',
+  apr: '04', april: '04',
+  may: '05',
+  jun: '06', june: '06',
+  jul: '07', july: '07',
+  aug: '08', august: '08',
+  sep: '09', sept: '09', september: '09',
+  oct: '10', october: '10',
+  nov: '11', november: '11',
+  dec: '12', december: '12',
+};
+
+function normalizeYear(year) {
+  let y = Number(year);
+  if (y < 100) y += 2000;
+  return String(y);
+}
+
+function toISODate(year, month, day) {
+  return `${normalizeYear(year)}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function parseDateToken(raw) {
+  if (!raw) return null;
+  const cleaned = raw.trim().replace(/\s+/g, ' ');
+  const isoMatch = cleaned.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+
+  const slashMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (slashMatch) return toISODate(slashMatch[3], slashMatch[1], slashMatch[2]);
+
+  const wordMatch = cleaned.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s*(\d{2,4})$/);
+  if (wordMatch) {
+    const month = MONTH_MAP[wordMatch[1].toLowerCase()];
+    if (month) return toISODate(wordMatch[3], month, wordMatch[2]);
+  }
+
+  return null;
+}
+
+function parseDateRangeText(raw) {
+  if (!raw) return { startDate: '', endDate: '' };
+  const cleaned = raw.trim().replace(/\s+/g, ' ');
+
+  const numericRange = cleaned.match(
+    /(\d{1,2}\/\d{1,2}\/\d{2,4})\s*(?:-|to)\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i,
+  );
+  if (numericRange) {
+    return {
+      startDate: parseDateToken(numericRange[1]) || '',
+      endDate: parseDateToken(numericRange[2]) || '',
+    };
+  }
+
+  const numericSingle = cleaned.match(/^(\d{1,2}\/\d{1,2}\/\d{2,4})$/);
+  if (numericSingle) {
+    const date = parseDateToken(numericSingle[1]) || '';
+    return { startDate: date, endDate: date };
+  }
+
+  const monthRange = cleaned.match(
+    /([A-Za-z]+\s+\d{1,2},?\s*\d{2,4})\s*(?:-|to)\s*([A-Za-z]+\s+\d{1,2},?\s*\d{2,4})/i,
+  );
+  if (monthRange) {
+    return {
+      startDate: parseDateToken(monthRange[1]) || '',
+      endDate: parseDateToken(monthRange[2]) || '',
+    };
+  }
+
+  const monthDayRange = cleaned.match(/([A-Za-z]+)\s+(\d{1,2})\s*(?:-|to)\s*(\d{1,2}),?\s*(\d{2,4})/i);
+  if (monthDayRange) {
+    const month = MONTH_MAP[monthDayRange[1].toLowerCase()];
+    if (month) {
+      return {
+        startDate: toISODate(monthDayRange[4], month, monthDayRange[2]),
+        endDate: toISODate(monthDayRange[4], month, monthDayRange[3]),
+      };
+    }
+  }
+
+  const single = parseDateToken(cleaned);
+  return single ? { startDate: single, endDate: single } : { startDate: '', endDate: '' };
+}
+
+function parseTournamentDateRange(html, fallbackDates) {
+  const parsedTimes = [];
+  const timeRe = /<time\b[^>]*(?:datetime="([^"]+)")?[^>]*>([^<]+)<\/time>/gi;
+  let match;
+  while ((match = timeRe.exec(html)) !== null) {
+    const candidate = parseDateToken(match[1] || '') || parseDateToken(match[2] || '');
+    if (candidate && !parsedTimes.includes(candidate)) parsedTimes.push(candidate);
+  }
+
+  if (parsedTimes.length >= 2) {
+    return { startDate: parsedTimes[0], endDate: parsedTimes[1] };
+  }
+  if (parsedTimes.length === 1) {
+    return { startDate: parsedTimes[0], endDate: parsedTimes[0] };
+  }
+
+  return parseDateRangeText(fallbackDates);
+}
+
+function isTournamentFinished(endDate) {
+  if (!endDate) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  return today > endDate;
+}
+
+function formatTimestamp(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}${month}${day}-${hours}${minutes}${seconds}`;
+}
+
+function getPathInfo(path) {
+  if (!existsSync(path)) return null;
+  const stats = lstatSync(path);
+  if (stats.isSymbolicLink()) {
+    const linkTarget = readlinkSync(path);
+    return {
+      type: 'symlink',
+      path,
+      linkTarget,
+      absoluteTarget: join(dirname(path), linkTarget),
+    };
+  }
+  if (stats.isDirectory()) return { type: 'directory', path };
+  return { type: 'file', path };
+}
+
+function isManagedSnapshotPath(path) {
+  return path.startsWith(`${CACHE_ROOT}/`) && path !== join(CACHE_ROOT, tswId) && path.includes(`${tswId}-`);
+}
+
+function planOutput(tswIdValue, endDate) {
+  const canonicalDir = join(CACHE_ROOT, tswIdValue);
+  if (isTournamentFinished(endDate)) {
+    return {
+      mode: 'final',
+      canonicalDir,
+      writeDir: join(CACHE_ROOT, `${tswIdValue}.tmp-${formatTimestamp()}`),
+    };
+  }
+
+  const snapshotName = `${tswIdValue}-${formatTimestamp()}`;
+  return {
+    mode: 'snapshot',
+    canonicalDir,
+    snapshotName,
+    writeDir: join(CACHE_ROOT, snapshotName),
+  };
+}
+
+function finalizeOutput(plan) {
+  const existing = getPathInfo(plan.canonicalDir);
+  const summary = {
+    mode: plan.mode,
+    canonicalDir: plan.canonicalDir,
+    writeDir: plan.writeDir,
+    replacedPathType: existing?.type || null,
+    previousLinkTarget: existing?.type === 'symlink' ? existing.absoluteTarget : null,
+    removedSnapshotDir: null,
+    finalDir: null,
+    symlinkPath: null,
+    symlinkTarget: null,
+  };
+
+  if (plan.mode === 'final') {
+    if (existing?.type === 'symlink') {
+      rmSync(plan.canonicalDir, { force: true });
+      if (isManagedSnapshotPath(existing.absoluteTarget) && existsSync(existing.absoluteTarget)) {
+        rmSync(existing.absoluteTarget, { recursive: true, force: true });
+        summary.removedSnapshotDir = existing.absoluteTarget;
+      }
+    } else if (existing) {
+      rmSync(plan.canonicalDir, { recursive: true, force: true });
+    }
+
+    renameSync(plan.writeDir, plan.canonicalDir);
+    summary.finalDir = plan.canonicalDir;
+    return summary;
+  }
+
+  if (existing?.type === 'symlink') {
+    rmSync(plan.canonicalDir, { force: true });
+  } else if (existing) {
+    rmSync(plan.canonicalDir, { recursive: true, force: true });
+  }
+
+  symlinkSync(plan.snapshotName, plan.canonicalDir, 'dir');
+  summary.finalDir = plan.writeDir;
+  summary.symlinkPath = plan.canonicalDir;
+  summary.symlinkTarget = plan.writeDir;
+  return summary;
 }
 
 async function buildPlayerIndexes({
@@ -320,27 +537,13 @@ async function buildPlayerIndexes({
   return true;
 }
 
-function discoverDateRange() {
-  const DATA_DIR = join(PROJECT_ROOT, 'data');
-  try {
-    const files = readdirSync(DATA_DIR).filter(f => f.startsWith('tournaments-') && f.endsWith('.json'));
-    for (const f of files) {
-      const data = JSON.parse(readFileSync(join(DATA_DIR, f), 'utf-8'));
-      const tournaments = data.tournaments || [];
-      const match = tournaments.find(t => t.tswId?.toUpperCase() === tswId.toUpperCase());
-      if (match) return { startDate: match.startDate || '', endDate: match.endDate || match.startDate || '' };
-    }
-  } catch { /* ignore */ }
-  return { startDate: '', endDate: '' };
-}
-
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
   console.log(`\nScraping tournament ${tswId} directly from TSW`);
-  console.log(`Output: ${outDir}\n`);
+  console.log(`Output root: ${CACHE_ROOT}\n`);
 
-  mkdirSync(outDir, { recursive: true });
+  mkdirSync(CACHE_ROOT, { recursive: true });
 
   // Phase 1: fetch detail (draws page) + events page
   console.log('Phase 1: Fetching detail and events from TSW...');
@@ -357,11 +560,18 @@ async function main() {
   const info = parseTswTournamentInfo(drawsHtml);
   const draws = parseTswDrawsList(drawsHtml);
   const events = parseTswEvents(eventsHtml);
+  const { startDate, endDate } = parseTournamentDateRange(drawsHtml, info.dates);
+  const finished = isTournamentFinished(endDate);
+  const outputPlan = planOutput(tswId, endDate);
+  outDir = outputPlan.writeDir;
+  mkdirSync(outDir, { recursive: true });
 
   const detail = {
     tswId,
     name: info.name,
     dates: info.dates,
+    startDate,
+    endDate,
     location: info.location,
     draws,
     tswUrl: `https://www.tournamentsoftware.com/tournament/${tswId}`,
@@ -372,12 +582,14 @@ async function main() {
   const dates = detail.dates || '';
   const drawIds = draws.map(d => d.drawId);
   const eventIds = events.map(e => e.eventId);
-
-  const { startDate, endDate } = discoverDateRange();
   const dateParams = generateDateParams(startDate, endDate);
 
   console.log(`  Tournament: ${tournamentName}`);
   console.log(`  Dates: ${dates} (${startDate} to ${endDate})`);
+  console.log(`  Finished: ${finished ? 'yes' : 'no'} (checked from end date only)`);
+  console.log(`  Output mode: ${finished ? 'final folder' : 'timestamped snapshot + symlink'}`);
+  console.log(`  Write dir: ${outDir}`);
+  console.log(`  Canonical path: ${outputPlan.canonicalDir}`);
   console.log(`  Draws: ${drawIds.length}`);
   console.log(`  Events: ${eventIds.length}`);
   console.log(`  Match days: ${dateParams.join(', ') || '(none found)'}\n`);
@@ -667,11 +879,18 @@ async function main() {
     scrapedAt: new Date().toISOString(),
     startDate,
     endDate,
+    finished,
     dateParams,
     drawIds,
     eventIds,
     playerIdMapIncluded: flagAll,
     mappedPlayerCount: Object.keys(playerIdMap).length,
+    output: {
+      mode: outputPlan.mode,
+      canonicalDir: outputPlan.canonicalDir,
+      writeDir: outDir,
+      symlinkPath: outputPlan.mode === 'snapshot' ? outputPlan.canonicalDir : null,
+    },
     files: {
       static: staticFiles,
       matches: dateParams.map(dp => `matches/${dp}.json`),
@@ -681,6 +900,8 @@ async function main() {
   };
   saveJson('_manifest.json', manifest);
   console.log('\n  Saved: _manifest.json');
+
+  const outputSummary = finalizeOutput(outputPlan);
 
   const totalFiles = manifest.files.static.length
     + manifest.files.matches.length
@@ -701,6 +922,7 @@ async function main() {
   console.log(`  Tournament : ${tournamentName}`);
   console.log(`  TSW ID     : ${tswId}`);
   console.log(`  Dates      : ${startDate || '?'} to ${endDate || '?'}`);
+  console.log(`  Finished   : ${finished ? 'yes' : 'no'} (end date only)`);
   console.log(`  Draws      : ${drawIds.length}`);
   console.log(`  Events     : ${eventIds.length}`);
   console.log(`  Match days : ${dateParams.length} (${totalMatchCount} total matches)`);
@@ -716,9 +938,25 @@ async function main() {
   } else {
     console.log('  USAB mapped: skipped (use --all to include)');
   }
+  console.log(`  Output mode: ${outputSummary.mode === 'final' ? 'final folder' : 'timestamped snapshot + symlink'}`);
+  console.log(`  Write dir  : ${outputSummary.writeDir}`);
+  if (outputSummary.symlinkPath && outputSummary.symlinkTarget) {
+    console.log(`  Symlink    : ${outputSummary.symlinkPath} -> ${outputSummary.symlinkTarget}`);
+  } else {
+    console.log(`  Output     : ${outputSummary.finalDir}`);
+  }
+  if (outputSummary.replacedPathType) {
+    console.log(`  Replaced   : existing ${outputSummary.replacedPathType} at ${outputSummary.canonicalDir}`);
+  }
+  if (outputSummary.previousLinkTarget) {
+    console.log(`  Prev link  : ${outputSummary.previousLinkTarget}`);
+  }
+  if (outputSummary.removedSnapshotDir) {
+    console.log(`  Removed    : ${outputSummary.removedSnapshotDir}`);
+  }
   console.log(`  Total files: ${totalFiles}`);
   console.log(`  Folder size: ${folderSize}`);
-  console.log(`  Output     : ${outDir}`);
+  console.log(`  Canonical  : ${outputSummary.canonicalDir}`);
   console.log('════════════════════════════════════════════════════════\n');
 }
 

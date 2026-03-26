@@ -143,7 +143,7 @@ All endpoints are served by `api-server.mjs` on port 3001. In production, these 
 ├── scripts/
 │   ├── refresh-rankings-cache.mjs  # Fetch latest rankings into disk cache
 │   ├── refresh-tournaments-cache.mjs  # Fetch season schedules from USAB
-│   ├── scrape-tournament-fixtures.mjs  # Scrape full tournament data from TSW
+│   ├── refresh-tournament-cache.mjs  # Refresh one tournament cache from TSW
 │   ├── patch-tournaments-tsw.mjs   # Match USAB tournaments to TSW IDs
 │   └── tsw-fetch.mjs              # Standalone TSW fetch utility
 ├── data/
@@ -226,7 +226,7 @@ All endpoints are served by `api-server.mjs` on port 3001. In production, these 
 
 Rankings data is refreshed automatically by a [GitHub Actions workflow](.github/workflows/refresh-rankings-cache.yml) that runs daily at 08:00 UTC. The workflow executes `scripts/refresh-rankings-cache.mjs`, and if the cache has changed, commits updated files back to the repo. You can also trigger a manual refresh from the GitHub Actions UI or locally with `npm run refresh-rankings-cache`.
 
-Tournament season schedules are refreshed with `npm run refresh-tournaments-cache`. Individual tournament data (draws, matches, players) is scraped with `scripts/scrape-tournament-fixtures.mjs <tswId>`.
+Tournament season schedules are refreshed with `npm run refresh-tournaments-cache`. Individual tournament data (draws, matches, players) is refreshed with `scripts/refresh-tournament-cache.mjs <tswId>`.
 
 ## Testing
 
