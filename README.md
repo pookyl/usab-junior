@@ -143,7 +143,6 @@ All endpoints are served by `api-server.mjs` on port 3001. In production, these 
 ├── scripts/
 │   ├── refresh-rankings-cache.mjs  # Fetch latest rankings into disk cache
 │   ├── refresh-tournaments-cache.mjs  # Fetch season schedules from USAB
-│   ├── refresh-medals-cache.mjs    # Compute and cache medal tallies
 │   ├── scrape-tournament-fixtures.mjs  # Scrape full tournament data from TSW
 │   ├── patch-tournaments-tsw.mjs   # Match USAB tournaments to TSW IDs
 │   └── tsw-fetch.mjs              # Standalone TSW fetch utility
@@ -152,7 +151,6 @@ All endpoints are served by `api-server.mjs` on port 3001. In production, these 
 │   ├── rankings-meta.json          # Default rankings date and metadata
 │   ├── rankings-{date}.json        # Per-date ranking snapshots
 │   ├── tournaments-{season}.json   # Season schedule files
-│   ├── medals-{tswId}.json         # Per-tournament medal data
 │   └── tournament-cache/{tswId}/   # Pre-scraped tournament data trees
 ├── .github/workflows/
 │   ├── ci.yml                      # PR/push: test → lint:api → build

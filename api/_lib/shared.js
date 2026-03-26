@@ -1,5 +1,3 @@
-import { readFile, writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import {
   listCachedDates,
   loadDiskCacheForDate,
@@ -54,26 +52,6 @@ export {
   getDiskCachedAllPlayers,
   getDiskCachedDate,
 };
-const DISK_CACHE_DIR = join(process.cwd(), 'data');
-
-// ── Medals disk cache ────────────────────────────────────────────────────────
-
-function medalsCachePath(tswId) {
-  return join(DISK_CACHE_DIR, `medals-${tswId.toLowerCase()}.json`);
-}
-
-export async function loadMedalsDiskCache(tswId) {
-  try {
-    const raw = await readFile(medalsCachePath(tswId), 'utf-8');
-    return JSON.parse(raw);
-  } catch { return null; }
-}
-
-export async function saveMedalsDiskCache(tswId, data) {
-  await mkdir(DISK_CACHE_DIR, { recursive: true });
-  await writeFile(medalsCachePath(tswId), JSON.stringify(data, null, 2));
-}
-
 // ── Shared fetch helpers (timeouts + retry) ─────────────────────────────────
 const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504]);
 

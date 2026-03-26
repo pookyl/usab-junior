@@ -64,8 +64,8 @@ flowchart LR
     S4["patch-tournaments-tsw.mjs"] -->|search TSW| TSW
     S4 -->|patch tswId into| T
 
-    S5["refresh-medals-cache.mjs"] -->|scrape| TSW
-    S5 -->|write| M["data/medals-{tswId}.json"]
+    S5["scrape-tournament-fixtures.mjs"] -->|scrape all| TSW
+    S5 -->|write| TC["data/tournament-cache/{tswId}/"]
 ```
 
 ### 2. Live Pipeline (API Requests)
