@@ -13,6 +13,7 @@ import {
   Link2,
   Check,
   LayoutDashboard,
+  MapPin,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import type { AgeGroup, PlayerEntry } from '../../types/junior';
@@ -332,6 +333,7 @@ const TAB_ITEMS = [
   { label: 'Rankings', icon: Trophy, to: 'rankings', requiresRank: true },
   { label: 'Tournaments', icon: Calendar, to: 'tournaments' },
   { label: 'Medals', icon: Medal, to: 'medals' },
+  { label: 'Map', icon: MapPin, to: 'map' },
 ];
 
 export default function PlayerProfileLayout() {

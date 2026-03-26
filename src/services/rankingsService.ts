@@ -369,6 +369,29 @@ export async function fetchPlayerTswOverviewStats(
   return fetchPlayerTswStatsInternal(usabId, playerName, false);
 }
 
+// ── Geocoding ────────────────────────────────────────────────────────────────
+
+export async function geocodeLocations(
+  locations: string[],
+  tswIds?: Record<string, string>,
+): Promise<Record<string, { lat: number; lng: number } | null>> {
+  if (locations.length === 0) return {};
+  const startedAt = nowMs();
+  const res = await fetch('/api/geocode', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ locations, tswIds }),
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Geocode API error ${res.status}: ${text}`);
+  }
+  return parseJsonWithPerf<Record<string, { lat: number; lng: number } | null>>(
+    res, 'geocode', startedAt, { count: locations.length },
+  );
+}
+
 const playerMedalsCache = new Map<string, PlayerMedalsResponse>();
 
 export async function fetchPlayerMedals(
