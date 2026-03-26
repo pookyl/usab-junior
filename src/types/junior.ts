@@ -351,6 +351,7 @@ export interface TournamentPlayerDetailResponse {
   winLoss: TournamentPlayerWinLoss | null;
   matches: TournamentMatch[];
   hasUpcomingMatches?: boolean;
+  medals?: { place: 'gold' | 'silver' | 'bronze' | 'fourth'; event: string }[];
 }
 
 export interface SeedEntry {
@@ -573,4 +574,39 @@ export interface PlayerScheduleResponse {
   endDate: string;
   players: { playerId: number; playerName: string }[];
   days: ScheduleDay[];
+}
+
+// ── Player Medals (cross-tournament) types ───────────────────────────────────
+
+export interface PlayerMedalEntry {
+  place: 'gold' | 'silver' | 'bronze' | 'fourth';
+  event: string;
+  category: 'singles' | 'doubles' | 'mixed';
+}
+
+export interface PlayerMedalTournament {
+  tournamentName: string;
+  startDate: string | null;
+  endDate: string | null;
+  tswId?: string;
+  tswPlayerId?: number;
+  medals: PlayerMedalEntry[];
+  isUsab: boolean;
+  region?: string;
+  tournamentType?: string;
+}
+
+export interface PlayerMedalsResponse {
+  usabId: string;
+  playerName: string;
+  tournaments: PlayerMedalTournament[];
+  summary: { gold: number; silver: number; bronze: number; fourth: number };
+}
+
+export interface MedalEncouragementMessages {
+  noMedals: Record<string, string[]>;
+  firstMedal: Record<string, string[]>;
+  fewMedalsInTournament: Record<string, string[]>;
+  allGoldInTournament: Record<string, string[]>;
+  improvedAcrossTournaments: Record<string, string[]>;
 }

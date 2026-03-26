@@ -31,6 +31,7 @@ const TournamentMedalsPage = lazy(() => import('./pages/tournament/TournamentMed
 const TournamentWatchlistPage = lazy(() => import('./pages/tournament/TournamentWatchlistPage'));
 const TournamentEventDetail = lazy(() => import('./pages/TournamentEventDetail'));
 const PlayerSchedulePage = lazy(() => import('./pages/tournament/PlayerSchedulePage'));
+const PlayerMedals = lazy(() => import('./pages/PlayerMedals'));
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -177,6 +178,7 @@ const ROUTE_PATTERNS = [
   '/tournaments/:tswId/medals',
   '/tournaments/:tswId/watchlist',
   '/tournaments/:tswId',
+  '/directory/:id/medals',
   '/directory/:id/rankings',
   '/directory/:id',
   '/players/:id',
@@ -213,6 +215,7 @@ export default function App() {
                       <Route path="/players" element={<SuspendedPage><Rankings /></SuspendedPage>} />
                       <Route path="/players/:id" element={<PlayerRedirect />} />
                       <Route path="/directory" element={<SuspendedPage><AllPlayers /></SuspendedPage>} />
+                      <Route path="/directory/:id/medals" element={<SuspendedPage><PlayerMedals /></SuspendedPage>} />
                       <Route path="/directory/:id/rankings" element={<SuspendedPage><PlayerRankingDetail /></SuspendedPage>} />
                       <Route path="/directory/:id" element={<SuspendedPage><PlayerProfile /></SuspendedPage>} />
                       <Route path="/analytics" element={<Navigate to="/players" replace />} />

@@ -679,8 +679,8 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  // GET /api/player/:id/tsw-stats, /api/player/:id/ranking-trend, /api/player/:id/ranking-detail
-  const playerActionMatch = reqUrl.pathname.match(/^\/api\/player\/(\d+)\/(tsw-stats|ranking-trend|ranking-detail)$/);
+  // GET /api/player/:id/tsw-stats, /api/player/:id/ranking-trend, /api/player/:id/ranking-detail, /api/player/:id/medals
+  const playerActionMatch = reqUrl.pathname.match(/^\/api\/player\/(\d+)\/(tsw-stats|ranking-trend|ranking-detail|medals)$/);
   if (playerActionMatch) {
     const { default: actionHandler } = await import('./api/player/[id]/[action].js');
     req.query = { ...Object.fromEntries(reqUrl.searchParams), id: playerActionMatch[1], action: playerActionMatch[2] };

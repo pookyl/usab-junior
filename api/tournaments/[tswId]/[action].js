@@ -11,6 +11,7 @@ import {
   TSW_BASE,
 } from '../../_lib/shared.js';
 import { getCached, setCache, setCors } from '../../_lib/runtime.js';
+import { deduceMedalsFromRounds } from '../../_lib/tswStats.js';
 import { isValidTswDayParam, isValidTswId } from '../../_lib/validation.js';
 import { serveTournamentDiskCache } from '../../_lib/tournamentDiskCache.js';
 import {
@@ -574,7 +575,21 @@ async function fetchPlayerDetailInternal(tswId, playerId, refresh) {
   const winLoss = parseTswPlayerWinLoss(html);
   const matches = parseTswPlayerMatches(html);
   const hasUpcomingMatches = matches.some(m => !m.team1Won && !m.team2Won && !m.bye && !m.walkover && m.time);
-  const result = { tswId, playerId, playerName, memberId: memberId || undefined, tournamentName: tournamentName || undefined, club: '', events, winLoss, matches, hasUpcomingMatches };
+
+  let medals = [];
+  if (!hasUpcomingMatches) {
+    const normalized = matches
+      .filter(m => m.round && (m.team1Won || m.team2Won))
+      .map(m => {
+        const onTeam1 = m.team1Ids?.includes(playerId) ?? false;
+        const onTeam2 = m.team2Ids?.includes(playerId) ?? false;
+        const won = (onTeam1 && m.team1Won) || (onTeam2 && m.team2Won);
+        return { event: m.event, round: m.round, won };
+      });
+    medals = deduceMedalsFromRounds(normalized).map(({ place, event }) => ({ place, event }));
+  }
+
+  const result = { tswId, playerId, playerName, memberId: memberId || undefined, tournamentName: tournamentName || undefined, club: '', events, winLoss, matches, hasUpcomingMatches, medals };
   setCache(cacheKey, result);
   return result;
 }

@@ -16,6 +16,7 @@ import {
   Share2,
   Link2,
   Check,
+  Medal,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import {
@@ -1355,6 +1356,14 @@ export default function PlayerProfile() {
             TSW Profile
             <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
           </a>
+          <Link
+            to={`/directory/${usabId}/medals`}
+            state={{ name: displayName }}
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
+          >
+            <Medal className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            Medals
+          </Link>
           <button
             onClick={() => setShowQr(true)}
             className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"

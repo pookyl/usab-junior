@@ -23,6 +23,7 @@ import type {
   EliminationDrawResponse,
   RoundRobinDrawResponse,
   PlayerScheduleResponse,
+  PlayerMedalsResponse,
   TournamentScheduleEntry,
   ScheduledTournament,
 } from '../types/junior';
@@ -351,6 +352,26 @@ export async function fetchPlayerTswStats(
   const stats = await parseJsonWithPerf<TswPlayerStats>(res, 'tsw-stats', startedAt, { usabId });
   cappedSet(tswStatsCache, cacheKey, stats);
   return stats;
+}
+
+const playerMedalsCache = new Map<string, PlayerMedalsResponse>();
+
+export async function fetchPlayerMedals(
+  usabId: string,
+  playerName: string,
+): Promise<PlayerMedalsResponse> {
+  const normalizedName = playerName.toLowerCase().replace(/\s+/g, ' ').trim();
+  const cacheKey = `${usabId}:${normalizedName || '__unknown__'}`;
+  if (playerMedalsCache.has(cacheKey)) return playerMedalsCache.get(cacheKey)!;
+
+  const url = `/api/player/${usabId}/medals?name=${encodeURIComponent(playerName)}`;
+  const startedAt = nowMs();
+  const res = await fetchWithRetry(url, 60_000, 1);
+  if (!res.ok) await throwApiError(res, 'Player medals API');
+
+  const data = await parseJsonWithPerf<PlayerMedalsResponse>(res, 'player-medals', startedAt, { usabId });
+  cappedSet(playerMedalsCache, cacheKey, data);
+  return data;
 }
 
 export function tswSearchUrl(playerName: string) {

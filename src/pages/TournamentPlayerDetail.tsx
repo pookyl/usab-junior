@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Calendar, Swords, Users } from 'lucide-react';
 import { fetchTournamentPlayerDetail } from '../services/rankingsService';
@@ -6,58 +6,7 @@ import { fetchTournamentPlayerDetail } from '../services/rankingsService';
 import { TabLoading, TabError, TabEmpty, RefreshButton } from '../components/tournament/shared';
 import MatchCard from '../components/tournament/MatchCard';
 import MedalIcon from '../components/tournament/MedalIcon';
-import type { MedalPlace } from '../components/tournament/MedalIcon';
-import type { TournamentPlayerDetailResponse, TournamentMatch } from '../types/junior';
-
-interface DeducedMedal {
-  place: MedalPlace;
-  event: string;
-}
-
-const PLACE_ORDER: Record<MedalPlace, number> = { gold: 1, silver: 2, bronze: 3, fourth: 4 };
-
-function deduceMedals(matches: TournamentMatch[], playerId: number): DeducedMedal[] {
-  const medals: DeducedMedal[] = [];
-  const seen = new Set<string>();
-
-  const playerInThirdFourth = new Set<string>();
-  for (const m of matches) {
-    if (!/3rd.*4th/i.test(m.round)) continue;
-    const inMatch = (m.team1Ids?.includes(playerId) ?? false) || (m.team2Ids?.includes(playerId) ?? false);
-    if (inMatch) playerInThirdFourth.add(m.event);
-  }
-
-  for (const m of matches) {
-    if (/consolation/i.test(m.round)) continue;
-
-    const onTeam1 = m.team1Ids?.includes(playerId) ?? false;
-    const onTeam2 = m.team2Ids?.includes(playerId) ?? false;
-    if (!onTeam1 && !onTeam2) continue;
-
-    const matchDecided = m.team1Won || m.team2Won;
-    if (!matchDecided) continue;
-
-    const playerWon = (onTeam1 && m.team1Won) || (onTeam2 && m.team2Won);
-    let place: MedalPlace | null = null;
-
-    if (m.round === 'Final') {
-      place = playerWon ? 'gold' : 'silver';
-    } else if (/3rd.*4th/i.test(m.round)) {
-      place = playerWon ? 'bronze' : 'fourth';
-    } else if (/semi/i.test(m.round) && !playerWon && !playerInThirdFourth.has(m.event)) {
-      place = 'bronze';
-    }
-
-    if (!place) continue;
-    const key = `${m.event}:${place}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    medals.push({ place, event: m.event });
-  }
-
-  medals.sort((a, b) => PLACE_ORDER[a.place] - PLACE_ORDER[b.place]);
-  return medals;
-}
+import type { TournamentPlayerDetailResponse } from '../types/junior';
 
 export default function TournamentPlayerDetail() {
   const { tswId, playerId } = useParams<{ tswId: string; playerId: string }>();
@@ -105,10 +54,7 @@ export default function TournamentPlayerDetail() {
     return data.matches.filter(m => m.event === eventFilter);
   }, [data, eventFilter]);
 
-  const medals = useMemo(() => {
-    if (!data || data.hasUpcomingMatches) return [];
-    return deduceMedals(data.matches, data.playerId);
-  }, [data]);
+  const medals = data?.medals ?? [];
 
   if (!tswId || !playerId) return null;
 

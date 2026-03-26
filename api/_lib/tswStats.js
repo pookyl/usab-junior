@@ -87,6 +87,57 @@ export function deriveCategoryFromEvent(eventName) {
   return 'singles';
 }
 
+const PLACE_ORDER = { gold: 1, silver: 2, bronze: 3, fourth: 4 };
+
+/**
+ * Single shared medal deduction algorithm.
+ * @param {Array<{event: string, round: string, won: boolean}>} matches
+ * @returns {Array<{place: string, event: string, category: string}>}
+ */
+export function deduceMedalsFromRounds(matches) {
+  const medals = [];
+  const seen = new Set();
+
+  const eventsWithThirdFourth = new Set();
+  for (const m of matches) {
+    if (/3rd.*4th/i.test(m.round)) eventsWithThirdFourth.add(m.event);
+  }
+
+  const medalledEvents = new Set();
+
+  for (const m of matches) {
+    if (/consolation/i.test(m.round) || !m.round) continue;
+
+    let place = null;
+    if (m.round === 'Final') {
+      place = m.won ? 'gold' : 'silver';
+    } else if (/3rd.*4th/i.test(m.round)) {
+      place = m.won ? 'bronze' : 'fourth';
+    }
+
+    if (!place) continue;
+    const key = `${m.event}:${place}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    medalledEvents.add(m.event);
+    medals.push({ place, event: m.event, category: deriveCategoryFromEvent(m.event) });
+  }
+
+  for (const m of matches) {
+    if (/consolation/i.test(m.round) || !m.round || !/semi/i.test(m.round)) continue;
+    if (m.won || medalledEvents.has(m.event)) continue;
+
+    const place = eventsWithThirdFourth.has(m.event) ? 'fourth' : 'bronze';
+    const key = `${m.event}:${place}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    medals.push({ place, event: m.event, category: deriveCategoryFromEvent(m.event) });
+  }
+
+  medals.sort((a, b) => PLACE_ORDER[a.place] - PLACE_ORDER[b.place]);
+  return medals;
+}
+
 export function parseTswTournaments(html, playerName) {
   const tournaments = [];
   const tournamentBlocks = html.split(/<div class="media">/g).slice(1);
@@ -102,6 +153,8 @@ export function parseTswTournaments(html, playerName) {
       || url.match(/\/tournament\/([0-9A-Fa-f-]+)/i)
       || tournamentBlock.match(/\/tournament\/([0-9A-Fa-f-]+)\/player\/\d+/i);
     const tournamentId = tournamentIdMatch ? tournamentIdMatch[1] : '';
+
+    let selfPlayerId;
 
     const dateMatch = tournamentBlock.match(/<time[^>]*>([^<]+)<\/time>\s*(?:to\s*<time[^>]*>([^<]+)<\/time>)?/);
     const dates = dateMatch
@@ -212,6 +265,17 @@ export function parseTswTournaments(html, playerName) {
         !nameParts.every((part) => new RegExp(`\\b${part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(teamName)),
       );
 
+      if (!selfPlayerId) {
+        const selfMember = playerTeam.find((p) => {
+          if (p.playerId == null) return false;
+          const pLower = p.name.toLowerCase();
+          return pLower.includes(playerName.toLowerCase())
+            || playerName.toLowerCase().includes(pLower)
+            || nameParts.every((part) => pLower.includes(part));
+        });
+        if (selfMember) selfPlayerId = selfMember.playerId;
+      }
+
       const category = deriveCategoryFromEvent(currentEvent);
       const roundMatch = block.match(/match__header-title-item[\s\S]*?nav-link__value">([^<]+)/);
       const round = roundMatch ? roundMatch[1].trim() : '';
@@ -264,6 +328,7 @@ export function parseTswTournaments(html, playerName) {
       tournaments.push({
         name,
         tswId: tournamentId || undefined,
+        selfPlayerId,
         url,
         dates,
         startDate: startDate || undefined,
