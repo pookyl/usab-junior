@@ -1,9 +1,7 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  ArrowLeft,
   ExternalLink,
-  Trophy,
   RefreshCw,
   Calendar,
   MapPin,
@@ -11,14 +9,7 @@ import {
   Award,
   Activity,
   ChevronDown,
-  QrCode,
-  X,
-  Share2,
-  Link2,
-  Check,
-  Medal,
 } from 'lucide-react';
-import { QRCodeCanvas } from 'qrcode.react';
 import {
   LineChart,
   Line,
@@ -40,45 +31,14 @@ import type {
 } from '../types/junior';
 import { AGE_GROUPS, EVENT_TYPES } from '../types/junior';
 import {
-  fetchPlayerDetail,
   fetchPlayerTswStats,
   fetchPlayerRankingTrend,
   tswSearchUrl,
 } from '../services/rankingsService';
 import { usePlayers } from '../contexts/PlayersContext';
 import { formatDateLabel, parseScoreString } from '../utils/playerUtils';
-
-const AGE_GRADIENT: Record<AgeGroup, string> = {
-  U11: 'from-violet-500 to-violet-700',
-  U13: 'from-blue-500 to-blue-700',
-  U15: 'from-emerald-500 to-emerald-700',
-  U17: 'from-amber-500 to-amber-600',
-  U19: 'from-rose-500 to-rose-700',
-};
-
-const AGE_BORDER: Record<AgeGroup, string> = {
-  U11: 'border-violet-200 hover:border-violet-400 dark:border-violet-800 dark:hover:border-violet-600',
-  U13: 'border-blue-200 hover:border-blue-400 dark:border-blue-800 dark:hover:border-blue-600',
-  U15: 'border-emerald-200 hover:border-emerald-400 dark:border-emerald-800 dark:hover:border-emerald-600',
-  U17: 'border-amber-200 hover:border-amber-400 dark:border-amber-800 dark:hover:border-amber-600',
-  U19: 'border-rose-200 hover:border-rose-400 dark:border-rose-800 dark:hover:border-rose-600',
-};
-
-const AGE_TEXT: Record<AgeGroup, string> = {
-  U11: 'text-violet-600',
-  U13: 'text-blue-600',
-  U15: 'text-emerald-600',
-  U17: 'text-amber-600',
-  U19: 'text-rose-600',
-};
-
-const AGE_HEX: Record<AgeGroup, string> = {
-  U11: '#8b5cf6',
-  U13: '#3b82f6',
-  U15: '#10b981',
-  U17: '#f59e0b',
-  U19: '#ef4444',
-};
+import { AGE_GRADIENT, AGE_BORDER, AGE_TEXT, AGE_HEX } from '../utils/playerStyles';
+import { usePlayerProfile } from '../components/player/PlayerProfileLayout';
 
 function RankingTrendChart({
   trend,
@@ -634,308 +594,6 @@ function PlayerNameLinkGroup({
   );
 }
 
-const CARD_THEMES = [
-  { name: 'Galaxy', gradient: 'from-violet-600 via-indigo-600 to-blue-600', avatar: 'from-violet-400 to-blue-500', qrColor: '#4338ca', stops: ['#7c3aed', '#4f46e5', '#2563eb'], avatarHex: ['#a78bfa', '#3b82f6'] },
-  { name: 'Sunset', gradient: 'from-orange-500 via-rose-500 to-pink-600', avatar: 'from-orange-400 to-pink-500', qrColor: '#be123c', stops: ['#f97316', '#f43f5e', '#db2777'], avatarHex: ['#fb923c', '#ec4899'] },
-  { name: 'Ocean', gradient: 'from-cyan-500 via-blue-500 to-indigo-600', avatar: 'from-cyan-400 to-indigo-500', qrColor: '#1d4ed8', stops: ['#06b6d4', '#3b82f6', '#4f46e5'], avatarHex: ['#22d3ee', '#6366f1'] },
-  { name: 'Forest', gradient: 'from-emerald-500 via-green-600 to-teal-700', avatar: 'from-emerald-400 to-teal-500', qrColor: '#047857', stops: ['#10b981', '#16a34a', '#0f766e'], avatarHex: ['#34d399', '#14b8a6'] },
-  { name: 'Flame', gradient: 'from-red-500 via-orange-500 to-amber-500', avatar: 'from-red-400 to-amber-400', qrColor: '#c2410c', stops: ['#ef4444', '#f97316', '#f59e0b'], avatarHex: ['#f87171', '#fbbf24'] },
-  { name: 'Storm', gradient: 'from-slate-600 via-slate-700 to-slate-900', avatar: 'from-slate-400 to-slate-600', qrColor: '#1e293b', stops: ['#475569', '#334155', '#0f172a'], avatarHex: ['#94a3b8', '#475569'] },
-];
-
-const AGE_PILL_HEX: Record<AgeGroup, string> = {
-  U11: '#7c3aed', U13: '#3b82f6', U15: '#059669', U17: '#d97706', U19: '#e11d48',
-};
-
-function canvasRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
-
-function drawShareCard(
-  opts: { name: string; usabId: string; ageGroups: AgeGroup[]; isRanked: boolean; theme: typeof CARD_THEMES[number]; qrCanvas: HTMLCanvasElement | null },
-): HTMLCanvasElement {
-  const { name, usabId, ageGroups, isRanked, theme, qrCanvas } = opts;
-  const DPR = Math.max(window.devicePixelRatio, 3);
-  const W = 320;
-  const PAD = 32;
-  const AVATAR = 64;
-  const QR = 160;
-  const QR_PAD = 16;
-  const QR_BOX = QR + QR_PAD * 2;
-  const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  const MONO = '"SF Mono", SFMono-Regular, Menlo, Consolas, monospace';
-
-  let H = PAD + AVATAR + 12 + 24 + 10 + 20 + 20 + QR_BOX + 16 + 16 + 4 + 14 + PAD;
-  if (!isRanked || ageGroups.length === 0) H += 0;
-
-  const c = document.createElement('canvas');
-  c.width = W * DPR;
-  c.height = H * DPR;
-  const ctx = c.getContext('2d')!;
-  ctx.scale(DPR, DPR);
-
-  // Clipped rounded background
-  ctx.save();
-  canvasRoundRect(ctx, 0, 0, W, H, 24);
-  ctx.clip();
-
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, theme.stops[0]);
-  bg.addColorStop(0.5, theme.stops[1]);
-  bg.addColorStop(1, theme.stops[2]);
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  // Glow effects
-  const g1 = ctx.createRadialGradient(W * 0.85, H * 0.05, 0, W * 0.85, H * 0.05, 140);
-  g1.addColorStop(0, 'rgba(255,255,255,0.12)');
-  g1.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g1;
-  ctx.fillRect(0, 0, W, H);
-  const g2 = ctx.createRadialGradient(W * 0.15, H * 0.95, 0, W * 0.15, H * 0.95, 100);
-  g2.addColorStop(0, 'rgba(255,255,255,0.06)');
-  g2.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g2;
-  ctx.fillRect(0, 0, W, H);
-
-  let y = PAD;
-  ctx.textAlign = 'center';
-
-  // Avatar
-  const ax = (W - AVATAR) / 2;
-  const av = ctx.createLinearGradient(ax, y, ax + AVATAR, y + AVATAR);
-  av.addColorStop(0, theme.avatarHex[0]);
-  av.addColorStop(1, theme.avatarHex[1]);
-  ctx.shadowColor = 'rgba(0,0,0,0.25)';
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 4;
-  canvasRoundRect(ctx, ax, y, AVATAR, AVATAR, 16);
-  ctx.fillStyle = av;
-  ctx.fill();
-  ctx.shadowColor = 'transparent';
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
-
-  const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('');
-  ctx.fillStyle = '#fff';
-  ctx.font = `900 22px ${FONT}`;
-  ctx.textBaseline = 'middle';
-  ctx.fillText(initials, W / 2, y + AVATAR / 2);
-  y += AVATAR + 12;
-
-  // Name
-  ctx.fillStyle = '#fff';
-  ctx.font = `700 20px ${FONT}`;
-  ctx.textBaseline = 'top';
-  ctx.fillText(name, W / 2, y, W - PAD * 2);
-  y += 24 + 10;
-
-  // Age pills
-  ctx.font = `700 10px ${FONT}`;
-  ctx.textBaseline = 'middle';
-  if (isRanked && ageGroups.length > 0) {
-    const pillH = 18;
-    const gap = 6;
-    const widths = ageGroups.map((ag) => ctx.measureText(ag).width + 20);
-    const total = widths.reduce((a, b) => a + b, 0) + (ageGroups.length - 1) * gap;
-    let px = (W - total) / 2;
-    for (let i = 0; i < ageGroups.length; i++) {
-      canvasRoundRect(ctx, px, y, widths[i], pillH, 9);
-      ctx.fillStyle = AGE_PILL_HEX[ageGroups[i]];
-      ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = `700 10px ${FONT}`;
-      ctx.fillText(ageGroups[i], px + widths[i] / 2, y + pillH / 2);
-      px += widths[i] + gap;
-    }
-  } else {
-    const pillH = 18;
-    const pw = ctx.measureText('Player').width + 20;
-    canvasRoundRect(ctx, (W - pw) / 2, y, pw, pillH, 9);
-    ctx.fillStyle = 'rgba(255,255,255,0.2)';
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx.fillText('Player', W / 2, y + pillH / 2);
-  }
-  y += 20 + 20;
-
-  // QR white container
-  const qx = (W - QR_BOX) / 2;
-  ctx.shadowColor = 'rgba(0,0,0,0.15)';
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 4;
-  canvasRoundRect(ctx, qx, y, QR_BOX, QR_BOX, 16);
-  ctx.fillStyle = '#fff';
-  ctx.fill();
-  ctx.shadowColor = 'transparent';
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
-
-  if (qrCanvas) {
-    ctx.drawImage(qrCanvas, qx + QR_PAD, y + QR_PAD, QR, QR);
-  }
-  y += QR_BOX + 16;
-
-  // Footer text
-  ctx.textBaseline = 'top';
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.font = `400 12px ${FONT}`;
-  ctx.fillText('Scan to view profile', W / 2, y);
-  y += 16 + 4;
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = `400 10px ${MONO}`;
-  ctx.fillText(`USAB #${usabId}`, W / 2, y);
-
-  ctx.restore();
-  return c;
-}
-
-function QrCardModal({
-  name,
-  usabId,
-  ageGroups,
-  isRanked,
-  onClose,
-}: {
-  name: string;
-  usabId: string;
-  ageGroups: AgeGroup[];
-  isRanked: boolean;
-  onClose: () => void;
-}) {
-  const [themeIdx, setThemeIdx] = useState(0);
-  const [copied, setCopied] = useState(false);
-  const qrRef = useRef<HTMLDivElement>(null);
-  const theme = CARD_THEMES[themeIdx];
-  const profileUrl = `${window.location.origin}/directory/${usabId}`;
-  const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('');
-  const canShare = typeof navigator.share === 'function';
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
-
-  const handleShare = useCallback(async () => {
-    const qrCanvas = qrRef.current?.querySelector('canvas') ?? null;
-    const card = drawShareCard({ name, usabId, ageGroups, isRanked, theme, qrCanvas });
-    try {
-      const blob = await new Promise<Blob | null>((res) => card.toBlob(res, 'image/png'));
-      if (!blob) return;
-      const file = new File([blob], `${name.replace(/\s+/g, '-')}-qr.png`, { type: 'image/png' });
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: `${name} – Player Profile`, url: profileUrl });
-      } else {
-        await navigator.share({ title: `${name} – Player Profile`, url: profileUrl });
-      }
-    } catch { /* user cancelled or unsupported */ }
-  }, [name, usabId, ageGroups, isRanked, theme, profileUrl]);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(profileUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* ignore */ }
-  }, [profileUrl]);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div
-        className="relative flex flex-col items-center gap-4 animate-scale-in motion-reduce:animate-none"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="relative">
-          <div
-            className={`w-72 md:w-80 rounded-3xl bg-gradient-to-br ${theme.gradient} p-6 md:p-8 flex flex-col items-center text-center overflow-hidden relative`}
-          >
-            <div
-              className="absolute top-0 right-0 w-64 h-64 -translate-y-1/3 translate-x-1/4 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)' }}
-            />
-            <div
-              className="absolute bottom-0 left-0 w-48 h-48 translate-y-1/4 -translate-x-1/4 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' }}
-            />
-
-            <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${theme.avatar} flex items-center justify-center text-xl font-black text-white shadow-lg mb-3`}>
-              {initials}
-            </div>
-
-            <h3 className="relative text-lg md:text-xl font-bold text-white mb-2">{name}</h3>
-
-            <div className="relative flex flex-wrap justify-center gap-1.5 mb-5">
-              {isRanked && ageGroups.length > 0 ? ageGroups.map((ag) => (
-                <span key={ag} className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r ${AGE_GRADIENT[ag]} text-white shadow-sm`}>
-                  {ag}
-                </span>
-              )) : (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white/80">
-                  Player
-                </span>
-              )}
-            </div>
-
-            <div ref={qrRef} className="relative bg-white rounded-2xl p-4 shadow-lg mb-4">
-              <QRCodeCanvas value={profileUrl} size={160} level="M" fgColor={theme.qrColor} />
-            </div>
-
-            <p className="relative text-xs text-white/70 mb-1">Scan to view profile</p>
-            <p className="relative text-[10px] font-mono text-white/50">USAB #{usabId}</p>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white/80 hover:text-white transition-colors backdrop-blur-sm"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {CARD_THEMES.map((t, i) => (
-            <button
-              key={t.name}
-              onClick={() => setThemeIdx(i)}
-              title={t.name}
-              className={`w-7 h-7 rounded-full bg-gradient-to-br ${t.gradient} transition-all ${
-                i === themeIdx ? 'ring-2 ring-white ring-offset-2 ring-offset-black/50 scale-110' : 'opacity-70 hover:opacity-100'
-              }`}
-            />
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
-          {canShare && (
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              Share
-            </button>
-          )}
-          <button
-            onClick={handleCopy}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
-          >
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
-            {copied ? 'Copied!' : 'Copy Link'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function useVisibleOnScroll() {
   const [el, setEl] = useState<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -963,29 +621,20 @@ function useVisibleOnScroll() {
 }
 
 export default function PlayerProfile() {
-  const { id: usabId } = useParams<{ id: string }>();
+  const {
+    usabId,
+    displayName,
+    isRanked,
+    entries,
+    sortedEntries,
+    rankingsDate,
+  } = usePlayerProfile();
   const location = useLocation();
   const {
-    players: allPlayers,
-    directoryPlayers,
-    directoryLoading,
     loading: loadingAllPlayers,
-    rankingsDate,
-    ensurePlayers,
-    ensureDirectoryPlayers,
+    directoryLoading,
   } = usePlayers();
-  const fromPath = (location.state as { fromPath?: string } | null)?.fromPath;
-  const backTarget = fromPath ?? '/directory';
-  const backLabel = fromPath ? 'Back' : 'Back to Players';
-  const backState = fromPath?.startsWith('/tournaments/') ? { restoreTournamentScroll: true } : undefined;
 
-  const rankedPlayer = allPlayers.find((p) => p.usabId === usabId) ?? null;
-  const dirPlayer = directoryPlayers.find((p) => p.usabId === usabId) ?? null;
-  const isRanked = rankedPlayer !== null && rankedPlayer.entries.length > 0;
-  const playerName = rankedPlayer?.name ?? dirPlayer?.name ?? '';
-  const playerFound = rankedPlayer !== null || dirPlayer !== null;
-
-  const [gender, setGender] = useState<string | null>(null);
   const [tswStats, setTswStats] = useState<TswPlayerStats | null>(null);
   const [loadingTsw, setLoadingTsw] = useState(() => {
     if (!usabId) return false;
@@ -998,9 +647,7 @@ export default function PlayerProfile() {
   const [trendData, setTrendData] = useState<PlayerRankingTrend | null>(null);
   const [loadingTrend, setLoadingTrend] = useState(false);
   const [trendError, setTrendError] = useState<string | null>(null);
-  const [detailError, setDetailError] = useState<string | null>(null);
   const [statsTab, setStatsTab] = useState<StatsCategory>('total');
-  const [showQr, setShowQr] = useState(false);
   const [expandedYears, setExpandedYears] = useState<Set<string>>(new Set());
   const [collapsedTournaments, setCollapsedTournaments] = useState<Set<string>>(new Set());
   const expandedYearsRef = useRef(expandedYears);
@@ -1026,14 +673,6 @@ export default function PlayerProfile() {
   const [tswSentinelRef, tswVisible] = useVisibleOnScroll();
   const trendTriggered = trendVisible || hasScrollRestore;
   const tswTriggered = tswVisible || hasScrollRestore;
-
-  useEffect(() => {
-    void ensureDirectoryPlayers();
-  }, [ensureDirectoryPlayers]);
-
-  useEffect(() => {
-    void ensurePlayers();
-  }, [ensurePlayers]);
 
   useEffect(() => {
     expandedYearsRef.current = expandedYears;
@@ -1140,33 +779,17 @@ export default function PlayerProfile() {
     yearsInitializedRef.current = true;
   }, [loadingTsw, tswStats]);
 
-  // Player detail fetch (eager — needed for hero card)
-  useEffect(() => {
-    if (!usabId || !playerName) return;
-    if (!rankedPlayer || rankedPlayer.entries.length === 0) return;
-    let cancelled = false;
-    const best = rankedPlayer.entries.reduce((b, e) => (e.rank < b.rank ? e : b));
-    setDetailError(null);
-    fetchPlayerDetail(usabId, best.ageGroup, best.eventType)
-      .then((d) => { if (!cancelled) setGender(d?.gender ?? null); })
-      .catch((err) => {
-        if (cancelled) return;
-        setDetailError(err instanceof Error ? err.message : 'Could not load player details');
-      });
-    return () => { cancelled = true; };
-  }, [usabId, playerName, rankedPlayer]);
-
   // TSW stats fetch (lazy — triggered by scroll or scroll-restore)
   useEffect(() => {
     if (!tswTriggered) return;
-    if (!usabId || !playerName) {
+    if (!usabId || !displayName) {
       if (!loadingAllPlayers && !directoryLoading) setLoadingTsw(false);
       return;
     }
     let cancelled = false;
     setLoadingTsw(true);
     setTswError(null);
-    fetchPlayerTswStats(usabId, playerName)
+    fetchPlayerTswStats(usabId, displayName)
       .then((data) => {
         if (cancelled) return;
         setTswStats(data);
@@ -1179,12 +802,12 @@ export default function PlayerProfile() {
       })
       .finally(() => { if (!cancelled) setLoadingTsw(false); });
     return () => { cancelled = true; };
-  }, [tswTriggered, usabId, playerName, loadingAllPlayers, directoryLoading]);
+  }, [tswTriggered, usabId, displayName, loadingAllPlayers, directoryLoading]);
 
   // Ranking trend fetch (lazy — triggered by scroll or scroll-restore)
   useEffect(() => {
     if (!trendTriggered) return;
-    if (!usabId || !playerName) {
+    if (!usabId || !displayName) {
       if (!loadingAllPlayers && !directoryLoading) setLoadingTrend(false);
       return;
     }
@@ -1204,186 +827,10 @@ export default function PlayerProfile() {
       })
       .finally(() => { if (!cancelled) setLoadingTrend(false); });
     return () => { cancelled = true; };
-  }, [trendTriggered, usabId, playerName, loadingAllPlayers, directoryLoading]);
-
-  if (!usabId) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <p className="text-slate-400 dark:text-slate-500 text-lg">Player not found.</p>
-        <Link to="/directory" className="text-violet-600 hover:underline mt-2 inline-block">
-          Back to Players
-        </Link>
-      </div>
-    );
-  }
-
-  if ((loadingAllPlayers || directoryLoading) && !playerFound) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <RefreshCw className="w-8 h-8 text-slate-300 dark:text-slate-600 animate-spin mx-auto mb-3" />
-        <p className="text-slate-400 dark:text-slate-500 text-sm">Loading player profile…</p>
-      </div>
-    );
-  }
-
-  if (!playerFound) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
-        <Link
-          to={backTarget}
-          state={backState}
-          className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600"
-        >
-          <ArrowLeft className="w-4 h-4" /> {backLabel}
-        </Link>
-        <div className="py-16 text-center">
-          <p className="text-slate-400 dark:text-slate-500 text-lg">Player USAB #{usabId} not found.</p>
-          <a
-            href={`https://usabjrrankings.org/${usabId}/details`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-violet-600 hover:underline mt-2 inline-flex items-center gap-1"
-          >
-            Search on USAB Rankings <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  const displayName = playerName;
-  const entries = rankedPlayer?.entries ?? [];
-  const bestEntry = entries.length > 0 ? entries.reduce((b, e) => (e.rank < b.rank ? e : b)) : null;
-  const sortedEntries = [...entries].sort((a, b) => {
-    const agOrder = AGE_GROUPS.indexOf(a.ageGroup) - AGE_GROUPS.indexOf(b.ageGroup);
-    if (agOrder !== 0) return agOrder;
-    return EVENT_TYPES.indexOf(a.eventType) - EVENT_TYPES.indexOf(b.eventType);
-  });
-
-  const ageGroupSet = [...new Set(entries.map((e) => e.ageGroup))].sort(
-    (a, b) => AGE_GROUPS.indexOf(a) - AGE_GROUPS.indexOf(b),
-  );
+  }, [trendTriggered, usabId, displayName, loadingAllPlayers, directoryLoading]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
-      {/* Back */}
-      <Link
-        to={backTarget}
-        state={backState}
-        className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {backLabel}
-      </Link>
-
-      {/* Hero card */}
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 md:p-6 text-white">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
-          <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br flex items-center justify-center text-xl md:text-2xl font-black text-white shrink-0 ${isRanked ? 'from-violet-500 to-blue-600' : 'from-slate-400 to-slate-500'}`}>
-            {displayName.split(' ').map((w) => w[0]).slice(0, 2).join('')}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl md:text-2xl font-bold mb-1.5 md:mb-2">{displayName}</h1>
-            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-1.5 md:mb-2">
-              {isRanked ? ageGroupSet.map((ag) => (
-                <span
-                  key={ag}
-                  className={`px-2.5 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-gradient-to-r ${AGE_GRADIENT[ag]} text-white`}
-                >
-                  {ag}
-                </span>
-              )) : (
-                <span className="px-2.5 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-slate-600 text-slate-300">
-                  Currently Unranked
-                </span>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2 md:gap-3 text-white/60 text-xs md:text-sm">
-              <span>USAB: <span className="font-mono text-white font-semibold">{usabId}</span></span>
-              {gender && (
-                <>
-                  <span className="hidden sm:inline">·</span>
-                  <span>{gender === 'M' ? 'Boy' : gender === 'F' ? 'Girl' : gender}</span>
-                </>
-              )}
-              {isRanked && (
-                <>
-                  <span className="hidden sm:inline">·</span>
-                  <span>{entries.length} ranked {entries.length === 1 ? 'event' : 'events'}</span>
-                </>
-              )}
-            </div>
-            {detailError && (
-              <p className="mt-1 text-[11px] text-amber-300">
-                Some profile details are unavailable. {detailError}
-              </p>
-            )}
-          </div>
-
-          {bestEntry && (
-            <div className="flex gap-5 md:gap-6 text-center shrink-0">
-              <div>
-                <p className="text-2xl md:text-3xl font-black text-violet-400">#{bestEntry.rank}</p>
-                <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Best Rank</p>
-              </div>
-              <div>
-                <p className="text-2xl md:text-3xl font-black">{bestEntry.rankingPoints.toLocaleString()}</p>
-                <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Points</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-4 md:mt-5 flex flex-wrap gap-2 md:gap-3">
-          {bestEntry && (
-            <Link
-              to={`/directory/${usabId}/rankings`}
-              state={{ name: displayName }}
-              className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
-            >
-              <Trophy className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              Rankings
-            </Link>
-          )}
-          <a
-            href={tswStats?.tswProfileUrl ?? tswSearchUrl(displayName)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
-          >
-            <Activity className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            TSW Profile
-            <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 opacity-70" />
-          </a>
-          <Link
-            to={`/directory/${usabId}/medals`}
-            state={{ name: displayName }}
-            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
-          >
-            <Medal className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            Medals
-          </Link>
-          <button
-            onClick={() => setShowQr(true)}
-            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm transition-colors"
-          >
-            <QrCode className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            QR Code
-          </button>
-        </div>
-      </div>
-
-      {showQr && (
-        <QrCardModal
-          name={displayName}
-          usabId={usabId}
-          ageGroups={ageGroupSet}
-          isRanked={isRanked}
-          onClose={() => setShowQr(false)}
-        />
-      )}
-
+    <div className="space-y-4 md:space-y-6">
       {/* Rankings overview — only shown for currently ranked players */}
       {isRanked && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
@@ -1454,7 +901,6 @@ export default function PlayerProfile() {
           </div>
         ) : tswStats && tswStats.total.career.total > 0 ? (
           <div className="space-y-5 md:space-y-6">
-            {/* Tabs */}
             <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
               {STATS_TABS.map((tab) => (
                 <button
@@ -1471,13 +917,11 @@ export default function PlayerProfile() {
               ))}
             </div>
 
-            {/* Win-Loss section */}
             <div>
               <h5 className="text-[10px] md:text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 md:mb-3">Win-Loss</h5>
               <StatsTabContent cat={tswStats[statsTab]} />
             </div>
 
-            {/* History indicators */}
             {statsTab === 'total' && tswStats.recentHistory.length > 0 && (
               <div>
                 <h5 className="text-[10px] md:text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 md:mb-3">History</h5>

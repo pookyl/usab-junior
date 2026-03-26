@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, Download, Filter, X, Trophy } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { RefreshCw, Download, Filter, X, Trophy } from 'lucide-react';
 import type * as XLSXType from 'xlsx';
 import { fetchPlayerMedals } from '../services/rankingsService';
-import { usePlayers } from '../contexts/PlayersContext';
 import MedalIcon from '../components/tournament/MedalIcon';
 import type { MedalPlace } from '../components/tournament/MedalIcon';
 import type { PlayerMedalsResponse } from '../types/junior';
 import { TOURNAMENT_TYPES } from '../types/junior';
+import { usePlayerProfile } from '../components/player/PlayerProfileLayout';
 
 const MEDAL_LABELS: Record<string, string> = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze', fourth: '4th' };
 const MEDAL_TYPES: MedalPlace[] = ['gold', 'silver', 'bronze', 'fourth'];
@@ -76,8 +76,8 @@ function MedalStatCard({ place, count }: { place: MedalPlace; count: number }) {
   return (
     <div className={`relative flex flex-col items-center justify-center rounded-2xl bg-gradient-to-br ${style.bg} backdrop-blur-sm ring-1 ${style.ring} shadow-lg ${style.glow} px-3 py-3 md:px-5 md:py-4 min-w-[70px] md:min-w-[90px]`}>
       <MedalIcon place={place} size={28} />
-      <span className="text-xl md:text-2xl font-black text-white mt-1">{count}</span>
-      <span className="text-[9px] md:text-[10px] font-medium text-white/50 uppercase tracking-wider">{MEDAL_LABELS[place]}</span>
+      <span className="text-xl md:text-2xl font-black text-slate-800 dark:text-white mt-1">{count}</span>
+      <span className="text-[9px] md:text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">{MEDAL_LABELS[place]}</span>
     </div>
   );
 }
@@ -99,14 +99,7 @@ function formatDateRange(startDate: string | null, endDate: string | null): stri
 }
 
 export default function PlayerMedals() {
-  const { id: usabId } = useParams<{ id: string }>();
-  const location = useLocation();
-  const { players: allPlayers, directoryPlayers, loading: loadingAllPlayers, directoryLoading } = usePlayers();
-
-  const rankedPlayer = allPlayers.find((p) => p.usabId === usabId) ?? null;
-  const dirPlayer = directoryPlayers.find((p) => p.usabId === usabId) ?? null;
-  const playerName = (location.state as { name?: string } | null)?.name
-    ?? rankedPlayer?.name ?? dirPlayer?.name ?? '';
+  const { usabId, displayName: playerName } = usePlayerProfile();
 
   const [data, setData] = useState<PlayerMedalsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -119,7 +112,7 @@ export default function PlayerMedals() {
 
   useEffect(() => {
     if (!usabId || !playerName) {
-      if (!loadingAllPlayers && !directoryLoading) setLoading(false);
+      setLoading(false);
       return;
     }
     let cancelled = false;
@@ -130,7 +123,7 @@ export default function PlayerMedals() {
       .catch((err) => { if (!cancelled) setError(err instanceof Error ? err.message : 'Could not load medals'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [usabId, playerName, loadingAllPlayers, directoryLoading]);
+  }, [usabId, playerName]);
 
   const toggleFilter = useCallback(<T,>(_set: Set<T>, setFn: React.Dispatch<React.SetStateAction<Set<T>>>, val: T) => {
     setFn((prev) => {
@@ -240,82 +233,42 @@ export default function PlayerMedals() {
     XLSX.writeFile(wb, `${safeName}-medals.xlsx`);
   }, [data, filtered, hasAnyUsab]);
 
-  if (!usabId) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <p className="text-slate-400 dark:text-slate-500 text-lg">Player not found.</p>
-        <Link to="/directory" className="text-violet-600 hover:underline mt-2 inline-block">
-          Back to Players
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
-      {/* Back */}
-      <Link
-        to={`/directory/${usabId}`}
-        className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back to Profile
-      </Link>
-
-      {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-900 via-violet-900 to-purple-900 p-5 md:p-8 text-white">
-        <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-violet-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-purple-400/5 blur-3xl" />
-
-        <div className="relative flex flex-col md:flex-row md:items-center gap-5 md:gap-8">
-          <div className="flex items-center gap-4 md:gap-5">
-            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-lg md:text-xl font-black text-white shadow-lg shadow-violet-500/20 shrink-0">
-              {(playerName || '??').split(' ').map((w) => w[0]).slice(0, 2).join('')}
+    <div className="space-y-4 md:space-y-6">
+      {/* Medal summary bar */}
+      {data && totalMedals > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+            <div className="flex items-center gap-3">
+              <Trophy className="w-5 h-5 text-amber-500" />
+              <span className="text-2xl md:text-3xl font-black text-slate-800 dark:text-slate-100">{totalMedals}</span>
+              <span className="text-sm text-slate-400 dark:text-slate-500">medals</span>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-lg md:text-2xl font-bold truncate">
-                {playerName || `Player #${usabId}`}
-              </h1>
-              <p className="text-white/40 text-xs md:text-sm font-medium tracking-wide">Medal Collection</p>
-            </div>
-          </div>
-
-          {data && totalMedals > 0 && (
-            <div className="flex items-center gap-2.5 md:gap-3 md:ml-auto">
-              <div className="flex items-center gap-2 mr-2 md:mr-4">
-                <Trophy className="w-5 h-5 text-amber-400/80" />
-                <span className="text-2xl md:text-3xl font-black">{totalMedals}</span>
-              </div>
+            <div className="flex items-center gap-2.5 md:gap-3">
               {MEDAL_TYPES.map((p) => (
                 data.summary[p] > 0 ? <MedalStatCard key={p} place={p} count={data.summary[p]} /> : null
               ))}
             </div>
-          )}
-        </div>
-
-        {data && totalMedals > 0 && (
-          <div className="relative mt-4 pt-4 border-t border-white/10 space-y-2">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-white/40">
-              <span>{data.tournaments.length} {data.tournaments.length === 1 ? 'tournament' : 'tournaments'}</span>
-              <span className="hidden sm:inline">·</span>
-              <span>{data.tournaments.filter((t) => t.isUsab).length} USAB</span>
-            </div>
-            {usabTypeCounts.length > 0 && (
+          </div>
+          {usabTypeCounts.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                {data.tournaments.length} tournaments · {data.tournaments.filter((t) => t.isUsab).length} USAB
+              </span>
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] font-medium text-white/30 uppercase tracking-wider mr-1">USAB</span>
                 {usabTypeCounts.map(({ type, count }) => (
                   <span
                     key={type}
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold border backdrop-blur-sm ${TYPE_COLORS[type] ?? 'bg-white/5 text-white/60 border-white/10'}`}
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold border ${TYPE_COLORS[type] ?? 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}
                   >
                     {type} <span className="opacity-60">{count}</span>
                   </span>
                 ))}
               </div>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div className="py-12 text-center">

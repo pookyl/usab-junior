@@ -45,9 +45,11 @@ export default function useScrollRestore() {
       }
     }
 
-    const restoreTournamentScroll = Boolean(
-      (state as { restoreTournamentScroll?: boolean } | null)?.restoreTournamentScroll,
-    );
+    const stateObj = state as { restoreTournamentScroll?: boolean; keepScroll?: boolean } | null;
+
+    if (stateObj?.keepScroll) return;
+
+    const restoreTournamentScroll = Boolean(stateObj?.restoreTournamentScroll);
     if (restoreTournamentScroll) {
       const saved = pathScrollPositions.get(pathname);
       if (saved != null) {

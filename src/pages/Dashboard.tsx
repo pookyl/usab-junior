@@ -184,6 +184,8 @@ function SiteQrModal({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  const canShare = typeof navigator.share === 'function';
+
   const handleShare = useCallback(async () => {
     const qrCanvas = qrRef.current?.querySelector('canvas') ?? null;
     const card = drawSiteCard(qrCanvas);
@@ -246,13 +248,15 @@ function SiteQrModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleShare}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            Share
-          </button>
+          {canShare && (
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              Share
+            </button>
+          )}
           <button
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors backdrop-blur-sm"

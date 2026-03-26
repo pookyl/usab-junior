@@ -14,6 +14,7 @@ import { isWithinTournamentFocusScope, getLastTournamentPath, setLastTournamentP
 const Home = lazy(() => import('./pages/Dashboard'));
 const Rankings = lazy(() => import('./pages/Players'));
 const AllPlayers = lazy(() => import('./pages/AllPlayers'));
+const PlayerProfileLayout = lazy(() => import('./components/player/PlayerProfileLayout'));
 const PlayerProfile = lazy(() => import('./pages/PlayerProfile'));
 const PlayerRankingDetail = lazy(() => import('./pages/PlayerRankingDetail'));
 const HeadToHead = lazy(() => import('./pages/HeadToHead'));
@@ -215,9 +216,11 @@ export default function App() {
                       <Route path="/players" element={<SuspendedPage><Rankings /></SuspendedPage>} />
                       <Route path="/players/:id" element={<PlayerRedirect />} />
                       <Route path="/directory" element={<SuspendedPage><AllPlayers /></SuspendedPage>} />
-                      <Route path="/directory/:id/medals" element={<SuspendedPage><PlayerMedals /></SuspendedPage>} />
-                      <Route path="/directory/:id/rankings" element={<SuspendedPage><PlayerRankingDetail /></SuspendedPage>} />
-                      <Route path="/directory/:id" element={<SuspendedPage><PlayerProfile /></SuspendedPage>} />
+                      <Route path="/directory/:id" element={<SuspendedPage><PlayerProfileLayout /></SuspendedPage>}>
+                        <Route index element={<SuspendedPage><PlayerProfile /></SuspendedPage>} />
+                        <Route path="rankings" element={<SuspendedPage><PlayerRankingDetail /></SuspendedPage>} />
+                        <Route path="medals" element={<SuspendedPage><PlayerMedals /></SuspendedPage>} />
+                      </Route>
                       <Route path="/analytics" element={<Navigate to="/players" replace />} />
                       <Route path="/head-to-head" element={<SuspendedPage><HeadToHead /></SuspendedPage>} />
                     </Route>

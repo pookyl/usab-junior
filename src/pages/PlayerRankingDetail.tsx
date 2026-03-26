@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
-  ArrowLeft,
   ExternalLink,
   Trophy,
   RefreshCw,
@@ -20,39 +19,8 @@ import {
   fetchTournaments,
   usabPlayerBaseUrl,
 } from '../services/rankingsService';
-import { usePlayersRankings } from '../contexts/PlayersContext';
-
-const AGE_GRADIENT: Record<string, string> = {
-  U11: 'from-violet-500 to-violet-700',
-  U13: 'from-blue-500 to-blue-700',
-  U15: 'from-emerald-500 to-emerald-700',
-  U17: 'from-amber-500 to-amber-600',
-  U19: 'from-rose-500 to-rose-700',
-};
-
-const AGE_BORDER: Record<string, string> = {
-  U11: 'border-violet-200 dark:border-violet-800',
-  U13: 'border-blue-200 dark:border-blue-800',
-  U15: 'border-emerald-200 dark:border-emerald-800',
-  U17: 'border-amber-200 dark:border-amber-800',
-  U19: 'border-rose-200 dark:border-rose-800',
-};
-
-const AGE_PILL_BG: Record<string, string> = {
-  U11: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
-  U13: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  U15: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-  U17: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-  U19: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
-};
-
-const AGE_PILL_ACTIVE: Record<string, string> = {
-  U11: 'bg-violet-600 text-white dark:bg-violet-500',
-  U13: 'bg-blue-600 text-white dark:bg-blue-500',
-  U15: 'bg-emerald-600 text-white dark:bg-emerald-500',
-  U17: 'bg-amber-600 text-white dark:bg-amber-500',
-  U19: 'bg-rose-600 text-white dark:bg-rose-500',
-};
+import { AGE_GRADIENT, AGE_BORDER_STATIC, AGE_PILL_BG, AGE_PILL_ACTIVE } from '../utils/playerStyles';
+import { usePlayerProfile } from '../components/player/PlayerProfileLayout';
 
 type FilterKey = 'all' | `${AgeGroup}-${EventType}`;
 
@@ -84,8 +52,8 @@ function CategoryCard({
   const totalPoints = section.rankingPoints || 1;
 
   return (
-    <div className={`bg-white dark:bg-slate-900 rounded-2xl border ${AGE_BORDER[section.ageGroup] ?? 'border-slate-200 dark:border-slate-700'} overflow-hidden`}>
-      <div className={`bg-gradient-to-r ${AGE_GRADIENT[section.ageGroup] ?? 'from-slate-500 to-slate-700'} px-4 md:px-5 py-3 flex items-center justify-between`}>
+    <div className={`bg-white dark:bg-slate-900 rounded-2xl border ${AGE_BORDER_STATIC[section.ageGroup] ?? 'border-slate-200 dark:border-slate-700'} overflow-hidden`}>
+      <div className={`bg-gradient-to-r ${AGE_GRADIENT[section.ageGroup as AgeGroup] ?? 'from-slate-500 to-slate-700'} px-4 md:px-5 py-3 flex items-center justify-between`}>
         <div className="flex items-center gap-2.5">
           <span className="px-2.5 py-0.5 rounded-full text-[11px] md:text-xs font-bold bg-white/20 text-white">
             {section.eventType} {section.ageGroup}
@@ -248,27 +216,13 @@ function TournamentMobileCard({
 }
 
 export default function PlayerRankingDetail() {
-  const { id: usabId } = useParams<{ id: string }>();
-  const location = useLocation();
-  const { players, ensurePlayers } = usePlayersRankings();
+  const { usabId } = usePlayerProfile();
 
   const [sections, setSections] = useState<RankingCategoryDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>('all');
   const [tournamentLookup, setTournamentLookup] = useState<Map<string, string>>(new Map());
-
-  const rankedPlayer = useMemo(
-    () => players.find((p) => p.usabId === usabId),
-    [players, usabId],
-  );
-  const playerName = rankedPlayer?.name
-    ?? (location.state as { name?: string } | null)?.name
-    ?? '';
-
-  useEffect(() => {
-    void ensurePlayers();
-  }, [ensurePlayers]);
 
   useEffect(() => {
     if (!usabId) return;
@@ -326,53 +280,8 @@ export default function PlayerRankingDetail() {
     [sortedSections],
   );
 
-  if (!usabId) {
-    return (
-      <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-        <p className="text-slate-400 dark:text-slate-500 text-lg">Player not found.</p>
-        <Link to="/directory" className="text-violet-600 hover:underline mt-2 inline-block">
-          Back to Directory
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-5">
-      {/* Back link */}
-      <Link
-        to={`/directory/${usabId}`}
-        className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {playerName ? `Back to ${playerName}` : 'Back to Profile'}
-      </Link>
-
-      {/* Compact header */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 px-4 md:px-5 py-3.5 md:py-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center text-sm md:text-base font-black text-white shrink-0">
-              {(playerName || usabId).split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-base md:text-lg font-bold text-slate-900 dark:text-slate-100 truncate">
-                {playerName ? `${playerName}'s Ranking Breakdown` : `Ranking Breakdown`}
-              </h1>
-              <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
-                <span>USAB: <span className="font-mono text-slate-600 dark:text-slate-300">{usabId}</span></span>
-                {!loading && sections.length > 0 && (
-                  <>
-                    <span>·</span>
-                    <span>{sections.length} ranked {sections.length === 1 ? 'event' : 'events'}</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div className="space-y-4 md:space-y-5">
       {/* Filter pills */}
       {!loading && categoryKeys.length > 1 && (
         <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-0.5 -mx-1 px-1">
