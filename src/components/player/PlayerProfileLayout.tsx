@@ -480,8 +480,8 @@ export default function PlayerProfileLayout() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="mb-1.5 md:mb-2 flex items-center gap-2">
-              <h1 className="min-w-0 flex-1 text-xl md:text-2xl font-bold">{displayName}</h1>
+            <div className="mb-1.5 md:mb-2 inline-flex max-w-full items-center gap-1.5">
+              <h1 className="min-w-0 text-xl md:text-2xl font-bold">{displayName}</h1>
               <button
                 onClick={() => setShowQr(true)}
                 className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-slate-950/20 text-white/85 transition-all hover:bg-white/10 hover:text-white"
