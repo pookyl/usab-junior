@@ -11,9 +11,7 @@
 - Extracted shared tournament disk-cache resolution into `api/_lib/tournamentDiskCache.js` and reused it from both `api-server.mjs` and `api/tournaments/[tswId]/[action].js`.
 - Switched player directory and ranking trend APIs to precomputed indexes instead of historical scans.
 - Made rankings index refresh incremental in `scripts/refresh-rankings-cache.mjs`.
-- Added reusable TSW lookup artifacts in `scripts/refresh-tournaments-cache.mjs`:
-  - `data/tournament-tsw-lookup.json`
-  - `data/tournament-tsw-details.json`
+- Added reusable TSW lookup caches in `scripts/refresh-tournaments-cache.mjs` (written to `.cache/`, gitignored).
 - Changed `src/contexts/PlayersContext.tsx` to lazy-load rankings data on page demand instead of fetching `all-players` on provider mount.
 
 ## Measurements

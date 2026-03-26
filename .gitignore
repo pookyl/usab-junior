@@ -29,5 +29,8 @@ dist-ssr
 .vercel
 
 
+# Script-internal caches (regenerated on demand)
+.cache/
+
 # Pre-scraped tournament data (served by api-server from data/)
 data/tournament-cache/

@@ -22,8 +22,9 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DATA_DIR = join(ROOT, 'data');
-const TSW_ID_LOOKUP_FILE = join(DATA_DIR, 'tournament-tsw-lookup.json');
-const TSW_DETAILS_LOOKUP_FILE = join(DATA_DIR, 'tournament-tsw-details.json');
+const CACHE_DIR = join(ROOT, '.cache');
+const TSW_ID_LOOKUP_FILE = join(CACHE_DIR, 'tournament-tsw-lookup.json');
+const TSW_DETAILS_LOOKUP_FILE = join(CACHE_DIR, 'tournament-tsw-details.json');
 
 process.chdir(ROOT);
 const {
@@ -513,6 +514,7 @@ async function main() {
   }
 
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
+  if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
 
   const tswIdLookupEntries = readJsonIfExists(TSW_ID_LOOKUP_FILE)?.entries || {};
   const tswDetailsLookupEntries = readJsonIfExists(TSW_DETAILS_LOOKUP_FILE)?.entries || {};
