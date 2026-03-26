@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, RefreshCw, ExternalLink } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet.markercluster';
@@ -192,6 +192,7 @@ export default function PlayerMap() {
   const { usabId, displayName, scrollToTabs } = usePlayerProfile();
   const { loading: loadingAllPlayers, directoryLoading } = usePlayers();
   const { resolved: theme } = useTheme();
+  const navigate = useNavigate();
   const isDark = theme === 'dark';
 
   const cachedVenues = usabId ? loadVenuesCache(usabId) : null;
@@ -356,13 +357,17 @@ export default function PlayerMap() {
                                 <span className="font-semibold text-rose-500">{t.losses}L</span>
                               </p>
                               {t.tswId && t.selfPlayerId && (
-                                <Link
-                                  to={`/tournaments/${t.tswId}/player/${t.selfPlayerId}`}
-                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600 hover:bg-violet-100 text-[10px] font-medium transition-colors"
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/tournaments/${t.tswId}/player/${t.selfPlayerId}`);
+                                  }}
+                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600 hover:bg-violet-100 text-[10px] font-medium transition-colors cursor-pointer"
                                 >
                                   Match details
                                   <ExternalLink className="w-2.5 h-2.5" />
-                                </Link>
+                                </button>
                               )}
                             </div>
                           </div>

@@ -563,6 +563,7 @@ export default function PlayerProfileLayout() {
                 key={tab.to}
                 to={tab.to ? `${basePath}/${tab.to}` : basePath}
                 end={tab.to === ''}
+                replace
                 state={{ keepScroll: true }}
                 className={({ isActive }) =>
                   `flex w-full sm:w-auto min-w-0 items-center justify-center gap-2 px-3 md:px-4 py-2.5 rounded-xl border text-xs md:text-sm font-medium transition-all ${
