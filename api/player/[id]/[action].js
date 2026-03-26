@@ -37,8 +37,9 @@ async function handleTswStats(req, res, usabId) {
   }
 
   const playerName = typeof req.query.name === 'string' ? req.query.name.trim() : '';
+  const includeTournaments = req.query.includeTournaments !== '0' && req.query.includeTournaments !== 'false';
   const normalizedName = playerName.toLowerCase().replace(/\s+/g, ' ').trim();
-  const cacheKey = `tsw-stats:v3:${usabId}:${normalizedName || '__unknown__'}`;
+  const cacheKey = `tsw-stats:v4:${usabId}:${normalizedName || '__unknown__'}:${includeTournaments ? 'full' : 'overview'}`;
 
   const cached = getCached(cacheKey);
   if (cached) { sendJson(res, 200, cached, { 'X-Cache': 'HIT' }); return; }
@@ -52,13 +53,23 @@ async function handleTswStats(req, res, usabId) {
     const encodedNoPad = encoded.replace(/=+$/, '');
     const warnings = [];
 
-    const [overviewResp, tournamentsResp] = await metrics.time('initial_fetches', () => Promise.all([
-      tswFetch(tswUsabOverviewPath(usabId)),
-      tswFetch(tswUsabTournamentsPath(usabId)),
-    ]));
+    let overviewResp;
+    let tournamentsResp = null;
+    if (includeTournaments) {
+      [overviewResp, tournamentsResp] = await metrics.time('initial_fetches', () => Promise.all([
+        tswFetch(tswUsabOverviewPath(usabId)),
+        tswFetch(tswUsabTournamentsPath(usabId)),
+      ]));
+    } else {
+      overviewResp = await metrics.time('fetch_overview', () => tswFetch(tswUsabOverviewPath(usabId)));
+    }
 
-    if (!overviewResp.ok && !tournamentsResp.ok) {
-      throw new UpstreamError(`TSW profile unavailable (overview=${overviewResp.status}, tournaments=${tournamentsResp.status})`);
+    if (includeTournaments) {
+      if (!overviewResp.ok && !tournamentsResp.ok) {
+        throw new UpstreamError(`TSW profile unavailable (overview=${overviewResp.status}, tournaments=${tournamentsResp.status})`);
+      }
+    } else if (!overviewResp.ok) {
+      throw new UpstreamError(`TSW overview unavailable (status=${overviewResp.status})`);
     }
 
     let overviewStats = {
@@ -74,7 +85,7 @@ async function handleTswStats(req, res, usabId) {
 
     const tournamentsByYear = {};
 
-    if (tournamentsResp.ok) {
+    if (includeTournaments && tournamentsResp?.ok) {
       const tournamentsHtml = await metrics.time('read_tournaments_html', () => tournamentsResp.text());
 
       const yearRegex = /data-tabid="(\d{4})"/g;
@@ -130,7 +141,7 @@ async function handleTswStats(req, res, usabId) {
           warnings.push(`older-tab:${err instanceof Error ? err.message : 'request-failed'}`);
         }
       }
-    } else {
+    } else if (includeTournaments && tournamentsResp) {
       warnings.push(`tournaments:${tournamentsResp.status}`);
     }
 
@@ -144,7 +155,7 @@ async function handleTswStats(req, res, usabId) {
       stats.warnings = warnings;
     }
     setCache(cacheKey, stats);
-    metrics.log({ years: Object.keys(tournamentsByYear).length, degraded: warnings.length > 0 });
+    metrics.log({ years: Object.keys(tournamentsByYear).length, degraded: warnings.length > 0, includeTournaments });
     sendJson(res, 200, stats, metrics.buildHeaders({ 'X-Cache': 'MISS' }));
   } catch (err) {
     sendApiError(res, err, { logLabel: 'tsw-stats' });

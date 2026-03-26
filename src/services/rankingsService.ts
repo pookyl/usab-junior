@@ -336,15 +336,16 @@ export async function fetchAllPlayers(
   return result;
 }
 
-export async function fetchPlayerTswStats(
+async function fetchPlayerTswStatsInternal(
   usabId: string,
   playerName: string,
+  includeTournaments: boolean,
 ): Promise<TswPlayerStats> {
   const normalizedName = playerName.toLowerCase().replace(/\s+/g, ' ').trim();
-  const cacheKey = `${usabId}:${normalizedName || '__unknown__'}`;
+  const cacheKey = `${usabId}:${normalizedName || '__unknown__'}:${includeTournaments ? 'full' : 'overview'}`;
   if (tswStatsCache.has(cacheKey)) return tswStatsCache.get(cacheKey)!;
 
-  const url = `/api/player/${usabId}/tsw-stats?name=${encodeURIComponent(playerName)}`;
+  const url = `/api/player/${usabId}/tsw-stats?name=${encodeURIComponent(playerName)}&includeTournaments=${includeTournaments ? '1' : '0'}`;
   const startedAt = nowMs();
   const res = await fetchWithRetry(url, 60_000, 1);
   if (!res.ok) await throwApiError(res, 'TSW stats API');
@@ -352,6 +353,20 @@ export async function fetchPlayerTswStats(
   const stats = await parseJsonWithPerf<TswPlayerStats>(res, 'tsw-stats', startedAt, { usabId });
   cappedSet(tswStatsCache, cacheKey, stats);
   return stats;
+}
+
+export async function fetchPlayerTswStats(
+  usabId: string,
+  playerName: string,
+): Promise<TswPlayerStats> {
+  return fetchPlayerTswStatsInternal(usabId, playerName, true);
+}
+
+export async function fetchPlayerTswOverviewStats(
+  usabId: string,
+  playerName: string,
+): Promise<TswPlayerStats> {
+  return fetchPlayerTswStatsInternal(usabId, playerName, false);
 }
 
 const playerMedalsCache = new Map<string, PlayerMedalsResponse>();

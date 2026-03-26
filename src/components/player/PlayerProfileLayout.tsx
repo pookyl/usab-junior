@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Trophy,
   Medal,
+  Calendar,
   QrCode,
   X,
   Share2,
@@ -329,6 +330,7 @@ function QrCardModal({
 const TAB_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard, to: '' },
   { label: 'Rankings', icon: Trophy, to: 'rankings', requiresRank: true },
+  { label: 'Tournaments', icon: Calendar, to: 'tournaments' },
   { label: 'Medals', icon: Medal, to: 'medals' },
 ];
 
@@ -471,14 +473,24 @@ export default function PlayerProfileLayout() {
       </Link>
 
       {/* Hero card */}
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 pb-7 md:p-6 md:pb-9 text-white">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 md:p-6 text-white">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
           <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br flex items-center justify-center text-xl md:text-2xl font-black text-white shrink-0 ${isRanked ? 'from-violet-500 to-blue-600' : 'from-slate-400 to-slate-500'}`}>
             {displayName.split(' ').map((w) => w[0]).slice(0, 2).join('')}
           </div>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl md:text-2xl font-bold mb-1.5 md:mb-2">{displayName}</h1>
+            <div className="mb-1.5 md:mb-2 flex items-center gap-2">
+              <h1 className="min-w-0 flex-1 text-xl md:text-2xl font-bold">{displayName}</h1>
+              <button
+                onClick={() => setShowQr(true)}
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-slate-950/20 text-white/85 transition-all hover:bg-white/10 hover:text-white"
+                aria-label="Show QR code"
+                title="Show QR code"
+              >
+                <QrCode className="h-4 w-4 shrink-0" />
+              </button>
+            </div>
             <div className="flex flex-wrap gap-1.5 md:gap-2 mb-1.5 md:mb-2">
               {isRanked ? ageGroupSet.map((ag) => (
                 <span
@@ -529,40 +541,29 @@ export default function PlayerProfileLayout() {
           )}
         </div>
 
-        {/* Tab navigation */}
-        <div className="mt-4 md:mt-5 flex flex-wrap gap-2 md:gap-3">
-          {visibleTabs.map((tab) => (
-            <NavLink
-              key={tab.to}
-              to={tab.to ? `${basePath}/${tab.to}` : basePath}
-              end={tab.to === ''}
-              state={{ keepScroll: true }}
-              className={({ isActive }) =>
-                `relative flex items-center gap-2 px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-white text-slate-800 shadow-md'
-                    : 'bg-white/10 text-white/70 hover:bg-white/15 hover:text-white'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  {tab.label}
-                  {isActive && (
-                    <span className="absolute -bottom-[11px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-t-[7px] border-t-white" />
-                  )}
-                </>
-              )}
-            </NavLink>
-          ))}
-          <button
-            onClick={() => setShowQr(true)}
-            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/15 text-white/70 hover:text-white rounded-xl text-xs md:text-sm font-medium transition-colors"
-          >
-            <QrCode className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            QR Code
-          </button>
+        <div className="mt-5 md:mt-6 border-t border-white/10 pt-4 md:pt-5">
+          <div className="grid grid-cols-2 gap-2 md:gap-3 sm:flex sm:flex-wrap">
+            {visibleTabs.map((tab, index) => (
+              <NavLink
+                key={tab.to}
+                to={tab.to ? `${basePath}/${tab.to}` : basePath}
+                end={tab.to === ''}
+                state={{ keepScroll: true }}
+                className={({ isActive }) =>
+                  `flex w-full sm:w-auto min-w-0 items-center justify-center gap-2 px-3 md:px-4 py-2.5 rounded-xl border text-xs md:text-sm font-medium transition-all ${
+                    visibleTabs.length % 2 === 1 && index === visibleTabs.length - 1 ? 'col-span-2 sm:col-span-1' : ''
+                  } ${
+                    isActive
+                      ? 'bg-white text-slate-900 border-white shadow-lg shadow-slate-950/20'
+                      : 'bg-white/8 text-white/75 border-white/10 hover:bg-white/14 hover:text-white'
+                  }`
+                }
+              >
+                <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                <span className="truncate">{tab.label}</span>
+              </NavLink>
+            ))}
+          </div>
         </div>
       </div>
 
