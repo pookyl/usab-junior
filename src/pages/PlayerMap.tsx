@@ -366,7 +366,6 @@ export default function PlayerMap() {
                                   className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600 hover:bg-violet-100 text-[10px] font-medium transition-colors cursor-pointer"
                                 >
                                   Match details
-                                  <ExternalLink className="w-2.5 h-2.5" />
                                 </button>
                               )}
                             </div>
