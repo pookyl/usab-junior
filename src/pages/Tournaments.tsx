@@ -11,6 +11,8 @@ import type { ScheduledTournament, TournamentsResponse } from '../types/junior';
 
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
 
+let _tournamentsCache: TournamentsResponse | null = null;
+
 // ── Color maps ───────────────────────────────────────────────────────────────
 
 const REGION_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
@@ -299,18 +301,24 @@ function TournamentCard({ tournament }: { tournament: ScheduledTournament }) {
 // ── Main Page ────────────────────────────────────────────────────────────────
 
 export default function Tournaments() {
-  const [data, setData] = useState<TournamentsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<TournamentsResponse | null>(_tournamentsCache);
+  const [loading, setLoading] = useState(_tournamentsCache === null);
   const [error, setError] = useState<string | null>(null);
-  const [selectedSeason, setSelectedSeason] = useState('');
+  const [selectedSeason, setSelectedSeason] = useState(_tournamentsCache?.availableSeasons[0] ?? '');
   const [regionFilter, setRegionFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
 
   useEffect(() => {
+    if (_tournamentsCache !== null) return;
     let cancelled = false;
     setLoading(true);
     fetchTournaments()
-      .then(d => { if (!cancelled) { setData(d); setSelectedSeason(d.availableSeasons[0] || ''); } })
+      .then(d => {
+        if (cancelled) return;
+        _tournamentsCache = d;
+        setData(d);
+        setSelectedSeason(d.availableSeasons[0] || '');
+      })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };

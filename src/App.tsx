@@ -171,11 +171,7 @@ function SuspendedPage({ children }: { children: ReactNode }) {
 }
 
 function PlayersDataLayout() {
-  return (
-    <PlayersProvider>
-      <Outlet />
-    </PlayersProvider>
-  );
+  return <Outlet />;
 }
 
 function TournamentDetailLayout() {
@@ -224,6 +220,7 @@ export default function App() {
       <ThemeProvider>
         <BrowserRouter>
           <TournamentFocusProvider>
+            <PlayersProvider>
               <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
                 <AnalyticsWithRoutes />
                 <RoutePreloader />
@@ -268,6 +265,7 @@ export default function App() {
                   </Routes>
                 </main>
               </div>
+            </PlayersProvider>
           </TournamentFocusProvider>
         </BrowserRouter>
       </ThemeProvider>

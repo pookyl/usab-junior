@@ -13,6 +13,8 @@ import type { ScheduledTournament } from '../types/junior';
 declare const __VERCEL_GIT_COMMIT_SHA__: string | null;
 declare const __BUILD_DATE__: string | null;
 
+let _spotlightCache: ScheduledTournament[] | null = null;
+
 interface Feature {
   title: string;
   description: string;
@@ -271,18 +273,21 @@ function SiteQrModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function Home() {
-  const [spotlights, setSpotlights] = useState<ScheduledTournament[]>([]);
-  const [spotlightLoading, setSpotlightLoading] = useState(true);
+  const [spotlights, setSpotlights] = useState<ScheduledTournament[]>(_spotlightCache ?? []);
+  const [spotlightLoading, setSpotlightLoading] = useState(_spotlightCache === null);
   const [spotlightError, setSpotlightError] = useState<string | null>(null);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [showQr, setShowQr] = useState(false);
 
   useEffect(() => {
+    if (_spotlightCache !== null) return;
     let cancelled = false;
     fetchSpotlight()
       .then(data => {
         if (cancelled) return;
-        setSpotlights(data.spotlight ?? []);
+        const items = data.spotlight ?? [];
+        _spotlightCache = items;
+        setSpotlights(items);
         setSpotlightError(null);
       })
       .catch((err) => {
