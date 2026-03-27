@@ -230,7 +230,7 @@ export default function PlayerSchedulePage() {
   }, [tswId, playerId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentDay: ScheduleDay | null = useMemo(() => {
-    if (!data || !selectedDay) return null;
+    if (!data || selectedDay == null) return null;
     return data.days.find(d => d.date === selectedDay) ?? null;
   }, [data, selectedDay]);
 

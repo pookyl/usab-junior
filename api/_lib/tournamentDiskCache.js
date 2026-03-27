@@ -260,9 +260,9 @@ async function synthesizePlayerSchedule(tswId, queryParams) {
     // Matches are optional for partially scraped tournaments.
   }
 
-  function parseTime(timeStr) {
-    if (!timeStr) return { date: '', time: '', dateLabel: '' };
-    const match = timeStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+  function parseTime(timeStr, dateParam) {
+    if (!timeStr && !dateParam) return { date: '', time: '', dateLabel: '' };
+    const match = (timeStr || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
     if (match) {
       const date = `${match[3]}-${match[1].padStart(2, '0')}-${match[2].padStart(2, '0')}`;
       const dateValue = new Date(`${date}T00:00:00`);
@@ -274,13 +274,25 @@ async function synthesizePlayerSchedule(tswId, queryParams) {
           : dateValue.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
       };
     }
-    return { date: '', time: timeStr, dateLabel: '' };
+    // Disk-cached match day files store time without date; derive from filename (YYYYMMDD).
+    if (dateParam && /^\d{8}$/.test(dateParam)) {
+      const date = `${dateParam.slice(0, 4)}-${dateParam.slice(4, 6)}-${dateParam.slice(6, 8)}`;
+      const dateValue = new Date(`${date}T00:00:00`);
+      return {
+        date,
+        time: timeStr || '',
+        dateLabel: isNaN(dateValue.getTime())
+          ? ''
+          : dateValue.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      };
+    }
+    return { date: '', time: timeStr || '', dateLabel: '' };
   }
 
   const matchesByDate = new Map();
   for (const match of allUpcoming) {
     const playerId = match._playerId;
-    const parsed = parseTime(match.time);
+    const parsed = parseTime(match.time, match._dateParam);
     const dateKey = parsed.date || 'unknown';
     const inTeam1 = (match.team1Ids || []).includes(playerId);
     if (!inTeam1 && !(match.team2Ids || []).includes(playerId)) continue;
