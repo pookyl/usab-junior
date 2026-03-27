@@ -123,6 +123,7 @@ export interface TswTournamentEvent {
 export interface TswTournament {
   name: string;
   tswId?: string;
+  selfPlayerId?: number;
   url: string;
   dates: string;
   startDate?: string;

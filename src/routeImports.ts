@@ -22,4 +22,5 @@ export const routeImports = {
   playerSchedule:        () => import('./pages/tournament/PlayerSchedulePage'),
   playerMedals:          () => import('./pages/PlayerMedals'),
   playerTournaments:     () => import('./pages/PlayerTournaments'),
+  playerMap:             () => import('./pages/PlayerMap'),
 };

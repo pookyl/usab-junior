@@ -13,6 +13,7 @@ import {
   Link2,
   Check,
   LayoutDashboard,
+  MapPin,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import type { AgeGroup, PlayerEntry } from '../../types/junior';
@@ -30,6 +31,7 @@ export interface PlayerProfileContext {
   ageGroupSet: AgeGroup[];
   gender: string | null;
   rankingsDate: string;
+  scrollToTabs: () => void;
 }
 
 export function usePlayerProfile(): PlayerProfileContext {
@@ -332,6 +334,7 @@ const TAB_ITEMS = [
   { label: 'Rankings', icon: Trophy, to: 'rankings', requiresRank: true },
   { label: 'Tournaments', icon: Calendar, to: 'tournaments' },
   { label: 'Medals', icon: Medal, to: 'medals' },
+  { label: 'Map', icon: MapPin, to: 'map' },
 ];
 
 export default function PlayerProfileLayout() {
@@ -360,6 +363,7 @@ export default function PlayerProfileLayout() {
   const [gender, setGender] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [showQr, setShowQr] = useState(false);
+  const tabRowRef = useRef<HTMLDivElement>(null);
 
   const entries = rankedPlayer?.entries ?? [];
   const bestEntry = entries.length > 0 ? entries.reduce((b, e) => (e.rank < b.rank ? e : b)) : null;
@@ -403,6 +407,16 @@ export default function PlayerProfileLayout() {
   const displayName = playerName;
   const basePath = `/directory/${usabId}`;
 
+  const scrollToTabs = useCallback(() => {
+    requestAnimationFrame(() => {
+      const el = tabRowRef.current;
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: y, behavior: 'instant' });
+      }
+    });
+  }, []);
+
   const outletContext = useMemo<PlayerProfileContext>(() => ({
     usabId: usabId ?? '',
     displayName,
@@ -412,7 +426,8 @@ export default function PlayerProfileLayout() {
     ageGroupSet,
     gender,
     rankingsDate,
-  }), [usabId, displayName, isRanked, entries, sortedEntries, ageGroupSet, gender, rankingsDate]);
+    scrollToTabs,
+  }), [usabId, displayName, isRanked, entries, sortedEntries, ageGroupSet, gender, rankingsDate, scrollToTabs]);
 
   if (!usabId) {
     return (
@@ -541,13 +556,14 @@ export default function PlayerProfileLayout() {
           )}
         </div>
 
-        <div className="mt-5 md:mt-6 border-t border-white/10 pt-4 md:pt-5">
+        <div ref={tabRowRef} className="mt-5 md:mt-6 border-t border-white/10 pt-4 md:pt-5">
           <div className="grid grid-cols-2 gap-2 md:gap-3 sm:flex sm:flex-wrap">
             {visibleTabs.map((tab, index) => (
               <NavLink
                 key={tab.to}
                 to={tab.to ? `${basePath}/${tab.to}` : basePath}
                 end={tab.to === ''}
+                replace
                 state={{ keepScroll: true }}
                 className={({ isActive }) =>
                   `flex w-full sm:w-auto min-w-0 items-center justify-center gap-2 px-3 md:px-4 py-2.5 rounded-xl border text-xs md:text-sm font-medium transition-all ${

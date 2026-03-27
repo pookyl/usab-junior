@@ -6,7 +6,7 @@
  */
 import { createServer } from 'http';
 import { URL } from 'url';
-import { readFile, stat, readdir } from 'fs/promises';
+import { readFile, writeFile, stat, readdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join, extname, resolve, normalize } from 'path';
 import { fileURLToPath } from 'url';
@@ -40,6 +40,53 @@ import { serveTournamentDiskCache } from './api/_lib/tournamentDiskCache.js';
 const PORT = process.env.PORT || 3001;
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+// Global Nominatim rate limiter — max 1 request per 1.5 seconds across all callers
+let nominatimLastRequest = 0;
+const nominatimQueue = [];
+let nominatimProcessing = false;
+
+function nominatimRateLimited(queryUrl) {
+  return new Promise((resolve, reject) => {
+    nominatimQueue.push({ queryUrl, resolve, reject });
+    processNominatimQueue();
+  });
+}
+
+async function processNominatimQueue() {
+  if (nominatimProcessing || nominatimQueue.length === 0) return;
+  nominatimProcessing = true;
+
+  while (nominatimQueue.length > 0) {
+    const { queryUrl, resolve, reject } = nominatimQueue.shift();
+    const elapsed = Date.now() - nominatimLastRequest;
+    if (elapsed < 1500) await new Promise((r) => setTimeout(r, 1500 - elapsed));
+    nominatimLastRequest = Date.now();
+
+    try {
+      let resp;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        resp = await fetch(queryUrl, {
+          headers: { 'User-Agent': 'usab-junior-rankings/1.0' },
+          signal: AbortSignal.timeout(10_000),
+        });
+        if (resp.status === 429) {
+          const wait = 3000 * (attempt + 1);
+          console.log(`[geocode] 429 rate-limited, retrying in ${wait}ms…`);
+          await new Promise((r) => setTimeout(r, wait));
+          nominatimLastRequest = Date.now();
+          continue;
+        }
+        break;
+      }
+      resolve(resp);
+    } catch (err) {
+      reject(err);
+    }
+  }
+
+  nominatimProcessing = false;
+}
+
 async function getDefaultDate() {
   const dates = await listCachedDates();
   if (dates[0]) return dates[0];
@@ -53,7 +100,8 @@ async function getDefaultDate() {
 // ── HTTP server ───────────────────────────────────────────────────────────────
 const server = createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
@@ -527,6 +575,157 @@ const server = createServer(async (req, res) => {
       playerIds: reqUrl.searchParams.get('playerIds') || '',
     };
     await actionHandler(req, res);
+    return;
+  }
+
+  // POST /api/geocode — batch geocode location strings via Nominatim with disk cache
+  // Accepts { locations: string[], tswIds?: Record<string, string> }
+  // tswIds maps location string → tswId so we can look up full venue addresses from schedule data
+  if (reqUrl.pathname === '/api/geocode' && req.method === 'POST') {
+    try {
+      const body = await new Promise((resolve, reject) => {
+        let data = '';
+        req.on('data', (chunk) => { data += chunk; });
+        req.on('end', () => {
+          try { resolve(JSON.parse(data)); } catch { reject(new ValidationError('Invalid JSON body')); }
+        });
+        req.on('error', reject);
+      });
+
+      const { locations, tswIds = {} } = body;
+      if (!Array.isArray(locations) || locations.length === 0) {
+        return sendApiError(res, new ValidationError('locations must be a non-empty array'));
+      }
+      if (locations.length > 100) {
+        return sendApiError(res, new ValidationError('Too many locations (max 100)'));
+      }
+
+      // Build lookup tables from schedule JSON files
+      const venueByTswId = {};
+      const venueByCity = {};
+      const tournamentDir = join(__dirname, 'data');
+      try {
+        const files = await readdir(tournamentDir);
+        for (const f of files) {
+          if (!f.match(/^tournaments-\d{4}-\d{4}\.json$/)) continue;
+          try {
+            const raw = JSON.parse(await readFile(join(tournamentDir, f), 'utf-8'));
+            for (const t of raw.tournaments || []) {
+              if (!t.venueLocation) continue;
+              if (t.tswId) venueByTswId[t.tswId.toUpperCase()] = t.venueLocation;
+              const cityMatch = t.venueLocation.match(/,\s*([^,]+),\s*[A-Z]{2}\b/);
+              if (cityMatch) {
+                const city = cityMatch[1].trim().toLowerCase();
+                if (!venueByCity[city]) venueByCity[city] = t.venueLocation;
+              }
+            }
+          } catch { /* skip bad file */ }
+        }
+      } catch { /* data dir missing */ }
+
+      const cachePath = join(__dirname, 'data', 'geocode-cache.json');
+      let cache = {};
+      try {
+        cache = JSON.parse(await readFile(cachePath, 'utf-8'));
+      } catch { /* no cache yet */ }
+
+      const KNOWN_TYPOS = {
+        mulkiteo: 'Mukilteo',
+        mulkitea: 'Mukilteo',
+      };
+
+      function normalizeQuery(loc) {
+        let q = loc.trim();
+        q = q.replace(/,?\s*U\.?S\.?A\.?\s*$/i, '');
+        q = q.replace(/,?\s*United States\s*$/i, '');
+        q = q.trim();
+        for (const [typo, fix] of Object.entries(KNOWN_TYPOS)) {
+          q = q.replace(new RegExp(typo, 'gi'), fix);
+        }
+        return q;
+      }
+
+      const results = {};
+      const toFetch = [];
+      for (const loc of locations) {
+        if (typeof loc !== 'string' || !loc.trim()) continue;
+        const key = loc.trim().toLowerCase();
+        if (key in cache) {
+          results[loc] = cache[key];
+        } else {
+          toFetch.push(loc);
+        }
+      }
+
+      for (let i = 0; i < toFetch.length; i++) {
+        const loc = toFetch[i];
+        const key = loc.trim().toLowerCase();
+
+        // Try to use the full venue address from schedule data
+        const tswId = tswIds[loc];
+        let venueAddress = tswId ? venueByTswId[tswId.toUpperCase()] : null;
+        if (!venueAddress) {
+          const city = normalizeQuery(loc).replace(/\s*&\s*.*/g, '').trim().toLowerCase();
+          venueAddress = venueByCity[city] || null;
+        }
+        const queryString = venueAddress ? normalizeQuery(venueAddress) : normalizeQuery(loc);
+
+        try {
+          async function tryQuery(q) {
+            const u = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=${encodeURIComponent(q)}`;
+            const r = await nominatimRateLimited(u);
+            if (!r.ok) return null;
+            const d = await r.json();
+            return d.length > 0 ? { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) } : null;
+          }
+
+          let coords = await tryQuery(queryString);
+
+          // Fallback: if full address failed, try just "City, State" from venueAddress
+          if (!coords && venueAddress) {
+            const csMatch = venueAddress.match(/,\s*([^,]+),\s*([A-Z]{2})\b/);
+            if (csMatch) {
+              const fallback = `${normalizeQuery(csMatch[1])}, ${csMatch[2]}`;
+              console.log(`[geocode] "${loc}" full address failed, trying fallback: "${fallback}"`);
+              coords = await tryQuery(fallback);
+            }
+          }
+
+          // Fallback: if city-only TSW location failed, try just the normalized city name
+          if (!coords && !venueAddress) {
+            const plain = normalizeQuery(loc).replace(/\s*&\s*.*/g, '').trim();
+            if (plain !== queryString) {
+              console.log(`[geocode] "${loc}" trying simplified: "${plain}"`);
+              coords = await tryQuery(plain);
+            }
+          }
+
+          if (coords) {
+            results[loc] = coords;
+            cache[key] = coords;
+          } else {
+            results[loc] = null;
+            cache[key] = null;
+          }
+          console.log(`[geocode] "${loc}" (query: "${queryString}") → ${results[loc] ? `${results[loc].lat},${results[loc].lng}` : 'not found'}`);
+        } catch (err) {
+          console.error(`[geocode] error for "${loc}":`, err.message);
+          results[loc] = null;
+        }
+      }
+
+      if (toFetch.length > 0) {
+        try {
+          await writeFile(cachePath, JSON.stringify(cache, null, 2), 'utf-8');
+        } catch (err) {
+          console.error('[geocode] failed to write cache:', err.message);
+        }
+      }
+
+      sendJson(res, 200, results);
+    } catch (err) {
+      sendApiError(res, err, { logLabel: 'geocode' });
+    }
     return;
   }
 
