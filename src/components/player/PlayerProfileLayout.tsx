@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { useParams, Link, NavLink, Outlet, useOutletContext, useLocation } from 'react-router-dom';
+import { useParams, NavLink, Outlet, useOutletContext } from 'react-router-dom';
 import {
   ArrowLeft,
   ExternalLink,
@@ -339,7 +339,6 @@ const TAB_ITEMS = [
 
 export default function PlayerProfileLayout() {
   const { id: usabId } = useParams<{ id: string }>();
-  const location = useLocation();
   const {
     players: allPlayers,
     directoryPlayers,
@@ -349,10 +348,6 @@ export default function PlayerProfileLayout() {
     ensurePlayers,
     ensureDirectoryPlayers,
   } = usePlayers();
-  const fromPath = (location.state as { fromPath?: string } | null)?.fromPath;
-  const backTarget = fromPath ?? '/directory';
-  const backLabel = fromPath ? 'Back' : 'Back to Players';
-  const backState = fromPath?.startsWith('/tournaments/') ? { restoreTournamentScroll: true } : undefined;
 
   const rankedPlayer = allPlayers.find((p) => p.usabId === usabId) ?? null;
   const dirPlayer = directoryPlayers.find((p) => p.usabId === usabId) ?? null;
@@ -433,9 +428,9 @@ export default function PlayerProfileLayout() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
         <p className="text-slate-400 dark:text-slate-500 text-lg">Player not found.</p>
-        <Link to="/directory" className="text-violet-600 hover:underline mt-2 inline-block">
-          Back to Players
-        </Link>
+        <button type="button" onClick={() => window.history.back()} className="text-violet-600 hover:underline mt-2 inline-block">
+          Back
+        </button>
       </div>
     );
   }
@@ -452,13 +447,13 @@ export default function PlayerProfileLayout() {
   if (!playerFound) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
-        <Link
-          to={backTarget}
-          state={backState}
+        <button
+          type="button"
+          onClick={() => window.history.back()}
           className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600"
         >
-          <ArrowLeft className="w-4 h-4" /> {backLabel}
-        </Link>
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
         <div className="py-16 text-center">
           <p className="text-slate-400 dark:text-slate-500 text-lg">Player USAB #{usabId} not found.</p>
           <a
@@ -478,14 +473,14 @@ export default function PlayerProfileLayout() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8 space-y-4 md:space-y-6">
-      <Link
-        to={backTarget}
-        state={backState}
+      <button
+        type="button"
+        onClick={() => window.history.back()}
         className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        {backLabel}
-      </Link>
+        Back
+      </button>
 
       {/* Hero card */}
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 md:p-6 text-white">
