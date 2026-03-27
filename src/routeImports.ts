@@ -18,6 +18,7 @@ export const routeImports = {
   tournamentWinners:     () => import('./pages/tournament/TournamentWinnersPage'),
   tournamentMedals:      () => import('./pages/tournament/TournamentMedalsPage'),
   tournamentWatchlist:   () => import('./pages/tournament/TournamentWatchlistPage'),
+  watchlistSchedule:     () => import('./pages/tournament/WatchlistSchedulePage'),
   tournamentEventDetail: () => import('./pages/TournamentEventDetail'),
   playerSchedule:        () => import('./pages/tournament/PlayerSchedulePage'),
   playerMedals:          () => import('./pages/PlayerMedals'),

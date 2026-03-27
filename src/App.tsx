@@ -31,6 +31,7 @@ const TournamentSeedsPage = lazy(routeImports.tournamentSeeds);
 const TournamentWinnersPage = lazy(routeImports.tournamentWinners);
 const TournamentMedalsPage = lazy(routeImports.tournamentMedals);
 const TournamentWatchlistPage = lazy(routeImports.tournamentWatchlist);
+const WatchlistSchedulePage = lazy(routeImports.watchlistSchedule);
 const TournamentEventDetail = lazy(routeImports.tournamentEventDetail);
 const PlayerSchedulePage = lazy(routeImports.playerSchedule);
 const PlayerMedals = lazy(routeImports.playerMedals);
@@ -195,6 +196,7 @@ const ROUTE_PATTERNS = [
   '/tournaments/:tswId/seeds',
   '/tournaments/:tswId/winners',
   '/tournaments/:tswId/medals',
+  '/tournaments/:tswId/watchlist/schedule',
   '/tournaments/:tswId/watchlist',
   '/tournaments/:tswId',
   '/directory/:id/medals',
@@ -259,6 +261,7 @@ export default function App() {
                       <Route path="winners" element={<SuspendedPage><TournamentWinnersPage /></SuspendedPage>} />
                       <Route path="medals" element={<SuspendedPage><TournamentMedalsPage /></SuspendedPage>} />
                       <Route path="watchlist" element={<SuspendedPage><TournamentWatchlistPage /></SuspendedPage>} />
+                      <Route path="watchlist/schedule" element={<SuspendedPage><WatchlistSchedulePage /></SuspendedPage>} />
                       <Route path="event/:eventId" element={<SuspendedPage><TournamentEventDetail /></SuspendedPage>} />
                       <Route path="draw/:drawId" element={<SuspendedPage><TournamentDrawDetail /></SuspendedPage>} />
                       <Route path="player/:playerId/schedule" element={<SuspendedPage><PlayerSchedulePage /></SuspendedPage>} />

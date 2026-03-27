@@ -491,7 +491,7 @@ async function main() {
   const response = await fetchWithRetry(
     USAB_SCHEDULE_URL,
     { headers: BROWSER_HEADERS },
-    { timeoutMs: 30_000, retries: 2 },
+    { timeoutMs: 30_000, retries: 4, baseDelayMs: 2_000 },
   );
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const html = await response.text();
@@ -589,7 +589,21 @@ async function main() {
   console.log(`\n[tournaments] done: ${written} written, ${skipped} skipped`);
 }
 
+function isTransientNetworkError(err) {
+  if (!err) return false;
+  const code = err.code || err.cause?.code;
+  if (['ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'UND_ERR_CONNECT_TIMEOUT'].includes(code)) return true;
+  if (err.cause && isTransientNetworkError(err.cause)) return true;
+  if (err.message?.includes('fetch failed')) return true;
+  return false;
+}
+
 main().catch((err) => {
+  if (isTransientNetworkError(err)) {
+    console.warn('[tournaments] skipping refresh — external site unreachable:', err.message);
+    console.warn('[tournaments] existing cached data remains valid');
+    process.exit(0);
+  }
   console.error('[tournaments] fatal error:', err);
   process.exit(1);
 });

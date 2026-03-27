@@ -181,6 +181,19 @@ graph TD
 - Uses `MatchCard` component with `fromPath` for back-navigation.
 - Internal matches (both teams have watched players) are annotated.
 
+### 5. Collective Schedule (separate page)
+
+**Route:** `/tournaments/:tswId/watchlist/schedule`
+
+A "Schedule" button appears next to the watchlist tab switcher when the active list has players. It navigates to a dedicated page showing all watched players' upcoming matches in a combined timeline.
+
+- **Data source:** `fetchPlayerSchedule(tswId, allPlayerIds)` — the existing multi-player schedule API.
+- **Day tabs:** Horizontal pill tabs for each day with upcoming matches, auto-selects today or the next day.
+- **Player filter pills:** "All" plus one pill per watched player with colored dot and match count for the selected day.
+- **Player color badges:** Each player gets a color from a 7-color palette (violet, sky, emerald, amber, rose, cyan, fuchsia). A colored dot + first name badge appears on each `ScheduleMatchCard` header when multiple players are watched.
+- **Time-grouped timeline:** Left column shows time (NOW / clock / TBD), right column shows `ScheduleMatchCard` with bracket paths (if-win / if-lose). Consecutive matches at the same time omit the repeated time label.
+- **Shared component:** `ScheduleMatchCard` (`src/components/tournament/ScheduleMatchCard.tsx`) is extracted from `PlayerSchedulePage` and shared between the single-player and collective schedule views. It accepts an optional `playerBadge` prop.
+
 ## URL Parameters
 
 Parsed once at app startup in `src/utils/urlFlags.ts` (eagerly loaded), so they are captured before lazy-loaded pages change the URL.
@@ -202,7 +215,10 @@ The two parameters are independent. Examples:
 |------|------|
 | `src/utils/urlFlags.ts` | Eagerly-loaded URL parameter capture (`watchlist_enable`, `watchlist_max`) |
 | `src/contexts/WatchlistContext.tsx` | Multi-list state, localStorage persistence, tournament binding, add/remove/clear/switch/rename |
-| `src/components/tournament/tabs/WatchlistTab.tsx` | Main UI: tab switcher, picker, summary, filters, match feed |
+| `src/components/tournament/tabs/WatchlistTab.tsx` | Main UI: tab switcher, picker, summary, filters, match feed, schedule link |
+| `src/components/tournament/ScheduleMatchCard.tsx` | Shared schedule match card with optional player badge (used by both schedule pages) |
 | `src/pages/tournament/TournamentWatchlistPage.tsx` | Page wrapper with SubPageLayout and refresh |
+| `src/pages/tournament/WatchlistSchedulePage.tsx` | Collective schedule: day tabs, player filters, color-coded timeline |
+| `src/pages/tournament/PlayerSchedulePage.tsx` | Single-player schedule (linked from player detail) |
 | `src/pages/TournamentHub.tsx` | Visibility gate: date eligibility + watchlist_enable override |
-| `src/components/tournament/MatchCard.tsx` | Shared match card used in the feed |
+| `src/components/tournament/MatchCard.tsx` | Shared match card used in the watchlist match feed |

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Search, Eye, X, Trash2, UserPlus, ChevronDown, ChevronUp, UsersRound, CalendarDays, Pencil, Check } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { Search, Eye, X, Trash2, UserPlus, ChevronDown, ChevronUp, UsersRound, CalendarDays, Pencil, Check, Calendar } from 'lucide-react';
 import { TabLoading, TabEmpty } from '../shared';
 import MatchCard from '../MatchCard';
 import { useWatchlist } from '../../../contexts/WatchlistContext';
@@ -538,13 +538,24 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
 
   return (
     <div className="space-y-5">
-      {/* Watchlist tab switcher */}
-      <WatchlistTabSwitcher
-        lists={lists}
-        activeIndex={activeIndex}
-        onSwitch={switchList}
-        onRename={renameList}
-      />
+      {/* Watchlist tab switcher + schedule link */}
+      <div className="flex items-center justify-between gap-2">
+        <WatchlistTabSwitcher
+          lists={lists}
+          activeIndex={activeIndex}
+          onSwitch={switchList}
+          onRename={renameList}
+        />
+        {watchedPlayers.length > 0 && (
+          <Link
+            to={`/tournaments/${tswId}/watchlist/schedule`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors shrink-0"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            Schedule
+          </Link>
+        )}
+      </div>
 
       {/* Overall W/L Summary — collapsible */}
       {watchedPlayers.length > 0 && (
