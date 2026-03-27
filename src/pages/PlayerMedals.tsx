@@ -31,21 +31,21 @@ const MEDAL_CARD_STYLES: Record<MedalPlace, { ring: string; glow: string; bg: st
   gold:   { ring: 'ring-amber-400/30', glow: 'shadow-amber-500/10', bg: 'from-amber-500/10 to-yellow-500/5' },
   silver: { ring: 'ring-slate-300/30', glow: 'shadow-slate-400/10', bg: 'from-slate-300/10 to-slate-400/5' },
   bronze: { ring: 'ring-orange-400/30', glow: 'shadow-orange-500/10', bg: 'from-orange-500/10 to-amber-600/5' },
-  fourth: { ring: 'ring-violet-400/20', glow: 'shadow-violet-500/10', bg: 'from-violet-500/10 to-purple-500/5' },
+  fourth: { ring: 'ring-orange-300/20', glow: 'shadow-orange-400/10', bg: 'from-orange-400/10 to-amber-500/5' },
 };
 
 const MEDAL_ACCENT: Record<MedalPlace, string> = {
   gold:   'border-l-amber-400',
   silver: 'border-l-slate-400',
   bronze: 'border-l-orange-400',
-  fourth: 'border-l-violet-400',
+  fourth: 'border-l-orange-300',
 };
 
 const MEDAL_CHIP_BG: Record<MedalPlace, string> = {
   gold:   'bg-amber-50 border-amber-200/60 dark:bg-amber-950/40 dark:border-amber-800/40',
   silver: 'bg-slate-50 border-slate-200/60 dark:bg-slate-800/60 dark:border-slate-700/40',
   bronze: 'bg-orange-50 border-orange-200/60 dark:bg-orange-950/40 dark:border-orange-800/40',
-  fourth: 'bg-violet-50 border-violet-200/60 dark:bg-violet-950/40 dark:border-violet-800/40',
+  fourth: 'bg-orange-50/60 border-orange-200/50 dark:bg-orange-950/30 dark:border-orange-800/30',
 };
 
 function bestMedalPlace(medals: { place: MedalPlace }[]): MedalPlace {
@@ -109,6 +109,7 @@ export default function PlayerMedals() {
   const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set());
   const [matchTypeFilter, setMatchTypeFilter] = useState<Set<MatchType>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [usabOnly, setUsabOnly] = useState(true);
 
   useEffect(() => {
     if (!usabId || !playerName) {
@@ -135,6 +136,8 @@ export default function PlayerMedals() {
   }, []);
 
   const hasAnyUsab = useMemo(() => data?.tournaments.some((t) => t.isUsab) ?? false, [data]);
+  const effectiveUsabOnly = hasAnyUsab && usabOnly;
+
   const availableTypes = useMemo(() => {
     if (!data) return [] as string[];
     const usabTypes = new Set(data.tournaments.filter((t) => t.tournamentType).map((t) => t.tournamentType!));
@@ -151,6 +154,7 @@ export default function PlayerMedals() {
   const filtered = useMemo(() => {
     if (!data) return [];
     return data.tournaments.filter((t) => {
+      if (effectiveUsabOnly && !t.isUsab) return false;
       if (typeFilter.size > 0) {
         const matchesKnown = t.tournamentType && typeFilter.has(t.tournamentType);
         const matchesOther = typeFilter.has(OTHER_TYPE) && !t.tournamentType;
@@ -169,7 +173,7 @@ export default function PlayerMedals() {
       if (matchTypeFilter.size > 0) medals = medals.filter((m) => matchTypeFilter.has(m.category as MatchType));
       return medals === t.medals ? t : { ...t, medals };
     });
-  }, [data, medalFilter, typeFilter, matchTypeFilter]);
+  }, [data, medalFilter, typeFilter, matchTypeFilter, effectiveUsabOnly]);
 
   const hasActiveFilters = medalFilter.size > 0 || typeFilter.size > 0 || matchTypeFilter.size > 0;
 
@@ -180,6 +184,18 @@ export default function PlayerMedals() {
   }, []);
 
   const totalMedals = data ? data.summary.gold + data.summary.silver + data.summary.bronze + data.summary.fourth : 0;
+
+  const displaySummary = useMemo(() => {
+    if (!data) return { gold: 0, silver: 0, bronze: 0, fourth: 0 };
+    if (!effectiveUsabOnly) return data.summary;
+    const s = { gold: 0, silver: 0, bronze: 0, fourth: 0 };
+    for (const t of data.tournaments) {
+      if (!t.isUsab) continue;
+      for (const m of t.medals) s[m.place]++;
+    }
+    return s;
+  }, [data, effectiveUsabOnly]);
+  const displayTotal = displaySummary.gold + displaySummary.silver + displaySummary.bronze + displaySummary.fourth;
 
   const usabTypeCounts = useMemo(() => {
     if (!data) return [];
@@ -241,12 +257,24 @@ export default function PlayerMedals() {
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
             <div className="flex items-center gap-3">
               <Trophy className="w-5 h-5 text-amber-500" />
-              <span className="text-2xl md:text-3xl font-black text-slate-800 dark:text-slate-100">{totalMedals}</span>
-              <span className="text-sm text-slate-400 dark:text-slate-500">medals</span>
+              <span className="text-2xl md:text-3xl font-black text-slate-800 dark:text-slate-100">{displayTotal}</span>
+              <span className="text-sm text-slate-400 dark:text-slate-500">{effectiveUsabOnly ? 'USAB Medals' : 'Medals'}</span>
+              {hasAnyUsab && (
+                <button
+                  onClick={() => setUsabOnly((v) => !v)}
+                  className={`ml-1 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-medium border transition-all ${
+                    usabOnly
+                      ? 'bg-blue-100 border-blue-300 text-blue-700 dark:bg-blue-950 dark:border-blue-700 dark:text-blue-300'
+                      : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400'
+                  }`}
+                >
+                  USAB Only
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-2.5 md:gap-3">
               {MEDAL_TYPES.map((p) => (
-                data.summary[p] > 0 ? <MedalStatCard key={p} place={p} count={data.summary[p]} /> : null
+                displaySummary[p] > 0 ? <MedalStatCard key={p} place={p} count={displaySummary[p]} /> : null
               ))}
             </div>
           </div>
