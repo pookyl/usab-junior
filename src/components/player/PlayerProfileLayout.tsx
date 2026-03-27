@@ -547,6 +547,7 @@ export default function PlayerProfileLayout() {
               <div>
                 <p className="text-2xl md:text-3xl font-black text-violet-400">#{bestEntry.rank}</p>
                 <p className="text-[10px] md:text-xs text-white/50 mt-0.5">Best Rank</p>
+                <p className="text-[10px] md:text-xs text-white/40">{bestEntry.ageGroup} {bestEntry.eventType}</p>
               </div>
               <div>
                 <p className="text-2xl md:text-3xl font-black">{bestEntry.rankingPoints.toLocaleString()}</p>
