@@ -315,9 +315,9 @@
       "tswId": "0E3C129B-28CA-43FF-9C2C-96C92D3C7090",
       "tswUrl": "https://www.tournamentsoftware.com/tournament/0e3c129b-28ca-43ff-9c2c-96c92d3c7090",
       "usabUrl": "https://usabadminton.org/2026-yonex-u-s-junior-selection-event-prospectus-released-for-pan-am-junior-championships-bwf-world-junior-championships/",
-      "prospectusUrl": "https://usabadminton.org/wp-content/uploads/2026/03/Junior-Selection-Selection-Prospectus.pdf",
+      "prospectusUrl": "http://usabadminton.org/wp-content/uploads/2026/03/Selectionevent26updated-1.pdf",
       "status": "upcoming",
-      "totalPlayers": null,
+      "totalPlayers": 288,
       "venueClub": "Wayside Athletic Club",
       "venueLocation": "80 Broadmeadow Street, Marlborough, MA 01752, U.S.A."
     },
@@ -387,10 +387,10 @@
     },
     {
       "name": "2026 YONEX U.S. JUNIOR NATIONAL CHAMPIONSHIPS",
-      "startDate": null,
-      "endDate": null,
+      "startDate": "2026-07-08",
+      "endDate": "2026-07-14",
       "region": "National",
-      "hostClub": "USA Badminton at TBA",
+      "hostClub": "USA Badminton at Wichita’s EDGE Sports Complex",
       "type": "National",
       "tswId": null,
       "tswUrl": null,
@@ -402,5 +402,5 @@
       "venueLocation": null
     }
   ],
-  "savedAt": "2026-03-25T04:20:48.408Z"
+  "savedAt": "2026-03-27T16:09:01.299Z"
 }
