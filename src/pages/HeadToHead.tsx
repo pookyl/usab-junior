@@ -789,7 +789,7 @@ export default function HeadToHead() {
   }, []);
 
   const filteredPlayers = useMemo(() => {
-    const pool = (ageGroup === null && gender === 'All') ? allDirectoryPool : allPlayers;
+    const pool = ageGroup === null ? allDirectoryPool : allPlayers;
     return pool
       .filter((p) => {
         if (ageGroup && !p.entries.some((e) => e.ageGroup === ageGroup)) return false;
@@ -805,7 +805,7 @@ export default function HeadToHead() {
       });
   }, [allPlayers, allDirectoryPool, ageGroup, gender]);
 
-  const pickerLoading = playersLoading || (ageGroup === null && gender === 'All' && directoryLoading);
+  const pickerLoading = playersLoading || (ageGroup === null && directoryLoading);
 
   // Clear selections on user-initiated filter changes only
   const prevFilters = useRef({ ageGroup, gender });
@@ -954,15 +954,24 @@ export default function HeadToHead() {
 
       {/* Age Group Tabs — horizontal scroll on mobile */}
       <div>
-        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Filter by Age Group</p>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+          <button
+            onClick={() => setAgeGroup(null)}
+            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
+              ageGroup === null
+                ? 'bg-violet-600 text-white'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
+            }`}
+          >
+            All
+          </button>
           {AGE_GROUPS.map((ag) => (
             <button
               key={ag}
-              onClick={() => setAgeGroup(ageGroup === ag ? null : ag)}
-              className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
+              onClick={() => setAgeGroup(ag)}
+              className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
                 ageGroup === ag
-                  ? `${AGE_COLORS[ag]} text-white scale-105`
+                  ? `${AGE_COLORS[ag]} text-white`
                   : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
               }`}
             >
@@ -973,18 +982,22 @@ export default function HeadToHead() {
       </div>
 
       {/* Gender Pills — horizontal scroll on mobile */}
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
         {(['All', 'Boy', 'Girl'] as Gender[]).map((g) => (
           <button
             key={g}
             onClick={() => setGender(g)}
-            className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-all border whitespace-nowrap shrink-0 shadow-sm ${
+            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
               gender === g
-                ? (ageGroup ? `${AGE_COLORS[ageGroup]} text-white border-transparent scale-105` : 'bg-slate-700 text-white border-transparent scale-105')
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
+                ? g === 'Boy'
+                  ? 'bg-blue-600 text-white'
+                  : g === 'Girl'
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-violet-600 text-white'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
             }`}
           >
-            <span className="font-bold">{g === 'All' ? '⚥ All' : g === 'Boy' ? '♂ Boy' : '♀ Girl'}</span>
+            {g === 'All' ? '⚥ All' : g === 'Boy' ? '♂ Boy' : '♀ Girl'}
           </button>
         ))}
       </div>

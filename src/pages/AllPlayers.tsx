@@ -23,7 +23,7 @@ const AGE_BADGE_COLORS: Record<AgeGroup, string> = {
 };
 
 const AGE_FILTER_ACTIVE: Record<AgeGroup, string> = {
-  U11: 'bg-violet-600 text-white',
+  U11: 'bg-purple-600 text-white',
   U13: 'bg-blue-600 text-white',
   U15: 'bg-emerald-600 text-white',
   U17: 'bg-amber-500 text-white',
@@ -236,6 +236,7 @@ export default function AllPlayers() {
   const paramAge = searchParams.get('age_group') as AgeGroup | null;
   const [search, setSearch] = useState('');
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
+  const [rankFilter, setRankFilter] = useState<'ranked' | 'unranked'>('ranked');
   const [ageGroupFilter, setAgeGroupFilter] = useState<AgeGroup | null>(
     paramAge && AGE_GROUPS.includes(paramAge) ? paramAge : null,
   );
@@ -268,7 +269,13 @@ export default function AllPlayers() {
   const filtered = useMemo(() => {
     let result = allDirectoryViewPlayers;
 
-    if (ageGroupFilter) {
+    if (rankFilter === 'ranked') {
+      result = result.filter((p) => p.entries.length > 0);
+    } else {
+      result = result.filter((p) => p.entries.length === 0);
+    }
+
+    if (ageGroupFilter && rankFilter === 'ranked') {
       result = result.filter((p) =>
         p.entries.some((e) => e.ageGroup === ageGroupFilter),
       );
@@ -288,7 +295,7 @@ export default function AllPlayers() {
     }
 
     return result;
-  }, [allDirectoryViewPlayers, search, activeLetter, ageGroupFilter]);
+  }, [allDirectoryViewPlayers, search, activeLetter, ageGroupFilter, rankFilter]);
 
   const letterCounts = useMemo(() => {
     const base = ageGroupFilter
@@ -331,24 +338,59 @@ export default function AllPlayers() {
         </div>
       </div>
 
-      {/* Age group filter — horizontal scroll on mobile */}
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Filter by Age Group</p>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
-          {AGE_GROUPS.map((ag) => (
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        {/* Rank filter */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+          {(['ranked', 'unranked'] as const).map((value) => (
             <button
-              key={ag}
-              onClick={() => setAgeGroupFilter(ageGroupFilter === ag ? null : ag)}
-              className={`px-5 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
-                ageGroupFilter === ag
-                  ? `${AGE_FILTER_ACTIVE[ag]} scale-105`
+              key={value}
+              onClick={() => {
+                setRankFilter(value);
+                if (value === 'unranked') setAgeGroupFilter(null);
+              }}
+              className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
+                rankFilter === value
+                  ? 'bg-violet-600 text-white'
                   : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
               }`}
             >
-              {ag}
+              {value === 'ranked' ? 'Ranked' : 'Unranked'}
             </button>
           ))}
         </div>
+
+        {/* Age group filter — only visible for ranked players */}
+        {rankFilter === 'ranked' && (
+          <>
+            <div className="hidden md:block w-px h-5 bg-slate-200 dark:bg-slate-700" />
+            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+              <button
+                onClick={() => setAgeGroupFilter(null)}
+                className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
+                  ageGroupFilter === null
+                    ? 'bg-violet-600 text-white'
+                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
+                }`}
+              >
+                All
+              </button>
+              {AGE_GROUPS.map((ag) => (
+                <button
+                  key={ag}
+                  onClick={() => setAgeGroupFilter(ag)}
+                  className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
+                    ageGroupFilter === ag
+                      ? `${AGE_FILTER_ACTIVE[ag]}`
+                      : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
+                  }`}
+                >
+                  {ag}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Search */}
@@ -421,6 +463,7 @@ export default function AllPlayers() {
       {filtered.length > 0 && (
         <p className="text-sm text-slate-400 dark:text-slate-500">
           Showing <span className="font-medium text-slate-600 dark:text-slate-300">{filtered.length}</span>{' '}
+          {`${rankFilter} `}
           {ageGroupFilter ? `${ageGroupFilter} ` : ''}
           players
           {activeLetter && ` starting with "${activeLetter}"`}

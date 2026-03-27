@@ -11,7 +11,7 @@ import { AGE_COLORS } from '../constants/ageGroupStyles';
 const LazyAnalyticsView = lazy(() => import('./PlayersAnalyticsView'));
 
 const AGE_OVERVIEW_COLORS: Record<AgeGroup, { bg: string; gradient: string; light: string; text: string }> = {
-  U11: { bg: 'bg-violet-600', gradient: 'from-violet-500 to-violet-700', light: 'bg-violet-50', text: 'text-violet-700' },
+  U11: { bg: 'bg-purple-600', gradient: 'from-purple-500 to-purple-700', light: 'bg-purple-50', text: 'text-purple-700' },
   U13: { bg: 'bg-blue-600', gradient: 'from-blue-500 to-blue-700', light: 'bg-blue-50', text: 'text-blue-700' },
   U15: { bg: 'bg-emerald-600', gradient: 'from-emerald-500 to-emerald-700', light: 'bg-emerald-50', text: 'text-emerald-700' },
   U17: { bg: 'bg-amber-500', gradient: 'from-amber-400 to-amber-600', light: 'bg-amber-50', text: 'text-amber-700' },
@@ -641,15 +641,15 @@ export default function Rankings() {
 
       {view !== 'player-stats' && (
         <>
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
             {AGE_GROUPS.map((ag) => (
               <button
                 key={ag}
                 onClick={() => setAgeGroup(ag)}
-                className={`px-5 md:px-6 py-2 md:py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap shrink-0 ${
+                className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
                   ageGroup === ag
-                    ? `${AGE_COLORS[ag]} text-white scale-105`
-                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400'
+                    ? `${AGE_COLORS[ag]} text-white`
+                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
                 }`}
               >
                 {ag}
@@ -657,18 +657,18 @@ export default function Rankings() {
             ))}
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
             {EVENT_TYPES.map((et) => (
               <button
                 key={et}
                 onClick={() => setEventType(et)}
-                className={`px-3.5 md:px-4 py-2 rounded-xl text-sm font-medium transition-all border whitespace-nowrap shrink-0 shadow-sm ${
+                className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
                   eventType === et
-                    ? `${AGE_COLORS[ageGroup]} text-white border-transparent scale-105`
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400'
+                    ? `${AGE_COLORS[ageGroup]} text-white`
+                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
                 }`}
               >
-                <span className="font-bold">{et}</span>
+                {et}
               </button>
             ))}
           </div>
