@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, Eye, X, Trash2, UserPlus, ChevronDown, ChevronUp, UsersRound, CalendarDays } from 'lucide-react';
+import { Search, Eye, X, Trash2, UserPlus, ChevronDown, ChevronUp, UsersRound, CalendarDays, Pencil, Check } from 'lucide-react';
 import { TabLoading, TabEmpty } from '../shared';
 import MatchCard from '../MatchCard';
 import { useWatchlist } from '../../../contexts/WatchlistContext';
@@ -97,29 +97,148 @@ interface WatchlistUIState {
   todayOnly?: boolean;
 }
 
-function loadWatchlistUI(tswId: string): WatchlistUIState {
+function loadWatchlistUI(tswId: string, listIndex: number): WatchlistUIState {
   try {
-    const raw = sessionStorage.getItem(`watchlist-ui-${tswId}`);
+    const raw = sessionStorage.getItem(`watchlist-ui-${tswId}-${listIndex}`);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
   }
 }
 
-function saveWatchlistUI(tswId: string, state: WatchlistUIState): void {
+function saveWatchlistUI(tswId: string, listIndex: number, state: WatchlistUIState): void {
   try {
-    sessionStorage.setItem(`watchlist-ui-${tswId}`, JSON.stringify(state));
+    sessionStorage.setItem(`watchlist-ui-${tswId}-${listIndex}`, JSON.stringify(state));
   } catch { /* quota errors are non-critical */ }
 }
 
+// ── Watchlist Tab Switcher ──────────────────────────────────────────────────
+
+function WatchlistTabSwitcher({
+  lists,
+  activeIndex,
+  onSwitch,
+  onRename,
+}: {
+  lists: { name: string; players: TournamentPlayer[] }[];
+  activeIndex: number;
+  onSwitch: (index: number) => void;
+  onRename: (index: number, name: string) => void;
+}) {
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingIndex !== null) inputRef.current?.focus();
+  }, [editingIndex]);
+
+  const startEditing = (index: number) => {
+    setEditingIndex(index);
+    setEditValue(lists[index].name);
+  };
+
+  const commitRename = () => {
+    if (editingIndex !== null && editValue.trim()) {
+      onRename(editingIndex, editValue.trim());
+    }
+    setEditingIndex(null);
+  };
+
+  return (
+    <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1">
+      {lists.map((list, i) => {
+        const isActive = i === activeIndex;
+        const isEditing = editingIndex === i;
+        const count = list.players.length;
+
+        if (isEditing) {
+          return (
+            <div key={i} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-violet-600 min-w-0">
+              <input
+                ref={inputRef}
+                type="text"
+                value={editValue}
+                onChange={e => setEditValue(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setEditingIndex(null); }}
+                onBlur={commitRename}
+                maxLength={20}
+                className="bg-transparent text-white text-xs font-medium outline-none w-20 min-w-0 placeholder:text-violet-300"
+              />
+              <button type="button" onMouseDown={e => { e.preventDefault(); commitRename(); }} className="text-violet-200 hover:text-white shrink-0">
+                <Check className="w-3 h-3" />
+              </button>
+            </div>
+          );
+        }
+
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => isActive ? undefined : onSwitch(i)}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+              isActive
+                ? 'bg-violet-600 text-white'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            <span className="truncate max-w-[7rem]">{list.name}</span>
+            {count > 0 && (
+              <span className={`shrink-0 text-[10px] font-bold tabular-nums ${
+                isActive ? 'text-violet-200' : 'text-slate-400 dark:text-slate-500'
+              }`}>
+                ({count})
+              </span>
+            )}
+            {isActive && (
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); startEditing(i); }}
+                className="shrink-0 text-violet-200 hover:text-white ml-0.5"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Main Component ──────────────────────────────────────────────────────────
+
 export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string; refreshTrigger?: number }) {
   const { pathname } = useLocation();
-  const { players: watchedPlayers, playerIds: watchedIds, maxPlayers, addPlayer, removePlayer, clearAll } = useWatchlist();
+  const {
+    players: watchedPlayers,
+    playerIds: watchedIds,
+    maxPlayers,
+    addPlayer,
+    removePlayer,
+    clearAll,
+    activeIndex,
+    lists,
+    switchList,
+    renameList,
+    bindTournament,
+  } = useWatchlist();
   const atCapacity = Number.isFinite(maxPlayers) && watchedPlayers.length >= maxPlayers;
   const meta = useTournamentMeta(tswId);
   const showTodayPill = useMemo(() => isTodayInRange(meta.startDate, meta.endDate), [meta.startDate, meta.endDate]);
 
-  const savedUI = useMemo(() => loadWatchlistUI(tswId), [tswId]);
+  // Bind this tournament on mount / when tswId or endDate becomes available
+  const boundRef = useRef<string | null>(null);
+  useEffect(() => {
+    const endDate = meta.endDate || meta.startDate || '';
+    if (boundRef.current !== tswId) {
+      bindTournament(tswId, endDate);
+      boundRef.current = tswId;
+    }
+  }, [tswId, meta.endDate, meta.startDate, bindTournament]);
+
+  const savedUI = useMemo(() => loadWatchlistUI(tswId, activeIndex), [tswId, activeIndex]);
   const hadSavedTodayOnly = useRef(savedUI.todayOnly !== undefined);
 
   const [tournamentPlayers, setTournamentPlayers] = useState<TournamentPlayer[]>([]);
@@ -135,6 +254,25 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
   const [playerFilter, setPlayerFilter] = useState<number | null>(savedUI.playerFilter ?? null);
   const [todayOnly, setTodayOnly] = useState(savedUI.todayOnly ?? showTodayPill);
 
+  // Reset local state when switching active watchlist
+  const prevIndex = useRef(activeIndex);
+  useEffect(() => {
+    if (prevIndex.current !== activeIndex) {
+      prevIndex.current = activeIndex;
+      setPlayerData(new Map());
+      fetchedPlayerIds.current.clear();
+      setPlayerFilter(null);
+      setSearchQuery('');
+      setClubFilter('');
+      setDropdownOpen(false);
+      const ui = loadWatchlistUI(tswId, activeIndex);
+      setSummaryOpen(ui.summaryOpen ?? true);
+      setPickerOpen(ui.pickerOpen ?? true);
+      setTodayOnly(ui.todayOnly ?? showTodayPill);
+      hadSavedTodayOnly.current = ui.todayOnly !== undefined;
+    }
+  }, [activeIndex, tswId, showTodayPill]);
+
   useEffect(() => {
     if (!hadSavedTodayOnly.current) {
       setTodayOnly(showTodayPill);
@@ -142,8 +280,8 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
   }, [showTodayPill]);
 
   useEffect(() => {
-    saveWatchlistUI(tswId, { summaryOpen, pickerOpen, playerFilter, todayOnly });
-  }, [tswId, summaryOpen, pickerOpen, playerFilter, todayOnly]);
+    saveWatchlistUI(tswId, activeIndex, { summaryOpen, pickerOpen, playerFilter, todayOnly });
+  }, [tswId, activeIndex, summaryOpen, pickerOpen, playerFilter, todayOnly]);
 
   const fetchedPlayerIds = useRef(new Set<number>());
   const refreshSeq = useRef(0);
@@ -400,6 +538,14 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
 
   return (
     <div className="space-y-5">
+      {/* Watchlist tab switcher */}
+      <WatchlistTabSwitcher
+        lists={lists}
+        activeIndex={activeIndex}
+        onSwitch={switchList}
+        onRename={renameList}
+      />
+
       {/* Overall W/L Summary — collapsible */}
       {watchedPlayers.length > 0 && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
