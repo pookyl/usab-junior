@@ -1,10 +1,11 @@
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
+import { Trophy, Download } from 'lucide-react';
 import type {
   BracketMatch as BracketMatchData,
   BracketSection,
 } from '../../types/junior';
+import { domToPng, downloadBlob } from '../../utils/domToPng';
 
 // ── Display types ───────────────────────────────────────────────────────────
 
@@ -518,8 +519,10 @@ const _bracketScroll = new Map<string, { scrollLeft: number; scrollTop: number }
 
 // ── Main BracketView component ──────────────────────────────────────────────
 
-export default function BracketView({ section, tswId, showTitle }: { section: BracketSection; tswId: string; showTitle?: boolean }) {
+export default function BracketView({ section, tswId, showTitle, consolation, drawName }: { section: BracketSection; tswId: string; showTitle?: boolean; consolation?: string | null; drawName?: string | null }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const captureRef = useRef<HTMLDivElement>(null);
+  const [saving, setSaving] = useState(false);
   const { pathname } = useLocation();
   const cacheKey = `${tswId}:${section.name}`;
 
@@ -559,22 +562,84 @@ export default function BracketView({ section, tswId, showTitle }: { section: Br
   const { rounds, hasFeedIn } = useMemo(() => buildDisplayRounds(section), [section]);
 
   const displayName = useMemo(() => {
-    if (hasFeedIn && /consolation/i.test(section.name) && !/feed.in/i.test(section.name)) {
+    if (!/consolation/i.test(section.name) || /feed.in/i.test(section.name)) {
+      return section.name;
+    }
+    if (consolation && /first match/i.test(consolation)) {
+      return section.name.replace(/consolation/i, 'First Match Consolation');
+    }
+    if (consolation && /feed.in/i.test(consolation)) {
+      return section.name.replace(/consolation/i, 'Full Feed-in Consolation');
+    }
+    if (hasFeedIn) {
       return section.name.replace(/consolation/i, 'Feed-in Consolation');
     }
     return section.name;
-  }, [section.name, hasFeedIn]);
+  }, [section.name, hasFeedIn, consolation]);
+
+  const handleSaveImage = useCallback(async () => {
+    const scrollEl = scrollRef.current;
+    const captureEl = captureRef.current;
+    if (!captureEl || !scrollEl || saving) return;
+    setSaving(true);
+    try {
+      const origOverflow = scrollEl.style.overflow;
+      const origMaxH = scrollEl.style.maxHeight;
+      scrollEl.style.overflow = 'visible';
+      scrollEl.style.maxHeight = 'none';
+
+      const blob = await domToPng(captureEl);
+
+      scrollEl.style.overflow = origOverflow;
+      scrollEl.style.maxHeight = origMaxH;
+
+      if (blob) {
+        const parts = [drawName, displayName || section.name].filter(Boolean);
+        const filename = (parts.join(' - ') || 'bracket').replace(/[/\\?%*:|"<>]/g, '-') + '.png';
+        const file = new File([blob], filename, { type: 'image/png' });
+        const canShare = typeof navigator.share === 'function' && navigator.canShare?.({ files: [file] });
+        if (canShare) {
+          await navigator.share({ files: [file] }).catch(() => {});
+        } else {
+          downloadBlob(blob, filename);
+        }
+      }
+    } finally {
+      setSaving(false);
+    }
+  }, [saving, drawName, displayName, section.name]);
 
   if (rounds.length === 0) return null;
 
   const lastRoundName = rounds[rounds.length - 1]?.name?.toLowerCase() ?? '';
   const hasWinnerColumn = lastRoundName === 'winner';
 
+  const saveButton = (
+    <button
+      type="button"
+      onClick={handleSaveImage}
+      disabled={saving}
+      title="Save bracket as image"
+      className="inline-flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-violet-600 dark:text-slate-500 dark:hover:text-violet-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+    >
+      <Download className="w-3.5 h-3.5" />
+    </button>
+  );
+
   return (
     <div>
-      {showTitle && <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200 mb-3">{displayName}</h3>}
+      {showTitle ? (
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">{displayName}</h3>
+          {saveButton}
+        </div>
+      ) : (
+        <div className="flex justify-end mb-1">
+          {saveButton}
+        </div>
+      )}
       <div ref={scrollRef} className="overflow-x-auto overflow-y-auto max-h-[80vh] -mx-4 px-4 md:mx-0 md:px-0 pb-4">
-        <div className="flex min-w-max items-stretch">
+        <div ref={captureRef} className="flex min-w-max items-stretch">
           {rounds.map((round, ri) => {
           const isWinner = ri === rounds.length - 1 && hasWinnerColumn;
           const isFirstRound = ri === 0;

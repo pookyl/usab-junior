@@ -11,9 +11,10 @@ import { getTournamentDrawOrigin } from '../utils/tournamentReturnState';
 export default function TournamentDrawDetail() {
   const { tswId, drawId } = useParams<{ tswId: string; drawId: string }>();
   const location = useLocation();
-  const routeState = location.state as { drawName?: string; fromPath?: string } | null;
+  const routeState = location.state as { drawName?: string; consolation?: string; fromPath?: string } | null;
 
   const [drawName, setDrawName] = useState<string | null>(routeState?.drawName ?? null);
+  const [consolation, setConsolation] = useState<string | null | undefined>(routeState?.consolation ?? undefined);
   const [drawData, setDrawData] = useState<DrawResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,10 +31,10 @@ export default function TournamentDrawDetail() {
     if (!isRefresh) setDrawData(null);
 
     const numericDrawId = Number(drawId);
-    const needsName = !routeState?.drawName && !drawName;
+    const needsDetail = (!routeState?.drawName && !drawName) || consolation === undefined;
 
     const fetches: [Promise<unknown>, Promise<DrawResponse>] = [
-      needsName ? fetchTournamentDetail(tswId, isRefresh) : Promise.resolve(null),
+      needsDetail ? fetchTournamentDetail(tswId, isRefresh) : Promise.resolve(null),
       fetchDrawBracket(tswId, numericDrawId, isRefresh),
     ];
 
@@ -41,14 +42,13 @@ export default function TournamentDrawDetail() {
       .then(([detailResult, bracketResult]) => {
         if (cancelled) return;
 
-        if (needsName) {
-          if (detailResult.status === 'fulfilled' && detailResult.value) {
-            const detail = detailResult.value as { draws: { drawId: number; name: string }[] };
-            const draw = detail.draws.find(d => d.drawId === numericDrawId);
-            setDrawName(draw?.name ?? `Draw ${drawId}`);
-          } else {
-            setDrawName(`Draw ${drawId}`);
-          }
+        if (needsDetail && detailResult.status === 'fulfilled' && detailResult.value) {
+          const detail = detailResult.value as { draws: { drawId: number; name: string; consolation: string | null }[] };
+          const draw = detail.draws.find(d => d.drawId === numericDrawId);
+          if (!drawName && !routeState?.drawName) setDrawName(draw?.name ?? `Draw ${drawId}`);
+          if (consolation === undefined) setConsolation(draw?.consolation ?? null);
+        } else if (needsDetail && !drawName && !routeState?.drawName) {
+          setDrawName(`Draw ${drawId}`);
         }
 
         if (bracketResult.status === 'fulfilled') {
@@ -60,7 +60,7 @@ export default function TournamentDrawDetail() {
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
-  }, [tswId, drawId, routeState?.drawName, drawName, fetchTrigger]);
+  }, [tswId, drawId, routeState?.drawName, drawName, consolation, fetchTrigger]);
 
   const handleRefresh = useCallback(() => {
     refreshFlag.current = true;
@@ -126,7 +126,7 @@ export default function TournamentDrawDetail() {
               ) : (
                 sections.map((section, si) => (
                   <div key={si} className="space-y-3">
-                    <BracketView section={section} tswId={tswId} showTitle={sections.length > 1} />
+                    <BracketView section={section} tswId={tswId} showTitle={sections.length > 1} consolation={consolation} drawName={drawName} />
                   </div>
                 ))
               );
