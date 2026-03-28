@@ -538,7 +538,6 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
 
   return (
     <div className="space-y-5">
-      {/* Watchlist tab switcher + schedule link */}
       <div className="flex items-center justify-between gap-2">
         <WatchlistTabSwitcher
           lists={lists}
@@ -549,10 +548,10 @@ export default function WatchlistTab({ tswId, refreshTrigger }: { tswId: string;
         {watchedPlayers.length > 0 && (
           <Link
             to={`/tournaments/${tswId}/watchlist/schedule`}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors shrink-0"
           >
             <Calendar className="w-3.5 h-3.5" />
-            Schedule
+            <span className="hidden sm:inline">Schedule</span>
           </Link>
         )}
       </div>
