@@ -360,7 +360,7 @@ export default function PlayerProfileLayout() {
   const [showQr, setShowQr] = useState(false);
   const tabRowRef = useRef<HTMLDivElement>(null);
 
-  const entries = rankedPlayer?.entries ?? [];
+  const entries = useMemo(() => rankedPlayer?.entries ?? [], [rankedPlayer]);
   const bestEntry = entries.length > 0 ? entries.reduce((b, e) => (e.rank < b.rank ? e : b)) : null;
   const sortedEntries = useMemo(() =>
     [...entries].sort((a, b) => {

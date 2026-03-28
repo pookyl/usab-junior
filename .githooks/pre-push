@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+echo "🔍 Running pre-push checks (test → lint → build)..."
+echo ""
+
+echo "▶ npm test"
+npm test || { echo "❌ Tests failed. Push aborted."; exit 1; }
+echo ""
+
+echo "▶ npm run lint"
+npm run lint || { echo "❌ Lint failed. Push aborted."; exit 1; }
+echo ""
+
+echo "▶ npm run build"
+npm run build || { echo "❌ Build failed. Push aborted."; exit 1; }
+echo ""
+
+echo "✅ All checks passed. Pushing..."

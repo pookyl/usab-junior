@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "lint:api": "eslint api-server.mjs \"api/**/*.js\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.13.23",

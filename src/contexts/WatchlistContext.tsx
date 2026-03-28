@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { TournamentPlayer } from '../types/junior';
 import { WATCHLIST_MAX, WATCHLIST_FORCE_ENABLED } from '../utils/urlFlags';
 
@@ -79,13 +79,13 @@ export interface WatchlistContextValue {
 const WatchlistContext = createContext<WatchlistContextValue | null>(null);
 
 export function WatchlistProvider({ children }: { children: ReactNode }) {
-  const stored = useRef(loadStorage());
+  const [stored] = useState(loadStorage);
 
-  const [boundTswId, setBoundTswId] = useState<string | null>(stored.current?.tswId ?? null);
-  const [endDate, setEndDate] = useState<string>(stored.current?.tournamentEndDate ?? '');
-  const [activeIndex, setActiveIndex] = useState<number>(stored.current?.activeIndex ?? 0);
+  const [boundTswId, setBoundTswId] = useState<string | null>(stored?.tswId ?? null);
+  const [endDate, setEndDate] = useState<string>(stored?.tournamentEndDate ?? '');
+  const [activeIndex, setActiveIndex] = useState<number>(stored?.activeIndex ?? 0);
   const [lists, setLists] = useState<[WatchlistEntry, WatchlistEntry, WatchlistEntry]>(
-    stored.current?.lists ?? defaultLists(),
+    stored?.lists ?? defaultLists(),
   );
 
   // Persist to localStorage on every state change
